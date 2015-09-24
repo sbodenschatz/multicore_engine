@@ -1,0 +1,6 @@
+.vs
+*.opensdf
+*.sdf
+*.sln
+build
+Makefile
