@@ -11,6 +11,7 @@
 #include <cassert>
 #include <type_traits>
 #include <vector>
+#include <algorithm>
 
 namespace mce {
 namespace containers {
@@ -24,6 +25,35 @@ private:
 	struct block_entry_link {
 		block_entry* entry;
 		block* containing_block;
+		block_entry_link& operator++() {
+			if(entry && containing_block) {
+				if(entry == containing_block->entries + block_size - 1) {
+					containing_block = containing_block->next_block;
+					if(containing_block) entry = containing_block->entries;
+					else entry = nullptr;
+				}
+				else ++entry;
+			}
+			return *this;
+		}
+		block_entry_link& operator--() {
+			if(entry && containing_block) {
+				if(entry == containing_block->entries) {
+					containing_block = containing_block->prev_block;
+					if(containing_block) entry = containing_block->entries + block_size - 1;
+					else entry = nullptr;
+				}
+				else --entry;
+			}
+			return *this;
+		}
+		bool operator==(const block_entry_link& other) const {
+			return other.entry==entry && other.containing_block==containing_block;
+		}
+		bool operator!=(const block_entry_link& other) const {
+			return !(*this==other);
+		}
+
 	};
 
 	union block_entry {
@@ -67,6 +97,8 @@ private:
 		}
 
 		~block()noexcept {
+			if(next_block) next_block->prev_block=prev_block;
+			if(prev_block) prev_block->next_block=next_block;
 			for(size_t i=0;i<block_size;++i) {
 				if(active_flags[i]) entries[i].object.~T();
 			}
@@ -123,8 +155,8 @@ public:
 			skip_until_valid();
 		}
 
-		iterator_(const iterator_<typename std::remove_cv<It_T>::type>& it):target(it.target){}
-		iterator_& operator=(const iterator_<typename std::remove_cv<It_T>::type>& it){
+		iterator_(const iterator_<typename std::remove_cv<It_T>::type>& it):target(it.target) {}
+		iterator_& operator=(const iterator_<typename std::remove_cv<It_T>::type>& it) {
 			target=it.target;
 			return *this;
 		}
@@ -158,9 +190,9 @@ public:
 		}
 
 	private:
-		void skip_empty_blocks(){
+		void skip_empty_blocks() {
 			//Skip over empty blocks without looking at individual entries
-			while(target.containing_block){
+			while(target.containing_block) {
 				if(target.containing_block->active_objects) break;
 				else target.containing_block=target.containing_block->next_block;
 			}
@@ -171,7 +203,7 @@ public:
 				target.entry=nullptr;
 				return;
 			}
-			else if(target.containing_block->active_objects==0){
+			else if(target.containing_block->active_objects==0) {
 				skip_empty_blocks();
 			}
 			while(true) {
@@ -237,19 +269,19 @@ public:
 		else return const_iterator();
 	}
 
-	iterator end(){
+	iterator end() {
 		return iterator();
 	}
 
-	const_iterator end() const{
+	const_iterator end() const {
 		return const_iterator();
 	}
 
-	const_iterator cend() const{
+	const_iterator cend() const {
 		return const_iterator();
 	}
 
-	iterator erase(iterator pos){
+	iterator erase(iterator pos) {
 		assert(pos.target.containing_block);
 		assert(pos.target.containing_block->active(pos.target.entry));
 		pos.target.containing_block->clear(pos.target.entry);
@@ -259,7 +291,7 @@ public:
 		pos.skip_until_valid();
 		return pos;
 	}
-	iterator erase(const_iterator pos){
+	iterator erase(const_iterator pos) {
 		assert(pos.target.containing_block);
 		assert(pos.target.containing_block->active(pos.target.entry));
 		pos.target.containing_block->clear(pos.target.entry);
@@ -270,28 +302,29 @@ public:
 		return iterator(pos.target);
 	}
 
-	iterator erase(iterator first, iterator last){
+	iterator erase(iterator first, iterator last) {
 		while(first!=last) first=erase(first);
 		return first;
 	}
 
-	iterator erase(const_iterator first, const_iterator last){
+	iterator erase(const_iterator first, const_iterator last) {
 		while(first!=last) first=erase(first);
 		return iterator(first.target);
 	}
 
-	void clear_and_reorganize(){
+	void clear_and_reorganize() {
 		blocks.clear();
 		active_objects=0;
-		first_free_entry={nullptr,nullptr};
+		first_free_entry= {nullptr,nullptr};
 	}
 
-	void clear(){
+	void clear() {
+		first_free_entry = {nullptr,nullptr};
 		block_entry_link* free=&first_free_entry;
-		for(auto& b: blocks){
-			for(size_t i=0;i<block_size;++i){
+		for(auto& b: blocks) {
+			for(size_t i=0;i<block_size;++i) {
 				block_entry* entry_ptr=b->entries+i;
-				if(b->active_flags[i]){
+				if(b->active_flags[i]) {
 					entry_ptr->object.~T();
 					b->active_flags[i]=false;
 				}
@@ -300,14 +333,60 @@ public:
 			}
 			b->active_objects=0;
 		}
+		*free={nullptr,nullptr};
 		active_objects=0;
 	}
 
-	size_t size()const{
+	size_t reorganize() {
+		if(active_objects==capacity()) return 0;
+		if(!active_objects){
+			clear_and_reorganize();
+			return 0;
+		}
+		block_entry_link it = {blocks.front()->entries,blocks.front().get()};
+		block_entry_link it2 = {blocks.back()->entries+block_size-1,blocks.back().get()};
+
+		size_t reallocated_objects=0;
+		while(it!=it2) {
+			for (; it != it2; ++it) {
+				if (!it.containing_block->active(it.entry)) break;
+			}
+			for (; it2 != it; --it2) {
+				if(it2.containing_block->active(it2.entry)) break;
+			}
+			if(it!=it2){
+				it.containing_block->fill(it.entry,std::move_if_noexcept(it2.entry->object));
+				it2.containing_block->clear(it2.entry);
+				++reallocated_objects;
+			}
+		}
+		if(reallocated_objects){
+			blocks.erase(std::remove_if(blocks.begin(),blocks.end(),[](auto& b){
+				return b->active_objects==0;
+			}),blocks.end());
+
+			first_free_entry = {nullptr,nullptr};
+			block_entry_link* free=&first_free_entry;
+			size_t free_entries = 0;
+			for(size_t i=0;i<block_size;++i) {
+				block_entry* entry_ptr=blocks.back()->entries+i;
+				if(!blocks.back()->active_flags[i]) {
+					*free = {entry_ptr,blocks.back().get()};
+					free = &(entry_ptr->next_free);
+					++free_entries;
+				}
+			}
+			*free={nullptr,nullptr};
+			assert(active_objects + free_entries == capacity());
+		}
+		return reallocated_objects;
+	}
+
+	size_t size()const {
 		return active_objects;
 	}
 
-	size_t capacity()const{
+	size_t capacity()const {
 		return blocks.size()*block_size;
 	}
 
@@ -316,7 +395,7 @@ private:
 		if(blocks.empty()) {
 			blocks.emplace_back(std::make_unique<block>(first_free_entry));
 		}
-		else{
+		else {
 			blocks.emplace_back(std::make_unique<block>(first_free_entry,blocks.back().get()));
 			blocks.back()->prev_block->next_block=blocks.back().get();
 		}
