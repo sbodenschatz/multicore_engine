@@ -40,7 +40,10 @@ private:
 	struct block {
 		typename unordered_object_pool<T,block_size>::block_entry entries[block_size];
 		bool active_flags[block_size];
+		size_t active_objects=0;
 		block* next_block=nullptr;
+		block* prev_block;
+
 		block(const block&)=delete;
 		block& operator=(const block&)=delete;
 		block(block&&)=delete;
@@ -52,7 +55,7 @@ private:
 			return *(active_flags+index);
 		}
 
-		block(block_entry_link& prev) noexcept {
+		block(block_entry_link& prev,block* prev_block=nullptr) noexcept:prev_block(prev_block) {
 			active_flags[block_size-1]=false;
 			entries[block_size-1].next_free = prev;
 			for(auto i = block_size-1;i>size_t(0);i--) {
@@ -74,6 +77,7 @@ private:
 			if(a) {
 				entry->object.~T();
 				a=false;
+				--active_objects;
 				entry->next_free= {nullptr,nullptr};
 			}
 		}
@@ -82,12 +86,14 @@ private:
 			clear(entry);
 			new (&entry->object) T(value);
 			active(entry)=true;
+			++active_objects;
 		}
 
 		void fill(block_entry* entry,T&& value) noexcept(std::is_nothrow_move_constructible<T>::value) {
 			clear(entry);
 			new (&entry->object) T(std::move(value));
 			active(entry)=true;
+			++active_objects;
 		}
 
 		template<typename... Args>
@@ -95,11 +101,13 @@ private:
 			clear(entry);
 			new (&entry->object) T(std::forward<Args>(args)...);
 			active(entry)=true;
+			++active_objects;
 		}
 	};
 
 	block_entry_link first_free_entry= {nullptr,nullptr};
 	std::vector<std::unique_ptr<block>> blocks;
+	size_t active_objects=0;
 
 public:
 	unordered_object_pool() noexcept {}
@@ -150,18 +158,29 @@ public:
 		}
 
 	private:
+		void skip_empty_blocks(){
+			//Skip over empty blocks without looking at individual entries
+			while(target.containing_block){
+				if(target.containing_block->active_objects) break;
+				else target.containing_block=target.containing_block->next_block;
+			}
+			target.entry=target.containing_block->entries;
+		}
 		void skip_until_valid() {
 			if(!target.containing_block) {
 				target.entry=nullptr;
 				return;
 			}
+			else if(target.containing_block->active_objects==0){
+				skip_empty_blocks();
+			}
 			while(true) {
 				if(target.entry>=target.containing_block->entries+block_size) {
 					target.containing_block=target.containing_block->next_block;
 					if(target.containing_block) {
-						target.entry=target.containing_block->entries;
+						skip_empty_blocks();
 					}
-					else {
+					if(!target.containing_block) {
 						target.entry=nullptr;
 						return;
 					}
@@ -181,6 +200,7 @@ public:
 		auto next_free = value_entry.entry->next_free;
 		value_entry.containing_block->fill(value_entry.entry,value);
 		first_free_entry=next_free;
+		++active_objects;
 	}
 
 	void insert(T&& value) {
@@ -189,6 +209,7 @@ public:
 		auto next_free = value_entry.entry->next_free;
 		value_entry.containing_block->fill(value_entry.entry,std::move(value));
 		first_free_entry=next_free;
+		++active_objects;
 	}
 
 	template<typename... Args>
@@ -198,6 +219,7 @@ public:
 		auto next_free = value_entry.entry->next_free;
 		value_entry.containing_block->emplace(value_entry.entry,std::forward<Args>(args)...);
 		first_free_entry=next_free;
+		++active_objects;
 	}
 
 	iterator begin() {
@@ -233,6 +255,7 @@ public:
 		pos.target.containing_block->clear(pos.target.entry);
 		pos.target.entry->next_free=first_free_entry;
 		first_free_entry=pos.target;
+		--active_objects;
 		pos.skip_until_valid();
 		return pos;
 	}
@@ -242,6 +265,7 @@ public:
 		pos.target.containing_block->clear(pos.target.entry);
 		pos.target.entry->next_free=first_free_entry;
 		first_free_entry=pos.target;
+		--active_objects;
 		pos.skip_until_valid();
 		return iterator(pos.target);
 	}
@@ -258,12 +282,44 @@ public:
 
 	void clear_and_reorganize(){
 		blocks.clear();
+		active_objects=0;
 		first_free_entry={nullptr,nullptr};
+	}
+
+	void clear(){
+		block_entry_link* free=&first_free_entry;
+		for(auto& b: blocks){
+			for(size_t i=0;i<block_size;++i){
+				block_entry* entry_ptr=b->entries+i;
+				if(b->active_flags[i]){
+					entry_ptr->object.~T();
+					b->active_flags[i]=false;
+				}
+				*free = {entry_ptr,b.get()};
+				free = &(entry_ptr->next_free);
+			}
+			b->active_objects=0;
+		}
+		active_objects=0;
+	}
+
+	size_t size()const{
+		return active_objects;
+	}
+
+	size_t capacity()const{
+		return blocks.size()*block_size;
 	}
 
 private:
 	void grow() {
-		blocks.emplace_back(std::make_unique<block>(first_free_entry));
+		if(blocks.empty()) {
+			blocks.emplace_back(std::make_unique<block>(first_free_entry));
+		}
+		else{
+			blocks.emplace_back(std::make_unique<block>(first_free_entry,blocks.back().get()));
+			blocks.back()->prev_block->next_block=blocks.back().get();
+		}
 	}
 };
 

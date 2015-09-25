@@ -7,43 +7,60 @@
 #include <string>
 #include <containers/unordered_object_pool.hpp>
 #include <iostream>
+#include <chrono>
 
-struct X{
+struct X {
 	int v;
-	X(int v):v(v){
+	int dummy[127];
+	X(int v) :
+			v(v) {
 //		std::cout<<"Constr. "<<v<<std::endl;
 	}
-	~X(){
+	~X() {
 //		std::cout<<"Destr. "<<v<<std::endl;
 	}
 };
 
-int main() {
-	mce::containers::unordered_object_pool<X,128> uop;
-
-	for (int run = 0;run < 100000;++run) {
-		if(run%1000==0) std::cout << run << std::endl;
-		for (int i = 0;i < 2048;++i) uop.emplace(i);
+void test_run(int runs, int objects, mce::containers::unordered_object_pool<X, 1024>& uop, int outer_run) {
+	for(int run = 0; run < runs; ++run) {
+		if(run % ((runs / 10) ? runs / 10 : 1) == 0) std::cout << outer_run << " " << run;
+		for(int i = 0; i < objects - 1; ++i)
+			uop.emplace(i);
 
 		auto it = uop.cbegin();
-		for (int i = 0;i < 100;++i) {
-			for (int j = 0;j < i;++j) {
+		for(int i = 0; i < 100; ++i) {
+			for(int j = 0; j < i; ++j) {
 				it++;
 			}
-			if (it == uop.cend()) break;
+			if(it == uop.cend()) break;
 			it = uop.erase(it);
 		}
-		for (int i = 8192;i < 8300;++i) uop.emplace(i);
+		for(int i = objects; i < objects + 100; ++i)
+			uop.emplace(i);
 
 		auto it2 = uop.begin();
 		std::advance(it2, 20);
 		uop.erase(uop.begin(), it2);
 
-		//for (auto& v : uop) {
-			//		std::cout<<v.v<<std::endl;
-		//}
+		if(run % ((runs / 10) ? runs / 10 : 1) == 0)
+			std::cout << " " << uop.size() << " " << uop.capacity() << std::endl;
+//		for (auto& v : uop) {
+//				std::cout<<v.v<<std::endl;
+//		}
 	}
-	uop.clear_and_reorganize();
-	std::cout<<"Test"<<std::endl;
+}
+
+int main() {
+	mce::containers::unordered_object_pool<X, 1024> uop;
+
+	auto start = std::chrono::high_resolution_clock::now();
+	for(int outer_run = 0; outer_run < 40; ++outer_run) {
+		test_run(100, 0x10000, uop, outer_run);
+		if(outer_run % 10) uop.clear();
+		else uop.clear_and_reorganize();
+	}
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> diff = end - start;
+	std::cout << "Test " << diff.count() << std::endl;
 }
 
