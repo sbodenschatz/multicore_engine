@@ -14,7 +14,7 @@
 namespace mce {
 namespace containers {
 
-template<typename T, size_t block_size = 1024u>
+template<typename T, size_t block_size = 0x10000u>
 class unordered_object_pool {
 private:
 	union block_entry;
@@ -27,7 +27,7 @@ private:
 
 	union block_entry {
 		T object;
-		typename unordered_object_pool<T>::block_entry_link next_free;
+		typename unordered_object_pool<T, block_size>::block_entry_link next_free;
 		block_entry() noexcept:next_free {nullptr,nullptr} {}
 		~block_entry()noexcept {}
 		block_entry(const block_entry&)=delete;
@@ -37,7 +37,7 @@ private:
 	};
 
 	struct block {
-		typename unordered_object_pool<T>::block_entry entries[block_size];
+		typename unordered_object_pool<T,block_size>::block_entry entries[block_size];
 		bool active_flags[block_size];
 		std::unique_ptr<block> next_block;
 		block(const block&)=delete;
