@@ -14,119 +14,256 @@
 namespace mce {
 namespace containers {
 
-//TODO Try to move active flags out of entries and into blocks to reduce overhead due to alignment
-//Idea: Store pointer to containing block with free pointers and iterators
-
 template<typename T, size_t block_size = 1024u>
 class unordered_object_pool {
 private:
-	class block_entry;
+	union block_entry;
+	struct block;
 
-	union block_entry_content {
-		T object;
-		block_entry* next_free;
-		block_entry_content() noexcept:next_free(nullptr) {}
-		~block_entry_content()noexcept {}
-		block_entry_content(const block_entry_content&)=delete;
-		block_entry_content& operator=(const block_entry_content&)=delete;
-		block_entry_content(block_entry_content&&)=delete;
-		block_entry_content& operator=(block_entry_content&&)=delete;
+	struct block_entry_link {
+		block_entry* entry;
+		block* containing_block;
 	};
 
-	class block_entry {
-		block_entry_content data;
-		bool active=false;
-	public:
+	union block_entry {
+		T object;
+		typename unordered_object_pool<T>::block_entry_link next_free;
+		block_entry() noexcept:next_free {nullptr,nullptr} {}
+		~block_entry()noexcept {}
 		block_entry(const block_entry&)=delete;
 		block_entry& operator=(const block_entry&)=delete;
 		block_entry(block_entry&&)=delete;
 		block_entry& operator=(block_entry&&)=delete;
-		block_entry() noexcept {}
-		~block_entry() noexcept {
-			if(active) data.object.~T();
-		}
-		void fill(const T& value) noexcept(std::is_nothrow_copy_constructible<T>::value) {
-			clear();
-			new (&data.object) T(value);
-			active=true;
-		}
-		void fill(T&& value) noexcept(std::is_nothrow_move_constructible<T>::value) {
-			clear();
-			new (&data.object) T(std::move(value));
-			active=true;
-		}
-		template<typename... Args>
-		void emplace(Args&&... args) noexcept(std::is_nothrow_constructible<T, Args...>::value) {
-			clear();
-			new (&data.object) T(std::forward<Args>(args)...);
-			active=true;
-		}
-		void clear() noexcept {
-			if(active) {
-				data.object.~T();
-				active=false;
-				data.next_free=nullptr;
-			}
-		}
-		block_entry* next_free() const noexcept {
-			assert(!active);
-			return data.next_free;
-		}
-		void next_free(block_entry* nf) noexcept {
-			assert(!active);
-			data.next_free=nf;
-		}
 	};
 
 	struct block {
-		block_entry entries[block_size];
+		typename unordered_object_pool<T>::block_entry entries[block_size];
+		bool active_flags[block_size];
 		std::unique_ptr<block> next_block;
 		block(const block&)=delete;
 		block& operator=(const block&)=delete;
 		block(block&&)=delete;
 		block& operator=(block&&)=delete;
-		block(block_entry*& prev) {
-			entries[block_size-1].next_free(prev);
+
+		bool& active(block_entry* entry) noexcept {
+			assert(entries<=entry && entry<(entries+block_size));
+			size_t index = entry-entries;
+			return *(active_flags+index);
+		}
+
+		block(block_entry_link& prev) noexcept {
+			active_flags[block_size-1]=false;
+			entries[block_size-1].next_free = prev;
 			for(auto i = block_size-1;i>size_t(0);i--) {
 				auto index=i-1;
-				entries[index].next_free(&entries[i]);
+				entries[index].next_free = {&entries[i],this};
+				active_flags[index]=false;
 			}
-			prev=&entries[0];
+			prev= {&entries[0],this};
+		}
+
+		~block()noexcept {
+			for(size_t i=0;i<block_size;++i) {
+				if(active_flags[i]) entries[i].object.~T();
+			}
+		}
+
+		void clear(block_entry* entry) noexcept {
+			auto& a = active(entry);
+			if(a) {
+				entry->object.~T();
+				a=false;
+				entry->next_free= {nullptr,nullptr};
+			}
+		}
+
+		void fill(block_entry* entry,const T& value) noexcept(std::is_nothrow_copy_constructible<T>::value) {
+			clear(entry);
+			new (&entry->object) T(value);
+			active(entry)=true;
+		}
+
+		void fill(block_entry* entry,T&& value) noexcept(std::is_nothrow_move_constructible<T>::value) {
+			clear(entry);
+			new (&entry->object) T(std::move(value));
+			active(entry)=true;
+		}
+
+		template<typename... Args>
+		void emplace(block_entry* entry,Args&&... args) noexcept(std::is_nothrow_constructible<T, Args...>::value) {
+			clear(entry);
+			new (&entry->object) T(std::forward<Args>(args)...);
+			active(entry)=true;
 		}
 	};
 
-	block_entry* first_free_entry=nullptr;
+	block_entry_link first_free_entry= {nullptr,nullptr};
 	std::unique_ptr<block> first_block;
 
 public:
-	unordered_object_pool(){}
+	unordered_object_pool() noexcept {}
+
+	template<typename It_T>
+	class iterator_:public std::iterator<std::forward_iterator_tag,It_T> {
+		block_entry_link target;
+		friend class unordered_object_pool<T,block_size>;
+
+	public:
+		iterator_():target {nullptr,nullptr} {}
+		iterator_(const block_entry_link& target):target(target) {
+			skip_until_valid();
+		}
+
+		iterator_(const iterator_<typename std::remove_cv<It_T>::type>& it):target(it.target){}
+		iterator_& operator=(const iterator_<typename std::remove_cv<It_T>::type>& it){
+			target=it.target;
+			return *this;
+		}
+
+		typename iterator_<T>::reference operator*() const {
+			assert(target.containing_block);
+			assert(target.containing_block->active(target.entry));
+			return target.entry->object;
+		}
+		typename iterator_<T>::pointer operator->() const {
+			assert(target.containing_block);
+			assert(target.containing_block->active(target.entry));
+			return &(target.entry->object);
+		}
+		bool operator==(const iterator_& it) const {
+			return it.target.entry==target.entry && it.target.containing_block==target.containing_block;
+		}
+		bool operator!=(const iterator_& it) const {
+			return !(*this==it);
+		}
+
+		iterator_& operator++() {
+			target.entry++;
+			skip_until_valid();
+			return *this;
+		}
+		iterator_ operator++(int) {
+			auto it=*this;
+			this->operator++();
+			return it;
+		}
+
+	private:
+		void skip_until_valid() {
+			if(!target.containing_block) {
+				target.entry=nullptr;
+				return;
+			}
+			while(true) {
+				if(target.entry>=target.containing_block->entries+block_size) {
+					target.containing_block=target.containing_block->next_block.get();
+					if(target.containing_block) {
+						target.entry=target.containing_block->entries;
+					}
+					else {
+						target.entry=nullptr;
+						return;
+					}
+				}
+				if(target.containing_block->active(target.entry)) return;
+				else target.entry++;
+			}
+		}
+	};
+
+	typedef iterator_<T> iterator;
+	typedef iterator_<const T> const_iterator;
 
 	void insert(const T& value) {
-		if(!first_free_entry) grow();
+		if(!first_free_entry.entry) grow();
 		auto value_entry=first_free_entry;
-		auto next_free = value_entry->next_free();
-		value_entry->fill(value);
-		first_free_entry=next_free;
-	}
-	void insert(T&& value) {
-		if(!first_free_entry) grow();
-		auto value_entry=first_free_entry;
-		auto next_free = value_entry->next_free();
-		value_entry->fill(std::move(value));
-		first_free_entry=next_free;
-	}
-	template<typename... Args>
-	void emplace(Args&&... args) {
-		if(!first_free_entry) grow();
-		auto value_entry=first_free_entry;
-		auto next_free = value_entry->next_free();
-		value_entry->emplace(std::forward<Args>(args)...);
+		auto next_free = value_entry.entry->next_free;
+		value_entry.containing_block->fill(value_entry.entry,value);
 		first_free_entry=next_free;
 	}
 
-	void grow(){
+	void insert(T&& value) {
+		if(!first_free_entry.entry) grow();
+		auto value_entry=first_free_entry;
+		auto next_free = value_entry.entry->next_free;
+		value_entry.containing_block->fill(value_entry.entry,std::move(value));
+		first_free_entry=next_free;
+	}
+
+	template<typename... Args>
+	void emplace(Args&&... args) {
+		if(!first_free_entry.entry) grow();
+		auto value_entry=first_free_entry;
+		auto next_free = value_entry.entry->next_free;
+		value_entry.containing_block->emplace(value_entry.entry,std::forward<Args>(args)...);
+		first_free_entry=next_free;
+	}
+
+	iterator begin() {
+		if(first_block) return iterator( {first_block->entries,first_block.get()});
+		else return iterator();
+	}
+
+	const_iterator begin() const {
+		if(first_block) return const_iterator( {first_block->entries,first_block.get()});
+		else return const_iterator();
+	}
+
+	const_iterator cbegin() const {
+		if(first_block) return const_iterator( {first_block->entries,first_block.get()});
+		else return const_iterator();
+	}
+
+	iterator end(){
+		return iterator();
+	}
+
+	const_iterator end() const{
+		return const_iterator();
+	}
+
+	const_iterator cend() const{
+		return const_iterator();
+	}
+
+	iterator erase(iterator pos){
+		assert(pos.target.containing_block);
+		assert(pos.target.containing_block->active(pos.target.entry));
+		pos.target.containing_block->clear(pos.target.entry);
+		pos.target.entry->next_free=first_free_entry;
+		first_free_entry=pos.target;
+		pos.skip_until_valid();
+		return pos;
+	}
+	iterator erase(const_iterator pos){
+		assert(pos.target.containing_block);
+		assert(pos.target.containing_block->active(pos.target.entry));
+		pos.target.containing_block->clear(pos.target.entry);
+		pos.target.entry->next_free=first_free_entry;
+		first_free_entry=pos.target;
+		pos.skip_until_valid();
+		return iterator(pos.target);
+	}
+
+	iterator erase(iterator first, iterator last){
+		while(first!=last) first=erase(first);
+		return first;
+	}
+
+	iterator erase(const_iterator first, const_iterator last){
+		while(first!=last) first=erase(first);
+		return iterator(first.target);
+	}
+
+	void clear_and_reorganize(){
+		first_block = nullptr;
+		first_free_entry={nullptr,nullptr};
+	}
+
+private:
+	void grow() {
 		auto i = &first_block;
-		while(*i){
+		while(*i) {
 			i=&((*i)->next_block);
 		}
 		*i=std::make_unique<block>(first_free_entry);
