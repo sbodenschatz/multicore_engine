@@ -14,10 +14,12 @@
 namespace mce {
 namespace containers {
 
+//TODO Try to move active flags out of entries and into blocks to reduce overhead due to alignment
+//Idea: Store pointer to containing block with free pointers and iterators
+
 template<typename T, size_t block_size = 1024u>
 class unordered_object_pool {
 private:
-public:
 	class block_entry;
 
 	union block_entry_content {
