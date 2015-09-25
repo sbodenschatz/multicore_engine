@@ -10,6 +10,7 @@
 #include <memory>
 #include <cassert>
 #include <type_traits>
+#include <vector>
 
 namespace mce {
 namespace containers {
@@ -39,7 +40,7 @@ private:
 	struct block {
 		typename unordered_object_pool<T,block_size>::block_entry entries[block_size];
 		bool active_flags[block_size];
-		std::unique_ptr<block> next_block;
+		block* next_block=nullptr;
 		block(const block&)=delete;
 		block& operator=(const block&)=delete;
 		block(block&&)=delete;
@@ -98,7 +99,7 @@ private:
 	};
 
 	block_entry_link first_free_entry= {nullptr,nullptr};
-	std::unique_ptr<block> first_block;
+	std::vector<std::unique_ptr<block>> blocks;
 
 public:
 	unordered_object_pool() noexcept {}
@@ -156,7 +157,7 @@ public:
 			}
 			while(true) {
 				if(target.entry>=target.containing_block->entries+block_size) {
-					target.containing_block=target.containing_block->next_block.get();
+					target.containing_block=target.containing_block->next_block;
 					if(target.containing_block) {
 						target.entry=target.containing_block->entries;
 					}
@@ -200,17 +201,17 @@ public:
 	}
 
 	iterator begin() {
-		if(first_block) return iterator( {first_block->entries,first_block.get()});
+		if(!blocks.empty()) return iterator( {blocks.front()->entries,blocks.front().get()});
 		else return iterator();
 	}
 
 	const_iterator begin() const {
-		if(first_block) return const_iterator( {first_block->entries,first_block.get()});
+		if(!blocks.empty()) return const_iterator( {blocks.front()->entries,blocks.front().get()});
 		else return const_iterator();
 	}
 
 	const_iterator cbegin() const {
-		if(first_block) return const_iterator( {first_block->entries,first_block.get()});
+		if(!blocks.empty()) return const_iterator( {blocks.front()->entries,blocks.front().get()});
 		else return const_iterator();
 	}
 
@@ -256,17 +257,13 @@ public:
 	}
 
 	void clear_and_reorganize(){
-		first_block = nullptr;
+		blocks.clear();
 		first_free_entry={nullptr,nullptr};
 	}
 
 private:
 	void grow() {
-		auto i = &first_block;
-		while(*i) {
-			i=&((*i)->next_block);
-		}
-		*i=std::make_unique<block>(first_free_entry);
+		blocks.emplace_back(std::make_unique<block>(first_free_entry));
 	}
 };
 

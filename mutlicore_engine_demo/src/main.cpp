@@ -19,7 +19,7 @@ struct X{
 };
 
 int main() {
-	mce::containers::unordered_object_pool<X,1024*1024> uop;
+	mce::containers::unordered_object_pool<X,128> uop;
 
 	for (int run = 0;run < 100000;++run) {
 		if(run%1000==0) std::cout << run << std::endl;
