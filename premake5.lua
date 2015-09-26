@@ -4,11 +4,9 @@ solution "multicore_engine_solution"
 	includedirs{"mutlicore_engine_core/include"}
 	vectorextensions "SSE2"
 	startproject "mutlicore_engine_demo"
+	warnings "Extra"
+	flags{"FatalWarnings"}
 	
-	configuration{"gmake"}
-		flags{"FatalWarnings"}
-		warnings "Extra"
-
 	configuration "debug"
 		defines{"DEBUG"}
 		flags{"Symbols"}
@@ -40,7 +38,7 @@ solution "multicore_engine_solution"
 	configuration {"vs2015"}
 		architecture "x64"
 		buildoptions {"/MP"}
-		flags {"LinkTimeOptimization"}
+		flags {"LinkTimeOptimization","NoIncrementalLink"}
 		targetdir "%{prj.location}/bin-vc/%{cfg.buildcfg}"
 		objdir "%{prj.location}/obj-vc/%{cfg.buildcfg}"
 		

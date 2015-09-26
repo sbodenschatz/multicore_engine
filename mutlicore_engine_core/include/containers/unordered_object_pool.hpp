@@ -257,7 +257,7 @@ public:
 			else if(target.containing_block->active_objects==0) {
 				skip_empty_blocks();
 			}
-			while(true) {
+			for (;;) {
 				if(target.entry>=target.containing_block->entries+block_size) {
 					target.containing_block=target.containing_block->next_block;
 					if(target.containing_block) {
