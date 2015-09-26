@@ -48,12 +48,44 @@ private:
 			return *this;
 		}
 		bool operator==(const block_entry_link& other) const {
-			return other.entry==entry && other.containing_block==containing_block;
+			return other.entry == entry && other.containing_block == containing_block;
 		}
 		bool operator!=(const block_entry_link& other) const {
-			return !(*this==other);
+			return !(*this == other);
 		}
+	};
 
+	struct const_block_entry_link {
+		const block_entry* entry;
+		const block* containing_block;
+		const_block_entry_link& operator++() {
+			if(entry && containing_block) {
+				if(entry == containing_block->entries + block_size - 1) {
+					containing_block = containing_block->next_block;
+					if(containing_block) entry = containing_block->entries;
+					else entry = nullptr;
+				}
+				else ++entry;
+			}
+			return *this;
+		}
+		const_block_entry_link& operator--() {
+			if(entry && containing_block) {
+				if(entry == containing_block->entries) {
+					containing_block = containing_block->prev_block;
+					if(containing_block) entry = containing_block->entries + block_size - 1;
+					else entry = nullptr;
+				}
+				else --entry;
+			}
+			return *this;
+		}
+		bool operator==(const const_block_entry_link& other) const {
+			return other.entry == entry && other.containing_block == containing_block;
+		}
+		bool operator!=(const const_block_entry_link& other) const {
+			return !(*this == other);
+		}
 	};
 
 	union block_entry {
@@ -79,10 +111,20 @@ private:
 		block(block&&)=delete;
 		block& operator=(block&&)=delete;
 
-		bool& active(block_entry* entry) noexcept {
-			assert(entries<=entry && entry<(entries+block_size));
+		bool& active(const block_entry* entry) noexcept {
+			assert(entries<=entry && entry<=(entries+block_size-1));
 			size_t index = entry-entries;
 			return *(active_flags+index);
+		}
+
+		bool active(const block_entry* entry) const noexcept {
+			assert(entries<=entry && entry<=(entries+block_size-1));
+			size_t index = entry-entries;
+			return *(active_flags+index);
+		}
+
+		bool contains(const block_entry* entry) const {
+			return entries<=entry && entry<=(entries+block_size-1);
 		}
 
 		block(block_entry_link& prev,block* prev_block=nullptr) noexcept:prev_block(prev_block) {
@@ -144,37 +186,46 @@ private:
 public:
 	unordered_object_pool() noexcept {}
 
-	template<typename It_T>
+	template<typename It_T,typename Target_T>
 	class iterator_:public std::iterator<std::forward_iterator_tag,It_T> {
-		block_entry_link target;
+		Target_T target;
 		friend class unordered_object_pool<T,block_size>;
 
-	public:
-		iterator_():target {nullptr,nullptr} {}
-		iterator_(const block_entry_link& target):target(target) {
+		iterator_(Target_T target):target(target) {
 			skip_until_valid();
 		}
 
-		iterator_(const iterator_<typename std::remove_cv<It_T>::type>& it):target(it.target) {}
-		iterator_& operator=(const iterator_<typename std::remove_cv<It_T>::type>& it) {
-			target=it.target;
+	public:
+		iterator_():target {nullptr,nullptr} {}
+
+		iterator_(const iterator_<T,block_entry_link>& it)noexcept:
+		target {it.target.entry,it.target.containing_block} {}
+
+		iterator_& operator=(const iterator_<T,block_entry_link>& it) noexcept {
+			target= {it.target.entry,it.target.containing_block};
 			return *this;
 		}
 
-		typename iterator_<T>::reference operator*() const {
+		typename iterator_<It_T,Target_T>::reference operator*() const {
 			assert(target.containing_block);
 			assert(target.containing_block->active(target.entry));
 			return target.entry->object;
 		}
-		typename iterator_<T>::pointer operator->() const {
+		typename iterator_<It_T,Target_T>::pointer operator->() const {
 			assert(target.containing_block);
 			assert(target.containing_block->active(target.entry));
 			return &(target.entry->object);
 		}
-		bool operator==(const iterator_& it) const {
+		bool operator==(const iterator_<const T,const_block_entry_link>& it) const {
 			return it.target.entry==target.entry && it.target.containing_block==target.containing_block;
 		}
-		bool operator!=(const iterator_& it) const {
+		bool operator!=(const iterator_<const T,const_block_entry_link>& it) const {
+			return !(*this==it);
+		}
+		bool operator==(const iterator_<T,block_entry_link>& it) const {
+			return it.target.entry==target.entry && it.target.containing_block==target.containing_block;
+		}
+		bool operator!=(const iterator_<T,block_entry_link>& it) const {
 			return !(*this==it);
 		}
 
@@ -223,8 +274,8 @@ public:
 		}
 	};
 
-	typedef iterator_<T> iterator;
-	typedef iterator_<const T> const_iterator;
+	typedef iterator_<T,block_entry_link> iterator;
+	typedef iterator_<const T,const_block_entry_link> const_iterator;
 
 	void insert(const T& value) {
 		if(!first_free_entry.entry) grow();
@@ -291,25 +342,26 @@ public:
 		pos.skip_until_valid();
 		return pos;
 	}
-	iterator erase(const_iterator pos) {
-		assert(pos.target.containing_block);
-		assert(pos.target.containing_block->active(pos.target.entry));
-		pos.target.containing_block->clear(pos.target.entry);
-		pos.target.entry->next_free=first_free_entry;
-		first_free_entry=pos.target;
-		--active_objects;
-		pos.skip_until_valid();
-		return iterator(pos.target);
-	}
 
 	iterator erase(iterator first, iterator last) {
 		while(first!=last) first=erase(first);
 		return first;
 	}
 
-	iterator erase(const_iterator first, const_iterator last) {
-		while(first!=last) first=erase(first);
-		return iterator(first.target);
+	const_iterator find(const T& object) const {
+		auto obj_entry = reinterpret_cast<const block_entry*>(&object);
+		auto block_it = std::find_if(blocks.begin(),blocks.end(),[obj_entry](auto& b) {
+					return b->contains(obj_entry);
+				});
+		return const_iterator( {obj_entry,block_it->get()});
+	}
+
+	iterator find(T& object) {
+		auto obj_entry = reinterpret_cast<block_entry*>(&object);
+		auto block_it = std::find_if(blocks.begin(),blocks.end(),[obj_entry](auto& b) {
+					return b->contains(obj_entry);
+				});
+		return iterator( {obj_entry,block_it->get()});
 	}
 
 	void clear_and_reorganize() {
@@ -333,13 +385,13 @@ public:
 			}
 			b->active_objects=0;
 		}
-		*free={nullptr,nullptr};
+		*free= {nullptr,nullptr};
 		active_objects=0;
 	}
 
 	size_t reorganize() {
 		if(active_objects==capacity()) return 0;
-		if(!active_objects){
+		if(!active_objects) {
 			clear_and_reorganize();
 			return 0;
 		}
@@ -354,16 +406,16 @@ public:
 			for (; it2 != it; --it2) {
 				if(it2.containing_block->active(it2.entry)) break;
 			}
-			if(it!=it2){
+			if(it!=it2) {
 				it.containing_block->fill(it.entry,std::move_if_noexcept(it2.entry->object));
 				it2.containing_block->clear(it2.entry);
 				++reallocated_objects;
 			}
 		}
-		if(reallocated_objects){
-			blocks.erase(std::remove_if(blocks.begin(),blocks.end(),[](auto& b){
-				return b->active_objects==0;
-			}),blocks.end());
+		if(reallocated_objects) {
+			blocks.erase(std::remove_if(blocks.begin(),blocks.end(),[](auto& b) {
+								return b->active_objects==0;
+							}),blocks.end());
 
 			first_free_entry = {nullptr,nullptr};
 			block_entry_link* free=&first_free_entry;
@@ -376,7 +428,7 @@ public:
 					++free_entries;
 				}
 			}
-			*free={nullptr,nullptr};
+			*free= {nullptr,nullptr};
 			assert(active_objects + free_entries == capacity());
 		}
 		return reallocated_objects;

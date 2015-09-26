@@ -29,11 +29,15 @@ void test_run(int runs, int objects, mce::containers::unordered_object_pool<X, b
 		for(int i = 0; i < objects; ++i)
 			uop.emplace(i);
 
-		auto it = uop.cbegin();
+		const auto& test_obj = *(uop.begin());
+		auto test_obj_it = uop.find(test_obj);
+		assert(test_obj_it==uop.begin());
+
+		auto it = uop.begin();
 		for(int i = 0; i < 32; ++i) {
-			if(it == uop.cend()) break;
+			if(it == uop.end()) break;
 			++it;
-			if(it == uop.cend()) break;
+			if(it == uop.end()) break;
 			it = uop.erase(it);
 		}
 		uop.reorganize();
