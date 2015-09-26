@@ -366,6 +366,11 @@ public:
 		return iterator();
 	}
 
+	void find_and_erase(T& object){
+		auto it = find(object);
+		if(it!=end()) erase(it);
+	}
+
 	void clear_and_reorganize() {
 		blocks.clear();
 		active_objects=0;
