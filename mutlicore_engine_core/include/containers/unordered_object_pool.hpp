@@ -185,6 +185,22 @@ private:
 
 public:
 	unordered_object_pool() noexcept {}
+	~unordered_object_pool()noexcept=default;
+	unordered_object_pool(const unordered_object_pool&)=delete;
+	unordered_object_pool(unordered_object_pool&& other)noexcept:
+			first_free_entry(other.first_free_entry),blocks(std::move(other.blocks)),active_objects(other.active_objects) {
+		other.first_free_entry={nullptr,nullptr};
+		other.active_objects=0;
+	}
+	unordered_object_pool& operator=(const unordered_object_pool&)=delete;
+	unordered_object_pool& operator=(unordered_object_pool&& other)noexcept{
+		first_free_entry=other.first_free_entry;
+		blocks=std::move(other.blocks);
+		active_objects=other.active_objects;
+		other.first_free_entry={nullptr,nullptr};
+		other.active_objects=0;
+		return *this;
+	}
 
 	template<typename It_T,typename Target_T>
 	class iterator_:public std::iterator<std::forward_iterator_tag,It_T> {
@@ -366,7 +382,7 @@ public:
 		return iterator();
 	}
 
-	void find_and_erase(T& object){
+	void find_and_erase(T& object) {
 		auto it = find(object);
 		if(it!=end()) erase(it);
 	}

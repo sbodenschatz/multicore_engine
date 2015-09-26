@@ -73,6 +73,9 @@ int main() {
 		if(outer_run % 10) uop.clear();
 		else uop.clear_and_reorganize();
 	}
+
+	mce::containers::unordered_object_pool<X, block_size> uop2 = std::move(uop);
+
 	auto end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> diff = end - start;
 	std::cout << "Test " << diff.count() << std::endl;
