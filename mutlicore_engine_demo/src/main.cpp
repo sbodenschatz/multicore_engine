@@ -29,7 +29,7 @@ void test_run(int runs, int objects, mce::containers::unordered_object_pool<X, b
 		for(int i = 0; i < objects; ++i)
 			uop.emplace(i);
 
-		const auto& test_obj = *(uop.begin());
+		auto& test_obj = *(uop.begin());
 		auto test_obj_it = uop.find(test_obj);
 		assert(test_obj_it==uop.begin());
 

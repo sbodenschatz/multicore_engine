@@ -353,7 +353,8 @@ public:
 		auto block_it = std::find_if(blocks.begin(),blocks.end(),[obj_entry](auto& b) {
 					return b->contains(obj_entry);
 				});
-		return const_iterator( {obj_entry,block_it->get()});
+		if(block_it!=blocks.end()) return const_iterator( {obj_entry,block_it->get()});
+		return const_iterator();
 	}
 
 	iterator find(T& object) {
@@ -361,7 +362,8 @@ public:
 		auto block_it = std::find_if(blocks.begin(),blocks.end(),[obj_entry](auto& b) {
 					return b->contains(obj_entry);
 				});
-		return iterator( {obj_entry,block_it->get()});
+		if(block_it!=blocks.end()) return iterator( {obj_entry,block_it->get()});
+		return iterator();
 	}
 
 	void clear_and_reorganize() {
