@@ -36,6 +36,17 @@ void test_run(int runs, int objects, mce::containers::unordered_object_pool<X, b
 //		assert(test_obj_it==uop.begin());
 		uop.find_and_erase(test_obj);
 
+		const X* x = uop.insert(X(42424242));
+		assert(x->v==42424242);
+
+		{
+			auto delter = [&](X* d){
+				uop.find_and_erase(*d);//Not optimal performance-wise
+			};
+			auto x2 = std::unique_ptr<X,decltype(delter)>(uop.emplace(X(424242)),delter);
+			assert(x2->v==424242);
+		}
+
 //		for (auto& v : uop) {
 //				std::cout<<v.v<<" ";
 //		}

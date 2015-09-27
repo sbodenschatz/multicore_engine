@@ -256,6 +256,12 @@ public:
 			return it;
 		}
 
+		operator It_T*() const{
+			assert(target.containing_block);
+			assert(target.containing_block->active(target.entry));
+			return &(target.entry->object);
+		}
+
 	private:
 		void skip_empty_blocks() {
 			//Skip over empty blocks without looking at individual entries
@@ -293,32 +299,35 @@ public:
 	typedef iterator_<T,block_entry_link> iterator;
 	typedef iterator_<const T,const_block_entry_link> const_iterator;
 
-	void insert(const T& value) {
+	iterator insert(const T& value) {
 		if(!first_free_entry.entry) grow();
 		auto value_entry=first_free_entry;
 		auto next_free = value_entry.entry->next_free;
 		value_entry.containing_block->fill(value_entry.entry,value);
 		first_free_entry=next_free;
 		++active_objects;
+		return iterator({value_entry.entry,value_entry.containing_block});
 	}
 
-	void insert(T&& value) {
+	iterator insert(T&& value) {
 		if(!first_free_entry.entry) grow();
 		auto value_entry=first_free_entry;
 		auto next_free = value_entry.entry->next_free;
 		value_entry.containing_block->fill(value_entry.entry,std::move(value));
 		first_free_entry=next_free;
 		++active_objects;
+		return iterator({value_entry.entry,value_entry.containing_block});
 	}
 
 	template<typename... Args>
-	void emplace(Args&&... args) {
+	iterator emplace(Args&&... args) {
 		if(!first_free_entry.entry) grow();
 		auto value_entry=first_free_entry;
 		auto next_free = value_entry.entry->next_free;
 		value_entry.containing_block->emplace(value_entry.entry,std::forward<Args>(args)...);
 		first_free_entry=next_free;
 		++active_objects;
+		return iterator({value_entry.entry,value_entry.containing_block});
 	}
 
 	iterator begin() {
