@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <vector>
 #include <algorithm>
+#include <iterator>
 
 namespace mce {
 namespace containers {
@@ -217,6 +218,7 @@ public:
 		fix_block_ptrs();
 		size_t free_entries = recalculate_freelist();
 		assert(active_objects + free_entries == capacity());
+		(void)free_entries;
 	}
 	unordered_object_pool(unordered_object_pool&& other)noexcept:
 	first_free_entry(other.first_free_entry),blocks(std::move(other.blocks)),active_objects(other.active_objects) {
@@ -235,6 +237,7 @@ public:
 		fix_block_ptrs();
 		size_t free_entries = recalculate_freelist();
 		assert(active_objects + free_entries == capacity());
+		(void)free_entries;
 		return *this;
 	}
 	unordered_object_pool& operator=(unordered_object_pool&& other)noexcept {
@@ -494,6 +497,7 @@ public:
 							}),blocks.end());
 			size_t free_entries=recalculate_freelist_last_block();
 			assert(active_objects + free_entries == capacity());
+			(void)free_entries;
 		}
 		return reallocated_objects;
 	}

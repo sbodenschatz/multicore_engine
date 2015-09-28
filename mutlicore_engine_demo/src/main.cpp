@@ -38,6 +38,7 @@ void test_run(int runs, int objects, mce::containers::unordered_object_pool<X, b
 
 		const X* x = uop.insert(X(42424242));
 		assert(x->v==42424242);
+		(void)x;
 
 		{
 			auto deleter = [&](X* d){
