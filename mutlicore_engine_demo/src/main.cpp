@@ -40,10 +40,10 @@ void test_run(int runs, int objects, mce::containers::unordered_object_pool<X, b
 		assert(x->v==42424242);
 
 		{
-			auto delter = [&](X* d){
+			auto deleter = [&](X* d){
 				uop.find_and_erase(*d);//Not optimal performance-wise
 			};
-			auto x2 = std::unique_ptr<X,decltype(delter)>(uop.emplace(X(424242)),delter);
+			auto x2 = std::unique_ptr<X,decltype(deleter)>(uop.emplace(X(424242)),deleter);
 			assert(x2->v==424242);
 		}
 
@@ -82,10 +82,12 @@ int main() {
 	for(int outer_run = 0; outer_run < 1; ++outer_run) {
 		test_run(1, 0x80, uop, outer_run);
 		if(outer_run % 10) uop.clear();
-		else uop.clear_and_reorganize();
+		//else uop.clear_and_reorganize();
 	}
 
+	mce::containers::unordered_object_pool<X, block_size> uop3 = uop;
 	mce::containers::unordered_object_pool<X, block_size> uop2 = std::move(uop);
+	uop = uop3;
 
 	auto end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> diff = end - start;

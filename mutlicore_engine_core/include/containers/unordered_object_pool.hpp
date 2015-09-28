@@ -90,7 +90,7 @@ private:
 
 	union block_entry {
 		T object;
-		typename unordered_object_pool<T, block_size>::block_entry_link next_free;
+		block_entry_link next_free;
 		block_entry() noexcept:next_free {nullptr,nullptr} {}
 		~block_entry()noexcept {}
 		block_entry(const block_entry&)=delete;
@@ -100,14 +100,36 @@ private:
 	};
 
 	struct block {
-		typename unordered_object_pool<T,block_size>::block_entry entries[block_size];
+		block_entry entries[block_size];
 		bool active_flags[block_size];
 		size_t active_objects=0;
 		block* next_block=nullptr;
 		block* prev_block;
 
-		block(const block&)=delete;
-		block& operator=(const block&)=delete;
+		block(const block& other):active_objects(other.active_objects),next_block(nullptr),prev_block(nullptr) {
+			for(size_t i=0;i<block_size;++i) {
+				active_flags[i]=other.active_flags[i];
+				if(active_flags[i]) {
+					entries[i].object = other.entries[i].object;
+				}
+				else {
+					entries[i].next_free = {nullptr,nullptr};
+				}
+			}
+		}
+		block& operator=(const block& other) {
+			active_objects=other.active_objects;
+			for(size_t i=0;i<block_size;++i) {
+				active_flags[i]=other.active_flags[i];
+				if(active_flags[i]) {
+					entries[i].object = other.entries[i].object;
+				}
+				else {
+					entries[i].next_free = {nullptr,nullptr};
+				}
+			}
+			return *this;
+		}
 		block(block&&)=delete;
 		block& operator=(block&&)=delete;
 
@@ -136,6 +158,7 @@ private:
 				active_flags[index]=false;
 			}
 			prev= {&entries[0],this};
+			if(prev_block) this->prev_block->next_block=this;
 		}
 
 		~block()noexcept {
@@ -186,18 +209,39 @@ private:
 public:
 	unordered_object_pool() noexcept {}
 	~unordered_object_pool()noexcept=default;
-	unordered_object_pool(const unordered_object_pool&)=delete;
+	unordered_object_pool(const unordered_object_pool& other):first_free_entry {nullptr,nullptr},active_objects(other.active_objects) {
+		blocks.reserve(other.blocks.size());
+		std::transform(other.blocks.begin(),other.blocks.end(),std::back_inserter(blocks),[](auto& b) {
+					return std::make_unique<block>(*b);
+				});
+		fix_block_ptrs();
+		size_t free_entries = recalculate_freelist();
+		assert(active_objects + free_entries == capacity());
+	}
 	unordered_object_pool(unordered_object_pool&& other)noexcept:
-			first_free_entry(other.first_free_entry),blocks(std::move(other.blocks)),active_objects(other.active_objects) {
-		other.first_free_entry={nullptr,nullptr};
+	first_free_entry(other.first_free_entry),blocks(std::move(other.blocks)),active_objects(other.active_objects) {
+		other.first_free_entry= {nullptr,nullptr};
 		other.active_objects=0;
 	}
-	unordered_object_pool& operator=(const unordered_object_pool&)=delete;
-	unordered_object_pool& operator=(unordered_object_pool&& other)noexcept{
+	unordered_object_pool& operator=(const unordered_object_pool& other) {
+		if(this==&other) return *this;
+		active_objects=other.active_objects;
+		blocks.clear();
+		first_free_entry= {nullptr,nullptr};
+		blocks.reserve(other.blocks.size());
+		std::transform(other.blocks.begin(),other.blocks.end(),std::back_inserter(blocks),[](auto& b) {
+					return std::make_unique<block>(*b);
+				});
+		fix_block_ptrs();
+		size_t free_entries = recalculate_freelist();
+		assert(active_objects + free_entries == capacity());
+		return *this;
+	}
+	unordered_object_pool& operator=(unordered_object_pool&& other)noexcept {
 		first_free_entry=other.first_free_entry;
 		blocks=std::move(other.blocks);
 		active_objects=other.active_objects;
-		other.first_free_entry={nullptr,nullptr};
+		other.first_free_entry= {nullptr,nullptr};
 		other.active_objects=0;
 		return *this;
 	}
@@ -256,7 +300,7 @@ public:
 			return it;
 		}
 
-		operator It_T*() const{
+		operator It_T*() const {
 			assert(target.containing_block);
 			assert(target.containing_block->active(target.entry));
 			return &(target.entry->object);
@@ -306,7 +350,7 @@ public:
 		value_entry.containing_block->fill(value_entry.entry,value);
 		first_free_entry=next_free;
 		++active_objects;
-		return iterator({value_entry.entry,value_entry.containing_block});
+		return iterator( {value_entry.entry,value_entry.containing_block});
 	}
 
 	iterator insert(T&& value) {
@@ -316,7 +360,7 @@ public:
 		value_entry.containing_block->fill(value_entry.entry,std::move(value));
 		first_free_entry=next_free;
 		++active_objects;
-		return iterator({value_entry.entry,value_entry.containing_block});
+		return iterator( {value_entry.entry,value_entry.containing_block});
 	}
 
 	template<typename... Args>
@@ -327,7 +371,7 @@ public:
 		value_entry.containing_block->emplace(value_entry.entry,std::forward<Args>(args)...);
 		first_free_entry=next_free;
 		++active_objects;
-		return iterator({value_entry.entry,value_entry.containing_block});
+		return iterator( {value_entry.entry,value_entry.containing_block});
 	}
 
 	iterator begin() {
@@ -448,19 +492,7 @@ public:
 			blocks.erase(std::remove_if(blocks.begin(),blocks.end(),[](auto& b) {
 								return b->active_objects==0;
 							}),blocks.end());
-
-			first_free_entry = {nullptr,nullptr};
-			block_entry_link* free=&first_free_entry;
-			size_t free_entries = 0;
-			for(size_t i=0;i<block_size;++i) {
-				block_entry* entry_ptr=blocks.back()->entries+i;
-				if(!blocks.back()->active_flags[i]) {
-					*free = {entry_ptr,blocks.back().get()};
-					free = &(entry_ptr->next_free);
-					++free_entries;
-				}
-			}
-			*free= {nullptr,nullptr};
+			size_t free_entries=recalculate_freelist_last_block();
 			assert(active_objects + free_entries == capacity());
 		}
 		return reallocated_objects;
@@ -481,8 +513,48 @@ private:
 		}
 		else {
 			blocks.emplace_back(std::make_unique<block>(first_free_entry,blocks.back().get()));
-			blocks.back()->prev_block->next_block=blocks.back().get();
 		}
+	}
+	size_t recalculate_freelist_last_block() {
+		size_t free_entries = 0;
+		block_entry_link* free=&first_free_entry;
+		if(!blocks.empty()) {
+			for(size_t i=0;i<block_size;++i) {
+				block_entry* entry_ptr=blocks.back()->entries+i;
+				if(!blocks.back()->active_flags[i]) {
+					*free = {entry_ptr,blocks.back().get()};
+					free = &(entry_ptr->next_free);
+					++free_entries;
+				}
+			}
+		}
+		*free= {nullptr,nullptr};
+		return free_entries;
+	}
+	size_t recalculate_freelist() {
+		size_t free_entries = 0;
+		block_entry_link* free=&first_free_entry;
+		for(auto& b: blocks) {
+			for(size_t i=0;i<block_size;++i) {
+				block_entry* entry_ptr=b->entries+i;
+				if(!b->active_flags[i]) {
+					*free = {entry_ptr,b.get()};
+					free = &(entry_ptr->next_free);
+					++free_entries;
+				}
+			}
+		}
+		*free= {nullptr,nullptr};
+		return free_entries;
+	}
+	void fix_block_ptrs() {
+		if(blocks.empty()) return;
+		blocks.front()->prev_block=nullptr;
+		for(size_t i=0;i<blocks.size();++i) {
+			if(i>0) blocks[i]->prev_block = blocks[i-1].get();
+			if(i<blocks.size()-1) blocks[i]->next_block = blocks[i+1].get();
+		}
+		blocks.back()->next_block=nullptr;
 	}
 };
 
