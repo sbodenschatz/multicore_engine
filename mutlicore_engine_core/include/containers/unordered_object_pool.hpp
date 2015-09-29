@@ -316,7 +316,7 @@ public:
 				if(target.containing_block->active_objects) break;
 				else target.containing_block=target.containing_block->next_block;
 			}
-			target.entry=target.containing_block->entries;
+			target.entry=target.containing_block?target.containing_block->entries:nullptr;
 		}
 		void skip_until_valid() {
 			if(!target.containing_block) {
