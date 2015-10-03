@@ -1,9 +1,11 @@
 solution "multicore_engine_solution"
 	configurations{"debug", "release"}
 	defines{}
-	includedirs{"mutlicore_engine_core/include"}
+	includedirs{"multicore_engine_core/include"}
 	vectorextensions "SSE2"
-	startproject "mutlicore_engine_demo"
+	startproject "multicore_engine_demo"
+	warnings "Extra"
+	flags{"FatalWarnings"}
 	
 	configuration{"gmake"}
 		flags{"FatalWarnings"}
@@ -44,18 +46,18 @@ solution "multicore_engine_solution"
 		targetdir "%{prj.location}/bin-vc/%{cfg.buildcfg}"
 		objdir "%{prj.location}/obj-vc/%{cfg.buildcfg}"
 		
-	project "mutlicore_engine_core"
+	project "multicore_engine_core"
 		kind "StaticLib"
 		language "C++"
-		location "mutlicore_engine_core/build"
-		files { "mutlicore_engine_core/include/**.hpp", "mutlicore_engine_core/src/**.cpp"}
+		location "multicore_engine_core/build"
+		files { "multicore_engine_core/include/**.hpp", "multicore_engine_core/src/**.cpp"}
 
-	project "mutlicore_engine_demo"
+	project "multicore_engine_demo"
 		kind "ConsoleApp"
 		--kind "WindowedApp"
 		language "C++"
-		location "mutlicore_engine_demo/build"
-		files { "mutlicore_engine_demo/include/**.hpp", "mutlicore_engine_demo/src/**.cpp"}
-		links {"mutlicore_engine_core"}
+		location "multicore_engine_demo/build"
+		files { "multicore_engine_demo/include/**.hpp", "multicore_engine_demo/src/**.cpp"}
+		links {"multicore_engine_core"}
 		configuration {"vs2015"}
-			debugdir "mutlicore_engine_demo"
+			debugdir "multicore_engine_demo"
