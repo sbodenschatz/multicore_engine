@@ -28,22 +28,29 @@ solution "multicore_engine_solution"
 		objdir "%{prj.location}/obj-gcc/%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
 
+	configuration {"gmake"}
+		if _OPTIONS["cc"] == "clang" then
+			buildoptions "-stdlib=libc++"
+			targetdir "%{prj.location}/bin-clang/%{cfg.buildcfg}"
+			objdir "%{prj.location}/obj-clang/%{cfg.buildcfg}"
+			toolset "clang"
+			links "c++"
+		end
+
+	configuration {"gmake","linux"}
+		if _OPTIONS["cc"] == "clang" then
+			includedirs {"/usr/local/include/clang-libs"}
+		end
+		
 	configuration {"gmake","linux","debug"}
 		if _OPTIONS["cc"] == "clang" then
-			toolset "clang"
-			buildoptions "-stdlib=libc++ -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined"
-			links "c++"
-			includedirs {"/usr/local/include/clang-libs"}
+			buildoptions "-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined"
 			libdirs {"/usr/local/lib/clang-libs/lib-debug"}
 			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-debug -fsanitize=address -fsanitize=undefined"}
 		end
 
 	configuration {"gmake","linux","release"}
 		if _OPTIONS["cc"] == "clang" then
-			toolset "clang"
-			buildoptions "-stdlib=libc++"
-			links "c++"
-			includedirs {"/usr/local/include/clang-libs"}
 			libdirs {"/usr/local/lib/clang-libs/lib-release"}
 			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-release"}
 		end
