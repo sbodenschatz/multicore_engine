@@ -33,6 +33,9 @@ solution "multicore_engine_solution"
 			toolset "clang"
 			buildoptions "-stdlib=libc++"
 			links "c++"
+			includedirs {"/usr/local/include/clang-libs"}
+			libdirs {"/usr/local/lib/clang-libs/lib-debug"}
+			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-debug"}
 		end
 
 	configuration {"vs2015"}
@@ -62,10 +65,10 @@ solution "multicore_engine_solution"
 		location "multicore_engine_core_tests/build"
 		files { "multicore_engine_core_tests/include/**.hpp", "multicore_engine_core_tests/src/**.cpp"}
 		links {"multicore_engine_core"}
-		--removeflags{"Symbols"}
-		--optimize "Debug"
+		removeflags{"Symbols"}
+		optimize "Debug"
 		configuration {"gmake"}
-			buildoptions "-Wno-deprecated-declarations -Wno-unused-variable"
+			buildoptions "-Wno-deprecated-declarations -Wno-unused-variable  -Wno-unused-parameter"
 			links {"boost_unit_test_framework"}
 		configuration {"gmake","linux"}
 			defines {"BOOST_TEST_DYN_LINK"}
