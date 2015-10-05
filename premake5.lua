@@ -28,14 +28,24 @@ solution "multicore_engine_solution"
 		objdir "%{prj.location}/obj-gcc/%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
 
-	configuration {"gmake","not windows"}
+	configuration {"gmake","linux","debug"}
+		if _OPTIONS["cc"] == "clang" then
+			toolset "clang"
+			buildoptions "-stdlib=libc++ -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined"
+			links "c++"
+			includedirs {"/usr/local/include/clang-libs"}
+			libdirs {"/usr/local/lib/clang-libs/lib-debug"}
+			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-debug -fsanitize=address -fsanitize=undefined"}
+		end
+
+	configuration {"gmake","linux","release"}
 		if _OPTIONS["cc"] == "clang" then
 			toolset "clang"
 			buildoptions "-stdlib=libc++"
 			links "c++"
 			includedirs {"/usr/local/include/clang-libs"}
-			libdirs {"/usr/local/lib/clang-libs/lib-debug"}
-			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-debug"}
+			libdirs {"/usr/local/lib/clang-libs/lib-release"}
+			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-release"}
 		end
 
 	configuration {"vs2015"}
