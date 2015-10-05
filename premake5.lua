@@ -67,6 +67,8 @@ solution "multicore_engine_solution"
 		configuration {"gmake"}
 			buildoptions "-Wno-deprecated-declarations -Wno-unused-variable"
 			links {"boost_unit_test_framework"}
+		configuration {"gmake","linux"}
+			defines {"BOOST_TEST_DYN_LINK"}
 		configuration {"vs2015"}
 			debugdir "multicore_engine_core_tests"
 

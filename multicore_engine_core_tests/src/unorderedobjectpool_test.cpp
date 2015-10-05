@@ -33,8 +33,8 @@ struct unordered_object_pool_fixture {
 				correct = false;
 			}
 		}
-		BOOST_TEST(correct);
-		BOOST_TEST(expected.empty());
+		BOOST_CHECK(correct);
+		BOOST_CHECK(expected.empty());
 	}
 	std::unordered_multiset<element> startSet() {
 		std::unordered_multiset<element> s;
@@ -46,7 +46,7 @@ struct unordered_object_pool_fixture {
 BOOST_FIXTURE_TEST_SUITE(unordered_object_pool_test, unordered_object_pool_fixture)
 BOOST_AUTO_TEST_CASE(emplace_one) {
 	auto it = uop.emplace(42);
-	BOOST_TEST(*it == 42);
+	BOOST_CHECK(*it == 42);
 	auto expect = startSet();
 	expect.emplace(42);
 	checkSet(expect);
@@ -57,14 +57,14 @@ BOOST_AUTO_TEST_CASE(emplace_many) {
 		auto it = uop.emplace(i);
 		if(*it != i) correct=false;
 	}
-	BOOST_TEST(correct);
+	BOOST_CHECK(correct);
 	auto expect = startSet();
 	for(int i = 0; i < 0x100000; ++i) { expect.emplace(i); }
 	checkSet(expect);
 }
 BOOST_AUTO_TEST_CASE(insert_one) {
 	auto it = uop.emplace(42);
-	BOOST_TEST(*it == 42);
+	BOOST_CHECK(*it == 42);
 	auto expect = startSet();
 	expect.insert(element(42));
 	checkSet(expect);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(insert_many) {
 		auto it = uop.insert(element(i));
 		if(*it != i) correct=false;
 	}
-	BOOST_TEST(correct);
+	BOOST_CHECK(correct);
 	auto expect = startSet();
 	for(int i = 0; i < 0x100000; ++i) { expect.emplace(i); }
 	checkSet(expect);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(insert_many) {
 BOOST_AUTO_TEST_CASE(erase_one) {
 	auto val = *uop.begin();
 	auto it = uop.erase(uop.begin());
-	BOOST_TEST(it == uop.begin());
+	BOOST_CHECK(it == uop.begin());
 	auto expect = startSet();
 	expect.erase(val);
 	checkSet(expect);
@@ -109,8 +109,8 @@ BOOST_AUTO_TEST_CASE(clear) {
 		(void)v;
 		correct=false;
 	}
-	BOOST_TEST(correct);
-	BOOST_TEST(uop.empty());
+	BOOST_CHECK(correct);
+	BOOST_CHECK(uop.empty());
 }
 
 BOOST_AUTO_TEST_CASE(clear_and_refill) {
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(clear_and_refill) {
 		auto it = uop.insert(element(i));
 		if(*it != i) correct=false;
 	}
-	BOOST_TEST(correct);
+	BOOST_CHECK(correct);
 	std::unordered_multiset<element> expect;
 	for(int i = 0; i < 0x200000; ++i) { expect.emplace(i); }
 	checkSet(expect);
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(reorganize) {
 		}
 	}
 	size_t count = uop.reorganize();
-	BOOST_TEST(count!=0u);
+	BOOST_CHECK(count!=0u);
 	checkSet(expect);
 }
 
