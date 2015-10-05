@@ -1,8 +1,6 @@
 stages:
   - analyse
-  - build_gcc
-  - build_clang
-  - test
+  - build
 
 scan-build:
   stage: analyse
@@ -24,6 +22,8 @@ gcc-build:
   - make CC=gcc CXX=g++ config=release clean
   - make -j 6 config=debug CC=gcc CXX=g++
   - make -j 6 config=release CC=gcc CXX=g++
+  - multicore_engine_core_tests/build/bin-gcc/debug/multicore_engine_core_tests --report_level=short
+  - multicore_engine_core_tests/build/bin-gcc/release/multicore_engine_core_tests --report_level=short
 
 clang-build:
   stage: build_clang
@@ -35,24 +35,6 @@ clang-build:
   - make CC=clang CXX=clang++ config=release clean
   - make -j 6 config=debug CC=clang CXX=clang++
   - make -j 6 config=release CC=clang CXX=clang++
-
-gcc-debug-test:
-  stage: test
-  script:
-  - multicore_engine_core_tests/build/bin-gcc/debug/multicore_engine_core_tests --report_level=short
-  
-gcc-release-test:
-  stage: test
-  script:
-  - multicore_engine_core_tests/build/bin-gcc/release/multicore_engine_core_tests --report_level=short
-  
-clang-debug-test:
-  stage: test
-  script:
   - multicore_engine_core_tests/build/bin-clang/debug/multicore_engine_core_tests --report_level=short
-
-clang-release-test:
-  stage: test
-  script:
   - multicore_engine_core_tests/build/bin-clang/release/multicore_engine_core_tests --report_level=short
 
