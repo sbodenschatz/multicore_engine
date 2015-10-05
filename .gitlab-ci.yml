@@ -13,7 +13,7 @@ scan-build:
   - scan-build --status-bugs make -j 6 config=debug CC=clang CXX=clang++
 
 gcc-build:
-  stage: build_gcc
+  stage: build
   script:
   - premake5 --cc=gcc gmake
   - export CC=gcc
@@ -26,7 +26,7 @@ gcc-build:
   - multicore_engine_core_tests/build/bin-gcc/release/multicore_engine_core_tests --report_level=short
 
 clang-build:
-  stage: build_clang
+  stage: build
   script:
   - premake5 --cc=clang gmake
   - export CC=clang
