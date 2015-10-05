@@ -336,6 +336,10 @@ public:
 				skip_empty_blocks();
 			}
 			for(;;) {
+				if (!target.containing_block) {
+					target.entry = nullptr;
+					return;
+				}
 				if(target.entry >= target.containing_block->entries + block_size) {
 					target.containing_block = target.containing_block->next_block;
 					if(target.containing_block) { skip_empty_blocks(); }
