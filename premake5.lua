@@ -65,8 +65,8 @@ solution "multicore_engine_solution"
 		location "multicore_engine_core_tests/build"
 		files { "multicore_engine_core_tests/include/**.hpp", "multicore_engine_core_tests/src/**.cpp"}
 		links {"multicore_engine_core"}
-		removeflags{"Symbols"}
-		optimize "Debug"
+		--removeflags{"Symbols"}
+		--optimize "Debug"
 		configuration {"gmake"}
 			buildoptions "-Wno-deprecated-declarations -Wno-unused-variable  -Wno-unused-parameter"
 			links {"boost_unit_test_framework"}
