@@ -1,6 +1,9 @@
+before_script:
+  - mkdir -p multicore_engine_{core,core_tests,demo}/build/{bin,obj}-{gcc,clang}/{debug,release}
+
 stages:
   - analyse
-  - build
+  - build_and_test
 
 scan-build:
   stage: analyse
@@ -12,29 +15,44 @@ scan-build:
   - export CXX=clang++
   - scan-build --status-bugs make -j 6 config=debug CC=clang CXX=clang++
 
-gcc-build:
-  stage: build
+gcc-debug-build:
+  stage: build_and_test
   script:
   - premake5 --cc=gcc gmake
   - export CC=gcc
   - export CXX=g++
   - make CC=gcc CXX=g++ config=debug clean
-  - make CC=gcc CXX=g++ config=release clean
   - make -j 6 config=debug CC=gcc CXX=g++
   - make -j 6 config=release CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin-gcc/debug/multicore_engine_core_tests --report_level=short
+
+gcc-release-build:
+  stage: build_and_test
+  script:
+  - premake5 --cc=gcc gmake
+  - export CC=gcc
+  - export CXX=g++
+  - make CC=gcc CXX=g++ config=release clean
+  - make -j 6 config=release CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin-gcc/release/multicore_engine_core_tests --report_level=short
 
-clang-build:
-  stage: build
+clang-debug-build:
+  stage: build_and_test
   script:
   - premake5 --cc=clang gmake
   - export CC=clang
   - export CXX=clang++
   - make CC=clang CXX=clang++ config=debug clean
-  - make CC=clang CXX=clang++ config=release clean
   - make -j 6 config=debug CC=clang CXX=clang++
-  - make -j 6 config=release CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin-clang/debug/multicore_engine_core_tests --report_level=short
+
+clang-release-build:
+  stage: build_and_test
+  script:
+  - premake5 --cc=clang gmake
+  - export CC=clang
+  - export CXX=clang++
+  - make CC=clang CXX=clang++ config=release clean
+  - make -j 6 config=release CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin-clang/release/multicore_engine_core_tests --report_level=short
 
