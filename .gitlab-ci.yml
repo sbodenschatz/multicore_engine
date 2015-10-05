@@ -11,10 +11,10 @@
   - make config=release clean
   - premake5 --cc=clang gmake
   - make -j 6 config=debug CC=clang CXX=clang++
+  - multicore_engine_core_tests/build/bin-gcc/debug/multicore_engine_core_tests --report_level=detailed
   - make config=debug clean
-  - make config=release clean
   - make -j 6 config=release CC=clang CXX=clang++
-  - make config=debug clean
+  - multicore_engine_core_tests/build/bin-gcc/release/multicore_engine_core_tests --report_level=detailed
   - make config=release clean
   - premake5 --cc=gcc gmake
   - export CC=gcc
@@ -22,10 +22,10 @@
   - make config=debug clean
   - make config=release clean
   - make -j 6 config=debug CC=gcc CXX=g++
+  - multicore_engine_core_tests/build/bin-gcc/debug/multicore_engine_core_tests --report_level=detailed
   - make config=debug clean
-  - make config=release clean
   - make -j 6 config=release CC=gcc CXX=g++
-  - make config=debug clean
+  - multicore_engine_core_tests/build/bin-gcc/release/multicore_engine_core_tests --report_level=detailed
   - make config=release clean
   tags: 
   except:

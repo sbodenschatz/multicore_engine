@@ -344,6 +344,10 @@ public:
 						return;
 					}
 				}
+				if (!target.containing_block) {
+					target.entry = nullptr;
+					return;
+				}
 				if(target.containing_block->active(target.entry))
 					return;
 				else
@@ -521,6 +525,10 @@ public:
 
 	size_t capacity() const {
 		return blocks.size() * block_size;
+	}
+
+	bool empty() const {
+		return active_objects==0;
 	}
 
 private:
