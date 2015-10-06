@@ -17,11 +17,9 @@ struct unordered_object_pool_fixture {
 	typedef long long element;
 	mce::containers::unordered_object_pool<element> uop;
 	unordered_object_pool_fixture() {
-		BOOST_TEST_MESSAGE("setup fixture");
 		for(int i = 0; i < 1024; ++i) { uop.emplace(i); }
 	}
 	~unordered_object_pool_fixture() {
-		BOOST_TEST_MESSAGE("teardown fixture");
 	}
 	void checkSet(std::unordered_multiset<element> expected) {
 		bool correct = true;
