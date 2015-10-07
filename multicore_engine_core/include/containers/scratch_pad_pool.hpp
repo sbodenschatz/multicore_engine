@@ -15,13 +15,15 @@
 namespace mce {
 namespace containers {
 
-// Can only be used efficiently for movable types.
+// Can only be used efficiently for nothrow movable types.
+// T needs to have a clear() method.
 template <typename T>
 class scratch_pad_pool {
 private:
 	std::mutex pool_mutex;
 	std::stack<T> pool;
 	void give_back(T&& obj) {
+		obj.clear();
 		std::lock_guard<std::mutex> lock(pool_mutex);
 		pool.push(std::move_if_noexcept(obj));
 	}
