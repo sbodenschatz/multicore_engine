@@ -13,6 +13,21 @@ namespace containers {
 template <typename T>
 class weak_pool_ptr;
 
+namespace detail {
+// Interface used for type erasure to remove template parameters of the pool
+// from the type of smart_pool_ptr instances.
+struct smart_object_pool_block_interface {
+	typedef long long ref_count_t;
+	virtual ref_count_t strong_ref_count(void* object) noexcept = 0;
+	virtual void increment_strong_ref(void* object) noexcept = 0;
+	virtual void increment_weak_ref(void* object) noexcept = 0;
+	virtual void decrement_strong_ref(void* object) noexcept = 0;
+	virtual void decrement_weak_ref(void* object) noexcept = 0;
+	virtual bool upgrade_ref(void* object) noexcept = 0;
+	virtual ~smart_object_pool_block_interface() noexcept = default;
+};
+}
+
 // Interface loosely follows that of std::shared_ptr.
 template <typename T>
 class smart_pool_ptr {

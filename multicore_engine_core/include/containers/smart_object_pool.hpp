@@ -17,6 +17,7 @@
 #include <iostream>
 #include <mutex>
 #include "scratch_pad_pool.hpp"
+#include "smart_pool_ptr.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -25,23 +26,6 @@
 
 namespace mce {
 namespace containers {
-
-template <typename T>
-class smart_pool_ptr;
-
-namespace detail {
-
-struct smart_object_pool_block_interface {
-	typedef long long ref_count_t;
-	virtual ref_count_t strong_ref_count(void* object) noexcept = 0;
-	virtual void increment_strong_ref(void* object) noexcept = 0;
-	virtual void increment_weak_ref(void* object) noexcept = 0;
-	virtual void decrement_strong_ref(void* object) noexcept = 0;
-	virtual void decrement_weak_ref(void* object) noexcept = 0;
-	virtual bool upgrade_ref(void* object) noexcept = 0;
-	virtual ~smart_object_pool_block_interface() noexcept = default;
-};
-}
 
 template <typename T, size_t block_size = 0x10000u>
 class smart_object_pool {
