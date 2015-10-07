@@ -21,27 +21,29 @@ class scratch_pad_pool {
 private:
 	std::mutex pool_mutex;
 	std::stack<T> pool;
-	void give_back(T&& obj){
+	void give_back(T&& obj) {
 		std::lock_guard<std::mutex> lock(pool_mutex);
-		pool.push(std::move(obj));
+		pool.push(std::move_if_noexcept(obj));
 	}
+
 public:
 	class object {
 		scratch_pad_pool<T>* pool;
 		T obj;
+
 	public:
-		object(scratch_pad_pool<T>* pool, T&& obj) : pool(pool), obj(std::move(obj)) {}
+		object(scratch_pad_pool<T>* pool, T&& obj) : pool(pool), obj(std::move_if_noexcept(obj)) {}
 		object(const object&) = delete;
 		object& operator=(const object&) = delete;
 		object(object&&) noexcept = default;
 		object& operator=(object&&) noexcept = default;
 		~object() noexcept {
-			pool->give_back(std::move(obj));
+			pool->give_back(std::move_if_noexcept(obj));
 		}
 		T& operator*() {
 			return obj;
 		}
-		const T& operator*() const{
+		const T& operator*() const {
 			return obj;
 		}
 		T* operator->() {
@@ -51,13 +53,12 @@ public:
 			return &obj;
 		}
 	};
-	object get(){
+	object get() {
 		std::lock_guard<std::mutex> lock(pool_mutex);
-		if(pool.empty()){
-			return object(this,T());
-		}
-		else{
-			object o(this,std::move(pool.top()));
+		if(pool.empty()) {
+			return object(this, T());
+		} else {
+			object o(this, std::move_if_noexcept(pool.top()));
 			pool.pop();
 			return o;
 		}
