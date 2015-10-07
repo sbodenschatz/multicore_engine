@@ -30,14 +30,15 @@ template <typename T>
 class smart_pool_ptr;
 
 namespace detail {
-// Interface used for type erasure
-template <typename T>
+
 struct smart_object_pool_block_interface {
-	virtual void increment_strong_ref(T* object) noexcept = 0;
-	virtual void increment_weak_ref(T* object) noexcept = 0;
-	virtual void decrement_strong_ref(T* object) noexcept = 0;
-	virtual void decrement_weak_ref(T* object) noexcept = 0;
-	virtual bool upgrade_ref(T* object) noexcept = 0;
+	typedef long long ref_count_t;
+	virtual ref_count_t strong_ref_count(void* object) noexcept = 0;
+	virtual void increment_strong_ref(void* object) noexcept = 0;
+	virtual void increment_weak_ref(void* object) noexcept = 0;
+	virtual void decrement_strong_ref(void* object) noexcept = 0;
+	virtual void decrement_weak_ref(void* object) noexcept = 0;
+	virtual bool upgrade_ref(void* object) noexcept = 0;
 	virtual ~smart_object_pool_block_interface() noexcept = default;
 };
 }
@@ -135,19 +136,19 @@ private:
 		block_entry& operator=(block_entry&&) = delete;
 	};
 
-	typedef long long ref_count_t;
+	typedef detail::smart_object_pool_block_interface::ref_count_t ref_count_t;
 
 	struct ref_count_ {
 		std::atomic<ref_count_t> strong;
 		std::atomic<ref_count_t> weak;
 	};
 
-	struct block : public detail::smart_object_pool_block_interface<T> {
+	struct block : public detail::smart_object_pool_block_interface {
 		block_entry entries[block_size];
 		alignas(cacheline_alignment) ref_count_ ref_counts[block_size];
-		std::atomic<block*> next_block{nullptr};
-		std::atomic<block*> prev_block;
 		smart_object_pool<T, block_size>* owning_pool;
+		std::atomic<block*> next_block{nullptr};
+		block* prev_block;
 		alignas(cacheline_alignment) std::atomic<size_t> allocated_objects{0};
 		alignas(cacheline_alignment) std::atomic<size_t> active_objects{0};
 
@@ -193,15 +194,19 @@ private:
 		// contain any objects that are alive or have weak refs on them at this point.
 		~block() noexcept = default;
 
-		virtual void increment_strong_ref(T* object) noexcept {
+		virtual ref_count_t strong_ref_count(void* object) noexcept override {
+			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
+			return rc.strong;
+		}
+		virtual void increment_strong_ref(void* object) noexcept override {
 			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
 			rc.strong++;
 		}
-		virtual void increment_weak_ref(T* object) noexcept {
+		virtual void increment_weak_ref(void* object) noexcept override {
 			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
 			rc.weak++;
 		}
-		virtual void decrement_strong_ref(T* object) noexcept {
+		virtual void decrement_strong_ref(void* object) noexcept override {
 			auto* entry = reinterpret_cast<block_entry*>(object);
 			auto& rc = ref_count(entry);
 			if(--(rc.strong) == 0) {
@@ -215,17 +220,17 @@ private:
 				}
 			}
 		}
-		virtual void decrement_weak_ref(T* object) noexcept {
+		virtual void decrement_weak_ref(void* object) noexcept override {
 			auto* entry = reinterpret_cast<block_entry*>(object);
 			auto& rc = ref_count(entry);
 			if(--(rc.weak) == 0) { owning_pool->deallocate(entry, this); }
 		}
 		// Needs to be called for incrementing the strong ref count if it isn't sure that the object is alive.
-		virtual bool upgrade_ref(T* object) noexcept {
+		virtual bool upgrade_ref(void* object) noexcept override {
 			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
 			ref_count_t old = rc.strong;
 			do { // Try to increment strong ref count while checking if the object is alive
-				if(old < 0) return false; // Object is dead -> fail
+				if(old < 0) return false; // Object is already dead -> fail
 			} while(!rc.strong.compare_exchange_weak(old, old + 1));
 			return true;
 		}
@@ -248,7 +253,7 @@ private:
 			assert(rc.strong == -1); // Assert there is no object living in this place
 			assert(rc.weak == 0);	// Assert nothing is observing the place
 			rc.weak = 1;			 // Object itself gets a weak ref to hold its entry
-			new(place->object) T(std::forward<Args>(args)...);
+			new(&place->object) T(std::forward<Args>(args)...);
 			++active_objects;
 			++(owning_pool->active_objects);
 			rc.strong = 1;
@@ -274,6 +279,9 @@ private:
 
 	block_entry_link allocate() {
 		std::lock_guard<std::mutex> lock(free_list_mutex);
+		if(!first_free_entry.entry) {
+			grow();
+		}
 		auto free_entry = first_free_entry;
 		first_free_entry = free_entry.entry->next_free;
 		++allocated_objects;
@@ -281,29 +289,38 @@ private:
 		return free_entry;
 	}
 
-	void deallocate(block_entry* entry, block* b) noexcept {
+	//May only be called when holding a lock on free list mutex
+	void grow() {
+		if(blocks.empty()) {
+			blocks.emplace_back(std::make_unique<block>(this,first_free_entry));
+		} else {
+			blocks.emplace_back(std::make_unique<block>(this,first_free_entry, blocks.back().get()));
+		}
+	}
+
+	void deallocate(block_entry* entry, block* block) noexcept {
 		std::lock_guard<std::mutex> lock(free_list_mutex);
-		deallocate_inner(entry, b);
+		deallocate_inner(entry, block);
 	}
 
 	// May only be called when already holding lock on free list
-	void deallocate_inner(block_entry* entry, block* b) noexcept {
+	void deallocate_inner(block_entry* entry, block* block) noexcept {
 		entry->next_free = first_free_entry;
-		first_free_entry = {entry, b};
-		--(b->allocated_objects);
+		first_free_entry = {entry, block};
+		--(block->allocated_objects);
 		--allocated_objects;
 	}
 
-	void mark_for_deferred_destruction(block_entry* entry, block* b)
+	void mark_for_deferred_destruction(block_entry* entry, block* block)
 	/*TODO Find a way to make this noexcept because it will be called in a destructor*/ {
 		std::lock_guard<std::mutex> lock(pending_destruction_list_mutex);
 		if(active_iterators > 0) { // Check again because iterator might already be finished
-			pending_destruction_list.push_back(block_entry_link{entry, b});
+			pending_destruction_list.push_back(block_entry_link{entry, block});
 			++pending_destructions;
 		} else {
-			if(b->try_to_destroy_object(entry)) {
+			if(block->try_to_destroy_object(entry)) {
 				// Object itself carries a weakref
-				b->decrement_weak_ref(&entry->object);
+				block->decrement_weak_ref(&entry->object);
 			}
 		}
 	}
@@ -342,6 +359,13 @@ public:
 	smart_object_pool& operator=(const smart_object_pool&) = delete;
 	smart_object_pool(smart_object_pool&&) noexcept = delete;
 	smart_object_pool& operator=(smart_object_pool&&) noexcept = delete;
+
+	template <typename... Args>
+	smart_pool_ptr<T> emplace(Args&&... args){
+		auto entry = allocate();
+		entry.containing_block->create_object(entry.entry,std::forward<Args>(args)...);
+		return smart_pool_ptr<T>(&entry.entry->object,entry.containing_block);
+	}
 };
 
 } // namespace containers

@@ -11,17 +11,172 @@ namespace mce {
 namespace containers {
 
 template <typename T>
+class weak_pool_ptr;
+
+// Interface loosely follows that of std::shared_ptr.
+template <typename T>
 class smart_pool_ptr {
 	T* object;
-	detail::smart_object_pool_block_interface<T>* block;
+	void* managed_object; // May differ from object if this smart_pool_ptr was constructed using the aliasing
+						  // constructor
+	detail::smart_object_pool_block_interface* block;
 
-	template <size_t block_size>
-	friend class smart_object_pool<T, block_size>;
+	template <typename U, size_t block_size>
+	friend class smart_object_pool;
 
-	smart_pool_ptr(T* object, detail::smart_object_pool_block_interface<T>* block) noexcept : object{object},
-																							  block{block} {}
+	smart_pool_ptr(T* object, detail::smart_object_pool_block_interface* block) noexcept
+			: object{object},
+			  managed_object{object},
+			  block{block} {}
 
 public:
+	typedef detail::smart_object_pool_block_interface::ref_count_t ref_count_t;
+	smart_pool_ptr() noexcept : object{nullptr}, managed_object{nullptr}, block{nullptr} {}
+	smart_pool_ptr(const smart_pool_ptr& other) noexcept : object{other.object},
+														   managed_object{other.managed_object},
+														   block{other.block} {
+		if(block) block->increment_strong_ref(managed_object);
+	}
+	smart_pool_ptr(smart_pool_ptr&& other) noexcept : object{other.object},
+													  managed_object{other.managed_object},
+													  block{other.block} {
+		other.object = nullptr;
+		other.managed_object = nullptr;
+		other.block = nullptr;
+	}
+	template <typename U>
+	smart_pool_ptr(const smart_pool_ptr<U>& other, T* ptr) noexcept : object{ptr},
+																	  managed_object{other.managed_object},
+																	  block{other.block} {
+		if(!block || !object || !managed_object) {
+			block = nullptr;
+			object = nullptr;
+			managed_object = nullptr;
+		}
+		if(block) block->increment_strong_ref(managed_object);
+	}
+	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
+	// to only participate in overload resolution if U* is convertible to T*.
+	template <typename U>
+	smart_pool_ptr(const smart_pool_ptr<U>& other) noexcept : object(other.object),
+															  managed_object{other.managed_object},
+															  block{other.block} {
+		if(block) block->increment_strong_ref(managed_object);
+	}
+	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
+	// to only participate in overload resolution if U* is convertible to T*.
+	template <typename U>
+	smart_pool_ptr(smart_pool_ptr<U>&& other) noexcept : object(other.object),
+														 managed_object{other.managed_object},
+														 block{other.block} {
+		other.object = nullptr;
+		other.managed_object = nullptr;
+		other.block = nullptr;
+	}
+	template <typename U>
+	explicit smart_pool_ptr(weak_pool_ptr<U>&& other)
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
+		if(!block) { throw std::bad_weak_ptr(); }
+		if(!block->upgrade_ref(managed_object)) { throw std::bad_weak_ptr(); }
+	}
+	smart_pool_ptr<T>& operator=(const smart_pool_ptr& other) noexcept {
+		if(other.managed_object == managed_object) {
+			object = other.object;
+			return *this;
+		}
+		if(block) block->decrement_strong_ref(managed_object);
+		object = other.object;
+		managed_object = other.managed_object;
+		block = other.block;
+		if(block) block->increment_strong_ref(managed_object);
+		return *this;
+	}
+	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
+	// to only participate in overload resolution if U* is convertible to T*.
+	template <typename U>
+	smart_pool_ptr<T>& operator=(const smart_pool_ptr<U>& other) noexcept {
+		if(other.managed_object == managed_object) {
+			object = other.object;
+			return *this;
+		}
+		if(block) block->decrement_strong_ref(managed_object);
+		object = other.object;
+		managed_object = other.managed_object;
+		block = other.block;
+		if(block) block->increment_strong_ref(managed_object);
+		return *this;
+	}
+	smart_pool_ptr<T>& operator=(smart_pool_ptr&& other) noexcept {
+		assert(this != &other);
+		if(block) block->decrement_strong_ref(managed_object);
+		object = other.object;
+		managed_object = other.managed_object;
+		block = other.block;
+		other.object = nullptr;
+		other.managed_object = nullptr;
+		other.block = nullptr;
+		return *this;
+	}
+	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
+	// to only participate in overload resolution if U* is convertible to T*.
+	template <typename U>
+	smart_pool_ptr<T>& operator=(smart_pool_ptr<U>&& other) noexcept {
+		assert(this != &other);
+		if(block) block->decrement_strong_ref(managed_object);
+		object = other.object;
+		managed_object = other.managed_object;
+		block = other.block;
+		other.object = nullptr;
+		other.managed_object = nullptr;
+		other.block = nullptr;
+		return *this;
+	}
+	~smart_pool_ptr() {
+		if(block) block->decrement_strong_ref(managed_object);
+	}
+
+	void swap(smart_pool_ptr& other) noexcept {
+		using std::swap;
+		swap(object, other.object);
+		swap(managed_object, other.managed_object);
+		swap(block, other.block);
+	}
+
+	T* get() const noexcept {
+		return object;
+	}
+
+	T& operator*() const noexcept {
+		assert(block);
+		assert(object);
+		return *object;
+	}
+
+	T* operator->() const noexcept {
+		assert(block);
+		assert(object);
+		return object;
+	}
+
+	ref_count_t use_count() const noexcept {
+		if(!block) return 0;
+		if(!object) return 0;
+		auto rc = block->strong_ref_count(managed_object);
+		assert(rc > 0);
+		return rc;
+	}
+
+	bool unique() const noexcept {
+		return use_count() == 1;
+	}
+
+	explicit operator bool() const noexcept {
+		if(!block) return false;
+		if(object)
+			return true;
+		else
+			return false;
+	}
 };
 
 } // namespace containers
