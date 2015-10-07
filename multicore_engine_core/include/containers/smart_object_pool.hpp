@@ -16,6 +16,7 @@
 #include <atomic>
 #include <iostream>
 #include <mutex>
+#include "scratch_pad_pool.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -144,8 +145,8 @@ private:
 	struct block : public detail::smart_object_pool_block_interface<T> {
 		block_entry entries[block_size];
 		alignas(cacheline_alignment) ref_count_ ref_counts[block_size];
-		block* next_block = nullptr;
-		block* prev_block;
+		std::atomic<block*> next_block{nullptr};
+		std::atomic<block*> prev_block;
 		smart_object_pool<T, block_size>* owning_pool;
 		alignas(cacheline_alignment) std::atomic<size_t> allocated_objects{0};
 		alignas(cacheline_alignment) std::atomic<size_t> active_objects{0};
@@ -173,8 +174,8 @@ private:
 
 		// May only be called inside of a lock on free list
 		block(smart_object_pool<T, block_size>* owning_pool, block_entry_link& prev,
-			  block* prev_block = nullptr) noexcept : owning_pool(owning_pool),
-													  prev_block(prev_block) {
+			  block* prev_block = nullptr) noexcept : owning_pool{owning_pool},
+													  prev_block{prev_block} {
 			ref_counts[block_size - 1].strong = 0;
 			ref_counts[block_size - 1].weak = 0;
 			entries[block_size - 1].next_free = prev;
@@ -188,17 +189,9 @@ private:
 			if(prev_block) this->prev_block->next_block = this;
 		}
 
-		// May only be called inside of a lock on free list
-		~block() noexcept {
-			if(next_block) next_block->prev_block = prev_block;
-			if(prev_block) prev_block->next_block = next_block;
-			if(allocated_objects > 0) {
-				std::cerr << "Attempt to destroy smart_object_pool::block which has alive objects in it. "
-							 "Continuing would leave dangling pointers. Calling std::terminate now."
-						  << std::endl;
-				std::terminate();
-			}
-		}
+		// Only releases the blocks resources, it is the pools responsibility to ensure that the block doesn't
+		// contain any objects that are alive or have weak refs on them at this point.
+		~block() noexcept = default;
 
 		virtual void increment_strong_ref(T* object) noexcept {
 			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
@@ -215,18 +208,17 @@ private:
 				if(owning_pool->active_iterators > 0) {
 					owning_pool->mark_for_deferred_destruction(entry, this);
 				} else {
-					try_to_destroy_object(entry);
+					if(try_to_destroy_object(entry)) {
+						// Object itself carries a weakref
+						decrement_weak_ref(&entry->object);
+					}
 				}
 			}
 		}
 		virtual void decrement_weak_ref(T* object) noexcept {
 			auto* entry = reinterpret_cast<block_entry*>(object);
 			auto& rc = ref_count(entry);
-			rc.weak--;
-			if(--(rc.weak) == 0) {
-				owning_pool->deallocate(entry, this);
-				--allocated_objects;
-			}
+			if(--(rc.weak) == 0) { owning_pool->deallocate(entry, this); }
 		}
 		// Needs to be called for incrementing the strong ref count if it isn't sure that the object is alive.
 		virtual bool upgrade_ref(T* object) noexcept {
@@ -245,21 +237,20 @@ private:
 				return false; // Something got a strong ref through upgrade
 			}
 			--active_objects;
+			--(owning_pool->active_objects);
 			entry->object.~T();
-			// Object itself carries a weakref
-			decrement_weak_ref(&entry->object);
 			return true;
 		}
-		//Creates object with 1 strong ref to it
+		// Creates object with 1 strong ref to it
 		template <typename... Args>
 		void create_object(block_entry* place, Args&&... args) {
 			auto& rc = ref_count(place);
 			assert(rc.strong == -1); // Assert there is no object living in this place
-			assert(rc.weak == 0); // Assert nothing is observing the place
-			--allocated_objects;
-			rc.weak = 1; // Object itself gets a weak ref to hold its entry
+			assert(rc.weak == 0);	// Assert nothing is observing the place
+			rc.weak = 1;			 // Object itself gets a weak ref to hold its entry
 			new(place->object) T(std::forward<Args>(args)...);
 			++active_objects;
+			++(owning_pool->active_objects);
 			rc.strong = 1;
 		}
 	};
@@ -273,28 +264,68 @@ private:
 	std::vector<std::unique_ptr<block>> blocks;
 	std::atomic<size_t> allocated_objects;
 
-	alignas(cacheline_alignment) std::mutex pending_destruction_list_mutex;
+	alignas(cacheline_alignment) std::atomic<size_t> pending_destructions;
+	std::mutex pending_destruction_list_mutex;
 	std::vector<block_entry_link> pending_destruction_list;
+
+	static scratch_pad_pool<std::vector<block_entry_link>> pending_destruction_scratch_pads;
 
 	friend class smart_pool_ptr<T>;
 
-	block_entry* allocate() {
-		// TODO implement
-		return nullptr;
+	block_entry_link allocate() {
+		std::lock_guard<std::mutex> lock(free_list_mutex);
+		auto free_entry = first_free_entry;
+		first_free_entry = free_entry.entry->next_free;
+		++allocated_objects;
+		++(free_entry.containing_block);
+		return free_entry;
 	}
 
-	void deallocate(block_entry* /* entry*/, block* /*b*/) noexcept {
-		// TODO implement
+	void deallocate(block_entry* entry, block* b) noexcept {
+		std::lock_guard<std::mutex> lock(free_list_mutex);
+		deallocate_inner(entry, b);
 	}
 
-	void mark_for_deferred_destruction(block_entry* /* entry*/, block* /*b*/)
+	// May only be called when already holding lock on free list
+	void deallocate_inner(block_entry* entry, block* b) noexcept {
+		entry->next_free = first_free_entry;
+		first_free_entry = {entry, b};
+		--(b->allocated_objects);
+		--allocated_objects;
+	}
+
+	void mark_for_deferred_destruction(block_entry* entry, block* b)
 	/*TODO Find a way to make this noexcept because it will be called in a destructor*/ {
-		// TODO implement
+		std::lock_guard<std::mutex> lock(pending_destruction_list_mutex);
+		if(active_iterators > 0) { // Check again because iterator might already be finished
+			pending_destruction_list.push_back(block_entry_link{entry, b});
+			++pending_destructions;
+		} else {
+			if(b->try_to_destroy_object(entry)) {
+				// Object itself carries a weakref
+				b->decrement_weak_ref(&entry->object);
+			}
+		}
 	}
 
+	// Call this only after decrementing the iterator counter
 	void process_deferred_destruction()
 	/*TODO Find a way to make this noexcept because it will be called in a destructor*/ {
-		// TODO implement
+		if(pending_destructions == 0) return;
+		auto pending = pending_destruction_scratch_pads.get();
+		auto dealloc = pending_destruction_scratch_pads.get();
+		{
+			std::lock_guard<std::mutex> lock(pending_destruction_list_mutex);
+			std::swap(*pending, pending_destruction_list);
+		}
+		for(auto& obj : *pending) {
+			if(obj.containing_block->try_to_destroy_object(obj.entry)) {
+				auto& rc = obj.containing_block->ref_count(obj.entry);
+				if(--(rc.weak) == 0) { dealloc->push_back(obj); }
+			}
+		}
+		std::lock_guard<std::mutex> lock(free_list_mutex);
+		for(auto& obj : *dealloc) { deallocate_inner(obj.entry, obj.containing_block); }
 	}
 
 public:
