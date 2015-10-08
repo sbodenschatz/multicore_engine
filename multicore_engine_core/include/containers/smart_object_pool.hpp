@@ -18,6 +18,7 @@
 #include <mutex>
 #include "scratch_pad_pool.hpp"
 #include "smart_pool_ptr.hpp"
+#include "../memory/aligned_new.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -128,6 +129,7 @@ private:
 	};
 
 	struct block : public detail::smart_object_pool_block_interface {
+		ALIGNED_NEW_AND_DELETE(block)
 		block_entry entries[block_size];
 		alignas(cacheline_alignment) ref_count_ ref_counts[block_size];
 		smart_object_pool<T, block_size>* owning_pool;
@@ -243,6 +245,7 @@ private:
 			rc.strong = 1;
 		}
 	};
+	ALIGNED_NEW_AND_DELETE(smart_object_pool)
 
 	std::atomic<size_t> active_iterators{0};
 
