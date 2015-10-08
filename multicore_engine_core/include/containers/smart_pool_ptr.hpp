@@ -33,7 +33,7 @@ struct smart_object_pool_block_interface {
 };
 }
 
-// Interface loosely follows that of std::shared_ptr.
+// Interface follows that of std::shared_ptr as closely as possible.
 template <typename T>
 class smart_pool_ptr {
 	T* object;
@@ -49,6 +49,10 @@ class smart_pool_ptr {
 	smart_pool_ptr(T* object, detail::smart_object_pool_block_interface* block) noexcept
 			: object{object},
 			  managed_object{object},
+			  block{block} {}
+	smart_pool_ptr(T* object, void* managed_object, detail::smart_object_pool_block_interface* block) noexcept
+			: object{object},
+			  managed_object{managed_object},
 			  block{block} {}
 
 public:
@@ -164,6 +168,13 @@ public:
 		swap(block, other.block);
 	}
 
+	void reset(){
+		if(block) block->decrement_strong_ref(managed_object);
+		object=nullptr;
+		managed_object=nullptr;
+		block=nullptr;
+	}
+
 	T* get() const noexcept {
 		return object;
 	}
@@ -201,7 +212,7 @@ public:
 	}
 };
 
-// Interface loosely follows that of std::weak_ptr.
+// Interface follows that of std::weak_ptr as closely as possible.
 template <typename T>
 class weak_pool_ptr {
 	T* object;
@@ -319,6 +330,13 @@ public:
 		if(block) block->decrement_weak_ref(managed_object);
 	}
 
+	void reset(){
+		if(block) block->decrement_weak_ref(managed_object);
+		object=nullptr;
+		managed_object=nullptr;
+		block=nullptr;
+	}
+
 	void swap(weak_pool_ptr& other) noexcept {
 		using std::swap;
 		swap(object, other.object);
@@ -326,42 +344,38 @@ public:
 		swap(block, other.block);
 	}
 
-	T* get() const noexcept {
-		return object;
-	}
-
-	T& operator*() const noexcept {
-		assert(block);
-		assert(object);
-		return *object;
-	}
-
-	T* operator->() const noexcept {
-		assert(block);
-		assert(object);
-		return object;
-	}
-
 	ref_count_t use_count() const noexcept {
 		if(!block) return 0;
+		if(!managed_object) return 0;
 		if(!object) return 0;
-		auto rc = block->strong_ref_count(managed_object);
-		assert(rc > 0);
-		return rc;
+		return block->strong_ref_count(managed_object);
 	}
 
-	bool unique() const noexcept {
-		return use_count() == 1;
+	bool expired() const noexcept {
+		if(!block) return true;
+		if(!managed_object) return true;
+		if(!object) return true;
+		return use_count() < 0;
 	}
 
-	explicit operator bool() const noexcept {
-		if(!block) return false;
-		if(object)
-			return true;
+	smart_pool_ptr<T> lock() const noexcept {
+		if(!object || !managed_object || !block) return smart_pool_ptr<T>();
+		if(block->upgrade_ref(managed_object))
+			return smart_pool_ptr<T>(object, managed_object, block);
 		else
-			return false;
+			return smart_pool_ptr<T>();
 	}
 };
+
+template<typename T>
+void swap(smart_pool_ptr<T>& a, smart_pool_ptr<T>& b){
+	a.swap(b);
+}
+template<typename T>
+void swap(weak_pool_ptr<T>& a, weak_pool_ptr<T>& b){
+	a.swap(b);
+}
+
 } // namespace containers
 } // namespace mce
 
