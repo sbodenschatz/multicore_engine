@@ -41,6 +41,7 @@ struct unordered_object_pool_fixture {
 	}
 };
 
+BOOST_AUTO_TEST_SUITE(containers)
 BOOST_FIXTURE_TEST_SUITE(unordered_object_pool_test, unordered_object_pool_fixture)
 BOOST_AUTO_TEST_CASE(emplace_one) {
 	auto it = uop.emplace(42);
@@ -147,6 +148,7 @@ BOOST_AUTO_TEST_CASE(reorganize) {
 	checkSet(expect);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace containers */
