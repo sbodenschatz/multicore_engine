@@ -132,7 +132,7 @@ private:
 		ALIGNED_NEW_AND_DELETE(block)
 		block_entry entries[block_size];
 		alignas(cacheline_alignment) ref_count_ ref_counts[block_size];
-		smart_object_pool<T, block_size>* owning_pool;
+		alignas(cacheline_alignment) smart_object_pool<T, block_size>* owning_pool;
 		std::atomic<block*> next_block{nullptr};
 		std::atomic<block*> prev_block;
 		alignas(cacheline_alignment) std::atomic<size_t> allocated_objects{0};
