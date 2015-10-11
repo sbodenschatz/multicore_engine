@@ -134,7 +134,7 @@ private:
 		alignas(cacheline_alignment) ref_count_ ref_counts[block_size];
 		smart_object_pool<T, block_size>* owning_pool;
 		std::atomic<block*> next_block{nullptr};
-		block* prev_block;
+		std::atomic<block*> prev_block;
 		alignas(cacheline_alignment) std::atomic<size_t> allocated_objects{0};
 		alignas(cacheline_alignment) std::atomic<size_t> active_objects{0};
 
@@ -173,7 +173,7 @@ private:
 				ref_counts[index].weak = 0;
 			}
 			prev = {&entries[0], this};
-			if(prev_block) this->prev_block->next_block = this;
+			if(prev_block) prev_block->next_block = this;
 		}
 
 		// Only releases the blocks resources, it is the pools responsibility to ensure that the block doesn't
@@ -254,9 +254,11 @@ private:
 	alignas(cacheline_alignment) std::mutex free_list_mutex;
 	block_entry_link first_free_entry = {nullptr, nullptr};
 	std::vector<std::unique_ptr<block>> blocks;
-	std::atomic<size_t> allocated_objects;
+	std::atomic<size_t> allocated_objects{0};
+	std::atomic<block*> first_block{nullptr};
+	std::atomic<size_t> block_count{0};
 
-	alignas(cacheline_alignment) std::atomic<size_t> pending_destructions;
+	alignas(cacheline_alignment) std::atomic<size_t> pending_destructions{0};
 	std::mutex pending_destruction_list_mutex;
 	std::vector<block_entry_link> pending_destruction_list;
 
@@ -266,9 +268,7 @@ private:
 
 	block_entry_link allocate() {
 		std::lock_guard<std::mutex> lock(free_list_mutex);
-		if(!first_free_entry.entry) {
-			grow();
-		}
+		if(!first_free_entry.entry) { grow(); }
 		auto free_entry = first_free_entry;
 		first_free_entry = free_entry.entry->next_free;
 		++allocated_objects;
@@ -276,13 +276,15 @@ private:
 		return free_entry;
 	}
 
-	//May only be called when holding a lock on free list mutex
+	// May only be called when holding a lock on free list mutex
 	void grow() {
 		if(blocks.empty()) {
-			blocks.emplace_back(std::make_unique<block>(this,first_free_entry));
+			blocks.emplace_back(std::make_unique<block>(this, first_free_entry));
+			first_block = blocks.front().get();
 		} else {
-			blocks.emplace_back(std::make_unique<block>(this,first_free_entry, blocks.back().get()));
+			blocks.emplace_back(std::make_unique<block>(this, first_free_entry, blocks.back().get()));
 		}
+		++block_count;
 	}
 
 	void deallocate(block_entry* entry, block* block) noexcept {
@@ -347,11 +349,203 @@ public:
 	smart_object_pool(smart_object_pool&&) noexcept = delete;
 	smart_object_pool& operator=(smart_object_pool&&) noexcept = delete;
 
+	template <typename It_T, typename Target_T>
+	class iterator_ : public std::iterator<std::forward_iterator_tag, It_T> {
+		Target_T target;
+		smart_object_pool<T, block_size>* pool;
+		friend class smart_object_pool<T, block_size>;
+
+		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target{target}, pool{pool} {
+			++(pool->active_iterators);
+			skip_until_valid();
+		}
+
+	public:
+		iterator_() : target{nullptr, nullptr}, pool{nullptr} {}
+		~iterator_() {
+			if(pool) --(pool->active_iterators);
+		}
+
+		iterator_(const iterator_<T, block_entry_link>& it) noexcept
+				: target{it.target.entry, it.target.containing_block},
+				  pool{it.pool} {
+			if(pool) ++(pool->active_iterators);
+		}
+
+		iterator_& operator=(const iterator_<T, block_entry_link>& it) noexcept {
+			target = {it.target.entry, it.target.containing_block};
+			if(pool != it.pool) {
+				if(pool) --(pool->active_iterators);
+				pool = it.pool;
+				if(pool) ++(pool->active_iterators);
+			}
+			return *this;
+		}
+
+		iterator_(iterator_<T, block_entry_link>&& it) noexcept
+				: target{it.target.entry, it.target.containing_block},
+				  pool{it.pool} {
+			it.target.entry = nullptr;
+			it.target.containing_block = nullptr;
+			it.pool = nullptr;
+		}
+
+		iterator_& operator=(iterator_<T, block_entry_link>&& it) noexcept {
+			target = {it.target.entry, it.target.containing_block};
+			if(pool != it.pool) {
+				if(pool) --(pool->active_iterators);
+				pool = it.pool;
+			}
+			it.target.entry = nullptr;
+			it.target.containing_block = nullptr;
+			it.pool = nullptr;
+			return *this;
+		}
+
+		typename iterator_<It_T, Target_T>::reference operator*() const {
+			assert(target.containing_block);
+			assert(target.entry);
+			return target.entry->object;
+		}
+		typename iterator_<It_T, Target_T>::pointer operator->() const {
+			assert(target.containing_block);
+			assert(target.entry);
+			return &(target.entry->object);
+		}
+		bool operator==(const iterator_<const T, const_block_entry_link>& it) const {
+			return it.target.entry == target.entry && it.target.containing_block == target.containing_block;
+		}
+		bool operator!=(const iterator_<const T, const_block_entry_link>& it) const {
+			return !(*this == it);
+		}
+		bool operator==(const iterator_<T, block_entry_link>& it) const {
+			return it.target.entry == target.entry && it.target.containing_block == target.containing_block;
+		}
+		bool operator!=(const iterator_<T, block_entry_link>& it) const {
+			return !(*this == it);
+		}
+
+		iterator_& operator++() {
+			target.entry++;
+			skip_until_valid();
+			return *this;
+		}
+		iterator_ operator++(int) {
+			auto it = *this;
+			this->operator++();
+			return it;
+		}
+
+		operator It_T*() const {
+			assert(target.containing_block);
+			assert(target.entry);
+			return &(target.entry->object);
+		}
+
+	private:
+		void skip_empty_blocks() {
+			// Skip over empty blocks without looking at individual entries
+			while(target.containing_block) {
+				if(target.containing_block->active_objects)
+					break;
+				else
+					target.containing_block = target.containing_block->next_block;
+			}
+			target.entry = target.containing_block ? target.containing_block->entries : nullptr;
+		}
+		void skip_until_valid() {
+			if(!target.containing_block) {
+				target.entry = nullptr;
+				return;
+			} else if(target.containing_block->active_objects == 0) {
+				skip_empty_blocks();
+			}
+			for(;;) {
+				if(!target.containing_block) {
+					target.entry = nullptr;
+					return;
+				}
+				if(target.entry >= target.containing_block->entries + block_size) {
+					target.containing_block = target.containing_block->next_block;
+					if(target.containing_block) { skip_empty_blocks(); }
+					if(!target.containing_block) {
+						target.entry = nullptr;
+						return;
+					}
+				}
+				if(!target.containing_block) {
+					target.entry = nullptr;
+					return;
+				}
+				if(target.containing_block->ref_count(target.entry).strong.load())
+					return;
+				else
+					target.entry++;
+			}
+		}
+	};
+
+	typedef iterator_<T, block_entry_link> iterator;
+	typedef iterator_<const T, const_block_entry_link> const_iterator;
+
 	template <typename... Args>
-	smart_pool_ptr<T> emplace(Args&&... args){
+	smart_pool_ptr<T> emplace(Args&&... args) {
 		auto entry = allocate();
-		entry.containing_block->create_object(entry.entry,std::forward<Args>(args)...);
-		return smart_pool_ptr<T>(&entry.entry->object,entry.containing_block);
+		entry.containing_block->create_object(entry.entry, std::forward<Args>(args)...);
+		return smart_pool_ptr<T>(&entry.entry->object, entry.containing_block);
+	}
+
+	bool empty() const {
+		return active_objects == 0;
+	}
+	size_t size() const {
+		return active_objects;
+	}
+	size_t capacity() const {
+		return block_count * block_size;
+	}
+
+	void reserve(size_t reserved_size) {
+		if(capacity() < reserved_size) {
+			std::lock_guard<std::mutex> lock(free_list_mutex);
+			while(capacity() < reserved_size) { grow(); }
+		}
+	}
+
+	iterator begin() {
+		block* block = first_block;
+		if(block)
+			return iterator({block->entries, block});
+		else
+			return iterator();
+	}
+
+	const_iterator begin() const {
+		block* block = first_block;
+		if(block)
+			return const_iterator({block->entries, block});
+		else
+			return const_iterator();
+	}
+
+	const_iterator cbegin() const {
+		block* block = first_block;
+		if(block)
+			return const_iterator({block->entries, block});
+		else
+			return const_iterator();
+	}
+
+	iterator end() {
+		return iterator();
+	}
+
+	const_iterator end() const {
+		return const_iterator();
+	}
+
+	const_iterator cend() const {
+		return const_iterator();
 	}
 };
 
