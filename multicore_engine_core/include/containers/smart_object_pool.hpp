@@ -163,13 +163,13 @@ private:
 		block(smart_object_pool<T, block_size>* owning_pool, block_entry_link& prev,
 			  block* prev_block = nullptr) noexcept : owning_pool{owning_pool},
 													  prev_block{prev_block} {
-			ref_counts[block_size - 1].strong = 0;
+			ref_counts[block_size - 1].strong = -1;
 			ref_counts[block_size - 1].weak = 0;
 			entries[block_size - 1].next_free = prev;
 			for(auto i = block_size - 1; i > size_t(0); i--) {
 				auto index = i - 1;
 				entries[index].next_free = {&entries[i], this};
-				ref_counts[index].strong = 0;
+				ref_counts[index].strong = -1;
 				ref_counts[index].weak = 0;
 			}
 			prev = {&entries[0], this};
@@ -272,7 +272,7 @@ private:
 		auto free_entry = first_free_entry;
 		first_free_entry = free_entry.entry->next_free;
 		++allocated_objects;
-		++(free_entry.containing_block);
+		++(free_entry.containing_block->allocated_objects);
 		return free_entry;
 	}
 
@@ -477,7 +477,7 @@ public:
 					target.entry = nullptr;
 					return;
 				}
-				if(target.containing_block->ref_count(target.entry).strong.load())
+				if(target.containing_block->ref_count(target.entry).strong > 0)
 					return;
 				else
 					target.entry++;
