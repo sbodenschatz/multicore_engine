@@ -355,15 +355,21 @@ public:
 		smart_object_pool<T, block_size>* pool;
 		friend class smart_object_pool<T, block_size>;
 
-		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target{target}, pool{pool} {
+		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
 			++(pool->active_iterators);
 			skip_until_valid();
+		}
+
+		void drop_iterator() {
+			if(pool) {
+				if(--(pool->active_iterators) == 0) { pool->process_deferred_destruction(); }
+			}
 		}
 
 	public:
 		iterator_() : target{nullptr, nullptr}, pool{nullptr} {}
 		~iterator_() {
-			if(pool) --(pool->active_iterators);
+			drop_iterator();
 		}
 
 		iterator_(const iterator_<T, block_entry_link>& it) noexcept
@@ -375,7 +381,7 @@ public:
 		iterator_& operator=(const iterator_<T, block_entry_link>& it) noexcept {
 			target = {it.target.entry, it.target.containing_block};
 			if(pool != it.pool) {
-				if(pool) --(pool->active_iterators);
+				drop_iterator();
 				pool = it.pool;
 				if(pool) ++(pool->active_iterators);
 			}
@@ -393,7 +399,7 @@ public:
 		iterator_& operator=(iterator_<T, block_entry_link>&& it) noexcept {
 			target = {it.target.entry, it.target.containing_block};
 			if(pool != it.pool) {
-				if(pool) --(pool->active_iterators);
+				drop_iterator();
 				pool = it.pool;
 			}
 			it.target.entry = nullptr;
@@ -515,7 +521,7 @@ public:
 	iterator begin() {
 		block* block = first_block;
 		if(block)
-			return iterator({block->entries, block});
+			return iterator({block->entries, block}, this);
 		else
 			return iterator();
 	}
@@ -523,7 +529,7 @@ public:
 	const_iterator begin() const {
 		block* block = first_block;
 		if(block)
-			return const_iterator({block->entries, block});
+			return const_iterator({block->entries, block}, this);
 		else
 			return const_iterator();
 	}
@@ -531,7 +537,7 @@ public:
 	const_iterator cbegin() const {
 		block* block = first_block;
 		if(block)
-			return const_iterator({block->entries, block});
+			return const_iterator({block->entries, block}, this);
 		else
 			return const_iterator();
 	}
@@ -548,6 +554,10 @@ public:
 		return const_iterator();
 	}
 };
+
+template <typename T, size_t block_size>
+scratch_pad_pool<std::vector<typename smart_object_pool<T, block_size>::block_entry_link>>
+		smart_object_pool<T, block_size>::pending_destruction_scratch_pads;
 
 } // namespace containers
 } // namespace mce
