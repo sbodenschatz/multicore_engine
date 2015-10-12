@@ -442,10 +442,15 @@ public:
 			return it;
 		}
 
-		operator It_T*() const {
+		operator smart_pool_ptr<It_T>() const{
 			assert(target.containing_block);
 			assert(target.entry);
-			return &(target.entry->object);
+			if(target.containing_block->upgrade_ref(target.element)){
+				return smart_pool_ptr<It_T>(target.element,target.containing_block);
+			}
+			else{
+				return smart_object_pool<It_T>();
+			}
 		}
 
 	private:
