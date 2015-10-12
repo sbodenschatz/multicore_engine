@@ -22,7 +22,7 @@ namespace detail {
 // Interface used for type erasure to remove template parameters of the pool
 // from the type of smart_pool_ptr instances.
 struct smart_object_pool_block_interface {
-	typedef long long ref_count_t;
+	typedef int ref_count_t;
 	virtual ref_count_t strong_ref_count(void* object) noexcept = 0;
 	virtual void increment_strong_ref(void* object) noexcept = 0;
 	virtual void increment_weak_ref(void* object) noexcept = 0;

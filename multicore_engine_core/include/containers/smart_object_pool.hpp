@@ -122,9 +122,37 @@ private:
 	};
 
 	typedef detail::smart_object_pool_block_interface::ref_count_t ref_count_t;
+	typedef unsigned int ref_count_tag_t;
+
+	struct tagged_ref_count {
+		ref_count_t count;
+		ref_count_tag_t version;
+	};
+
+	static tagged_ref_count pre_increment_tagged_ref_count(std::atomic<tagged_ref_count>& rc) {
+		tagged_ref_count tmp = rc.load();
+		tagged_ref_count res;
+		while(!rc.compare_exchange_weak(tmp, res = {tmp.count + 1, tmp.version + 1}))
+			;
+		return res;
+	}
+
+	static tagged_ref_count pre_decrement_tagged_ref_count(std::atomic<tagged_ref_count>& rc) {
+		tagged_ref_count tmp = rc.load();
+		tagged_ref_count res;
+		while(!rc.compare_exchange_weak(tmp, res = {tmp.count - 1, tmp.version + 1}))
+			;
+		return res;
+	}
+
+	static void store_tagged_ref_count(std::atomic<tagged_ref_count>& rc, ref_count_t new_ref_count) {
+		tagged_ref_count tmp = rc.load();
+		while(!rc.compare_exchange_weak(tmp, {new_ref_count, tmp.version + 1}))
+			;
+	}
 
 	struct ref_count_ {
-		std::atomic<ref_count_t> strong;
+		std::atomic<tagged_ref_count> strong;
 		std::atomic<ref_count_t> weak;
 	};
 
@@ -163,13 +191,13 @@ private:
 		block(smart_object_pool<T, block_size>* owning_pool, block_entry_link& prev,
 			  block* prev_block = nullptr) noexcept : owning_pool{owning_pool},
 													  prev_block{prev_block} {
-			ref_counts[block_size - 1].strong = -1;
+			ref_counts[block_size - 1].strong = {-1, 0u};
 			ref_counts[block_size - 1].weak = 0;
 			entries[block_size - 1].next_free = prev;
 			for(auto i = block_size - 1; i > size_t(0); i--) {
 				auto index = i - 1;
 				entries[index].next_free = {&entries[i], this};
-				ref_counts[index].strong = -1;
+				ref_counts[index].strong = {-1, 0u};
 				ref_counts[index].weak = 0;
 			}
 			prev = {&entries[0], this};
@@ -182,11 +210,11 @@ private:
 
 		virtual ref_count_t strong_ref_count(void* object) noexcept override {
 			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
-			return rc.strong;
+			return rc.strong.load().count;
 		}
 		virtual void increment_strong_ref(void* object) noexcept override {
 			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
-			rc.strong++;
+			pre_increment_tagged_ref_count(rc.strong);
 		}
 		virtual void increment_weak_ref(void* object) noexcept override {
 			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
@@ -195,11 +223,12 @@ private:
 		virtual void decrement_strong_ref(void* object) noexcept override {
 			auto* entry = reinterpret_cast<block_entry*>(object);
 			auto& rc = ref_count(entry);
-			if(--(rc.strong) == 0) {
+			auto rc_result = pre_decrement_tagged_ref_count(rc.strong);
+			if(rc_result.count == 0) {
 				if(owning_pool->active_iterators > 0) {
-					owning_pool->mark_for_deferred_destruction(entry, this);
+					owning_pool->mark_for_deferred_destruction(entry, this, rc_result.version);
 				} else {
-					if(try_to_destroy_object(entry)) {
+					if(try_to_destroy_object(entry, rc_result.version)) {
 						// Object itself carries a weakref
 						decrement_weak_ref(&entry->object);
 					}
@@ -214,17 +243,17 @@ private:
 		// Needs to be called for incrementing the strong ref count if it isn't sure that the object is alive.
 		virtual bool upgrade_ref(void* object) noexcept override {
 			auto& rc = ref_count(reinterpret_cast<block_entry*>(object));
-			ref_count_t old = rc.strong;
+			auto old = rc.strong.load();
 			do { // Try to increment strong ref count while checking if the object is alive
-				if(old < 0) return false; // Object is already dead -> fail
-			} while(!rc.strong.compare_exchange_weak(old, old + 1));
+				if(old.count < 0) return false; // Object is already dead -> fail
+			} while(!rc.strong.compare_exchange_weak(old, {old.count + 1, old.version + 1}));
 			return true;
 		}
-		bool try_to_destroy_object(block_entry* entry) noexcept {
+		bool try_to_destroy_object(block_entry* entry, ref_count_tag_t version_tag) noexcept {
 			auto& rc = ref_count(entry);
 			// Attempt to set ref_count to -1 as a flag marking it as dead.
-			ref_count_t expected_ref_count = 0;
-			if(!rc.strong.compare_exchange_strong(expected_ref_count, -1)) {
+			tagged_ref_count expected_ref_count = {0, version_tag};
+			if(!rc.strong.compare_exchange_strong(expected_ref_count, {-1, version_tag + 1})) {
 				return false; // Something got a strong ref through upgrade
 			}
 			--active_objects;
@@ -236,15 +265,21 @@ private:
 		template <typename... Args>
 		void create_object(block_entry* place, Args&&... args) {
 			auto& rc = ref_count(place);
-			assert(rc.strong == -1); // Assert there is no object living in this place
-			assert(rc.weak == 0);	// Assert nothing is observing the place
-			rc.weak = 1;			 // Object itself gets a weak ref to hold its entry
+			assert(rc.strong.load().count == -1); // Assert there is no object living in this place
+			assert(rc.weak == 0);				  // Assert nothing is observing the place
+			rc.weak = 1;						  // Object itself gets a weak ref to hold its entry
 			new(&place->object) T(std::forward<Args>(args)...);
 			++active_objects;
 			++(owning_pool->active_objects);
-			rc.strong = 1;
+			store_tagged_ref_count(rc.strong, 1);
 		}
 	};
+
+	struct pending_destruction_list_entry {
+		block_entry_link ptr;
+		ref_count_tag_t version;
+	};
+
 	ALIGNED_NEW_AND_DELETE(smart_object_pool)
 
 	std::atomic<size_t> active_iterators{0};
@@ -260,9 +295,9 @@ private:
 
 	alignas(cacheline_alignment) std::atomic<size_t> pending_destructions{0};
 	std::mutex pending_destruction_list_mutex;
-	std::vector<block_entry_link> pending_destruction_list;
+	std::vector<pending_destruction_list_entry> pending_destruction_list;
 
-	static scratch_pad_pool<std::vector<block_entry_link>> pending_destruction_scratch_pads;
+	static scratch_pad_pool<std::vector<pending_destruction_list_entry>> pending_destruction_scratch_pads;
 
 	friend class smart_pool_ptr<T>;
 
@@ -300,14 +335,15 @@ private:
 		--allocated_objects;
 	}
 
-	void mark_for_deferred_destruction(block_entry* entry, block* block)
+	void mark_for_deferred_destruction(block_entry* entry, block* block, ref_count_tag_t version_tag)
 	/*TODO Find a way to make this noexcept because it will be called in a destructor*/ {
 		std::lock_guard<std::mutex> lock(pending_destruction_list_mutex);
 		if(active_iterators > 0) { // Check again because iterator might already be finished
-			pending_destruction_list.push_back(block_entry_link{entry, block});
+			pending_destruction_list.push_back(
+					pending_destruction_list_entry{block_entry_link{entry, block}, version_tag});
 			++pending_destructions;
 		} else {
-			if(block->try_to_destroy_object(entry)) {
+			if(block->try_to_destroy_object(entry, version_tag)) {
 				// Object itself carries a weakref
 				block->decrement_weak_ref(&entry->object);
 			}
@@ -325,13 +361,13 @@ private:
 			std::swap(*pending, pending_destruction_list);
 		}
 		for(auto& obj : *pending) {
-			if(obj.containing_block->try_to_destroy_object(obj.entry)) {
-				auto& rc = obj.containing_block->ref_count(obj.entry);
+			if(obj.ptr.containing_block->try_to_destroy_object(obj.ptr.entry, obj.version)) {
+				auto& rc = obj.ptr.containing_block->ref_count(obj.ptr.entry);
 				if(--(rc.weak) == 0) { dealloc->push_back(obj); }
 			}
 		}
 		std::lock_guard<std::mutex> lock(free_list_mutex);
-		for(auto& obj : *dealloc) { deallocate_inner(obj.entry, obj.containing_block); }
+		for(auto& obj : *dealloc) { deallocate_inner(obj.ptr.entry, obj.ptr.containing_block); }
 	}
 
 public:
@@ -442,13 +478,12 @@ public:
 			return it;
 		}
 
-		operator smart_pool_ptr<It_T>() const{
+		operator smart_pool_ptr<It_T>() const {
 			assert(target.containing_block);
 			assert(target.entry);
-			if(target.containing_block->upgrade_ref(target.element)){
-				return smart_pool_ptr<It_T>(target.element,target.containing_block);
-			}
-			else{
+			if(target.containing_block->upgrade_ref(target.element)) {
+				return smart_pool_ptr<It_T>(target.element, target.containing_block);
+			} else {
 				return smart_object_pool<It_T>();
 			}
 		}
@@ -488,7 +523,7 @@ public:
 					target.entry = nullptr;
 					return;
 				}
-				if(target.containing_block->ref_count(target.entry).strong > 0)
+				if(target.containing_block->ref_count(target.entry).strong.load().count > 0)
 					return;
 				else
 					target.entry++;
@@ -561,7 +596,7 @@ public:
 };
 
 template <typename T, size_t block_size>
-scratch_pad_pool<std::vector<typename smart_object_pool<T, block_size>::block_entry_link>>
+scratch_pad_pool<std::vector<typename smart_object_pool<T, block_size>::pending_destruction_list_entry>>
 		smart_object_pool<T, block_size>::pending_destruction_scratch_pads;
 
 } // namespace containers
