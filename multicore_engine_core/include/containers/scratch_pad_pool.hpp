@@ -37,10 +37,17 @@ public:
 		object(scratch_pad_pool<T>* pool, T&& obj) : pool(pool), obj(std::move_if_noexcept(obj)) {}
 		object(const object&) = delete;
 		object& operator=(const object&) = delete;
-		object(object&&) noexcept = default;
-		object& operator=(object&&) noexcept = default;
+		object(object&& other) noexcept : pool(other.pool),obj(std::move_if_noexcept(other.obj)) {
+			other.pool = nullptr;
+		}
+		object& operator=(object&& other) noexcept {
+			pool = other.pool;
+			obj = std::move_if_noexcept(other.obj);
+			other.pool = nullptr;
+			return *this;
+		}
 		~object() noexcept {
-			pool->give_back(std::move_if_noexcept(obj));
+			if(pool) pool->give_back(std::move_if_noexcept(obj));
 		}
 		T& operator*() {
 			return obj;

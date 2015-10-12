@@ -15,7 +15,26 @@ namespace mce {
 namespace containers {
 
 struct smart_object_pool_fixture {
-	typedef long long element;
+	struct X{
+		long long x;
+		X(const long long& o):x(o){}
+		X& operator=(const long long & o){
+			x=o;
+			return *this;
+		}
+		X(const X& o):x(o.x){}
+		X& operator=(const X& o){
+			x=o.x;
+			return *this;
+		}
+		~X(){
+			x=0xdeadbeefdeadbeef;
+		}
+		operator long long () const{
+			return x;
+		}
+	};
+	typedef X element;
 	mce::containers::smart_object_pool<element> sop;
 	smart_object_pool_fixture() {}
 	~smart_object_pool_fixture() {}
@@ -58,9 +77,26 @@ BOOST_AUTO_TEST_CASE(iterator_holds_object) {
 	BOOST_CHECK(sop.empty());
 }
 
+BOOST_AUTO_TEST_CASE(rescue_object) {
+	auto ptr = sop.emplace(42);
+	BOOST_CHECK(*ptr == 42);
+	BOOST_CHECK(sop.size() == 1);
+	auto it = sop.begin();
+	weak_pool_ptr<element> wptr = ptr;
+	ptr.reset();
+	ptr=wptr.lock();
+	BOOST_CHECK(ptr);
+	BOOST_CHECK(sop.size() == 1);
+	it = decltype(sop)::iterator();
+	BOOST_CHECK(*ptr == 42);
+	ptr.reset();
+	BOOST_CHECK(sop.size() == 0);
+	BOOST_CHECK(sop.empty());
+}
+
 BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 	auto t1 = std::chrono::high_resolution_clock::now();
-	sop.reserve(128 * 0x10000);
+	sop.reserve(128 * 0x1000);
 	auto t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> diff1 = t2 - t1;
 	std::cout << diff1.count() << std::endl;

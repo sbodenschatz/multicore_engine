@@ -257,7 +257,7 @@ public:
 		other.block = nullptr;
 	}
 	template <typename U>
-	weak_pool_ptr(smart_pool_ptr<U>&& other)
+	weak_pool_ptr(smart_pool_ptr<U>& other)
 			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_weak_ref(managed_object);
 	}
