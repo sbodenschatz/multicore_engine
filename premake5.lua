@@ -27,6 +27,7 @@ solution "multicore_engine_solution"
 		targetdir "%{prj.location}/bin-gcc/%{cfg.buildcfg}"
 		objdir "%{prj.location}/obj-gcc/%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
+		links {"pthread"}
 
 	configuration {"gmake"}
 		if _OPTIONS["cc"] == "clang" then
