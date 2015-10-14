@@ -13,13 +13,14 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <stdexcept>
+#include <tuple>
 
 namespace mce {
 namespace containers {
 
 // Interface resembling that of the STL map containers
-template <template <typename> class Container, typename Key, typename Value,
-		  typename Compare = std::less<Key>>
+template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
 class map_wrapper {
 	Container<Key> keys;
 	Container<Value> values;
@@ -86,14 +87,108 @@ public:
 		return *this;
 	}
 
-	class iterator {
-		iterator(size_t) {}
-		// TODO Implement
+	template <typename T>
+	struct member_access_wrapper {
+		T value;
+		template <typename... Args>
+		member_access_wrapper(Args&&... args)
+				: value{std::forward<Args>(args)...} {}
+		T* operator->() noexcept {
+			return &value;
+		}
 	};
-	class const_iterator {
-		const_iterator(size_t) {}
-		// TODO Implement
+
+	template <typename Map, typename It_Key, typename It_Value>
+	class iterator_ : public std::iterator<std::bidirectional_iterator_tag, std::pair<It_Key&, It_Value&>> {
+		size_t index;
+		Map* map;
+
+	public:
+		template <typename M, typename IK, typename IV>
+		friend class iterator_;
+		friend Map;
+		typedef typename iterator_::value_type reference;
+		iterator_() = delete;
+		iterator_(size_t index, Map* map) noexcept : index(index), map(map) {}
+		iterator_(const iterator_<std::remove_const_t<Map>, std::remove_const_t<It_Key>,
+								  std::remove_const_t<It_Value>>& it) noexcept : index(it.index),
+																				 map(it.map) {}
+		iterator_& operator=(const iterator_<std::remove_const_t<Map>, std::remove_const_t<It_Key>,
+											 std::remove_const_t<It_Value>>& it) noexcept {
+			index = it.index;
+			map = it.map;
+			return *this;
+		}
+
+		std::pair<It_Key&, It_Value&> operator*() const noexcept {
+			return std::make_pair(std::ref(map->keys[index]), std::ref(map->values[index]));
+		}
+		member_access_wrapper<std::pair<It_Key&, It_Value&>> operator->() const noexcept {
+			return member_access_wrapper<std::pair<It_Key&, It_Value&>>(operator*());
+		}
+		bool operator==(const iterator_& it) const noexcept {
+			return it.index == index && it.map == map;
+		}
+		bool operator!=(const iterator_& it) const noexcept {
+			return !(*this == it);
+		}
+		iterator_& operator++() noexcept {
+			++index;
+			return *this;
+		}
+		iterator_ operator++(int) noexcept {
+			auto it = *this;
+			this->operator++();
+			return it;
+		}
+		iterator_& operator--() noexcept {
+			--index;
+			return *this;
+		}
+		iterator_ operator--(int) noexcept {
+			auto it = *this;
+			this->operator--();
+			return it;
+		}
+		iterator_& operator+=(typename iterator_::difference_type n) noexcept {
+			index += n;
+			return *this;
+		}
+		iterator_& operator-=(typename iterator_::difference_type n) noexcept {
+			index -= n;
+			return *this;
+		}
+		friend iterator_ operator+(iterator_ it, typename iterator_::difference_type n) noexcept {
+			return it += n;
+		}
+		friend iterator_ operator+(typename iterator_::difference_type n, iterator_ it) noexcept {
+			return it += n;
+		}
+		friend iterator_ operator-(iterator_ it, typename iterator_::difference_type n) noexcept {
+			return it -= n;
+		}
+		friend typename iterator_::difference_type operator-(iterator_ it1, iterator_ it2) noexcept {
+			return it1.index - it2.index;
+		}
+		std::pair<It_Key&, It_Value&> operator[](int n) noexcept {
+			return *((*this) + n);
+		}
+		bool operator<(iterator_ other) noexcept {
+			return (map == other.map) && (index < other.index);
+		}
+		bool operator>(iterator_ other) noexcept {
+			return (map == other.map) && (index > other.index);
+		}
+		bool operator<=(iterator_ other) noexcept {
+			return (map == other.map) && (index <= other.index);
+		}
+		bool operator>=(iterator_ other) noexcept {
+			return (map == other.map) && (index >= other.index);
+		}
 	};
+
+	typedef iterator_<map_wrapper, Key, Value> iterator;
+	typedef iterator_<const map_wrapper, const Key, const Value> const_iterator;
 	typedef std::reverse_iterator<iterator> reverse_iterator;
 	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -103,26 +198,26 @@ public:
 	}
 
 	template <typename K, typename V>
-	std::pair<iterator, bool> insert(const K&& key, const V&& value) {
+	std::pair<iterator, bool> insert(K&& key, V&& value) {
 		try {
-			auto it_key = std::lower_bound(keys.begin(), keys.end(), key, compare);
+			auto it_key = std::upper_bound(keys.begin(), keys.end(), key, compare);
 			if(it_key == keys.end()) {
 				auto index = keys.size();
 				keys.reserve(keys.size() + 1);
 				values.reserve(values.size() + 1);
 				keys.emplace_back(std::forward<K>(key));
 				values.emplace_back(std::forward<V>(value));
-				return std::make_pair(iterator(index), true);
+				return std::make_pair(iterator(index, this), true);
 			}
 			auto index = std::distance(keys.begin(), it_key);
 			if(!compare(*it_key, key) && !compare(key, *it_key))
-				return std::make_pair(iterator(index), false);
+				return std::make_pair(iterator(index, this), false);
 			auto it_value = values.begin() + index;
 			keys.reserve(keys.size() + 1);
 			values.reserve(values.size() + 1);
 			keys.emplace(it_key, std::forward<K>(key));
 			values.emplace(it_value, std::forward<V>(value));
-			return std::make_pair(iterator(index), true);
+			return std::make_pair(iterator(index, this), true);
 		} catch(...) {
 			keys.clear();
 			values.clear();
@@ -130,79 +225,192 @@ public:
 		}
 	}
 	template <typename K, typename V>
-	std::pair<iterator, bool> insert_or_assign(const K&& key, const V&& value) {
+	std::pair<iterator, bool> insert_or_assign(K&& key, V&& value) {
 		try {
-			auto it_key = std::lower_bound(keys.begin(), keys.end(), key, compare);
+			auto it_key = std::upper_bound(keys.begin(), keys.end(), key, compare);
 			if(it_key == keys.end()) {
 				auto index = keys.size();
 				keys.reserve(keys.size() + 1);
 				values.reserve(values.size() + 1);
 				keys.emplace_back(std::forward<K>(key));
 				values.emplace_back(std::forward<V>(value));
-				return std::make_pair(iterator(index), true);
+				return std::make_pair(iterator(index, this), true);
 			}
 			auto index = std::distance(keys.begin(), it_key);
 			if(!compare(*it_key, key) && !compare(key, *it_key)) {
 				values[index] = std::forward<V>(value);
-				return std::make_pair(iterator(index), false);
+				return std::make_pair(iterator(index, this), false);
 			}
 			auto it_value = values.begin() + index;
 			keys.reserve(keys.size() + 1);
 			values.reserve(values.size() + 1);
 			keys.emplace(it_key, std::forward<K>(key));
 			values.emplace(it_value, std::forward<V>(value));
-			return std::make_pair(iterator(index), true);
+			return std::make_pair(iterator(index, this), true);
 		} catch(...) {
 			keys.clear();
 			values.clear();
 			throw;
 		}
 	}
-	iterator erase(iterator pos);
-	iterator erase(const_iterator pos);
-	size_t erase(const Key& key);
-	void swap(map_wrapper& other);
-	size_t count(const Key& key) const;
-	template <typename K,
-			  // Only allow this overload for transparent Compares:
-			  typename Comp = Compare, typename X = typename Comp::is_transparent>
-	size_t count(const K& x) const;
-	iterator find(const Key& key);
-	const_iterator find(const Key& key) const;
-	template <typename K,
-			  // Only allow this overload for transparent Compares:
-			  typename Comp = Compare, typename X = typename Comp::is_transparent>
-	iterator find(const K& x);
-	template <typename K,
-			  // Only allow this overload for transparent Compares:
-			  typename Comp = Compare, typename X = typename Comp::is_transparent>
-	const_iterator find(const K& x) const;
-	iterator lower_bound(const Key& key);
-	const_iterator lower_bound(const Key& key) const;
-	template <typename K,
-			  // Only allow this overload for transparent Compares:
-			  typename Comp = Compare, typename X = typename Comp::is_transparent>
-	iterator lower_bound(const K& x);
-	template <typename K,
-			  // Only allow this overload for transparent Compares:
-			  typename Comp = Compare, typename X = typename Comp::is_transparent>
-	const_iterator lower_bound(const K& x) const;
-	iterator upper_bound(const Key& key);
-	const_iterator upper_bound(const Key& key) const;
-	template <typename K,
-			  // Only allow this overload for transparent Compares:
-			  typename Comp = Compare, typename X = typename Comp::is_transparent>
-	iterator upper_bound(const K& x);
-	template <typename K,
-			  // Only allow this overload for transparent Compares:
-			  typename Comp = Compare, typename X = typename Comp::is_transparent>
-	const_iterator upper_bound(const K& x) const;
-	std::pair<iterator, iterator> equal_range(const Key& key);
-	std::pair<const_iterator, const_iterator> equal_range(const Key& key) const;
+	iterator erase(iterator pos) {
+		return erase(const_iterator(pos));
+	}
+	iterator erase(const_iterator pos) {
+		try {
+			auto it = keys.erase(keys.begin() + pos.index);
+			values.erase(values.begin() + pos.index);
+			return iterator(std::distance(keys.begin(), it), this);
+		} catch(...) {
+			keys.clear();
+			values.clear();
+			throw;
+		}
+	}
+	size_t erase(const Key& key) {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		if(it != keys.end()) {
+			erase(iterator(std::distance(keys.begin(), it), this));
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	void swap(map_wrapper& other) {
+		try {
+			using std::swap;
+			swap(compare, other.compare);
+			swap(keys, other.keys);
+			swap(values, other.values);
+		} catch(...) {
+			keys.clear();
+			values.clear();
+			other.keys.clear();
+			other.values.clear();
+			throw;
+		}
+	}
+
+	Value& at(const Key& key) {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		if(it != keys.end()) {
+			return values[std::distance(keys.begin(), it)];
+		} else {
+			throw std::out_of_range("Key not found.");
+		}
+	}
+	const Value& at(const Key& key) const {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		if(it != keys.end()) {
+			return values[std::distance(keys.begin(), it)];
+		} else {
+			throw std::out_of_range("Key not found.");
+		}
+	}
 	template <typename K>
-	std::pair<iterator, iterator> equal_range(const K& x);
+	Value& operator[](K&& key) {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		if(it == keys.end()) { std::tie(it, std::ignore) = insert(std::forward<K>(key), Value()); }
+		return values[std::distance(keys.begin(), it)];
+	}
+
+	size_t count(const Key& key) const {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		if(it != keys.end())
+			return 1;
+		else
+			return 0;
+	}
+	template <typename K,
+			  // Only allow this overload for transparent Compares:
+			  typename Comp = Compare, typename X = typename Comp::is_transparent>
+	size_t count(const K& key) const {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		if(it != keys.end())
+			return 1;
+		else
+			return 0;
+	}
+	iterator find(const Key& key) {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		return iterator(std::distance(keys.begin(), it), this);
+	}
+	const_iterator find(const Key& key) const {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		return const_iterator(std::distance(keys.begin(), it), this);
+	}
+	template <typename K,
+			  // Only allow this overload for transparent Compares:
+			  typename Comp = Compare, typename X = typename Comp::is_transparent>
+	iterator find(const K& key) {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		return iterator(std::distance(keys.begin(), it), this);
+	}
+	template <typename K,
+			  // Only allow this overload for transparent Compares:
+			  typename Comp = Compare, typename X = typename Comp::is_transparent>
+	const_iterator find(const K& key) const {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		return const_iterator(std::distance(keys.begin(), it), this);
+	}
+	iterator lower_bound(const Key& key) {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		return iterator(std::distance(keys.begin(), it), this);
+	}
+	const_iterator lower_bound(const Key& key) const {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		return const_iterator(std::distance(keys.begin(), it), this);
+	}
+	template <typename K,
+			  // Only allow this overload for transparent Compares:
+			  typename Comp = Compare, typename X = typename Comp::is_transparent>
+	iterator lower_bound(const K& key) {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		return iterator(std::distance(keys.begin(), it), this);
+	}
+	template <typename K,
+			  // Only allow this overload for transparent Compares:
+			  typename Comp = Compare, typename X = typename Comp::is_transparent>
+	const_iterator lower_bound(const K& key) const {
+		auto it = std::lower_bound(keys.begin(), keys.end(), key, compare);
+		return const_iterator(std::distance(keys.begin(), it), this);
+	}
+	iterator upper_bound(const Key& key) {
+		auto it = std::upper_bound(keys.begin(), keys.end(), key, compare);
+		return iterator(std::distance(keys.begin(), it), this);
+	}
+	const_iterator upper_bound(const Key& key) const {
+		auto it = std::upper_bound(keys.begin(), keys.end(), key, compare);
+		return const_iterator(std::distance(keys.begin(), it), this);
+	}
+	template <typename K,
+			  // Only allow this overload for transparent Compares:
+			  typename Comp = Compare, typename X = typename Comp::is_transparent>
+	iterator upper_bound(const K& key) {
+		auto it = std::upper_bound(keys.begin(), keys.end(), key, compare);
+		return iterator(std::distance(keys.begin(), it), this);
+	}
+	template <typename K,
+			  // Only allow this overload for transparent Compares:
+			  typename Comp = Compare, typename X = typename Comp::is_transparent>
+	const_iterator upper_bound(const K& key) const {
+		auto it = std::upper_bound(keys.begin(), keys.end(), key, compare);
+		return const_iterator(std::distance(keys.begin(), it), this);
+	}
+	std::pair<iterator, iterator> equal_range(const Key& key) {
+		return std::make_pair(lower_bound(key), upper_bound(key));
+	}
+	std::pair<const_iterator, const_iterator> equal_range(const Key& key) const {
+		return std::make_pair(lower_bound(key), upper_bound(key));
+	}
 	template <typename K>
-	std::pair<const_iterator, const_iterator> equal_range(const K& x) const;
+	std::pair<iterator, iterator> equal_range(const K& key) {
+		return std::make_pair(lower_bound(key), upper_bound(key));
+	}
+	template <typename K>
+	std::pair<const_iterator, const_iterator> equal_range(const K& key) const {
+		return std::make_pair(lower_bound(key), upper_bound(key));
+	}
 
 	bool empty() const noexcept {
 		return keys.empty();
@@ -212,25 +420,51 @@ public:
 		return keys.size();
 	}
 
-	iterator begin() noexcept;
-	const_iterator begin() const noexcept;
-	const_iterator cbegin() const noexcept;
+	iterator begin() noexcept {
+		return iterator(0, this);
+	}
+	const_iterator begin() const noexcept {
+		return const_iterator(0, this);
+	}
+	const_iterator cbegin() const noexcept {
+		return const_iterator(0, this);
+	}
 
-	iterator end() noexcept;
-	const_iterator end() const noexcept;
-	const_iterator cend() const noexcept;
+	iterator end() noexcept {
+		return iterator(keys.size(), this);
+	}
+	const_iterator end() const noexcept {
+		return const_iterator(keys.size(), this);
+	}
+	const_iterator cend() const noexcept {
+		return const_iterator(keys.size(), this);
+	}
 
-	iterator rbegin() noexcept;
-	const_iterator rbegin() const noexcept;
-	const_iterator crbegin() const noexcept;
+	reverse_iterator rbegin() noexcept {
+		return reverse_iterator(end());
+	}
+	const_reverse_iterator rbegin() const noexcept {
+		return const_reverse_iterator(end());
+	}
+	const_reverse_iterator crbegin() const noexcept {
+		return const_reverse_iterator(cend());
+	}
 
-	iterator rend() noexcept;
-	const_iterator rend() const noexcept;
-	const_iterator crend() const noexcept;
+	reverse_iterator rend() noexcept {
+		return reverse_iterator(begin());
+	}
+	const_reverse_iterator rend() const noexcept {
+		return const_reverse_iterator(begin());
+	}
+	const_reverse_iterator crend() const noexcept {
+		return const_reverse_iterator(cbegin());
+	}
 };
 
 template <template <typename> class Container, typename Key, typename Value, typename Compare>
-void swap(map_wrapper<Container, Key, Value, Compare>& m1, map_wrapper<Container, Key, Value, Compare>& m2);
+void swap(map_wrapper<Container, Key, Value, Compare>& m1, map_wrapper<Container, Key, Value, Compare>& m2) {
+	m1.swap(m2);
+}
 
 } // namespace containers
 } // namespace mce

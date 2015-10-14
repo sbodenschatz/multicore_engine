@@ -348,7 +348,7 @@ public:
 						return;
 					}
 				}
-				if (!target.containing_block) {
+				if(!target.containing_block) {
 					target.entry = nullptr;
 					return;
 				}
@@ -532,7 +532,7 @@ public:
 	}
 
 	bool empty() const {
-		return active_objects==0;
+		return active_objects == 0;
 	}
 
 private:
