@@ -4,8 +4,8 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#ifndef CONTAINERS_MAP_WRAPPER_HPP_
-#define CONTAINERS_MAP_WRAPPER_HPP_
+#ifndef CONTAINERS_DUAL_CONTAINER_MAP_HPP_
+#define CONTAINERS_DUAL_CONTAINER_MAP_HPP_
 
 #include <utility>
 #include <functional>
@@ -20,22 +20,25 @@ namespace mce {
 namespace containers {
 
 // Interface resembling that of the STL map containers
+// But iterators return (by value) a pair of references to the key and value instead of a reference to a pair
+// of the values of the keys and the values. This means taking the dereferenced value into auto by value still
+// yields a pair of references which can modify the value in the map.
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
-class map_wrapper {
+class dual_container_map {
 	Container<Key> keys;
 	Container<Value> values;
 	Compare compare;
 
 public:
 	template <typename... Args>
-	explicit map_wrapper(const Compare& compare, Args&&... args) noexcept(
+	explicit dual_container_map(const Compare& compare, Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Container<Key>>::value&&
 					std::is_nothrow_default_constructible<Container<Value>>::value&&
 							std::is_nothrow_default_constructible<Compare>::value&&
 									std::is_nothrow_copy_constructible<Compare>::value)
 			: keys(std::forward<Args>(args)...), values(std::forward<Args>(args)...), compare(compare) {}
 	template <typename... Args>
-	explicit map_wrapper(Compare&& compare = Compare(), Args&&... args) noexcept(
+	explicit dual_container_map(Compare&& compare = Compare(), Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Container<Key>>::value&&
 					std::is_nothrow_default_constructible<Container<Value>>::value&&
 							std::is_nothrow_default_constructible<Compare>::value &&
@@ -43,11 +46,11 @@ public:
 			 std::is_nothrow_move_constructible<Compare>::value))
 			: keys(std::forward<Args>(args)...), values(std::forward<Args>(args)...),
 			  compare(std::move_if_noexcept(compare)) {}
-	map_wrapper(const map_wrapper& other) noexcept(
+	dual_container_map(const dual_container_map& other) noexcept(
 			std::is_nothrow_copy_constructible<Container<Key>>::value&& std::is_nothrow_copy_constructible<
 					Container<Value>>::value&& std::is_nothrow_copy_constructible<Compare>::value)
 			: keys(other.keys), values(other.values), compare(other.compare) {}
-	map_wrapper(map_wrapper&& other) noexcept((std::is_nothrow_copy_constructible<Container<Key>>::value ||
+	dual_container_map(dual_container_map&& other) noexcept((std::is_nothrow_copy_constructible<Container<Key>>::value ||
 											   std::is_nothrow_move_constructible<Container<Key>>::value) &&
 											  (std::is_nothrow_copy_constructible<Container<Value>>::value ||
 											   std::is_nothrow_move_constructible<Container<Value>>::value) &&
@@ -55,7 +58,7 @@ public:
 											   std::is_nothrow_move_constructible<Compare>::value))
 			: keys(std::move_if_noexcept(other.keys)), values(std::move_if_noexcept(other.values)),
 			  compare(std::move_if_noexcept(other.compare)) {}
-	map_wrapper& operator=(const map_wrapper& other) noexcept(
+	dual_container_map& operator=(const dual_container_map& other) noexcept(
 			std::is_nothrow_copy_assignable<Container<Key>>::value&& std::is_nothrow_copy_assignable<
 					Container<Value>>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
 		try {
@@ -71,7 +74,7 @@ public:
 		}
 		return *this;
 	}
-	map_wrapper& operator=(map_wrapper&& other) noexcept(
+	dual_container_map& operator=(dual_container_map&& other) noexcept(
 			std::is_nothrow_copy_assignable<Container<Key>>::value&& std::is_nothrow_copy_assignable<
 					Container<Value>>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
 		assert(this == &other);
@@ -188,8 +191,8 @@ public:
 		}
 	};
 
-	typedef iterator_<map_wrapper, const Key, Value> iterator;
-	typedef iterator_<const map_wrapper, const Key, const Value> const_iterator;
+	typedef iterator_<dual_container_map, const Key, Value> iterator;
+	typedef iterator_<const dual_container_map, const Key, const Value> const_iterator;
 	typedef std::reverse_iterator<iterator> reverse_iterator;
 	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -267,7 +270,7 @@ public:
 			return 0;
 		}
 	}
-	void swap(map_wrapper& other) {
+	void swap(dual_container_map& other) {
 		try {
 			using std::swap;
 			swap(compare, other.compare);
@@ -453,11 +456,11 @@ public:
 };
 
 template <template <typename> class Container, typename Key, typename Value, typename Compare>
-void swap(map_wrapper<Container, Key, Value, Compare>& m1, map_wrapper<Container, Key, Value, Compare>& m2) {
+void swap(dual_container_map<Container, Key, Value, Compare>& m1, dual_container_map<Container, Key, Value, Compare>& m2) {
 	m1.swap(m2);
 }
 
 } // namespace containers
 } // namespace mce
 
-#endif /* CONTAINERS_MAP_WRAPPER_HPP_ */
+#endif /* CONTAINERS_DUAL_CONTAINER_MAP_HPP_ */
