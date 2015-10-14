@@ -110,11 +110,12 @@ public:
 		typedef typename iterator_::value_type reference;
 		iterator_() = delete;
 		iterator_(size_t index, Map* map) noexcept : index(index), map(map) {}
-		iterator_(const iterator_<std::remove_const_t<Map>, std::remove_const_t<It_Key>,
-								  std::remove_const_t<It_Value>>& it) noexcept : index(it.index),
-																				 map(it.map) {}
-		iterator_& operator=(const iterator_<std::remove_const_t<Map>, std::remove_const_t<It_Key>,
-											 std::remove_const_t<It_Value>>& it) noexcept {
+		iterator_(
+				const iterator_<std::remove_const_t<Map>, It_Key, std::remove_const_t<It_Value>>& it) noexcept
+				: index(it.index),
+				  map(it.map) {}
+		iterator_& operator=(const iterator_<std::remove_const_t<Map>, It_Key, std::remove_const_t<It_Value>>&
+									 it) noexcept {
 			index = it.index;
 			map = it.map;
 			return *this;
@@ -187,7 +188,7 @@ public:
 		}
 	};
 
-	typedef iterator_<map_wrapper, Key, Value> iterator;
+	typedef iterator_<map_wrapper, const Key, Value> iterator;
 	typedef iterator_<const map_wrapper, const Key, const Value> const_iterator;
 	typedef std::reverse_iterator<iterator> reverse_iterator;
 	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -200,23 +201,18 @@ public:
 	template <typename K, typename V>
 	std::pair<iterator, bool> insert(K&& key, V&& value) {
 		try {
-			auto it_key = std::upper_bound(keys.begin(), keys.end(), key, compare);
-			if(it_key == keys.end()) {
-				auto index = keys.size();
-				keys.reserve(keys.size() + 1);
-				values.reserve(values.size() + 1);
-				keys.emplace_back(std::forward<K>(key));
-				values.emplace_back(std::forward<V>(value));
-				return std::make_pair(iterator(index, this), true);
-			}
-			auto index = std::distance(keys.begin(), it_key);
+			auto it_after_key = std::upper_bound(keys.begin(), keys.end(), key, compare);
+			auto it_key = it_after_key;
+			if(it_key != keys.begin()) --it_key;
+			auto key_index = std::distance(keys.begin(), it_key);
 			if(!compare(*it_key, key) && !compare(key, *it_key))
-				return std::make_pair(iterator(index, this), false);
-			auto it_value = values.begin() + index;
+				return std::make_pair(iterator(key_index, this), false);
+			auto index = std::distance(keys.begin(), it_after_key);
+			auto it_after_value = values.begin() + index;
 			keys.reserve(keys.size() + 1);
 			values.reserve(values.size() + 1);
-			keys.emplace(it_key, std::forward<K>(key));
-			values.emplace(it_value, std::forward<V>(value));
+			keys.emplace(it_after_key, std::forward<K>(key));
+			values.emplace(it_after_value, std::forward<V>(value));
 			return std::make_pair(iterator(index, this), true);
 		} catch(...) {
 			keys.clear();
@@ -227,25 +223,20 @@ public:
 	template <typename K, typename V>
 	std::pair<iterator, bool> insert_or_assign(K&& key, V&& value) {
 		try {
-			auto it_key = std::upper_bound(keys.begin(), keys.end(), key, compare);
-			if(it_key == keys.end()) {
-				auto index = keys.size();
-				keys.reserve(keys.size() + 1);
-				values.reserve(values.size() + 1);
-				keys.emplace_back(std::forward<K>(key));
-				values.emplace_back(std::forward<V>(value));
-				return std::make_pair(iterator(index, this), true);
-			}
-			auto index = std::distance(keys.begin(), it_key);
+			auto it_after_key = std::upper_bound(keys.begin(), keys.end(), key, compare);
+			auto it_key = it_after_key;
+			if(it_key != keys.begin()) --it_key;
+			auto key_index = std::distance(keys.begin(), it_key);
 			if(!compare(*it_key, key) && !compare(key, *it_key)) {
-				values[index] = std::forward<V>(value);
-				return std::make_pair(iterator(index, this), false);
+				values[key_index] = std::forward<V>(value);
+				return std::make_pair(iterator(key_index, this), false);
 			}
-			auto it_value = values.begin() + index;
+			auto index = std::distance(keys.begin(), it_after_key);
+			auto it_after_value = values.begin() + index;
 			keys.reserve(keys.size() + 1);
 			values.reserve(values.size() + 1);
-			keys.emplace(it_key, std::forward<K>(key));
-			values.emplace(it_value, std::forward<V>(value));
+			keys.emplace(it_after_key, std::forward<K>(key));
+			values.emplace(it_after_value, std::forward<V>(value));
 			return std::make_pair(iterator(index, this), true);
 		} catch(...) {
 			keys.clear();

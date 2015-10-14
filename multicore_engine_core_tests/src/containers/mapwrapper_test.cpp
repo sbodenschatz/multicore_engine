@@ -39,6 +39,40 @@ BOOST_AUTO_TEST_CASE(insert) {
 	stdmap.emplace(42, "hello");
 	mw.insert(43, "world");
 	stdmap.emplace(43, "world");
+	for(auto&& v : mw) { std::cout << v.first << " " << v.second << "   "; }
+	std::cout << std::endl;
+	for(auto& v : stdmap) { std::cout << v.first << " " << v.second << "   "; }
+	std::cout << std::endl;
+	BOOST_CHECK(std::equal(mw.begin(), mw.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+		return v1.first == v2.first && v1.second == v2.second;
+	}));
+}
+BOOST_AUTO_TEST_CASE(insert_duplicate) {
+	mw.insert(123, "ABCD");
+	stdmap.emplace(123, "ABCD");
+	mw.insert(123, "EFG");
+	stdmap.emplace(123, "EFG");
+	mw.insert(456, "XYZ");
+	stdmap.emplace(456, "XYZ");
+	mw.insert(42, "hello");
+	stdmap.emplace(42, "hello");
+	mw.insert(43, "world");
+	stdmap.emplace(43, "world");
+	BOOST_CHECK(std::equal(mw.begin(), mw.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+		return v1.first == v2.first && v1.second == v2.second;
+	}));
+}
+BOOST_AUTO_TEST_CASE(insert_or_assign_duplicate) {
+	mw.insert_or_assign(123, "ABCD");
+	stdmap.emplace(123, "ABCD");
+	mw.insert_or_assign(123, "EFG");
+	stdmap[123] = "EFG";
+	mw.insert_or_assign(456, "XYZ");
+	stdmap.emplace(456, "XYZ");
+	mw.insert_or_assign(42, "hello");
+	stdmap.emplace(42, "hello");
+	mw.insert_or_assign(43, "world");
+	stdmap.emplace(43, "world");
 	BOOST_CHECK(std::equal(mw.begin(), mw.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
