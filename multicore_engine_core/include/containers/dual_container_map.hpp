@@ -36,7 +36,7 @@ public:
 									std::is_nothrow_copy_constructible<Compare>::value)
 			: keys(std::forward<Args>(args)...), values(std::forward<Args>(args)...), compare(compare) {}
 	template <typename... Args>
-	explicit dual_container_map_base(Compare&& compare = Compare(), Args&&... args) noexcept(
+	explicit dual_container_map_base(Compare&& compare, Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Container<Key>>::value&&
 					std::is_nothrow_default_constructible<Container<Value>>::value&&
 							std::is_nothrow_default_constructible<Compare>::value &&
@@ -389,6 +389,11 @@ class dual_container_map
 
 public:
 	template <typename... Args>
+	dual_container_map(Args&&... args) noexcept(
+			std::is_nothrow_constructible<Compare>::value&&
+					std::is_nothrow_constructible<Base, Compare, Args...>::value)
+			: dual_container_map(Compare(), std::forward<Args>(args)...) {}
+	template <typename... Args>
 	explicit dual_container_map(const Compare& compare, Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Container<Key>>::value&&
 					std::is_nothrow_default_constructible<Container<Value>>::value&&
@@ -396,7 +401,7 @@ public:
 									std::is_nothrow_copy_constructible<Compare>::value)
 			: Base(compare, std::forward<Args>(args)...) {}
 	template <typename... Args>
-	explicit dual_container_map(Compare&& compare = Compare(), Args&&... args) noexcept(
+	explicit dual_container_map(Compare&& compare, Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Container<Key>>::value&&
 					std::is_nothrow_default_constructible<Container<Value>>::value&&
 							std::is_nothrow_default_constructible<Compare>::value &&
@@ -567,6 +572,11 @@ class dual_container_multimap
 
 public:
 	template <typename... Args>
+	dual_container_multimap(Args&&... args) noexcept(
+			std::is_nothrow_constructible<Compare>::value&&
+					std::is_nothrow_constructible<Base, Compare, Args...>::value)
+			: dual_container_multimap(Compare(), std::forward<Args>(args)...) {}
+	template <typename... Args>
 	explicit dual_container_multimap(const Compare& compare, Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Container<Key>>::value&&
 					std::is_nothrow_default_constructible<Container<Value>>::value&&
@@ -574,7 +584,7 @@ public:
 									std::is_nothrow_copy_constructible<Compare>::value)
 			: Base(compare, std::forward<Args>(args)...) {}
 	template <typename... Args>
-	explicit dual_container_multimap(Compare&& compare = Compare(), Args&&... args) noexcept(
+	explicit dual_container_multimap(Compare&& compare, Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Container<Key>>::value&&
 					std::is_nothrow_default_constructible<Container<Value>>::value&&
 							std::is_nothrow_default_constructible<Compare>::value &&
