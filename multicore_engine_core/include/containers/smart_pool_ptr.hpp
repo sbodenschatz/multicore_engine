@@ -367,6 +367,27 @@ public:
 	}
 };
 
+template<typename T, typename U>
+smart_pool_ptr<T> static_pointer_cast(const smart_pool_ptr<U>& orig) noexcept{
+	auto p = static_cast<T*>(orig.get());
+	return smart_pool_ptr<T>(orig,p);
+}
+
+template<typename T, typename U>
+smart_pool_ptr<T> dynamic_pointer_cast(const smart_pool_ptr<U>& orig) noexcept{
+	auto p = dynamic_cast<T*>(orig.get());
+	if(p)
+		return smart_pool_ptr<T>(orig,p);
+	else
+		return smart_pool_ptr<T>();
+}
+
+template<typename T, typename U>
+smart_pool_ptr<T> const_pointer_cast(const smart_pool_ptr<U>& orig) noexcept{
+	auto p = const_cast<T*>(orig.get());
+	return smart_pool_ptr<T>(orig,p);
+}
+
 template<typename T>
 void swap(smart_pool_ptr<T>& a, smart_pool_ptr<T>& b){
 	a.swap(b);
