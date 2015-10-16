@@ -31,8 +31,7 @@ public:
 	template <typename... Args>
 	explicit dual_container_map_base(const Compare& compare, Args&&... args) noexcept(
 			std::is_nothrow_constructible<Container<Key>, Args...>::value&& std::is_nothrow_constructible<
-					Container<Value>, Args...>::value&& std::is_nothrow_copy_constructible<Compare>::value&&
-					std::is_nothrow_copy_constructible<Compare>::value)
+					Container<Value>, Args...>::value&& std::is_nothrow_copy_constructible<Compare>::value)
 			: keys(std::forward<Args>(args)...), values(std::forward<Args>(args)...), compare(compare) {}
 	template <typename... Args>
 	explicit dual_container_map_base(Compare&& compare, Args&&... args) noexcept(
@@ -103,6 +102,8 @@ public:
 		size_t index;
 		It_Map* map;
 
+		iterator_(size_t index, It_Map* map) noexcept : index(index), map(map) {}
+
 	public:
 		template <typename M, typename IK, typename IV>
 		friend class iterator_;
@@ -111,7 +112,6 @@ public:
 		friend class dual_container_map_base;
 		typedef typename iterator_::value_type reference;
 		iterator_() = delete;
-		iterator_(size_t index, It_Map* map) noexcept : index(index), map(map) {}
 		iterator_(const iterator_<std::remove_const_t<It_Map>, It_Key, std::remove_const_t<It_Value>>&
 						  it) noexcept : index(it.index),
 										 map(it.map) {}
