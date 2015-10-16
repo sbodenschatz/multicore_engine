@@ -15,7 +15,7 @@ namespace containers {
 
 struct unordered_object_pool_fixture {
 	typedef long long element;
-	mce::containers::unordered_object_pool<element> uop;
+	mce::containers::unordered_object_pool<element,0x100u> uop;
 	unordered_object_pool_fixture() {
 		for(int i = 0; i < 1024; ++i) { uop.emplace(i); }
 	}
@@ -52,13 +52,13 @@ BOOST_AUTO_TEST_CASE(emplace_one) {
 }
 BOOST_AUTO_TEST_CASE(emplace_many) {
 	bool correct=true;
-	for(int i = 0; i < 0x100000; ++i) {
+	for(int i = 0; i < 0x1000; ++i) {
 		auto it = uop.emplace(i);
 		if(*it != i) correct=false;
 	}
 	BOOST_CHECK(correct);
 	auto expect = startSet();
-	for(int i = 0; i < 0x100000; ++i) { expect.emplace(i); }
+	for(int i = 0; i < 0x1000; ++i) { expect.emplace(i); }
 	checkSet(expect);
 }
 BOOST_AUTO_TEST_CASE(insert_one) {
@@ -70,13 +70,13 @@ BOOST_AUTO_TEST_CASE(insert_one) {
 }
 BOOST_AUTO_TEST_CASE(insert_many) {
 	bool correct=true;
-	for(int i = 0; i < 0x100000; ++i) {
+	for(int i = 0; i < 0x1000; ++i) {
 		auto it = uop.insert(element(i));
 		if(*it != i) correct=false;
 	}
 	BOOST_CHECK(correct);
 	auto expect = startSet();
-	for(int i = 0; i < 0x100000; ++i) { expect.emplace(i); }
+	for(int i = 0; i < 0x1000; ++i) { expect.emplace(i); }
 	checkSet(expect);
 }
 BOOST_AUTO_TEST_CASE(erase_one) {
@@ -115,13 +115,13 @@ BOOST_AUTO_TEST_CASE(clear) {
 BOOST_AUTO_TEST_CASE(clear_and_refill) {
 	uop.clear();
 	bool correct=true;
-	for(int i = 0; i < 0x200000; ++i) {
+	for(int i = 0; i < 0x2000; ++i) {
 		auto it = uop.insert(element(i));
 		if(*it != i) correct=false;
 	}
 	BOOST_CHECK(correct);
 	std::unordered_multiset<element> expect;
-	for(int i = 0; i < 0x200000; ++i) { expect.emplace(i); }
+	for(int i = 0; i < 0x2000; ++i) { expect.emplace(i); }
 	checkSet(expect);
 }
 BOOST_AUTO_TEST_CASE(reorganize) {
