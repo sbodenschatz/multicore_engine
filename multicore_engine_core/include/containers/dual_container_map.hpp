@@ -30,16 +30,14 @@ protected:
 public:
 	template <typename... Args>
 	explicit dual_container_map_base(const Compare& compare, Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Container<Key>>::value&&
-					std::is_nothrow_default_constructible<Container<Value>>::value&&
-							std::is_nothrow_default_constructible<Compare>::value&&
-									std::is_nothrow_copy_constructible<Compare>::value)
+			std::is_nothrow_constructible<Container<Key>, Args...>::value&& std::is_nothrow_constructible<
+					Container<Value>, Args...>::value&& std::is_nothrow_copy_constructible<Compare>::value&&
+					std::is_nothrow_copy_constructible<Compare>::value)
 			: keys(std::forward<Args>(args)...), values(std::forward<Args>(args)...), compare(compare) {}
 	template <typename... Args>
 	explicit dual_container_map_base(Compare&& compare, Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Container<Key>>::value&&
-					std::is_nothrow_default_constructible<Container<Value>>::value&&
-							std::is_nothrow_default_constructible<Compare>::value &&
+			std::is_nothrow_constructible<Container<Key>, Args...>::value&&
+					std::is_nothrow_constructible<Container<Value>, Args...>::value &&
 			(std::is_nothrow_copy_constructible<Compare>::value ||
 			 std::is_nothrow_move_constructible<Compare>::value))
 			: keys(std::forward<Args>(args)...), values(std::forward<Args>(args)...),
@@ -390,45 +388,29 @@ class dual_container_map
 public:
 	template <typename... Args>
 	dual_container_map(Args&&... args) noexcept(
-			std::is_nothrow_constructible<Compare>::value&&
+			std::is_nothrow_default_constructible<Compare>::value&&
 					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: dual_container_map(Compare(), std::forward<Args>(args)...) {}
 	template <typename... Args>
 	explicit dual_container_map(const Compare& compare, Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Container<Key>>::value&&
-					std::is_nothrow_default_constructible<Container<Value>>::value&&
-							std::is_nothrow_default_constructible<Compare>::value&&
-									std::is_nothrow_copy_constructible<Compare>::value)
+			std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: Base(compare, std::forward<Args>(args)...) {}
 	template <typename... Args>
 	explicit dual_container_map(Compare&& compare, Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Container<Key>>::value&&
-					std::is_nothrow_default_constructible<Container<Value>>::value&&
-							std::is_nothrow_default_constructible<Compare>::value &&
-			(std::is_nothrow_copy_constructible<Compare>::value ||
-			 std::is_nothrow_move_constructible<Compare>::value))
+			std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: Base(std::move_if_noexcept(compare), std::forward<Args>(args)...) {}
 	dual_container_map(const dual_container_map& other) noexcept(
-			std::is_nothrow_copy_constructible<Container<Key>>::value&& std::is_nothrow_copy_constructible<
-					Container<Value>>::value&& std::is_nothrow_copy_constructible<Compare>::value)
+			std::is_nothrow_copy_constructible<Base>::value)
 			: Base(other) {}
-	dual_container_map(dual_container_map&& other) noexcept(
-			(std::is_nothrow_copy_constructible<Container<Key>>::value ||
-			 std::is_nothrow_move_constructible<Container<Key>>::value) &&
-			(std::is_nothrow_copy_constructible<Container<Value>>::value ||
-			 std::is_nothrow_move_constructible<Container<Value>>::value) &&
-			(std::is_nothrow_copy_constructible<Compare>::value ||
-			 std::is_nothrow_move_constructible<Compare>::value))
+	dual_container_map(dual_container_map&& other) noexcept(std::is_nothrow_move_constructible<Base>::value)
 			: Base(std::move(other)) {}
-	dual_container_map& operator=(const dual_container_map& other) noexcept(
-			std::is_nothrow_copy_assignable<Container<Key>>::value&& std::is_nothrow_copy_assignable<
-					Container<Value>>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
+	dual_container_map&
+	operator=(const dual_container_map& other) noexcept(std::is_nothrow_copy_assignable<Base>::value) {
 		Base::operator=(other);
 		return *this;
 	}
-	dual_container_map& operator=(dual_container_map&& other) noexcept(
-			std::is_nothrow_copy_assignable<Container<Key>>::value&& std::is_nothrow_copy_assignable<
-					Container<Value>>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
+	dual_container_map&
+	operator=(dual_container_map&& other) noexcept(std::is_nothrow_move_assignable<Base>::value) {
 		Base::operator=(std::move(other));
 		return *this;
 	}
@@ -573,45 +555,30 @@ class dual_container_multimap
 public:
 	template <typename... Args>
 	dual_container_multimap(Args&&... args) noexcept(
-			std::is_nothrow_constructible<Compare>::value&&
+			std::is_nothrow_default_constructible<Compare>::value&&
 					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: dual_container_multimap(Compare(), std::forward<Args>(args)...) {}
 	template <typename... Args>
 	explicit dual_container_multimap(const Compare& compare, Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Container<Key>>::value&&
-					std::is_nothrow_default_constructible<Container<Value>>::value&&
-							std::is_nothrow_default_constructible<Compare>::value&&
-									std::is_nothrow_copy_constructible<Compare>::value)
+			std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: Base(compare, std::forward<Args>(args)...) {}
 	template <typename... Args>
 	explicit dual_container_multimap(Compare&& compare, Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Container<Key>>::value&&
-					std::is_nothrow_default_constructible<Container<Value>>::value&&
-							std::is_nothrow_default_constructible<Compare>::value &&
-			(std::is_nothrow_copy_constructible<Compare>::value ||
-			 std::is_nothrow_move_constructible<Compare>::value))
+			std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: Base(std::move_if_noexcept(compare), std::forward<Args>(args)...) {}
 	dual_container_multimap(const dual_container_multimap& other) noexcept(
-			std::is_nothrow_copy_constructible<Container<Key>>::value&& std::is_nothrow_copy_constructible<
-					Container<Value>>::value&& std::is_nothrow_copy_constructible<Compare>::value)
+			std::is_nothrow_copy_constructible<Base>::value)
 			: Base(other) {}
 	dual_container_multimap(dual_container_multimap&& other) noexcept(
-			(std::is_nothrow_copy_constructible<Container<Key>>::value ||
-			 std::is_nothrow_move_constructible<Container<Key>>::value) &&
-			(std::is_nothrow_copy_constructible<Container<Value>>::value ||
-			 std::is_nothrow_move_constructible<Container<Value>>::value) &&
-			(std::is_nothrow_copy_constructible<Compare>::value ||
-			 std::is_nothrow_move_constructible<Compare>::value))
+			std::is_nothrow_move_constructible<Base>::value)
 			: Base(std::move(other)) {}
-	dual_container_multimap& operator=(const dual_container_multimap& other) noexcept(
-			std::is_nothrow_copy_assignable<Container<Key>>::value&& std::is_nothrow_copy_assignable<
-					Container<Value>>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
+	dual_container_multimap&
+	operator=(const dual_container_multimap& other) noexcept(std::is_nothrow_copy_assignable<Base>::value) {
 		Base::operator=(other);
 		return *this;
 	}
-	dual_container_multimap& operator=(dual_container_multimap&& other) noexcept(
-			std::is_nothrow_copy_assignable<Container<Key>>::value&& std::is_nothrow_copy_assignable<
-					Container<Value>>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
+	dual_container_multimap&
+	operator=(dual_container_multimap&& other) noexcept(std::is_nothrow_move_assignable<Base>::value) {
 		Base::operator=(std::move(other));
 		return *this;
 	}
