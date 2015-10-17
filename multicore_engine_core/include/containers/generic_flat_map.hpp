@@ -57,11 +57,10 @@ public:
 			 std::is_nothrow_move_constructible<Compare>::value))
 			: values(std::forward<Args>(args)...), compare(std::move_if_noexcept(compare)) {
 		std::stable_sort(values.begin(), values.end(),
-						 [&compare](const auto& a,const auto& b) { return compare(a.first, b.first); });
+						 [&compare](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
-	generic_flat_map_base(const generic_flat_map_base& other) noexcept(
-			std::is_nothrow_copy_constructible<container_t>::value&&
-					std::is_nothrow_copy_constructible<Compare>::value)
+	generic_flat_map_base(const generic_flat_map_base& other) noexcept(std::is_nothrow_copy_constructible<
+			container_t>::value&& std::is_nothrow_copy_constructible<Compare>::value)
 			: values(other.values), compare(other.compare) {}
 	generic_flat_map_base(generic_flat_map_base&& other) noexcept(
 			(std::is_nothrow_copy_constructible<container_t>::value ||
@@ -77,9 +76,8 @@ public:
 		values = other.values;
 		return *this;
 	}
-	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(
-			std::is_nothrow_copy_assignable<container_t>::value&&
-					std::is_nothrow_copy_assignable<Compare>::value) {
+	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(std::is_nothrow_copy_assignable<
+			container_t>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
 		assert(this == &other);
 		compare = std::move_if_noexcept(other.compare);
 		values = std::move_if_noexcept(other.values);
@@ -344,7 +342,7 @@ public:
 	}
 	void resort() {
 		std::stable_sort(values.begin(), values.end(),
-						 [this](const auto& a,const auto& b) { return compare(a.first, b.first); });
+						 [this](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
 };
 
@@ -357,7 +355,9 @@ void swap(generic_flat_map_base<Map, Container, Key, Value, Compare>& m1,
 
 // Interface resembling that of the STL map containers
 // But iterators return a std::pair<Key,Value> instead of std::pair<const Key, Value> because the latter one
-// can't be portably combined with reallocating containers. If the Key is modified by the user, the resort()
+// can't be portably combined with reallocating containers. (see
+// http://stackoverflow.com/questions/14272141/is-casting-stdpairt1-t2-const-to-stdpairt1-const-t2-const-safe
+// for explanation.) If the Key is modified by the user, the resort()
 // member function has to be called to restore the invariants of the map.
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
 class generic_flat_map
@@ -369,9 +369,8 @@ class generic_flat_map
 
 public:
 	template <typename... Args>
-	generic_flat_map(Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Compare>::value&&
-					std::is_nothrow_constructible<Base, Compare, Args...>::value)
+	generic_flat_map(Args&&... args) noexcept(std::is_nothrow_default_constructible<
+			Compare>::value&& std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: generic_flat_map(Compare(), std::forward<Args>(args)...) {}
 	template <typename... Args>
 	explicit generic_flat_map(const Compare& compare, Args&&... args) noexcept(
@@ -438,9 +437,7 @@ public:
 			if(comp(key, *it)) return 0;
 			erase(iterator(it));
 			return 1;
-		} else {
-			return 0;
-		}
+		} else { return 0; }
 	}
 	size_t count(const Key& key) const {
 		key_compare comp(this->compare);
@@ -448,9 +445,7 @@ public:
 		if(it != this->values.end()) {
 			if(comp(key, *it)) return 0;
 			return 1;
-		} else {
-			return 0;
-		}
+		} else { return 0; }
 	}
 	template <typename K,
 			  // Only allow this overload for transparent Compares:
@@ -461,9 +456,7 @@ public:
 		if(it != this->values.end()) {
 			if(comp(key, *it)) return 0;
 			return 1;
-		} else {
-			return 0;
-		}
+		} else { return 0; }
 	}
 
 	Value& at(const Key& key) {
@@ -472,9 +465,7 @@ public:
 		if(it != this->values.end()) {
 			if(comp(key, *it)) std::out_of_range("Key not found.");
 			return it->second;
-		} else {
-			throw std::out_of_range("Key not found.");
-		}
+		} else { throw std::out_of_range("Key not found."); }
 	}
 	const Value& at(const Key& key) const {
 		key_compare comp(this->compare);
@@ -482,9 +473,7 @@ public:
 		if(it != this->values.end()) {
 			if(comp(key, *it)) std::out_of_range("Key not found.");
 			return it->second;
-		} else {
-			throw std::out_of_range("Key not found.");
-		}
+		} else { throw std::out_of_range("Key not found."); }
 	}
 	template <typename K>
 	Value& operator[](K&& key) {
@@ -509,7 +498,9 @@ void swap(generic_flat_map<Container, Key, Value, Compare>& m1,
 
 // Interface resembling that of the STL map containers
 // But iterators return a std::pair<Key,Value> instead of std::pair<const Key, Value> because the latter one
-// can't be portably combined with reallocating containers. If the Key is modified by the user, the resort()
+// can't be portably combined with reallocating containers. (see
+// http://stackoverflow.com/questions/14272141/is-casting-stdpairt1-t2-const-to-stdpairt1-const-t2-const-safe
+// for explanation.) If the Key is modified by the user, the resort()
 // member function has to be called to restore the invariants of the map.
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
 class generic_flat_multimap
@@ -521,9 +512,8 @@ class generic_flat_multimap
 
 public:
 	template <typename... Args>
-	generic_flat_multimap(Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Compare>::value&&
-					std::is_nothrow_constructible<Base, Compare, Args...>::value)
+	generic_flat_multimap(Args&&... args) noexcept(std::is_nothrow_default_constructible<
+			Compare>::value&& std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: generic_flat_multimap(Compare(), std::forward<Args>(args)...) {}
 	template <typename... Args>
 	explicit generic_flat_multimap(const Compare& compare, Args&&... args) noexcept(
@@ -580,9 +570,7 @@ public:
 				++count;
 			}
 			return count;
-		} else {
-			return 0;
-		}
+		} else { return 0; }
 	}
 	size_t count(const Key& key) const {
 		auto range = equal_range(key);
