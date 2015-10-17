@@ -57,7 +57,7 @@ public:
 			 std::is_nothrow_move_constructible<Compare>::value))
 			: values(std::forward<Args>(args)...), compare(std::move_if_noexcept(compare)) {
 		std::stable_sort(values.begin(), values.end(),
-						 [&compare](const auto& a, auto& b) { return compare(a.first, b.first); });
+						 [&compare](const auto& a,const auto& b) { return compare(a.first, b.first); });
 	}
 	generic_flat_map_base(const generic_flat_map_base& other) noexcept(
 			std::is_nothrow_copy_constructible<container_t>::value&&
