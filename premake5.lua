@@ -59,7 +59,7 @@ solution "multicore_engine_solution"
 	configuration {"vs2015"}
 		architecture "x64"
 		buildoptions {"/MP"}
-		flags {"LinkTimeOptimization","NoIncrementalLink"}
+		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild"}
 		targetdir "%{prj.location}/bin-vc/%{cfg.buildcfg}"
 		objdir "%{prj.location}/obj-vc/%{cfg.buildcfg}"
 
