@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/containers/map_wrapper.hpp
+ * File /multicore_engine_core/include/containers/dual_container_map.hpp
  * Copyright 2015 by Stefan Bodenschatz
  */
 
