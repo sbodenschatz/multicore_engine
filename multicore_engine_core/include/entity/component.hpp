@@ -11,16 +11,31 @@ namespace mce {
 namespace entity {
 
 class entity;
+class component_configuration;
 
 class component {
 private:
-	entity& owner;
+	entity& owner_;
+	component_configuration& configuration_;
 
 protected:
-	component(entity& owner) noexcept : owner(owner) {}
+	component(entity& owner, component_configuration& configuration) noexcept
+			: owner_(owner),
+			  configuration_(configuration) {}
 
 public:
 	virtual ~component() = default;
+
+	component_configuration& configuration() const {
+		return configuration_;
+	}
+
+	const entity& owner() const {
+		return owner_;
+	}
+	entity& owner() {
+		return owner_;
+	}
 };
 
 } // namespace entity

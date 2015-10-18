@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <containers/smart_pool_ptr.hpp>
 
 namespace mce {
 namespace entity {
