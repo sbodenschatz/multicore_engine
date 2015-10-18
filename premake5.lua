@@ -1,6 +1,6 @@
 solution "multicore_engine_solution"
 	configurations{"debug", "release"}
-	defines{}
+	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH"}
 	includedirs{"multicore_engine_core/include"}
 	vectorextensions "SSE2"
 	startproject "multicore_engine_demo"
@@ -18,7 +18,7 @@ solution "multicore_engine_solution"
 	
 	configuration "windows"
 		defines{"MULTICORE_ENGINE_WINDOWS"}
-		includedirs{"C:/Libs/Boost/include"}
+		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
 	configuration "not windows"
 		defines{"MULTICORE_ENGINE_NOT_WINDOWS"}
 		includedirs{}
@@ -57,6 +57,7 @@ solution "multicore_engine_solution"
 		end
 
 	configuration {"vs2015"}
+		defines{"GLM_FORCE_CXX11"}
 		architecture "x64"
 		buildoptions {"/MP"}
 		flags {"LinkTimeOptimization","NoIncrementalLink"}
