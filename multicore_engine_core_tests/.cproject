@@ -27,6 +27,7 @@
 								<option id="gnu.both.asm.option.include.paths.2103179112" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1459155580" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -35,6 +36,7 @@
 								<option id="gnu.cpp.compiler.option.include.paths.513182432" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1005330771" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -42,6 +44,7 @@
 								<option id="gnu.c.compiler.option.include.paths.1394503566" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.906289021" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -85,6 +88,7 @@
 								<option id="gnu.both.asm.option.include.paths.567735645" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2072545442" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -93,6 +97,7 @@
 								<option id="gnu.cpp.compiler.option.include.paths.1266148748" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033980625" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -100,6 +105,7 @@
 								<option id="gnu.c.compiler.option.include.paths.33154476" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.851904731" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
