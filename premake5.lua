@@ -60,7 +60,7 @@ solution "multicore_engine_solution"
 		defines{"GLM_FORCE_CXX11"}
 		architecture "x64"
 		buildoptions {"/MP"}
-		flags {"LinkTimeOptimization","NoIncrementalLink"}
+		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild"}
 		targetdir "%{prj.location}/bin-vc/%{cfg.buildcfg}"
 		objdir "%{prj.location}/obj-vc/%{cfg.buildcfg}"
 
