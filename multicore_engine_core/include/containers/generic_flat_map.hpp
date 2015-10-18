@@ -28,8 +28,8 @@ protected:
 	Compare compare;
 
 	struct key_compare {
-		key_compare(Compare& comp) : comp(comp) {}
-		Compare& comp;
+		key_compare(const Compare& comp) : comp(comp) {}
+		const Compare& comp;
 		bool operator()(const std::pair<Key, Value>& a, const Key& b) const {
 			return comp(a.first, b);
 		}
@@ -57,7 +57,7 @@ public:
 			 std::is_nothrow_move_constructible<Compare>::value))
 			: values(std::forward<Args>(args)...), compare(std::move_if_noexcept(compare)) {
 		std::stable_sort(values.begin(), values.end(),
-						 [&compare](const auto& a,const auto& b) { return compare(a.first, b.first); });
+						 [&compare](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
 	generic_flat_map_base(const generic_flat_map_base& other) noexcept(
 			std::is_nothrow_copy_constructible<container_t>::value&&
@@ -86,14 +86,14 @@ public:
 		return *this;
 	}
 
-	template <typename It_Map, typename It, typename It_Key, typename It_Value>
-	class iterator_ : public std::iterator<std::bidirectional_iterator_tag, std::pair<It_Key, It_Value>> {
+	template <typename It_Map, typename It, typename It_T>
+	class iterator_ : public std::iterator<std::bidirectional_iterator_tag, It_T> {
 		It iterator;
 
 		iterator_(It iterator) noexcept : iterator(iterator) {}
 
 	public:
-		template <typename M, typename I, typename IK, typename IV>
+		template <typename M, typename I, typename IT>
 		friend class iterator_;
 		friend It_Map;
 		template <typename M, template <typename> class Cont, typename K, typename V, typename Comp>
@@ -172,8 +172,8 @@ public:
 		}
 	};
 
-	typedef iterator_<Map, typename container_t::iterator, Key, Value> iterator;
-	typedef iterator_<Map, typename container_t::const_iterator, const Key, const Value> const_iterator;
+	typedef iterator_<Map, typename container_t::iterator, std::pair<Key, Value>> iterator;
+	typedef iterator_<Map, typename container_t::const_iterator, const std::pair<Key, Value>> const_iterator;
 	typedef std::reverse_iterator<iterator> reverse_iterator;
 	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -198,14 +198,14 @@ public:
 		key_compare comp(compare);
 		auto it = std::lower_bound(values.begin(), values.end(), key, comp);
 		if(it != values.end())
-			if(comp(key, it->first)) it = values.end();
+			if(compare(key, it->first)) it = values.end();
 		return iterator(it);
 	}
 	const_iterator find(const Key& key) const {
 		key_compare comp(compare);
 		auto it = std::lower_bound(values.begin(), values.end(), key, comp);
 		if(it != values.end())
-			if(comp(key, it->first)) it = values.end();
+			if(compare(key, it->first)) it = values.end();
 		return const_iterator(it);
 	}
 	template <typename K,
@@ -344,7 +344,7 @@ public:
 	}
 	void resort() {
 		std::stable_sort(values.begin(), values.end(),
-						 [this](const auto& a,const auto& b) { return compare(a.first, b.first); });
+						 [this](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
 };
 
