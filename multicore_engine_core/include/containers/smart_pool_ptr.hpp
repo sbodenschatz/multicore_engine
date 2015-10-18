@@ -8,6 +8,7 @@
 #define CONTAINERS_SMART_POOL_PTR_HPP_
 
 #include <utility>
+#include <memory>
 
 namespace mce {
 namespace containers {
@@ -168,11 +169,11 @@ public:
 		swap(block, other.block);
 	}
 
-	void reset(){
+	void reset() {
 		if(block) block->decrement_strong_ref(managed_object);
-		object=nullptr;
-		managed_object=nullptr;
-		block=nullptr;
+		object = nullptr;
+		managed_object = nullptr;
+		block = nullptr;
 	}
 
 	T* get() const noexcept {
@@ -330,11 +331,11 @@ public:
 		if(block) block->decrement_weak_ref(managed_object);
 	}
 
-	void reset(){
+	void reset() {
 		if(block) block->decrement_weak_ref(managed_object);
-		object=nullptr;
-		managed_object=nullptr;
-		block=nullptr;
+		object = nullptr;
+		managed_object = nullptr;
+		block = nullptr;
 	}
 
 	void swap(weak_pool_ptr& other) noexcept {
@@ -367,33 +368,33 @@ public:
 	}
 };
 
-template<typename T, typename U>
-smart_pool_ptr<T> static_pointer_cast(const smart_pool_ptr<U>& orig) noexcept{
+template <typename T, typename U>
+smart_pool_ptr<T> static_pointer_cast(const smart_pool_ptr<U>& orig) noexcept {
 	auto p = static_cast<T*>(orig.get());
-	return smart_pool_ptr<T>(orig,p);
+	return smart_pool_ptr<T>(orig, p);
 }
 
-template<typename T, typename U>
-smart_pool_ptr<T> dynamic_pointer_cast(const smart_pool_ptr<U>& orig) noexcept{
+template <typename T, typename U>
+smart_pool_ptr<T> dynamic_pointer_cast(const smart_pool_ptr<U>& orig) noexcept {
 	auto p = dynamic_cast<T*>(orig.get());
 	if(p)
-		return smart_pool_ptr<T>(orig,p);
+		return smart_pool_ptr<T>(orig, p);
 	else
 		return smart_pool_ptr<T>();
 }
 
-template<typename T, typename U>
-smart_pool_ptr<T> const_pointer_cast(const smart_pool_ptr<U>& orig) noexcept{
+template <typename T, typename U>
+smart_pool_ptr<T> const_pointer_cast(const smart_pool_ptr<U>& orig) noexcept {
 	auto p = const_cast<T*>(orig.get());
-	return smart_pool_ptr<T>(orig,p);
+	return smart_pool_ptr<T>(orig, p);
 }
 
-template<typename T>
-void swap(smart_pool_ptr<T>& a, smart_pool_ptr<T>& b){
+template <typename T>
+void swap(smart_pool_ptr<T>& a, smart_pool_ptr<T>& b) {
 	a.swap(b);
 }
-template<typename T>
-void swap(weak_pool_ptr<T>& a, weak_pool_ptr<T>& b){
+template <typename T>
+void swap(weak_pool_ptr<T>& a, weak_pool_ptr<T>& b) {
 	a.swap(b);
 }
 
