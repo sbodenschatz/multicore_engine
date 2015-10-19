@@ -7,13 +7,26 @@
 #ifndef ENTITY_COMPONENT_CONFIGURATION_HPP_
 #define ENTITY_COMPONENT_CONFIGURATION_HPP_
 
-namespace mce {
-namespace entity {
+#include "ecs_types.hpp"
 
-class component_type;
+namespace mce {
+namespace core {
+class engine;
+} // namespace core
+namespace entity {
+class entity;
+class abstract_component_type;
 
 class component_configuration {
-	component_type* type;
+	abstract_component_type& type_;
+
+public:
+	explicit component_configuration(abstract_component_type& type) : type_(type) {}
+	component_pool_ptr create_component(entity& owner, core::engine& engine) const;
+
+	const abstract_component_type& type() const {
+		return type_;
+	}
 };
 
 } // namespace entity

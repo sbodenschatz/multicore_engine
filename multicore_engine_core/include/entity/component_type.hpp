@@ -32,14 +32,29 @@ public:
 	abstract_component_type& operator=(const abstract_component_type&) = delete;
 	abstract_component_type& operator=(abstract_component_type&&) = delete;
 	virtual ~abstract_component_type() = default;
-	virtual component_pool_ptr create_component(entity& owner, component_configuration& config,
+	virtual component_pool_ptr create_component(entity& owner, const component_configuration& config,
 												core::engine& engine) = 0;
 };
 
-template <typename T>
+template <typename T, typename F>
 class component_type : public abstract_component_type {
+	F factory_function_;
+	// TODO Add property list
+public:
+	component_type(component_type_id_t id, const std::string& name, const F& factory_function)
+			: abstract_component_type(id, name), factory_function_(factory_function) {}
 	virtual ~component_type() override = default;
+	virtual component_pool_ptr create_component(entity& owner, const component_configuration& config,
+												core::engine& engine) override {
+		return factory_function_(owner, config, engine);
+	}
 };
+
+template <typename T, typename F>
+std::unique_ptr<abstract_component_type> make_component_type(component_type_id_t id, const std::string& name,
+															 const F& factory_function) {
+	return std::make_unique<component_type<T, F>>(id, name, factory_function);
+}
 
 } // namespace entity
 } // namespace mce
