@@ -16,7 +16,7 @@ class component_configuration;
 class component {
 private:
 	entity& owner_;
-	component_configuration& configuration_;
+	const component_configuration& configuration_;
 
 protected:
 	component(entity& owner, component_configuration& configuration) noexcept
@@ -26,7 +26,7 @@ protected:
 public:
 	virtual ~component() = default;
 
-	component_configuration& configuration() const {
+	const component_configuration& configuration() const {
 		return configuration_;
 	}
 
