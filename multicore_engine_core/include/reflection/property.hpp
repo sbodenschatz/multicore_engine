@@ -7,6 +7,8 @@
 #ifndef REFLECTION_PROPERTY_HPP_
 #define REFLECTION_PROPERTY_HPP_
 
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include "type.hpp"
 
@@ -61,35 +63,36 @@ public:
 	virtual mce::reflection::type type() const noexcept override {
 		return type_info<T>::type;
 	}
-	virtual accessor_value get_value(const Root_Type& object) const noexcept = 0;
-	virtual void set_value(Root_Type& object, accessor_value value) const noexcept = 0;
+	virtual accessor_value get_value(const Root_Type& object) const = 0;
+	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
 };
 
 template <typename Root_Type, typename T, typename Object_Type>
 class linked_property : public property<Root_Type, T> {
 public:
-	typedef typename detail::property_type_helper<T, Object_Type>::getter getter;
-	typedef typename detail::property_type_helper<T, Object_Type>::setter setter;
+	typedef typename detail::property_type_helper<T, Object_Type>::accessor_value accessor_value;
+	typedef typename detail::property_type_helper<T, Object_Type>::getter getter_t;
+	typedef typename detail::property_type_helper<T, Object_Type>::setter setter_t;
 
 private:
-	getter getter;
-	setter setter;
+	getter_t getter;
+	setter_t setter;
 
 public:
-	linked_property(const std::string& name, getter getter, setter setter)
+	linked_property(const std::string& name, getter_t getter, setter_t setter)
 			: property<Root_Type, T>(name), getter(getter), setter(setter) {}
 	linked_property(const linked_property&) = delete;
 	linked_property(linked_property&&) = delete;
 	linked_property& operator=(const linked_property&) = delete;
 	linked_property& operator=(linked_property&&) = delete;
 	virtual ~linked_property() = default;
-	virtual accessor_value get_value(const Root_Type& object) const noexcept override {
+	virtual accessor_value get_value(const Root_Type& object) const override {
 		if(getter)
 			return (static_cast<const Object_Type&>(object).*getter)();
 		else
 			throw std::logic_error("Attempt to get not readable property.");
 	}
-	virtual void set_value(Root_Type& object, accessor_value value) const noexcept override {
+	virtual void set_value(Root_Type& object, accessor_value value) const override {
 		if(setter)
 			(static_cast<Object_Type&>(object).*setter)(value);
 		else
@@ -100,14 +103,15 @@ public:
 template <typename Root_Type, typename T, typename Object_Type>
 class directly_linked_property : public property<Root_Type, T> {
 public:
-	typedef T Object_Type::*variable;
+	typedef typename detail::property_type_helper<T, Object_Type>::accessor_value accessor_value;
+	typedef T Object_Type::*variable_t;
 
 private:
-	variable variable;
+	variable_t variable;
 	bool read_only = false;
 
 public:
-	directly_linked_property(const std::string& name, variable variable, bool read_only)
+	directly_linked_property(const std::string& name, variable_t variable, bool read_only)
 			: property<Root_Type, T>(name), variable(variable), read_only(read_only) {}
 	directly_linked_property(const directly_linked_property&) = delete;
 	directly_linked_property(directly_linked_property&&) = delete;
@@ -117,11 +121,11 @@ public:
 	virtual accessor_value get_value(const Root_Type& object) const noexcept override {
 		return static_cast<const Object_Type&>(object).*variable;
 	}
-	virtual void set_value(Root_Type& object, accessor_value value) const noexcept override {
+	virtual void set_value(Root_Type& object, accessor_value value) const override {
 		if(read_only)
 			throw std::logic_error("Attempt to set not writable property.");
 		else
-			static_cast<const Object_Type&>(object).*variable = value;
+			static_cast<Object_Type&>(object).*variable = value;
 	}
 };
 

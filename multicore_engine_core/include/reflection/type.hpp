@@ -9,6 +9,8 @@
 
 #include <string>
 #include <sstream>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace mce {
 namespace reflection {
