@@ -16,6 +16,11 @@ namespace mce {
 namespace reflection {
 
 template <typename Root_Type>
+class abstract_property_assignment;
+template <typename Root_Type, typename T>
+class property_assignment;
+
+template <typename Root_Type>
 class abstract_property {
 protected:
 	std::string name_;
@@ -28,8 +33,8 @@ public:
 	abstract_property& operator=(abstract_property&&) = delete;
 	virtual ~abstract_property() = default;
 	virtual mce::reflection::type type() const noexcept = 0;
-
-	const std::string& name() const {
+	virtual std::unique_ptr<abstract_property_assignment<Root_Type>> make_assignment() const = 0;
+	virtual const std::string& name() const {
 		return name_;
 	}
 };
@@ -65,7 +70,19 @@ public:
 	}
 	virtual accessor_value get_value(const Root_Type& object) const = 0;
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
+	virtual std::unique_ptr<abstract_property_assignment<Root_Type>> make_assignment() const override;
 };
+
+} // namespace reflection
+} // namespace mce
+#include "property_assignment.hpp"
+namespace mce {
+namespace reflection {
+
+template <typename Root_Type, typename T>
+std::unique_ptr<abstract_property_assignment<Root_Type>> property<Root_Type, T>::make_assignment() const {
+	return std::make_unique<mce::reflection::property_assignment<Root_Type, T>>(*this);
+}
 
 template <typename Root_Type, typename T, typename Object_Type>
 class linked_property : public property<Root_Type, T> {

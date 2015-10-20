@@ -7,6 +7,10 @@
 #ifndef ENTITY_COMPONENT_HPP_
 #define ENTITY_COMPONENT_HPP_
 
+#include <vector>
+#include <memory>
+#include <reflection/property.hpp>
+
 namespace mce {
 namespace entity {
 
@@ -24,6 +28,7 @@ protected:
 			  configuration_(configuration) {}
 
 public:
+	typedef std::vector<std::unique_ptr<reflection::abstract_property<component>>> property_list;
 	virtual ~component() = default;
 
 	const component_configuration& configuration() const {
@@ -33,9 +38,12 @@ public:
 	const entity& owner() const {
 		return owner_;
 	}
+
 	entity& owner() {
 		return owner_;
 	}
+
+	static void fill_property_list(property_list& properties);
 };
 
 } // namespace entity

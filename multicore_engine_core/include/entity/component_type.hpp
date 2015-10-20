@@ -7,8 +7,11 @@
 #ifndef ENTITY_COMPONENT_TYPE_HPP_
 #define ENTITY_COMPONENT_TYPE_HPP_
 
+#include <memory>
+#include <vector>
 #include <string>
 #include "ecs_types.hpp"
+#include <reflection/property.hpp>
 
 namespace mce {
 namespace core {
@@ -27,6 +30,7 @@ protected:
 	abstract_component_type(component_type_id_t id, const std::string& name) : id_(id), name_(name) {}
 
 public:
+	typedef std::vector<std::unique_ptr<reflection::abstract_property<component>>> property_list;
 	abstract_component_type(const abstract_component_type&) = delete;
 	abstract_component_type(abstract_component_type&&) = delete;
 	abstract_component_type& operator=(const abstract_component_type&) = delete;
@@ -34,19 +38,35 @@ public:
 	virtual ~abstract_component_type() = default;
 	virtual component_pool_ptr create_component(entity& owner, const component_configuration& config,
 												core::engine& engine) = 0;
+	virtual const property_list& properties() const noexcept = 0;
+
+	component_type_id_t id() const noexcept {
+		return id_;
+	}
+
+	const std::string& name() const noexcept {
+		return name_;
+	}
 };
 
 template <typename T, typename F>
 class component_type : public abstract_component_type {
 	F factory_function_;
-	// TODO Add property list
+	property_list properties_;
+
 public:
 	component_type(component_type_id_t id, const std::string& name, const F& factory_function)
-			: abstract_component_type(id, name), factory_function_(factory_function) {}
+			: abstract_component_type(id, name), factory_function_(factory_function) {
+		T::fill_property_list(properties_);
+	}
 	virtual ~component_type() override = default;
 	virtual component_pool_ptr create_component(entity& owner, const component_configuration& config,
 												core::engine& engine) override {
 		return factory_function_(owner, config, engine);
+	}
+
+	virtual const property_list& properties() const noexcept override {
+		return properties_;
 	}
 };
 
