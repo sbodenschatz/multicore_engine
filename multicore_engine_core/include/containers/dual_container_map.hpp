@@ -18,7 +18,6 @@
 
 namespace mce {
 namespace containers {
-namespace detail {
 template <typename Map, template <typename> class Container, typename Key, typename Value,
 		  typename Compare = std::less<>>
 class dual_container_map_base {
@@ -27,7 +26,6 @@ protected:
 	Container<Value> values;
 	Compare compare;
 
-public:
 	template <typename... Args>
 	explicit dual_container_map_base(const Compare& compare, Args&&... args) noexcept(
 			std::is_nothrow_constructible<Container<Key>, Args...>::value&& std::is_nothrow_constructible<
@@ -86,6 +84,7 @@ public:
 		return *this;
 	}
 
+public:
 	template <typename T>
 	struct member_access_wrapper {
 		T value;
@@ -371,19 +370,17 @@ void swap(dual_container_map_base<Map, Container, Key, Value, Compare>& m1,
 		  dual_container_map_base<Map, Container, Key, Value, Compare>& m2) {
 	m1.swap(m2);
 }
-} // namespace detail
 
 // Interface resembling that of the STL map containers
 // But iterators return (by value) a pair of references to the key and value instead of a reference to a pair
 // of the values of the keys and the values. This means taking the dereferenced value into auto by value still
 // yields a pair of references which can modify the value in the map.
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
-class dual_container_map
-		: public detail::dual_container_map_base<dual_container_map<Container, Key, Value, Compare>,
-												 Container, Key, Value, Compare> {
+class dual_container_map : public dual_container_map_base<dual_container_map<Container, Key, Value, Compare>,
+														  Container, Key, Value, Compare> {
 
-	typedef detail::dual_container_map_base<dual_container_map<Container, Key, Value, Compare>, Container,
-											Key, Value, Compare> Base;
+	typedef dual_container_map_base<dual_container_map<Container, Key, Value, Compare>, Container, Key, Value,
+									Compare> Base;
 
 public:
 	template <typename... Args>
@@ -546,11 +543,11 @@ void swap(dual_container_map<Container, Key, Value, Compare>& m1,
 // yields a pair of references which can modify the value in the map.
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
 class dual_container_multimap
-		: public detail::dual_container_map_base<dual_container_multimap<Container, Key, Value, Compare>,
-												 Container, Key, Value, Compare> {
+		: public dual_container_map_base<dual_container_multimap<Container, Key, Value, Compare>, Container,
+										 Key, Value, Compare> {
 
-	typedef detail::dual_container_map_base<dual_container_multimap<Container, Key, Value, Compare>,
-											Container, Key, Value, Compare> Base;
+	typedef dual_container_map_base<dual_container_multimap<Container, Key, Value, Compare>, Container, Key,
+									Value, Compare> Base;
 
 public:
 	template <typename... Args>

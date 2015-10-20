@@ -18,7 +18,6 @@
 
 namespace mce {
 namespace containers {
-namespace detail {
 template <typename Map, template <typename> class Container, typename Key, typename Value,
 		  typename Compare = std::less<>>
 class generic_flat_map_base {
@@ -41,7 +40,6 @@ protected:
 		}
 	};
 
-public:
 	template <typename... Args>
 	explicit generic_flat_map_base(const Compare& compare, Args&&... args) noexcept(
 			std::is_nothrow_constructible<container_t, Args...>::value&&
@@ -59,8 +57,9 @@ public:
 		std::stable_sort(values.begin(), values.end(),
 						 [&compare](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
-	generic_flat_map_base(const generic_flat_map_base& other) noexcept(std::is_nothrow_copy_constructible<
-			container_t>::value&& std::is_nothrow_copy_constructible<Compare>::value)
+	generic_flat_map_base(const generic_flat_map_base& other) noexcept(
+			std::is_nothrow_copy_constructible<container_t>::value&&
+					std::is_nothrow_copy_constructible<Compare>::value)
 			: values(other.values), compare(other.compare) {}
 	generic_flat_map_base(generic_flat_map_base&& other) noexcept(
 			(std::is_nothrow_copy_constructible<container_t>::value ||
@@ -76,14 +75,16 @@ public:
 		values = other.values;
 		return *this;
 	}
-	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(std::is_nothrow_copy_assignable<
-			container_t>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
+	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(
+			std::is_nothrow_copy_assignable<container_t>::value&&
+					std::is_nothrow_copy_assignable<Compare>::value) {
 		assert(this == &other);
 		compare = std::move_if_noexcept(other.compare);
 		values = std::move_if_noexcept(other.values);
 		return *this;
 	}
 
+public:
 	template <typename It_Map, typename It, typename It_T>
 	class iterator_ : public std::iterator<std::bidirectional_iterator_tag, It_T> {
 		It iterator;
@@ -351,7 +352,6 @@ void swap(generic_flat_map_base<Map, Container, Key, Value, Compare>& m1,
 		  generic_flat_map_base<Map, Container, Key, Value, Compare>& m2) {
 	m1.swap(m2);
 }
-} // namespace detail
 
 // Interface resembling that of the STL map containers
 // But iterators return a std::pair<Key,Value> instead of std::pair<const Key, Value> because the latter one
@@ -360,17 +360,17 @@ void swap(generic_flat_map_base<Map, Container, Key, Value, Compare>& m1,
 // for explanation.) If the Key is modified by the user, the resort()
 // member function has to be called to restore the invariants of the map.
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
-class generic_flat_map
-		: public detail::generic_flat_map_base<generic_flat_map<Container, Key, Value, Compare>, Container,
-											   Key, Value, Compare> {
+class generic_flat_map : public generic_flat_map_base<generic_flat_map<Container, Key, Value, Compare>,
+													  Container, Key, Value, Compare> {
 
-	typedef detail::generic_flat_map_base<generic_flat_map<Container, Key, Value, Compare>, Container, Key,
-										  Value, Compare> Base;
+	typedef generic_flat_map_base<generic_flat_map<Container, Key, Value, Compare>, Container, Key, Value,
+								  Compare> Base;
 
 public:
 	template <typename... Args>
-	generic_flat_map(Args&&... args) noexcept(std::is_nothrow_default_constructible<
-			Compare>::value&& std::is_nothrow_constructible<Base, Compare, Args...>::value)
+	generic_flat_map(Args&&... args) noexcept(
+			std::is_nothrow_default_constructible<Compare>::value&&
+					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: generic_flat_map(Compare(), std::forward<Args>(args)...) {}
 	template <typename... Args>
 	explicit generic_flat_map(const Compare& compare, Args&&... args) noexcept(
@@ -437,7 +437,9 @@ public:
 			if(comp(key, *it)) return 0;
 			erase(iterator(it));
 			return 1;
-		} else { return 0; }
+		} else {
+			return 0;
+		}
 	}
 	size_t count(const Key& key) const {
 		key_compare comp(this->compare);
@@ -445,7 +447,9 @@ public:
 		if(it != this->values.end()) {
 			if(comp(key, *it)) return 0;
 			return 1;
-		} else { return 0; }
+		} else {
+			return 0;
+		}
 	}
 	template <typename K,
 			  // Only allow this overload for transparent Compares:
@@ -456,7 +460,9 @@ public:
 		if(it != this->values.end()) {
 			if(comp(key, *it)) return 0;
 			return 1;
-		} else { return 0; }
+		} else {
+			return 0;
+		}
 	}
 
 	Value& at(const Key& key) {
@@ -465,7 +471,9 @@ public:
 		if(it != this->values.end()) {
 			if(comp(key, *it)) std::out_of_range("Key not found.");
 			return it->second;
-		} else { throw std::out_of_range("Key not found."); }
+		} else {
+			throw std::out_of_range("Key not found.");
+		}
 	}
 	const Value& at(const Key& key) const {
 		key_compare comp(this->compare);
@@ -473,7 +481,9 @@ public:
 		if(it != this->values.end()) {
 			if(comp(key, *it)) std::out_of_range("Key not found.");
 			return it->second;
-		} else { throw std::out_of_range("Key not found."); }
+		} else {
+			throw std::out_of_range("Key not found.");
+		}
 	}
 	template <typename K>
 	Value& operator[](K&& key) {
@@ -504,16 +514,17 @@ void swap(generic_flat_map<Container, Key, Value, Compare>& m1,
 // member function has to be called to restore the invariants of the map.
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
 class generic_flat_multimap
-		: public detail::generic_flat_map_base<generic_flat_multimap<Container, Key, Value, Compare>,
-											   Container, Key, Value, Compare> {
+		: public generic_flat_map_base<generic_flat_multimap<Container, Key, Value, Compare>, Container, Key,
+									   Value, Compare> {
 
-	typedef detail::generic_flat_map_base<generic_flat_multimap<Container, Key, Value, Compare>, Container,
-										  Key, Value, Compare> Base;
+	typedef generic_flat_map_base<generic_flat_multimap<Container, Key, Value, Compare>, Container, Key,
+								  Value, Compare> Base;
 
 public:
 	template <typename... Args>
-	generic_flat_multimap(Args&&... args) noexcept(std::is_nothrow_default_constructible<
-			Compare>::value&& std::is_nothrow_constructible<Base, Compare, Args...>::value)
+	generic_flat_multimap(Args&&... args) noexcept(
+			std::is_nothrow_default_constructible<Compare>::value&&
+					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: generic_flat_multimap(Compare(), std::forward<Args>(args)...) {}
 	template <typename... Args>
 	explicit generic_flat_multimap(const Compare& compare, Args&&... args) noexcept(
@@ -570,7 +581,9 @@ public:
 				++count;
 			}
 			return count;
-		} else { return 0; }
+		} else {
+			return 0;
+		}
 	}
 	size_t count(const Key& key) const {
 		auto range = equal_range(key);
