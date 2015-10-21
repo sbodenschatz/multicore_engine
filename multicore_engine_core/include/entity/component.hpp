@@ -44,9 +44,33 @@ public:
 	}
 
 	static void fill_property_list(property_list& properties);
+
+protected:
+	template <typename T, typename Comp>
+	static void
+	register_component_property(property_list& list, const std::string& name,
+								typename reflection::linked_property<component, T, Comp>::getter_t getter,
+								typename reflection::linked_property<component, T, Comp>::setter_t setter) {
+		list.emplace_back(reflection::make_property<component, T, Comp>(name, getter, setter));
+	}
+	template <typename T, typename Comp>
+	static void register_component_property(
+			property_list& list, const std::string& name,
+			typename reflection::directly_linked_property<component, T, Comp>::variable_t variable) {
+		list.emplace_back(reflection::make_property<component>(name, variable));
+	}
 };
 
 } // namespace entity
 } // namespace mce
+
+#define REGISTER_COMPONENT_PROPERTY(LIST, COMP, TYPE, NAME)                                                  \
+	register_component_property<TYPE, COMP>(                                                                 \
+			LIST, #NAME,                                                                                     \
+			static_cast<mce::reflection::linked_property<component, TYPE, COMP>::getter_t>(&COMP::NAME),     \
+			static_cast<mce::reflection::linked_property<component, TYPE, COMP>::setter_t>(&COMP::NAME))
+
+#define REGISTER_COMPONENT_PROPERTY_DIRECT(LIST, COMP, TYPE, NAME)                                           \
+	register_component_property<TYPE, COMP>(LIST, #NAME, &COMP::NAME)
 
 #endif /* ENTITY_COMPONENT_HPP_ */
