@@ -28,11 +28,11 @@ solution "multicore_engine_solution"
 		objdir "%{prj.location}/obj-gcc/%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
 		links {"pthread"}
-		buildoptions "-Wno-unused-parameter -Wno-unused-private-field"
+		buildoptions "-Wno-unused-parameter"
 
 	configuration {"gmake"}
 		if _OPTIONS["cc"] == "clang" then
-			buildoptions "-stdlib=libc++"
+			buildoptions "-stdlib=libc++  -Wno-unused-private-field"
 			targetdir "%{prj.location}/bin-clang/%{cfg.buildcfg}"
 			objdir "%{prj.location}/obj-clang/%{cfg.buildcfg}"
 			toolset "clang"
