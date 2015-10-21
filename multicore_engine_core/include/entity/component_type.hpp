@@ -12,6 +12,7 @@
 #include <string>
 #include "ecs_types.hpp"
 #include <reflection/property.hpp>
+#include "component_type_id_manager.hpp"
 
 namespace mce {
 namespace core {
@@ -55,8 +56,9 @@ class component_type : public abstract_component_type {
 	property_list properties_;
 
 public:
-	component_type(component_type_id_t id, const std::string& name, const F& factory_function)
-			: abstract_component_type(id, name), factory_function_(factory_function) {
+	component_type(const std::string& name, const F& factory_function)
+			: abstract_component_type(component_type_id_manager::id<T>(), name),
+			  factory_function_(factory_function) {
 		T::fill_property_list(properties_);
 	}
 	virtual ~component_type() override = default;
