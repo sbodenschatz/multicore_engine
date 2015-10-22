@@ -50,10 +50,6 @@ BOOST_AUTO_TEST_CASE(insert) {
 	stdmap.emplace(42, "hello");
 	dcm.insert(43, "world");
 	stdmap.emplace(43, "world");
-	for(auto&& v : dcm) { std::cout << v.first << " " << v.second << "   "; }
-	std::cout << std::endl;
-	for(auto& v : stdmap) { std::cout << v.first << " " << v.second << "   "; }
-	std::cout << std::endl;
 	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
@@ -101,10 +97,6 @@ BOOST_AUTO_TEST_CASE(erase) {
 
 	dcm.erase(456);
 	stdmap.erase(456);
-	for(auto&& v : dcm) { std::cout << v.first << " " << v.second << "   "; }
-	std::cout << std::endl;
-	for(auto& v : stdmap) { std::cout << v.first << " " << v.second << "   "; }
-	std::cout << std::endl;
 	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
@@ -123,10 +115,6 @@ BOOST_AUTO_TEST_CASE(insert) {
 	stdmap.emplace(42, "hello");
 	dcm.insert(43, "world");
 	stdmap.emplace(43, "world");
-	for(auto&& v : dcm) { std::cout << v.first << " " << v.second << "   "; }
-	std::cout << std::endl;
-	for(auto& v : stdmap) { std::cout << v.first << " " << v.second << "   "; }
-	std::cout << std::endl;
 	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
@@ -159,10 +147,6 @@ BOOST_AUTO_TEST_CASE(erase) {
 
 	dcm.erase(456);
 	stdmap.erase(456);
-	for(auto&& v : dcm) { std::cout << v.first << " " << v.second << "   "; }
-	std::cout << std::endl;
-	for(auto& v : stdmap) { std::cout << v.first << " " << v.second << "   "; }
-	std::cout << std::endl;
 	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
