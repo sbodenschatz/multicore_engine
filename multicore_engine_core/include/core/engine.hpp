@@ -7,6 +7,7 @@
 #ifndef CORE_ENGINE_HPP_
 #define CORE_ENGINE_HPP_
 
+#include <cassert>
 #include <memory>
 #include <entity/entity_manager.hpp>
 
@@ -18,6 +19,15 @@ class engine {
 
 public:
 	engine();
+
+	const entity::entity_manager& entity_manager() const {
+		assert(entity_manager_);
+		return *entity_manager_;
+	}
+	entity::entity_manager& entity_manager() {
+		assert(entity_manager_);
+		return *entity_manager_;
+	}
 };
 
 } // namespace core

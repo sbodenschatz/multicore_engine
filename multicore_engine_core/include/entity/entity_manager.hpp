@@ -31,13 +31,7 @@ class entity_manager {
 	boost::container::flat_map<std::string, std::unique_ptr<entity_configuration>> entity_configurations;
 	boost::container::flat_map<std::string, std::unique_ptr<abstract_component_type>> component_types;
 
-	template <typename T, typename F>
-	void register_component_type(const std::string& name, const F& factory_function) {
-		bool success = false;
-		std::tie(std::ignore, success) =
-				component_types.emplace(name, make_component_type<T>(name, factory_function));
-		if(!success) throw std::logic_error("Duplicate component type name.");
-	}
+	void register_builtin_components();
 
 public:
 	entity_manager(core::engine& engine);
@@ -46,9 +40,32 @@ public:
 	entity_manager& operator=(const entity_manager&) = delete;
 	entity_manager& operator=(entity_manager&&) = delete;
 	~entity_manager();
+
+	template <typename T, typename F>
+	void register_component_type(const std::string& name, const F& factory_function) {
+		bool success = false;
+		std::tie(std::ignore, success) =
+				component_types.emplace(name, make_component_type<T>(name, factory_function));
+		if(!success) throw std::logic_error("Duplicate component type name.");
+	}
 };
 
 } // namespace entity
 } // namespace mce
+
+#define REGISTER_COMPONENT_TYPE(ENTITYMANAGER, TYPE, NAME, FACTORYEXPR)                                      \
+	ENTITYMANAGER.register_component_type<TYPE>(NAME, [](auto&& owner, auto&& config, auto&& engine) {       \
+		/*Silence unused parameter warnings:*/                                                               \
+		static_cast<void>(owner), static_cast<void>(config), static_cast<void>(engine);                      \
+		return FACTORYEXPR;                                                                                  \
+	})
+
+#define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR)                                     \
+	ENTITYMANAGER.register_component_type<NAME##_component>(                                                 \
+			#NAME, [](auto&& owner, auto&& config, auto&& engine) {                                          \
+				/*Silence unused parameter warnings:*/                                                       \
+				static_cast<void>(owner), static_cast<void>(config), static_cast<void>(engine);              \
+				return FACTORYEXPR;                                                                          \
+			})
 
 #endif /* ENTITY_ENTITY_MANAGER_HPP_ */
