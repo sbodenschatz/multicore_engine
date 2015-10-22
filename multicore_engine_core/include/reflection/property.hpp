@@ -32,7 +32,7 @@ public:
 	abstract_property& operator=(const abstract_property&) = delete;
 	abstract_property& operator=(abstract_property&&) = delete;
 	virtual ~abstract_property() = default;
-	virtual mce::reflection::type type() const noexcept = 0;
+	virtual mce::reflection::type_t type() const noexcept = 0;
 	virtual std::unique_ptr<abstract_property_assignment<Root_Type>> make_assignment() const = 0;
 	virtual const std::string& name() const {
 		return name_;
@@ -65,7 +65,7 @@ public:
 	property& operator=(const property&) = delete;
 	property& operator=(property&&) = delete;
 	virtual ~property() = default;
-	virtual mce::reflection::type type() const noexcept override {
+	virtual mce::reflection::type_t type() const noexcept override {
 		return type_info<T>::type;
 	}
 	virtual accessor_value get_value(const Root_Type& object) const = 0;
