@@ -9,8 +9,10 @@ scan-build:
 #  stage: analyse
   script:
   - premake5 --cc=gcc gmake
-  - make config=debug clean
-  - make config=release clean
+  - make CC=gcc CXX=g++ config=debug clean
+  - make CC=gcc CXX=g++ config=release clean
+  - make CC=clang CXX=clang++ config=debug clean
+  - make CC=clang CXX=clang++ config=release clean
   - export CC=clang
   - export CXX=clang++
   - scan-build --status-bugs make -j 6 config=debug CC=clang CXX=clang++
@@ -23,7 +25,6 @@ gcc-debug-build:
   - export CXX=g++
   - make CC=gcc CXX=g++ config=debug clean
   - make -j 6 config=debug CC=gcc CXX=g++
-  - make -j 6 config=release CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin-gcc/debug/multicore_engine_core_tests --report_level=short
 
 gcc-release-build:
