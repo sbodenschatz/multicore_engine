@@ -46,6 +46,8 @@ class smart_pool_ptr {
 	friend class smart_object_pool;
 	template <typename U>
 	friend class weak_pool_ptr;
+	template <typename U>
+	friend class smart_pool_ptr;
 
 	smart_pool_ptr(T* object, detail::smart_object_pool_block_interface* block) noexcept
 			: object{object},

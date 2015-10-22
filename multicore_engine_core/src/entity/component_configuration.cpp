@@ -6,6 +6,7 @@
 
 #include <entity/component_configuration.hpp>
 #include <entity/component_type.hpp>
+#include <reflection/property_assignment.hpp>
 
 namespace mce {
 namespace entity {
@@ -29,6 +30,8 @@ component_pool_ptr component_configuration::create_component(entity& owner, core
 	for(const auto& assignment : assignments) { assignment->assign(*comp); }
 	return comp;
 }
+
+component_configuration::~component_configuration() {}
 
 } // namespace entity
 } // namespace mce

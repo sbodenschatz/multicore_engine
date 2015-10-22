@@ -30,7 +30,7 @@ public:
 	entity_configuration(entity_configuration&&) = delete;
 	entity_configuration& operator=(const entity_configuration&) = delete;
 	entity_configuration& operator=(entity_configuration&&) = delete;
-	~entity_configuration() = default;
+	~entity_configuration();
 
 	const std::vector<std::unique_ptr<component_configuration>>& components() const {
 		return components_;

@@ -73,9 +73,9 @@ public:
 };
 
 template <typename T, typename F>
-std::unique_ptr<abstract_component_type> make_component_type(component_type_id_t id, const std::string& name,
+std::unique_ptr<abstract_component_type> make_component_type(const std::string& name,
 															 const F& factory_function) {
-	return std::make_unique<component_type<T, F>>(id, name, factory_function);
+	return std::make_unique<component_type<T, F>>(name, factory_function);
 }
 
 } // namespace entity

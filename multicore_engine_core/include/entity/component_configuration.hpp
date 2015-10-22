@@ -10,12 +10,15 @@
 #include <unordered_map>
 #include <vector>
 #include "ecs_types.hpp"
-#include <reflection/property_assignment.hpp>
 
 namespace mce {
 namespace core {
 class engine;
 } // namespace core
+namespace reflection {
+template <typename Root_Type>
+class abstract_property_assignment;
+} // namespace reflection
 namespace entity {
 class entity;
 class abstract_component_type;
@@ -27,6 +30,7 @@ class component_configuration {
 public:
 	explicit component_configuration(abstract_component_type& type,
 									 const std::unordered_map<std::string, std::string>& property_values);
+	~component_configuration();
 	component_pool_ptr create_component(entity& owner, core::engine& engine) const;
 
 	const abstract_component_type& type() const {

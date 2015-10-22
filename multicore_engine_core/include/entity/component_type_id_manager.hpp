@@ -14,6 +14,8 @@ namespace entity {
 
 class component_type_id_manager {
 	static component_type_id_t next_id;
+
+public:
 	template <typename T>
 	static component_type_id_t id() {
 		static component_type_id_t id_ = next_id++;
