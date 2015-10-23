@@ -4,6 +4,8 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <iterator>
+#include <algorithm>
 #include <entity/component_configuration.hpp>
 #include <entity/component_type.hpp>
 #include <reflection/property_assignment.hpp>
@@ -23,6 +25,11 @@ component_configuration::component_configuration(
 			assignments.push_back(std::move(assignment));
 		}
 	}
+}
+
+component_configuration::component_configuration(const component_configuration& other) : type_(other.type_) {
+	std::transform(other.assignments.begin(), other.assignments.end(), std::back_inserter(assignments),
+				   [](const auto& assignment) { return assignment->make_copy(); });
 }
 
 component_pool_ptr component_configuration::create_component(entity& owner, core::engine& engine) const {

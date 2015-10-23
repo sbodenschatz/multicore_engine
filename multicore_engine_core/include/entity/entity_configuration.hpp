@@ -26,8 +26,8 @@ class entity_configuration {
 
 public:
 	explicit entity_configuration(const std::string& name);
-	entity_configuration(const entity_configuration&) = delete;
-	entity_configuration(entity_configuration&&) = delete;
+	entity_configuration(const entity_configuration& other);
+	entity_configuration(entity_configuration&&) = default;
 	entity_configuration& operator=(const entity_configuration&) = delete;
 	entity_configuration& operator=(entity_configuration&&) = delete;
 	~entity_configuration();

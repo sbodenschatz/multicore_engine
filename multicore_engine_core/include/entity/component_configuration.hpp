@@ -28,8 +28,12 @@ class component_configuration {
 	std::vector<std::unique_ptr<reflection::abstract_property_assignment<component>>> assignments;
 
 public:
-	explicit component_configuration(abstract_component_type& type,
-									 const std::unordered_map<std::string, std::string>& property_values);
+	component_configuration(abstract_component_type& type,
+							const std::unordered_map<std::string, std::string>& property_values);
+	component_configuration(const component_configuration& other);
+	component_configuration(component_configuration&&) = default;
+	component_configuration& operator=(const component_configuration&) = delete;
+	component_configuration& operator=(component_configuration&&) = delete;
 	~component_configuration();
 	component_pool_ptr create_component(entity& owner, core::engine& engine) const;
 
