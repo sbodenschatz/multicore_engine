@@ -10,6 +10,8 @@
 #include <memory>
 #include <string>
 #include "property.hpp"
+#include <entity/parser/entity_text_file_ast.hpp>
+#include <entity/parser/entity_text_file_ast_value_mapper.hpp>
 
 namespace mce {
 namespace reflection {
@@ -32,7 +34,8 @@ public:
 	abstract_property_assignment& operator=(abstract_property_assignment&&) = default;
 	virtual ~abstract_property_assignment() = default;
 	virtual void assign(Root_Type& object) const = 0;
-	virtual void parse(const std::string& value_string) = 0; // TODO Change to fit AST-Nodes
+	virtual void parse(const entity::ast::variable_value& ast_value, const std::string& entity_context,
+					   const std::string& component_context) = 0;
 	virtual const mce::reflection::abstract_property<Root_Type>& abstract_property() noexcept = 0;
 	virtual std::unique_ptr<abstract_property_assignment<Root_Type>> make_copy() const = 0;
 	// TODO: Implement interface for binary serialization of object configurations
@@ -45,7 +48,27 @@ public:
 template <typename Root_Type, typename T>
 class property_assignment : public abstract_property_assignment<Root_Type> {
 	const property<Root_Type, T>& property_;
-	T value;
+	T value_;
+
+	struct ast_visitor : public boost::static_visitor<> {
+		const std::string& entity_context;
+		const std::string& component_context;
+		property_assignment& pa;
+		ast_visitor(const std::string& entity_context, const std::string& component_context,
+					property_assignment& pa)
+				: entity_context(entity_context), component_context(component_context), pa(pa) {}
+		template <typename U, typename V = T,
+				  typename W = typename entity::ast::ast_value_mapper<U, V>::error>
+		void operator()(const U&, W* dummy = nullptr) {
+			throw std::runtime_error("Invalid value for " + pa.property_.name() + " of " + component_context +
+									 " in " + entity_context + ".");
+		}
+		template <typename U, typename V = T,
+				  void (*convert)(const U&, V&) = entity::ast::ast_value_mapper<U, V>::convert>
+		void operator()(const U& ast_value) {
+			convert(ast_value, pa.value_);
+		}
+	};
 
 public:
 	property_assignment(const mce::reflection::property<Root_Type, T>& property) : property_(property) {}
@@ -56,10 +79,12 @@ public:
 	virtual ~property_assignment() = default;
 
 	virtual void assign(Root_Type& object) const override {
-		if(this->valid_) property_.set_value(object, value);
+		if(this->valid_) property_.set_value(object, value_);
 	}
-	virtual void parse(const std::string& value_string) override {
-		this->valid_ = type_parser<T>::from_string(value_string, value);
+	virtual void parse(const entity::ast::variable_value& ast_value, const std::string& entity_context,
+					   const std::string& component_context) override {
+		ast_visitor visitor(entity_context, component_context, *this);
+		ast_value.apply_visitor(visitor);
 	}
 	virtual const mce::reflection::abstract_property<Root_Type>& abstract_property() noexcept override {
 		return property_;

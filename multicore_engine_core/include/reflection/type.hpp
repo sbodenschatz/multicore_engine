@@ -7,6 +7,7 @@
 #ifndef REFLECTION_TYPE_HPP_
 #define REFLECTION_TYPE_HPP_
 
+#include <vector>
 #include <string>
 #include <sstream>
 #include <glm/glm.hpp>
@@ -26,7 +27,8 @@ enum class type_t {
 	float_3,
 	float_4,
 	quaternion,
-	string
+	string,
+	string_list,
 };
 
 template <typename T>
@@ -79,6 +81,11 @@ struct type_info<glm::quat> {
 template <>
 struct type_info<std::string> {
 	static const type_t type = type_t::string;
+};
+
+template <>
+struct type_info<std::vector<std::string>> {
+	static const type_t type = type_t::string_list;
 };
 
 template <typename T>
