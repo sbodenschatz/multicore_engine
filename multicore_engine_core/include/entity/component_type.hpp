@@ -31,7 +31,8 @@ protected:
 	abstract_component_type(component_type_id_t id, const std::string& name) : id_(id), name_(name) {}
 
 public:
-	typedef std::vector<std::unique_ptr<reflection::abstract_property<component>>> property_list;
+	typedef std::vector<std::unique_ptr<
+			reflection::abstract_property<component, abstract_property_assignment>>> property_list;
 	abstract_component_type(const abstract_component_type&) = delete;
 	abstract_component_type(abstract_component_type&&) = delete;
 	abstract_component_type& operator=(const abstract_component_type&) = delete;

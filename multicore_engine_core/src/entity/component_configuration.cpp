@@ -7,8 +7,8 @@
 #include <iterator>
 #include <algorithm>
 #include <entity/component_configuration.hpp>
+#include <entity/component_property_assignment.hpp>
 #include <entity/component_type.hpp>
-#include <reflection/property_assignment.hpp>
 
 namespace mce {
 namespace entity {
@@ -16,6 +16,7 @@ namespace entity {
 component_configuration::component_configuration(
 		abstract_component_type& type, const std::unordered_map<std::string, std::string>& property_values)
 		: type_(type) {
+	(void)property_values;
 	// TODO:Replace with AST implementation
 	//	for(const auto& prop : type.properties()) {
 	//		auto assignment = prop->make_assignment();

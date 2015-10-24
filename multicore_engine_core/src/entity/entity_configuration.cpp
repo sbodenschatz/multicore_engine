@@ -9,7 +9,6 @@
 #include <entity/entity_configuration.hpp>
 #include <entity/component_configuration.hpp>
 #include <entity/entity.hpp>
-#include <reflection/property_assignment.hpp>
 
 namespace mce {
 namespace entity {
