@@ -26,23 +26,25 @@ class property;
 
 namespace entity {
 template <typename Root_Type>
-class abstract_property_assignment {
+class abstract_component_property_assignment {
 protected:
 	bool valid_;
 
 public:
-	abstract_property_assignment() noexcept : valid_(false) {}
-	abstract_property_assignment(const abstract_property_assignment&) = default;
-	abstract_property_assignment(abstract_property_assignment&&) = default;
-	abstract_property_assignment& operator=(const abstract_property_assignment&) = default;
-	abstract_property_assignment& operator=(abstract_property_assignment&&) = default;
-	virtual ~abstract_property_assignment() = default;
+	abstract_component_property_assignment() noexcept : valid_(false) {}
+	abstract_component_property_assignment(const abstract_component_property_assignment&) = default;
+	abstract_component_property_assignment(abstract_component_property_assignment&&) = default;
+	abstract_component_property_assignment&
+	operator=(const abstract_component_property_assignment&) = default;
+	abstract_component_property_assignment& operator=(abstract_component_property_assignment&&) = default;
+	virtual ~abstract_component_property_assignment() = default;
 	virtual void assign(Root_Type& object) const = 0;
 	virtual void parse(const ast::variable_value& ast_value, const std::string& entity_context,
 					   const std::string& component_context) = 0;
-	virtual const mce::reflection::abstract_property<Root_Type, mce::entity::abstract_property_assignment>&
+	virtual const mce::reflection::abstract_property<Root_Type,
+													 mce::entity::abstract_component_property_assignment>&
 	abstract_property() noexcept = 0;
-	virtual std::unique_ptr<abstract_property_assignment<Root_Type>> make_copy() const = 0;
+	virtual std::unique_ptr<abstract_component_property_assignment<Root_Type>> make_copy() const = 0;
 	// TODO: Implement interface for binary serialization of object configurations
 
 	bool valid() const {
@@ -51,17 +53,17 @@ public:
 };
 
 template <typename Root_Type, typename T>
-class property_assignment : public abstract_property_assignment<Root_Type> {
-	const reflection::property<Root_Type, T, mce::entity::abstract_property_assignment,
-							   mce::entity::property_assignment>& property_;
+class component_property_assignment : public abstract_component_property_assignment<Root_Type> {
+	const reflection::property<Root_Type, T, mce::entity::abstract_component_property_assignment,
+							   mce::entity::component_property_assignment>& property_;
 	T value_;
 
 	struct ast_visitor : public boost::static_visitor<> {
 		const std::string& entity_context;
 		const std::string& component_context;
-		property_assignment& pa;
+		component_property_assignment& pa;
 		ast_visitor(const std::string& entity_context, const std::string& component_context,
-					property_assignment& pa)
+					component_property_assignment& pa)
 				: entity_context(entity_context), component_context(component_context), pa(pa) {}
 		template <typename U, typename V = T, typename W = typename ast::ast_value_mapper<U, V>::error>
 		void operator()(const U&, W* = nullptr) {
@@ -76,15 +78,15 @@ class property_assignment : public abstract_property_assignment<Root_Type> {
 	};
 
 public:
-	property_assignment(
-			const mce::reflection::property<Root_Type, T, mce::entity::abstract_property_assignment,
-											mce::entity::property_assignment>& property)
+	component_property_assignment(
+			const mce::reflection::property<Root_Type, T, mce::entity::abstract_component_property_assignment,
+											mce::entity::component_property_assignment>& property)
 			: property_(property) {}
-	property_assignment(const property_assignment&) = default;
-	property_assignment(property_assignment&&) = default;
-	property_assignment& operator=(const property_assignment&) = default;
-	property_assignment& operator=(property_assignment&&) = default;
-	virtual ~property_assignment() = default;
+	component_property_assignment(const component_property_assignment&) = default;
+	component_property_assignment(component_property_assignment&&) = default;
+	component_property_assignment& operator=(const component_property_assignment&) = default;
+	component_property_assignment& operator=(component_property_assignment&&) = default;
+	virtual ~component_property_assignment() = default;
 
 	virtual void assign(Root_Type& object) const override {
 		if(this->valid_) property_.set_value(object, value_);
@@ -94,12 +96,13 @@ public:
 		ast_visitor visitor(entity_context, component_context, *this);
 		ast_value.apply_visitor(visitor);
 	}
-	virtual const mce::reflection::abstract_property<Root_Type, mce::entity::abstract_property_assignment>&
+	virtual const mce::reflection::abstract_property<Root_Type,
+													 mce::entity::abstract_component_property_assignment>&
 	abstract_property() noexcept override {
 		return property_;
 	}
-	virtual std::unique_ptr<abstract_property_assignment<Root_Type>> make_copy() const override {
-		return std::make_unique<property_assignment<Root_Type, T>>(*this);
+	virtual std::unique_ptr<abstract_component_property_assignment<Root_Type>> make_copy() const override {
+		return std::make_unique<component_property_assignment<Root_Type, T>>(*this);
 	}
 };
 

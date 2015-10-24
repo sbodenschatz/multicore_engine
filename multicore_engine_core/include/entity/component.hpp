@@ -30,7 +30,7 @@ protected:
 
 public:
 	typedef std::vector<std::unique_ptr<
-			reflection::abstract_property<component, abstract_property_assignment>>> property_list;
+			reflection::abstract_property<component, abstract_component_property_assignment>>> property_list;
 	virtual ~component() = default;
 
 	const component_configuration& configuration() const {
@@ -51,21 +51,22 @@ protected:
 	template <typename T, typename Comp>
 	static void register_component_property(
 			property_list& list, const std::string& name,
-			typename reflection::linked_property<component, T, Comp, abstract_property_assignment,
-												 property_assignment>::getter_t getter,
-			typename reflection::linked_property<component, T, Comp, abstract_property_assignment,
-												 property_assignment>::setter_t setter) {
-		list.emplace_back(reflection::make_property<component, abstract_property_assignment,
-													property_assignment, T, Comp>(name, getter, setter));
+			typename reflection::linked_property<component, T, Comp, abstract_component_property_assignment,
+												 component_property_assignment>::getter_t getter,
+			typename reflection::linked_property<component, T, Comp, abstract_component_property_assignment,
+												 component_property_assignment>::setter_t setter) {
+		list.emplace_back(
+				reflection::make_property<component, abstract_component_property_assignment,
+										  component_property_assignment, T, Comp>(name, getter, setter));
 	}
 	template <typename T, typename Comp>
-	static void register_component_property(
-			property_list& list, const std::string& name,
-			typename reflection::directly_linked_property<component, T, Comp, abstract_property_assignment,
-														  property_assignment>::variable_t variable) {
-		list.emplace_back(
-				reflection::make_property<component, abstract_property_assignment, property_assignment>(
-						name, variable));
+	static void
+	register_component_property(property_list& list, const std::string& name,
+								typename reflection::directly_linked_property<
+										component, T, Comp, abstract_component_property_assignment,
+										component_property_assignment>::variable_t variable) {
+		list.emplace_back(reflection::make_property<component, abstract_component_property_assignment,
+													component_property_assignment>(name, variable));
 	}
 };
 
@@ -75,12 +76,11 @@ protected:
 #define REGISTER_COMPONENT_PROPERTY(LIST, COMP, TYPE, NAME)                                                  \
 	register_component_property<TYPE, COMP>(                                                                 \
 			LIST, #NAME, static_cast<mce::reflection::linked_property<                                       \
-								 component, TYPE, COMP, mce::entity::abstract_property_assignment,           \
-								 mce::entity::property_assignment>::getter_t>(&COMP::NAME),                  \
-			static_cast<mce::reflection::linked_property<component, TYPE, COMP,                              \
-														 mce::entity::abstract_property_assignment,          \
-														 mce::entity::property_assignment>::setter_t>(       \
-					&COMP::NAME))
+								 component, TYPE, COMP, mce::entity::abstract_component_property_assignment, \
+								 mce::entity::component_property_assignment>::getter_t>(&COMP::NAME),        \
+			static_cast<mce::reflection::linked_property<                                                    \
+					component, TYPE, COMP, mce::entity::abstract_component_property_assignment,              \
+					mce::entity::component_property_assignment>::setter_t>(&COMP::NAME))
 
 #define REGISTER_COMPONENT_PROPERTY_DIRECT(LIST, COMP, TYPE, NAME)                                           \
 	register_component_property<TYPE, COMP>(LIST, #NAME, &COMP::NAME)

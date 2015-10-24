@@ -32,7 +32,7 @@ protected:
 
 public:
 	typedef std::vector<std::unique_ptr<
-			reflection::abstract_property<component, abstract_property_assignment>>> property_list;
+			reflection::abstract_property<component, abstract_component_property_assignment>>> property_list;
 	abstract_component_type(const abstract_component_type&) = delete;
 	abstract_component_type(abstract_component_type&&) = delete;
 	abstract_component_type& operator=(const abstract_component_type&) = delete;

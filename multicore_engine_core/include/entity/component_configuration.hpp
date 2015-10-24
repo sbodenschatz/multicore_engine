@@ -17,13 +17,13 @@ class engine;
 } // namespace core
 namespace entity {
 template <typename Root_Type>
-class abstract_property_assignment;
+class abstract_component_property_assignment;
 class entity;
 class abstract_component_type;
 
 class component_configuration {
 	abstract_component_type& type_;
-	std::vector<std::unique_ptr<abstract_property_assignment<component>>> assignments;
+	std::vector<std::unique_ptr<abstract_component_property_assignment<component>>> assignments;
 
 public:
 	component_configuration(abstract_component_type& type,
