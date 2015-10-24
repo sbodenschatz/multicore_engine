@@ -34,9 +34,10 @@ public:
 	virtual ~abstract_property() = default;
 	virtual mce::reflection::type_t type() const noexcept = 0;
 	virtual std::unique_ptr<abstract_property_assignment<Root_Type>> make_assignment() const = 0;
-	virtual const std::string& name() const {
+	const std::string& name() const {
 		return name_;
 	}
+	// TODO: Implement interface for binary serialization of objects
 };
 
 namespace detail {

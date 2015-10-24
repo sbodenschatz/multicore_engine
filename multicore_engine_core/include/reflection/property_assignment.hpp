@@ -32,10 +32,10 @@ public:
 	abstract_property_assignment& operator=(abstract_property_assignment&&) = default;
 	virtual ~abstract_property_assignment() = default;
 	virtual void assign(Root_Type& object) const = 0;
-	virtual void parse(const std::string& value_string) = 0;
+	virtual void parse(const std::string& value_string) = 0; // TODO Change to fit AST-Nodes
 	virtual const mce::reflection::abstract_property<Root_Type>& abstract_property() noexcept = 0;
 	virtual std::unique_ptr<abstract_property_assignment<Root_Type>> make_copy() const = 0;
-	// TODO: Implement interface for binary formating and possibly AST
+	// TODO: Implement interface for binary serialization of object configurations
 
 	bool valid() const {
 		return valid_;

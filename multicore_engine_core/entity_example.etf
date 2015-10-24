@@ -1,0 +1,17 @@
+include "other_file.etf"
+
+Entity_Config_Name : Super_Entity {
+	Component_Name{
+		variable_1=42;
+		var_2=(123,456,789);
+	}
+	Inherited_Component1{
+		changed_variable="Test";	
+	}
+	replace Inherited_Component2{
+	}
+}
+
+//This file format allows C++-Style comments but not C-Style comments
+Entity_Config_Name (1,2,3),(x:45,y:30); //Unnamed entity
+Entity_Config_Name name_of_entity (1,2,3),(x:45,y:30);
