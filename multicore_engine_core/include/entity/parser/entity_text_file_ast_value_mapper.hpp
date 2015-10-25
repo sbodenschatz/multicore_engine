@@ -23,8 +23,8 @@ struct ast_value_mapper {
 };
 
 template <typename T>
-struct ast_value_mapper<int64_t, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
-	static void convert(const int64_t& ast_val, T& val) {
+struct ast_value_mapper<long long, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
+	static void convert(const long long& ast_val, T& val) {
 		val = T(ast_val);
 	}
 };
@@ -44,8 +44,8 @@ struct ast_value_mapper<std::string, std::string> {
 };
 
 template <>
-struct ast_value_mapper<std::vector<std::string>, std::vector<std::string>> {
-	static void convert(const std::vector<std::string>& ast_val, std::vector<std::string>& val) {
+struct ast_value_mapper<string_list, std::vector<std::string>> {
+	static void convert(const string_list& ast_val, std::vector<std::string>& val) {
 		val = ast_val;
 	}
 };
@@ -75,7 +75,7 @@ struct ast_value_mapper<float_list, glm::vec4> {
 };
 
 template <typename T, glm::precision p>
-struct ast_value_mapper<float_list, glm::tvec2<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
+struct ast_value_mapper<int_list, glm::tvec2<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	static void convert(const int_list& ast_val, glm::tvec2<T, p>& val) {
 		val = glm::tvec2<T, p>();
 		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) { val[i] = T(ast_val[i]); }
@@ -83,7 +83,7 @@ struct ast_value_mapper<float_list, glm::tvec2<T, p>, std::enable_if_t<std::is_a
 };
 
 template <typename T, glm::precision p>
-struct ast_value_mapper<float_list, glm::tvec3<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
+struct ast_value_mapper<int_list, glm::tvec3<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	static void convert(const int_list& ast_val, glm::tvec3<T, p>& val) {
 		val = glm::tvec3<T, p>();
 		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) { val[i] = T(ast_val[i]); }
@@ -91,7 +91,7 @@ struct ast_value_mapper<float_list, glm::tvec3<T, p>, std::enable_if_t<std::is_a
 };
 
 template <typename T, glm::precision p>
-struct ast_value_mapper<float_list, glm::tvec4<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
+struct ast_value_mapper<int_list, glm::tvec4<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	static void convert(const int_list& ast_val, glm::tvec4<T, p>& val) {
 		val = glm::tvec4<T, p>();
 		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) { val[i] = T(ast_val[i]); }

@@ -14,13 +14,12 @@ BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::rotation_element,	 //
 						  (mce::entity::ast::rotation_axis, axis) //
 						  (float, angle))						  //
 
-BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::marker_evaluation,			  //
-						  (mce::entity::ast::marker_attribute, attribute) //
-						  (std::string, marker_name))					  //
+BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::marker_evaluation, //
+						  //(mce::entity::ast::marker_attribute, attribute) //
+						  (std::string, marker_name)) //
 
-BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::entity_reference,			  //
-						  (mce::entity::ast::entity_attribute, attribute) //
-						  (std::string, referred_name))					  //
+BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::entity_reference, //
+						  (std::string, referred_name))		  //
 
 BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::variable, (std::string, name) //
 						  (mce::entity::ast::variable_value, value))	  //

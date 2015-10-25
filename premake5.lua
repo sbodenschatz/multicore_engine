@@ -1,7 +1,7 @@
 solution "multicore_engine_solution"
 	configurations{"debug", "release"}
 	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH"}
-	includedirs{"multicore_engine_core/include"}
+	includedirs{"multicore_engine_core/include","multicore_engine_parsers/include"}
 	vectorextensions "SSE2"
 	startproject "multicore_engine_demo"
 	warnings "Extra"
@@ -58,7 +58,7 @@ solution "multicore_engine_solution"
 		
 	configuration{"gmake","windows"}
 		buildoptions "-isystemC:/Libs/Boost/include -isystemC:/Libs/glm/include"
-
+	
 	configuration {"vs2015"}
 		defines{"GLM_FORCE_CXX11"}
 		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
@@ -75,11 +75,23 @@ solution "multicore_engine_solution"
 	configuration {"gmake","windows","release"}
 		libdirs {"C:/Libs/Boost/lib_x64_mingw_release"}
 		
+	project "multicore_engine_parsers"
+		kind "StaticLib"
+		language "C++"
+		location "multicore_engine_parsers/build"
+		files {"multicore_engine_parsers/src/**.cpp"}
+
+		configuration{"gmake","windows"}
+			-- disable debug settings for the parser because 32-bit-hosted MinGW used on windows runs into OOM or other size restrictions when compiling the parser
+			removeflags{"Symbols"}
+			optimize "Debug"
+
 	project "multicore_engine_core"
 		kind "StaticLib"
 		language "C++"
 		location "multicore_engine_core/build"
-		files { "multicore_engine_core/include/**.hpp", "multicore_engine_core/src/**.cpp"}
+		links {"multicore_engine_parsers"}
+		files {"multicore_engine_core/include/**.hpp", "multicore_engine_core/src/**.cpp"}
 
 	project "multicore_engine_core_tests"
 		kind "ConsoleApp"
@@ -87,9 +99,7 @@ solution "multicore_engine_solution"
 		language "C++"
 		location "multicore_engine_core_tests/build"
 		files { "multicore_engine_core_tests/include/**.hpp", "multicore_engine_core_tests/src/**.cpp"}
-		links {"multicore_engine_core"}
-		--removeflags{"Symbols"}
-		--optimize "Debug"
+		links {"multicore_engine_core","multicore_engine_parsers"}
 		configuration {"gmake"}
 			buildoptions "-Wno-deprecated-declarations -Wno-unused-variable  -Wno-unused-parameter"
 			links {"boost_unit_test_framework"}
@@ -104,6 +114,6 @@ solution "multicore_engine_solution"
 		language "C++"
 		location "multicore_engine_demo/build"
 		files { "multicore_engine_demo/include/**.hpp", "multicore_engine_demo/src/**.cpp"}
-		links {"multicore_engine_core"}
+		links {"multicore_engine_core","multicore_engine_parsers"}
 		configuration {"vs2015"}
 			debugdir "multicore_engine_demo"

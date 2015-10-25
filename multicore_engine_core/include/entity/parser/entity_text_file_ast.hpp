@@ -16,7 +16,7 @@ namespace mce {
 namespace entity {
 namespace ast {
 
-typedef std::vector<int64_t> int_list;
+typedef std::vector<long long> int_list;
 typedef std::vector<float> float_list;
 typedef std::vector<std::string> string_list;
 
@@ -27,19 +27,17 @@ struct rotation_element {
 };
 typedef std::vector<rotation_element> rotation_list;
 
-enum class marker_attribute { position };
+// enum class marker_attribute { position };
 struct marker_evaluation {
-	marker_attribute attribute;
+	// marker_attribute attribute = marker_attribute::position;
 	std::string marker_name;
 };
 
-enum class entity_attribute { id, position, orientation };
 struct entity_reference {
-	entity_attribute attribute = entity_attribute::id;
 	std::string referred_name;
 };
 
-typedef boost::variant<int64_t, float, std::string, int_list, float_list, string_list, rotation_list,
+typedef boost::variant<long long, float, std::string, int_list, float_list, string_list, rotation_list,
 					   marker_evaluation, entity_reference> variable_value;
 
 struct variable {
@@ -72,6 +70,10 @@ struct entity_instance {
 	entity_instance_param position_parameter;
 	entity_instance_param orientation_parameter;
 };
+
+typedef boost::variant<entity_definition, include_instruction, entity_instance> root_element;
+
+typedef std::vector<root_element> ast_root;
 
 } // namespace ast
 } // namespace entity

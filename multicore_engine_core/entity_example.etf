@@ -1,4 +1,4 @@
-include "other_file.etf"
+include "other_file.etf";
 
 Entity_Config_Name : Super_Entity {
 	Component_Name{
