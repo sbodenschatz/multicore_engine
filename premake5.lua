@@ -18,7 +18,6 @@ solution "multicore_engine_solution"
 	
 	configuration "windows"
 		defines{"MULTICORE_ENGINE_WINDOWS"}
-		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
 	configuration "not windows"
 		defines{"MULTICORE_ENGINE_NOT_WINDOWS"}
 		includedirs{}
@@ -56,9 +55,13 @@ solution "multicore_engine_solution"
 			libdirs {"/usr/local/lib/clang-libs/lib-release"}
 			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-release"}
 		end
+		
+	configuration{"gmake","windows"}
+		buildoptions "-isystemC:/Libs/Boost/include -isystemC:/Libs/glm/include"
 
 	configuration {"vs2015"}
 		defines{"GLM_FORCE_CXX11"}
+		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
 		architecture "x64"
 		buildoptions {"/MP"}
 		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild"}
