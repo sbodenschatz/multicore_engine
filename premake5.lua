@@ -81,6 +81,9 @@ solution "multicore_engine_solution"
 		location "multicore_engine_parsers/build"
 		files {"multicore_engine_parsers/src/**.cpp"}
 
+		configuration{"gmake"}
+			buildoptions "-Wno-sign-compare"
+		
 		configuration{"gmake","windows"}
 			-- disable debug settings for the parser because 32-bit-hosted MinGW used on windows runs into OOM or other size restrictions when compiling the parser
 			removeflags{"Symbols"}
