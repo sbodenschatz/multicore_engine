@@ -1,5 +1,5 @@
 before_script:
-  - mkdir -p multicore_engine_{core,core_tests,demo}/build/{bin,obj}-{gcc,clang}/{debug,release}
+  - mkdir -p multicore_engine_{core,core_tests,demo,parsers}/build/{bin,obj}-{gcc,clang}/{debug,release}
 
 #stages:
 #  - analyse
