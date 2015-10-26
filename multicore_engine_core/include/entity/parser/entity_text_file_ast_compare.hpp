@@ -9,6 +9,7 @@
 
 #include "entity_text_file_ast.hpp"
 #include <limits>
+#include <cmath>
 
 namespace mce {
 namespace entity {
