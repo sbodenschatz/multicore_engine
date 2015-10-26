@@ -14,6 +14,9 @@
 #include <entity/parser/entity_text_file_ast_value_mapper.hpp>
 
 namespace mce {
+namespace core {
+class engine;
+} // namespace core
 namespace reflection {
 
 template <typename Root_Type, template <typename> class AbstractAssignment, typename... Assignment_Param>
@@ -28,10 +31,11 @@ namespace entity {
 template <typename Root_Type>
 class abstract_component_property_assignment {
 protected:
+	core::engine& engine_;
 	bool valid_;
 
 public:
-	abstract_component_property_assignment() noexcept : valid_(false) {}
+	abstract_component_property_assignment(core::engine& engine) noexcept : engine_(engine), valid_(false) {}
 	abstract_component_property_assignment(const abstract_component_property_assignment&) = default;
 	abstract_component_property_assignment(abstract_component_property_assignment&&) = default;
 	abstract_component_property_assignment&
@@ -80,8 +84,9 @@ class component_property_assignment : public abstract_component_property_assignm
 public:
 	component_property_assignment(
 			const mce::reflection::property<Root_Type, T, mce::entity::abstract_component_property_assignment,
-											mce::entity::component_property_assignment>& property)
-			: property_(property) {}
+											mce::entity::component_property_assignment>& property,
+			core::engine& engine)
+			: abstract_component_property_assignment<Root_Type>(engine), property_(property) {}
 	component_property_assignment(const component_property_assignment&) = default;
 	component_property_assignment(component_property_assignment&&) = default;
 	component_property_assignment& operator=(const component_property_assignment&) = default;

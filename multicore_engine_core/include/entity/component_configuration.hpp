@@ -26,8 +26,8 @@ class component_configuration {
 	std::vector<std::unique_ptr<abstract_component_property_assignment<component>>> assignments;
 
 public:
-	component_configuration(abstract_component_type& type,
-							const std::unordered_map<std::string, std::string>& property_values);
+	component_configuration(core::engine& engine, abstract_component_type& type /*,
+							const std::unordered_map<std::string, std::string>& property_values*/);
 	component_configuration(const component_configuration& other);
 	component_configuration(component_configuration&&) = default;
 	component_configuration& operator=(const component_configuration&) = delete;

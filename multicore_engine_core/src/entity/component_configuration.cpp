@@ -14,19 +14,20 @@ namespace mce {
 namespace entity {
 
 component_configuration::component_configuration(
-		abstract_component_type& type, const std::unordered_map<std::string, std::string>& property_values)
+		core::engine& engine,
+		abstract_component_type&
+				type /*, const std::unordered_map<std::string, std::string>& property_values*/)
 		: type_(type) {
-	(void)property_values;
 	// TODO:Replace with AST implementation
-	//	for(const auto& prop : type.properties()) {
-	//		auto assignment = prop->make_assignment();
-	//		auto& prop_name = prop->name();
-	//		auto it = property_values.find(prop_name);
-	//		if(it != property_values.end()) {
-	//			assignment->parse(it->second);
-	//			assignments.push_back(std::move(assignment));
-	//		}
-	//	}
+	for(const auto& prop : type.properties()) {
+		auto assignment = prop->make_assignment(engine);
+		//			auto& prop_name = prop->name();
+		//			auto it = property_values.find(prop_name);
+		//			if(it != property_values.end()) {
+		//				assignment->parse(it->second);
+		assignments.push_back(std::move(assignment));
+		//			}
+	}
 }
 
 component_configuration::component_configuration(const component_configuration& other) : type_(other.type_) {
