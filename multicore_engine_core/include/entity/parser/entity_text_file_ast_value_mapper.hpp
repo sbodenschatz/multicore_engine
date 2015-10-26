@@ -31,7 +31,7 @@ struct ast_value_mapper<long long, T, std::enable_if_t<std::is_arithmetic<T>::va
 
 template <typename T>
 struct ast_value_mapper<float, T, std::enable_if_t<std::is_floating_point<T>::value>> {
-	static void convert(const float& ast_val, T& val) {
+	static void convert(const ast::float_node& ast_val, T& val) {
 		val = T(ast_val);
 	}
 };

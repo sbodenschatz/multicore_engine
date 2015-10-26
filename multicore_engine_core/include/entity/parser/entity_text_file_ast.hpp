@@ -10,21 +10,50 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <ostream>
 #include <boost/variant.hpp>
 
 namespace mce {
 namespace entity {
 namespace ast {
 
+// Proxy for float to enable approximate comparison.
+struct float_node {
+	float value;
+	float_node() : value(0.0f) {}
+	float_node(float value) : value(value) {}
+	float_node& operator=(float new_value) {
+		value = new_value;
+		return *this;
+	}
+	operator float() const {
+		return value;
+	}
+};
+
 typedef std::vector<long long> int_list;
-typedef std::vector<float> float_list;
+typedef std::vector<float_node> float_list;
 typedef std::vector<std::string> string_list;
 
 enum class rotation_axis { x, y, z };
+inline std::ostream& operator<<(std::ostream& s, const rotation_axis& r) {
+	if(r == rotation_axis::x) {
+		s << "x";
+	} else if(r == rotation_axis::y) {
+		s << "y";
+	} else if(r == rotation_axis::z) {
+		s << "z";
+	} else {
+		s << "<invalid rotation_axis>";
+	}
+	return s;
+}
+
 struct rotation_element {
 	rotation_axis axis;
 	float angle;
 };
+
 typedef std::vector<rotation_element> rotation_list;
 
 // enum class marker_attribute { position };
@@ -37,7 +66,7 @@ struct entity_reference {
 	std::string referred_name;
 };
 
-typedef boost::variant<long long, float, std::string, int_list, float_list, string_list, rotation_list,
+typedef boost::variant<long long, float_node, std::string, int_list, float_list, string_list, rotation_list,
 					   marker_evaluation, entity_reference> variable_value;
 
 struct variable {

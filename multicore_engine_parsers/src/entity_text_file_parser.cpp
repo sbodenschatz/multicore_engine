@@ -5,6 +5,7 @@
  */
 
 //#define BOOST_SPIRIT_DEBUG
+
 #include <istream>
 #include <string>
 #include <vector>
@@ -34,7 +35,16 @@ namespace mce {
 namespace entity {
 namespace parser {
 
-typedef boost::spirit::ascii::space_type entity_text_file_skipper;
+struct entity_text_file_skipper : qi::grammar<const char*> {
+	qi::rule<const char*> skip;
+	entity_text_file_skipper() : entity_text_file_skipper::base_type(skip, "Skipper") {
+		using qi::lit;
+		using qi::char_;
+		using qi::eol;
+		using qi::eoi;
+		skip = (spirit::ascii::space | (lit("//") >> *((char_ - eol) - eoi) >> (eol | eoi)));
+	}
+};
 
 struct entity_text_file_grammar : qi::grammar<const char*, entity_text_file_skipper, ast::ast_root()> {
 	template <typename Signature>
@@ -60,6 +70,7 @@ struct entity_text_file_grammar : qi::grammar<const char*, entity_text_file_skip
 	rule<ast::string_list()> string_list;
 	rule<std::string()> string_literal;
 	rule<ast::entity_instance_param()> entity_instance_param;
+	rule<ast::float_node> float_literal;
 
 	entity_text_file_grammar() : entity_text_file_grammar::base_type(start) {
 		using qi::_1;
@@ -75,7 +86,7 @@ struct entity_text_file_grammar : qi::grammar<const char*, entity_text_file_skip
 		using spirit::long_long;
 		using spirit::float_;
 		start %= *(root_element);
-		identifier %= lexeme[char_("a-fA-F_") >> *char_("0-9a-fA-F_")];
+		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
 		root_element =
 				include_instruction[_val = _1] | entity_definition[_val = _1] | entity_instance[_val = _1];
 		include_instruction %= lit("include") > string_literal > lit(";");
@@ -87,35 +98,58 @@ struct entity_text_file_grammar : qi::grammar<const char*, entity_text_file_skip
 		component_definition = -(lit("replace")[at_c<0>(_val) = true]) >> identifier[at_c<1>(_val) = _1] >>
 							   lit("{") >> (*variable)[at_c<2>(_val) = _1] >> lit("}");
 		variable %= identifier >> lit("=") >> variable_value >> lit(";");
-		variable_value = long_long[_val = _1] | float_[_val = _1] | string_literal[_val = _1] |
-						 int_list[_val = _1] | float_list[_val = _1] | string_list[_val = _1] |
-						 rotation_list[_val = _1] | marker_evaluation[_val = _1] |
+		variable_value = (long_long[_val = _1] >> !lit('.')) | float_literal[_val = _1] |
+						 string_literal[_val = _1] | int_list[_val = _1] | float_list[_val = _1] |
+						 string_list[_val = _1] | rotation_list[_val = _1] | marker_evaluation[_val = _1] |
 						 entity_reference[_val = _1];
-		entity_reference = lit("entity") >> identifier[at_c<0>(_val) = _1];
-		marker_evaluation = lit("marker") >> string_literal[at_c<0>(_val) = _1];
+		entity_reference = lit("entity ") >> identifier[at_c<0>(_val) = _1];
+		marker_evaluation = lit("marker ") >> string_literal[at_c<0>(_val) = _1];
 		// marker_attribute;
-		rotation_list = (lit("(") >> lit(")")) | ((rotation_element % ',')[_val = _1]);
+		rotation_list = lit("(") >> ((rotation_element % ',')[_val = _1]) >> lit(")");
 		rotation_element %= rotation_axis >> lit(":") >> float_;
 		rotation_axis =
 				no_case[lit("x")[_val = ast::rotation_axis::x] | lit("y")[_val = ast::rotation_axis::y] |
 						lit("z")[_val = ast::rotation_axis::z]];
-		int_list = (lit("(") >> lit(")")) | ((long_long % ',')[_val = _1]);
-		float_list = (lit("(") >> lit(")")) | ((float_ % ',')[_val = _1]);
-		string_list = (lit("(") >> lit(")")) | ((string_literal % ',')[_val = _1]);
+		int_list = (lit("(") >> lit(")")) | (lit("(") >> ((long_long % ',')[_val = _1]) >> lit(")"));
+		float_list = lit("(") >> ((float_literal % ',')[_val = _1]) >> lit(")");
+		string_list = lit("(") >> ((string_literal % ',')[_val = _1]) >> lit(")");
 		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
 		entity_instance_param = int_list[_val = _1] | float_list[_val = _1] | rotation_list[_val = _1] |
 								marker_evaluation[_val = _1] | entity_reference[_val = _1];
+		float_literal = float_[at_c<0>(_val) = _1];
+
+		BOOST_SPIRIT_DEBUG_NODE(start);
+		BOOST_SPIRIT_DEBUG_NODE(identifier);
+		BOOST_SPIRIT_DEBUG_NODE(root_element);
+		BOOST_SPIRIT_DEBUG_NODE(include_instruction);
+		BOOST_SPIRIT_DEBUG_NODE(entity_instance);
+		BOOST_SPIRIT_DEBUG_NODE(entity_definition);
+		BOOST_SPIRIT_DEBUG_NODE(component_definition);
+		BOOST_SPIRIT_DEBUG_NODE(variable);
+		BOOST_SPIRIT_DEBUG_NODE(variable_value);
+		BOOST_SPIRIT_DEBUG_NODE(entity_reference);
+		BOOST_SPIRIT_DEBUG_NODE(marker_evaluation);
+		// BOOST_SPIRIT_DEBUG_NODE(marker_attribute);
+		BOOST_SPIRIT_DEBUG_NODE(rotation_list);
+		BOOST_SPIRIT_DEBUG_NODE(rotation_element);
+		BOOST_SPIRIT_DEBUG_NODE(rotation_axis);
+		BOOST_SPIRIT_DEBUG_NODE(int_list);
+		BOOST_SPIRIT_DEBUG_NODE(float_list);
+		BOOST_SPIRIT_DEBUG_NODE(string_list);
+		BOOST_SPIRIT_DEBUG_NODE(string_literal);
+		BOOST_SPIRIT_DEBUG_NODE(entity_instance_param);
+		BOOST_SPIRIT_DEBUG_NODE(float_literal);
 	}
 };
 
 entity_text_file_parser_frontend::entity_text_file_parser_frontend()
-		: grammar(std::make_unique<entity_text_file_grammar>()) {}
+		: grammar(std::make_unique<entity_text_file_grammar>()),
+		  skipper(std::make_unique<entity_text_file_skipper>()) {}
 entity_text_file_parser_frontend::~entity_text_file_parser_frontend() {}
 
-void entity_text_file_parser_frontend::parse(const char* first, const char* last, ast::ast_root& ast_root) {
-	(void)first;
-	(void)last;
-	(void)ast_root;
+bool entity_text_file_parser_frontend::parse(const char*& first, const char* last, ast::ast_root& ast_root) {
+	bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
+	return result;
 }
 
 } // namespace parser
