@@ -49,7 +49,7 @@ solution "multicore_engine_solution"
 		end
 		if _OPTIONS["cc"] == "gcc" then
 			libdirs {"/usr/local/lib/local-boost/lib-gcc-debug"}
-			linkoptions {"-rpath /usr/local/lib/local-boost/lib-gcc-debug -fsanitize=address -fsanitize=undefined"}
+			linkoptions {"-Wl,-rpath /usr/local/lib/local-boost/lib-gcc-debug -fsanitize=address -fsanitize=undefined"}
 		end
 
 
@@ -60,7 +60,7 @@ solution "multicore_engine_solution"
 		end
 		if _OPTIONS["cc"] == "gcc" then
 			libdirs {"/usr/local/lib/local-boost/lib-gcc-release"}
-			linkoptions {"-rpath /usr/local/lib/local-boost/lib-gcc-release"}
+			linkoptions {"-Wl,-rpath /usr/local/lib/local-boost/lib-gcc-release"}
 		end
 		
 	configuration{"gmake","windows"}
