@@ -39,21 +39,28 @@ solution "multicore_engine_solution"
 		end
 
 	configuration {"gmake","linux"}
-		if _OPTIONS["cc"] == "clang" then
-			includedirs {"/usr/local/include/clang-libs"}
-		end
+			includedirs {"/usr/local/include/local-boost"}
 		
 	configuration {"gmake","linux","debug"}
 		if _OPTIONS["cc"] == "clang" then
 			buildoptions "-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined"
-			libdirs {"/usr/local/lib/clang-libs/lib-debug"}
-			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-debug -fsanitize=address -fsanitize=undefined"}
+			libdirs {"/usr/local/lib/local-boost/lib-clang-debug"}
+			linkoptions {"-rpath /usr/local/lib/local-boost/lib-clang-debug -fsanitize=address -fsanitize=undefined"}
 		end
+		if _OPTIONS["cc"] == "gcc" then
+			libdirs {"/usr/local/lib/local-boost/lib-gcc-debug"}
+			linkoptions {"-rpath /usr/local/lib/local-boost/lib-gcc-debug -fsanitize=address -fsanitize=undefined"}
+		end
+
 
 	configuration {"gmake","linux","release"}
 		if _OPTIONS["cc"] == "clang" then
-			libdirs {"/usr/local/lib/clang-libs/lib-release"}
-			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-release"}
+			libdirs {"/usr/local/lib/local-boost/lib-clang-release"}
+			linkoptions {"-rpath /usr/local/lib/local-boost/lib-clang-release"}
+		end
+		if _OPTIONS["cc"] == "gcc" then
+			libdirs {"/usr/local/lib/local-boost/lib-gcc-release"}
+			linkoptions {"-rpath /usr/local/lib/local-boost/lib-gcc-release"}
 		end
 		
 	configuration{"gmake","windows"}
