@@ -16,10 +16,10 @@
 namespace mce {
 namespace reflection {
 
-template <typename Root_Type, template <typename> class AbstractAssignment>
+template <typename Root_Type, template <typename> class AbstractAssignment, typename Assignment_Param>
 class abstract_property;
 template <typename Root_Type, typename T, template <typename> class AbstractAssignment,
-		  template <typename, typename> class Assignment>
+		  template <typename, typename> class Assignment, typename Assignment_Param>
 class property;
 
 } // namespace reflection

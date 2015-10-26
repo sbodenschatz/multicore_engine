@@ -14,24 +14,27 @@
 
 namespace mce {
 namespace reflection {
-template <typename Root_Type, template <typename> class AbstractAssignment>
-class abstract_property;
-template <typename Root_Type, typename T, template <typename> class AbstractAssignment,
-		  template <typename, typename> class Assignment>
-class property;
 
 template <typename U>
 class abstract_null_assignment {};
 template <typename U, typename V>
 class null_assignment;
+
+template <typename Root_Type, template <typename> class AbstractAssignment, typename Assignment_Param>
+class abstract_property;
+template <typename Root_Type, typename T, template <typename> class AbstractAssignment,
+		  template <typename, typename> class Assignment, typename Assignment_Param>
+class property;
+
 template <typename U, typename V>
 class null_assignment : public abstract_null_assignment<U> {
 public:
 	null_assignment(const mce::reflection::property<U, V, mce::reflection::abstract_null_assignment,
-													mce::reflection::null_assignment>&) {}
+													mce::reflection::null_assignment, void>&) {}
 };
 
-template <typename Root_Type, template <typename> class AbstractAssignment = abstract_null_assignment>
+template <typename Root_Type, template <typename> class Abstract_Assignment = abstract_null_assignment,
+		  typename Assignment_Param = void>
 class abstract_property {
 protected:
 	std::string name_;
@@ -44,7 +47,28 @@ public:
 	abstract_property& operator=(abstract_property&&) = delete;
 	virtual ~abstract_property() = default;
 	virtual mce::reflection::type_t type() const noexcept = 0;
-	virtual std::unique_ptr<AbstractAssignment<Root_Type>> make_assignment() const = 0;
+	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
+	make_assignment(const Assignment_Param&) const = 0;
+	const std::string& name() const {
+		return name_;
+	}
+	// TODO: Implement interface for binary serialization of objects
+};
+
+template <typename Root_Type, template <typename> class Abstract_Assignment>
+class abstract_property<Root_Type, Abstract_Assignment, void> {
+protected:
+	std::string name_;
+
+public:
+	abstract_property(const std::string& name) : name_(name) {}
+	abstract_property(const abstract_property&) = delete;
+	abstract_property(abstract_property&&) = delete;
+	abstract_property& operator=(const abstract_property&) = delete;
+	abstract_property& operator=(abstract_property&&) = delete;
+	virtual ~abstract_property() = default;
+	virtual mce::reflection::type_t type() const noexcept = 0;
+	virtual std::unique_ptr<Abstract_Assignment<Root_Type>> make_assignment() const = 0;
 	const std::string& name() const {
 		return name_;
 	}
@@ -69,8 +93,8 @@ struct property_type_helper<T, void> {
 
 template <typename Root_Type, typename T,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
-		  template <typename, typename> class Assignment = null_assignment>
-class property : public abstract_property<Root_Type, AbstractAssignment> {
+		  template <typename, typename> class Assignment = null_assignment, typename Assignment_Param = void>
+class property : public abstract_property<Root_Type, AbstractAssignment, Assignment_Param> {
 public:
 	typedef typename detail::property_type_helper<T, void>::accessor_value accessor_value;
 	property(const std::string& name) : abstract_property<Root_Type, AbstractAssignment>(name) {}
@@ -84,7 +108,28 @@ public:
 	}
 	virtual accessor_value get_value(const Root_Type& object) const = 0;
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
-	virtual std::unique_ptr<AbstractAssignment<Root_Type>> make_assignment() const override;
+	virtual std::unique_ptr<AbstractAssignment<Root_Type>>
+	make_assignment(const Assignment_Param&) const override;
+};
+
+template <typename Root_Type, typename T, template <typename> class Abstract_Assignment,
+		  template <typename, typename> class Assignment>
+class property<Root_Type, T, Abstract_Assignment, Assignment, void>
+		: public abstract_property<Root_Type, Abstract_Assignment, void> {
+public:
+	typedef typename detail::property_type_helper<T, void>::accessor_value accessor_value;
+	property(const std::string& name) : abstract_property<Root_Type, Abstract_Assignment>(name) {}
+	property(const property&) = delete;
+	property(property&&) = delete;
+	property& operator=(const property&) = delete;
+	property& operator=(property&&) = delete;
+	virtual ~property() = default;
+	virtual mce::reflection::type_t type() const noexcept override {
+		return type_info<T>::type;
+	}
+	virtual accessor_value get_value(const Root_Type& object) const = 0;
+	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
+	virtual std::unique_ptr<Abstract_Assignment<Root_Type>> make_assignment() const override;
 };
 
 } // namespace reflection
@@ -94,16 +139,24 @@ namespace mce {
 namespace reflection {
 
 template <typename Root_Type, typename T, template <typename> class AbstractAssignment,
+		  template <typename, typename> class Assignment, typename Assignment_Param>
+std::unique_ptr<AbstractAssignment<Root_Type>>
+property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param>::make_assignment(
+		const Assignment_Param& param) const {
+	return std::make_unique<Assignment<Root_Type, T>>(*this, param);
+}
+
+template <typename Root_Type, typename T, template <typename> class AbstractAssignment,
 		  template <typename, typename> class Assignment>
 std::unique_ptr<AbstractAssignment<Root_Type>>
-property<Root_Type, T, AbstractAssignment, Assignment>::make_assignment() const {
+property<Root_Type, T, AbstractAssignment, Assignment, void>::make_assignment() const {
 	return std::make_unique<Assignment<Root_Type, T>>(*this);
 }
 
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
-		  template <typename, typename> class Assignment = null_assignment>
-class linked_property : public property<Root_Type, T, AbstractAssignment, Assignment> {
+		  template <typename, typename> class Assignment = null_assignment, typename Assignment_Param = void>
+class linked_property : public property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param> {
 public:
 	typedef typename detail::property_type_helper<T, Object_Type>::accessor_value accessor_value;
 	typedef typename detail::property_type_helper<T, Object_Type>::getter getter_t;
@@ -115,7 +168,8 @@ private:
 
 public:
 	linked_property(const std::string& name, getter_t getter, setter_t setter)
-			: property<Root_Type, T, AbstractAssignment, Assignment>(name), getter(getter), setter(setter) {}
+			: property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param>(name), getter(getter),
+			  setter(setter) {}
 	linked_property(const linked_property&) = delete;
 	linked_property(linked_property&&) = delete;
 	linked_property& operator=(const linked_property&) = delete;
@@ -137,8 +191,9 @@ public:
 
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
-		  template <typename, typename> class Assignment = null_assignment>
-class directly_linked_property : public property<Root_Type, T, AbstractAssignment, Assignment> {
+		  template <typename, typename> class Assignment = null_assignment, typename Assignment_Param = void>
+class directly_linked_property
+		: public property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param> {
 public:
 	typedef typename detail::property_type_helper<T, Object_Type>::accessor_value accessor_value;
 	typedef T Object_Type::*variable_t;
@@ -149,8 +204,8 @@ private:
 
 public:
 	directly_linked_property(const std::string& name, variable_t variable, bool read_only)
-			: property<Root_Type, T, AbstractAssignment, Assignment>(name), variable(variable),
-			  read_only(read_only) {}
+			: property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param>(name),
+			  variable(variable), read_only(read_only) {}
 	directly_linked_property(const directly_linked_property&) = delete;
 	directly_linked_property(directly_linked_property&&) = delete;
 	directly_linked_property& operator=(const directly_linked_property&) = delete;
@@ -168,7 +223,8 @@ public:
 };
 
 template <typename Root_Type, template <typename> class AbstractAssignment,
-		  template <typename, typename> class Assignment, typename T, typename Object_Type>
+		  template <typename, typename> class Assignment, typename Assignment_Param = void, typename T,
+		  typename Object_Type>
 std::unique_ptr<abstract_property<Root_Type, AbstractAssignment>>
 make_property(const std::string& name, typename detail::property_type_helper<T, Object_Type>::getter getter,
 			  typename detail::property_type_helper<T, Object_Type>::setter setter = nullptr) {
@@ -177,7 +233,8 @@ make_property(const std::string& name, typename detail::property_type_helper<T, 
 }
 
 template <typename Root_Type, template <typename> class AbstractAssignment = abstract_null_assignment,
-		  template <typename, typename> class Assignment = null_assignment, typename T, typename Object_Type>
+		  template <typename, typename> class Assignment = null_assignment, typename Assignment_Param = void,
+		  typename T, typename Object_Type>
 std::unique_ptr<abstract_property<Root_Type, AbstractAssignment>>
 make_property(const std::string& name, T Object_Type::*variable, bool read_only = false) {
 	return std::make_unique<
