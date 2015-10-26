@@ -45,8 +45,8 @@ public:
 	virtual void assign(Root_Type& object) const = 0;
 	virtual void parse(const ast::variable_value& ast_value, const std::string& entity_context,
 					   const std::string& component_context) = 0;
-	virtual const mce::reflection::abstract_property<Root_Type,
-													 mce::entity::abstract_component_property_assignment>&
+	virtual const mce::reflection::abstract_property<
+			Root_Type, mce::entity::abstract_component_property_assignment, core::engine&>&
 	abstract_property() noexcept = 0;
 	virtual std::unique_ptr<abstract_component_property_assignment<Root_Type>> make_copy() const = 0;
 	// TODO: Implement interface for binary serialization of object configurations
@@ -59,7 +59,7 @@ public:
 template <typename Root_Type, typename T>
 class component_property_assignment : public abstract_component_property_assignment<Root_Type> {
 	const reflection::property<Root_Type, T, mce::entity::abstract_component_property_assignment,
-							   mce::entity::component_property_assignment>& property_;
+							   mce::entity::component_property_assignment, core::engine&>& property_;
 	T value_;
 
 	struct ast_visitor : public boost::static_visitor<> {
@@ -84,7 +84,8 @@ class component_property_assignment : public abstract_component_property_assignm
 public:
 	component_property_assignment(
 			const mce::reflection::property<Root_Type, T, mce::entity::abstract_component_property_assignment,
-											mce::entity::component_property_assignment>& property,
+											mce::entity::component_property_assignment, core::engine&>&
+					property,
 			core::engine& engine)
 			: abstract_component_property_assignment<Root_Type>(engine), property_(property) {}
 	component_property_assignment(const component_property_assignment&) = default;
@@ -101,8 +102,8 @@ public:
 		ast_visitor visitor(entity_context, component_context, *this);
 		ast_value.apply_visitor(visitor);
 	}
-	virtual const mce::reflection::abstract_property<Root_Type,
-													 mce::entity::abstract_component_property_assignment>&
+	virtual const mce::reflection::abstract_property<
+			Root_Type, mce::entity::abstract_component_property_assignment, core::engine&>&
 	abstract_property() noexcept override {
 		return property_;
 	}
