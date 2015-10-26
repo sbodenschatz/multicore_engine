@@ -56,8 +56,8 @@ protected:
 			typename reflection::linked_property<component, T, Comp, abstract_component_property_assignment,
 												 component_property_assignment>::setter_t setter) {
 		list.emplace_back(
-				reflection::make_property<component, abstract_component_property_assignment,
-										  component_property_assignment, T, Comp>(name, getter, setter));
+				reflection::make_property<component, T, Comp, abstract_component_property_assignment,
+										  component_property_assignment>(name, getter, setter));
 	}
 	template <typename T, typename Comp>
 	static void
