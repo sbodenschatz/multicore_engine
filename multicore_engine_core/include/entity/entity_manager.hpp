@@ -41,6 +41,16 @@ public:
 	entity_manager& operator=(entity_manager&&) = delete;
 	~entity_manager();
 
+	void clear();
+	void load_entities_from_text_file(const std::string& filename);
+	entity* create_entity(const entity_configuration& config);
+	void despawn_marked_entities();
+
+	entity* get_entity(long long id) const;
+	entity* get_entity(const std::string& name) const;
+	void assign_entity_name(const std::string& name, long long id);
+	entity_configuration* get_entity_template(const std::string& name) const;
+
 	template <typename T, typename F>
 	void register_component_type(const std::string& name, const F& factory_function) {
 		bool success = false;
