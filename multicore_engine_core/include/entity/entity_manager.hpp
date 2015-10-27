@@ -46,10 +46,10 @@ public:
 	entity* create_entity(const entity_configuration& config);
 	void despawn_marked_entities();
 
-	entity* get_entity(long long id) const;
-	entity* get_entity(const std::string& name) const;
+	entity* find_entity(long long id) const;
+	entity* find_entity(const std::string& name) const;
 	void assign_entity_name(const std::string& name, long long id);
-	entity_configuration* get_entity_template(const std::string& name) const;
+	entity_configuration* find_entity_template(const std::string& name) const;
 
 	template <typename T, typename F>
 	void register_component_type(const std::string& name, const F& factory_function) {
