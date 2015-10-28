@@ -70,8 +70,7 @@ solution "multicore_engine_solution"
 		defines{"GLM_FORCE_CXX11"}
 		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
 		architecture "x64"
-		buildoptions {"/MP"}
-		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild"}
+		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild","MultiProcessorCompile"}
 		targetdir "%{prj.location}/bin-vc/%{cfg.buildcfg}"
 		objdir "%{prj.location}/obj-vc/%{cfg.buildcfg}"
 
