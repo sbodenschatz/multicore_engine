@@ -10,6 +10,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include "type.hpp"
 
 namespace mce {
@@ -73,14 +74,15 @@ struct property_type_helper<T, void> {
 } // namespace detail
 
 template <typename Root_Type, typename T,
-		  template <typename> class AbstractAssignment = abstract_null_assignment,
+		  template <typename> class Abstract_Assignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
-class property : public abstract_property<Root_Type, AbstractAssignment, Assignment_Param...> {
+class property : public abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...> {
 public:
-	// TODO static_assert(std::is_base_of<AbstractAssignment<>,>);
+	static_assert(std::is_base_of<Abstract_Assignment<Root_Type>, Assignment<Root_Type, T>>::value,
+				  "The Abstract_Assignment template class has to be a base of the Assignment_Class");
 	typedef typename detail::property_type_helper<T, void>::accessor_value accessor_value;
 	property(const std::string& name)
-			: abstract_property<Root_Type, AbstractAssignment, Assignment_Param...>(name) {}
+			: abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...>(name) {}
 	property(const property&) = delete;
 	property(property&&) = delete;
 	property& operator=(const property&) = delete;
@@ -91,7 +93,7 @@ public:
 	}
 	virtual accessor_value get_value(const Root_Type& object) const = 0;
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
-	virtual std::unique_ptr<AbstractAssignment<Root_Type>>
+	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
 			make_assignment(Assignment_Param...) const override;
 };
 
@@ -101,10 +103,10 @@ public:
 namespace mce {
 namespace reflection {
 
-template <typename Root_Type, typename T, template <typename> class AbstractAssignment,
+template <typename Root_Type, typename T, template <typename> class Abstract_Assignment,
 		  template <typename, typename> class Assignment, typename... Assignment_Param>
-std::unique_ptr<AbstractAssignment<Root_Type>>
-		property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...>::make_assignment(
+std::unique_ptr<Abstract_Assignment<Root_Type>>
+		property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>::make_assignment(
 				Assignment_Param... param) const {
 	return std::make_unique<Assignment<Root_Type, T>>(*this, param...);
 }
