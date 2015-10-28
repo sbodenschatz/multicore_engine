@@ -77,6 +77,7 @@ template <typename Root_Type, typename T,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
 class property : public abstract_property<Root_Type, AbstractAssignment, Assignment_Param...> {
 public:
+	// TODO static_assert(std::is_base_of<AbstractAssignment<>,>);
 	typedef typename detail::property_type_helper<T, void>::accessor_value accessor_value;
 	property(const std::string& name)
 			: abstract_property<Root_Type, AbstractAssignment, Assignment_Param...>(name) {}
@@ -177,8 +178,9 @@ public:
 	}
 };
 
-template <typename Root_Type, typename T, typename Object_Type, template <typename> class Abstract_Assignment,
-		  template <typename, typename> class Assignment, typename... Assignment_Param>
+template <typename Root_Type, typename T, typename Object_Type,
+		  template <typename> class Abstract_Assignment = abstract_null_assignment,
+		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
 std::unique_ptr<abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...>>
 make_property(const std::string& name, typename detail::property_type_helper<T, Object_Type>::getter getter,
 			  typename detail::property_type_helper<T, Object_Type>::setter setter = nullptr) {
