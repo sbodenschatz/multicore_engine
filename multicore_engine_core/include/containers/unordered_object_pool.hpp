@@ -555,7 +555,7 @@ public:
 	}
 
 	iterator find(T& object) {
-		auto obj_entry = reinterpret_cast<const block_entry*>(&object);
+		auto obj_entry = reinterpret_cast<block_entry*>(&object);
 		for(block* b = first_block; b; b = b->next_block) {
 			if(b->contains(obj_entry)) return iterator({obj_entry, b});
 		}
