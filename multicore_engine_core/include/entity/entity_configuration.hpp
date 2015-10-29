@@ -25,6 +25,7 @@ class entity_configuration {
 	void create_components(entity& entity, core::engine& engine) const;
 
 public:
+	friend class entity_manager;
 	explicit entity_configuration(const std::string& name);
 	entity_configuration(const entity_configuration& other);
 	entity_configuration(entity_configuration&&) = default;

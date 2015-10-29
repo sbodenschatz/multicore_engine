@@ -27,9 +27,9 @@ private:
 	containers::generic_flat_map<component_container, component_type_id_t,
 								 containers::smart_pool_ptr<mce::entity::component>> components_;
 	bool marker_for_despawn = false;
-	entity(entity_id_t id) noexcept : id_(id) {}
 
 public:
+	entity(entity_id_t id) noexcept : id_(id) {}
 	entity(const entity&) = delete;
 	entity(entity&&) = delete;
 	entity& operator=(const entity&) = delete;
