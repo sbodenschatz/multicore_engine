@@ -16,6 +16,7 @@
 #include "component_type.hpp"
 #include <mutex>
 #include <atomic>
+#include "parser/entity_text_file_ast.hpp"
 
 namespace mce {
 namespace core {

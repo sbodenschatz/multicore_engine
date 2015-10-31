@@ -86,8 +86,12 @@ struct entity_definition {
 	std::vector<component_definition> components;
 };
 
+struct ast_wrapper;
+
 struct include_instruction {
 	std::string filename;
+	// Additional annotation used in later phases:
+	std::shared_ptr<ast_wrapper> included_ast;
 };
 
 typedef boost::variant<int_list, float_list, rotation_list, marker_evaluation, entity_reference>
@@ -103,6 +107,12 @@ struct entity_instance {
 typedef boost::variant<entity_definition, include_instruction, entity_instance> root_element;
 
 typedef std::vector<root_element> ast_root;
+
+struct ast_wrapper {
+	ast_root root;
+	ast_wrapper(const ast_root& root) : root(root) {}
+	ast_wrapper(ast_root&& root) : root(std::move(root)) {}
+};
 
 } // namespace ast
 } // namespace entity
