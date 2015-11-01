@@ -22,8 +22,8 @@ entity_configuration::entity_configuration(const entity_configuration& other) : 
 
 entity_configuration::~entity_configuration() {}
 
-void entity_configuration::create_components(entity& entity, core::engine& engine) const {
-	for(const auto& comp : components_) { entity.add_component(comp->create_component(entity, engine)); }
+void entity_configuration::create_components(entity& entity) const {
+	for(const auto& comp : components_) { entity.add_component(comp->create_component(entity)); }
 }
 
 } // namespace entity

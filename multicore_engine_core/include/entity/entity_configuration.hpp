@@ -22,7 +22,7 @@ class component_configuration;
 class entity_configuration {
 	std::string name_;
 	std::vector<std::unique_ptr<component_configuration>> components_;
-	void create_components(entity& entity, core::engine& engine) const;
+	void create_components(entity& entity) const;
 
 public:
 	friend class entity_manager;
@@ -36,9 +36,16 @@ public:
 	const std::vector<std::unique_ptr<component_configuration>>& components() const {
 		return components_;
 	}
+	std::vector<std::unique_ptr<component_configuration>>& components() {
+		return components_;
+	}
 
 	const std::string& name() const {
 		return name_;
+	}
+
+	void name(const std::string& value) {
+		name_ = value;
 	}
 };
 
