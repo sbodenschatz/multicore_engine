@@ -1,7 +1,7 @@
 solution "multicore_engine_solution"
 	configurations{"debug", "release"}
 	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH"}
-	includedirs{"multicore_engine_core/include"}
+	includedirs{"multicore_engine_core/include","multicore_engine_parsers/include"}
 	vectorextensions "SSE2"
 	startproject "multicore_engine_demo"
 	warnings "Extra"
@@ -18,7 +18,6 @@ solution "multicore_engine_solution"
 	
 	configuration "windows"
 		defines{"MULTICORE_ENGINE_WINDOWS"}
-		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
 	configuration "not windows"
 		defines{"MULTICORE_ENGINE_NOT_WINDOWS"}
 		includedirs{}
@@ -28,10 +27,11 @@ solution "multicore_engine_solution"
 		objdir "%{prj.location}/obj-gcc/%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
 		links {"pthread"}
+		buildoptions "-Wno-unused-parameter -Wno-deprecated-declarations"
 
 	configuration {"gmake"}
 		if _OPTIONS["cc"] == "clang" then
-			buildoptions "-stdlib=libc++"
+			buildoptions "-stdlib=libc++  -Wno-unused-private-field"
 			targetdir "%{prj.location}/bin-clang/%{cfg.buildcfg}"
 			objdir "%{prj.location}/obj-clang/%{cfg.buildcfg}"
 			toolset "clang"
@@ -39,28 +39,38 @@ solution "multicore_engine_solution"
 		end
 
 	configuration {"gmake","linux"}
-		if _OPTIONS["cc"] == "clang" then
-			includedirs {"/usr/local/include/clang-libs"}
-		end
+			includedirs {"/usr/local/include/local-boost"}
 		
 	configuration {"gmake","linux","debug"}
 		if _OPTIONS["cc"] == "clang" then
 			buildoptions "-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined"
-			libdirs {"/usr/local/lib/clang-libs/lib-debug"}
-			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-debug -fsanitize=address -fsanitize=undefined"}
+			libdirs {"/usr/local/lib/local-boost/lib-clang-debug"}
+			linkoptions {"-rpath /usr/local/lib/local-boost/lib-clang-debug -fsanitize=address -fsanitize=undefined"}
 		end
+		if _OPTIONS["cc"] == "gcc" then
+			libdirs {"/usr/local/lib/local-boost/lib-gcc-debug"}
+			linkoptions {"-Wl,-rpath,/usr/local/lib/local-boost/lib-gcc-debug -fsanitize=address -fsanitize=undefined"}
+		end
+
 
 	configuration {"gmake","linux","release"}
 		if _OPTIONS["cc"] == "clang" then
-			libdirs {"/usr/local/lib/clang-libs/lib-release"}
-			linkoptions {"-rpath /usr/local/lib/clang-libs/lib-release"}
+			libdirs {"/usr/local/lib/local-boost/lib-clang-release"}
+			linkoptions {"-rpath /usr/local/lib/local-boost/lib-clang-release"}
 		end
-
+		if _OPTIONS["cc"] == "gcc" then
+			libdirs {"/usr/local/lib/local-boost/lib-gcc-release"}
+			linkoptions {"-Wl,-rpath,/usr/local/lib/local-boost/lib-gcc-release"}
+		end
+		
+	configuration{"gmake","windows"}
+		buildoptions "-isystemC:/Libs/Boost/include -isystemC:/Libs/glm/include"
+	
 	configuration {"vs2015"}
 		defines{"GLM_FORCE_CXX11"}
+		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
 		architecture "x64"
-		buildoptions {"/MP"}
-		flags {"LinkTimeOptimization","NoIncrementalLink"}
+		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild","MultiProcessorCompile"}
 		targetdir "%{prj.location}/bin-vc/%{cfg.buildcfg}"
 		objdir "%{prj.location}/obj-vc/%{cfg.buildcfg}"
 
@@ -71,11 +81,26 @@ solution "multicore_engine_solution"
 	configuration {"gmake","windows","release"}
 		libdirs {"C:/Libs/Boost/lib_x64_mingw_release"}
 		
+	project "multicore_engine_parsers"
+		kind "StaticLib"
+		language "C++"
+		location "multicore_engine_parsers/build"
+		files {"multicore_engine_parsers/src/**.cpp"}
+
+		configuration{"gmake"}
+			buildoptions "-Wno-sign-compare"
+		
+		configuration{"gmake","windows"}
+			-- disable debug settings for the parser because 32-bit-hosted MinGW used on windows runs into OOM or other size restrictions when compiling the parser
+			removeflags{"Symbols"}
+			optimize "Debug"
+
 	project "multicore_engine_core"
 		kind "StaticLib"
 		language "C++"
 		location "multicore_engine_core/build"
-		files { "multicore_engine_core/include/**.hpp", "multicore_engine_core/src/**.cpp"}
+		links {"multicore_engine_parsers"}
+		files {"multicore_engine_core/include/**.hpp", "multicore_engine_core/src/**.cpp"}
 
 	project "multicore_engine_core_tests"
 		kind "ConsoleApp"
@@ -83,9 +108,7 @@ solution "multicore_engine_solution"
 		language "C++"
 		location "multicore_engine_core_tests/build"
 		files { "multicore_engine_core_tests/include/**.hpp", "multicore_engine_core_tests/src/**.cpp"}
-		links {"multicore_engine_core"}
-		--removeflags{"Symbols"}
-		--optimize "Debug"
+		links {"multicore_engine_core","multicore_engine_parsers"}
 		configuration {"gmake"}
 			buildoptions "-Wno-deprecated-declarations -Wno-unused-variable  -Wno-unused-parameter"
 			links {"boost_unit_test_framework"}
@@ -100,6 +123,6 @@ solution "multicore_engine_solution"
 		language "C++"
 		location "multicore_engine_demo/build"
 		files { "multicore_engine_demo/include/**.hpp", "multicore_engine_demo/src/**.cpp"}
-		links {"multicore_engine_core"}
+		links {"multicore_engine_core","multicore_engine_parsers"}
 		configuration {"vs2015"}
 			debugdir "multicore_engine_demo"

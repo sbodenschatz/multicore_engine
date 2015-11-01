@@ -316,9 +316,7 @@ private:
 		if(blocks.empty()) {
 			blocks.emplace_back(std::make_unique<block>(this, first_free_entry));
 			first_block = blocks.front().get();
-		} else {
-			blocks.emplace_back(std::make_unique<block>(this, first_free_entry, blocks.back().get()));
-		}
+		} else { blocks.emplace_back(std::make_unique<block>(this, first_free_entry, blocks.back().get())); }
 		++block_count;
 	}
 
@@ -375,8 +373,7 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now."
-					  << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
 			std::terminate();
 		}
 	}
@@ -483,9 +480,7 @@ public:
 			assert(target.entry);
 			if(target.containing_block->upgrade_ref(target.element)) {
 				return smart_pool_ptr<It_T>(target.element, target.containing_block);
-			} else {
-				return smart_object_pool<It_T>();
-			}
+			} else { return smart_pool_ptr<It_T>(); }
 		}
 
 	private:
@@ -503,9 +498,7 @@ public:
 			if(!target.containing_block) {
 				target.entry = nullptr;
 				return;
-			} else if(target.containing_block->active_objects == 0) {
-				skip_empty_blocks();
-			}
+			} else if(target.containing_block->active_objects == 0) { skip_empty_blocks(); }
 			for(;;) {
 				if(!target.containing_block) {
 					target.entry = nullptr;

@@ -7,6 +7,7 @@
 #ifndef REFLECTION_TYPE_HPP_
 #define REFLECTION_TYPE_HPP_
 
+#include <vector>
 #include <string>
 #include <sstream>
 #include <glm/glm.hpp>
@@ -15,7 +16,7 @@
 namespace mce {
 namespace reflection {
 
-enum class type {
+enum class type_t {
 	unknown,
 	int_1,
 	int_2,
@@ -26,59 +27,65 @@ enum class type {
 	float_3,
 	float_4,
 	quaternion,
-	string
+	string,
+	string_list,
 };
 
 template <typename T>
 struct type_info {
-	static const type type = type::unknown;
+	static const type_t type = type_t::unknown;
 };
 
 template <>
 struct type_info<int> {
-	static const type type = type::int_1;
+	static const type_t type = type_t::int_1;
 };
 template <>
 struct type_info<glm::ivec2> {
-	static const type type = type::int_2;
+	static const type_t type = type_t::int_2;
 };
 template <>
 struct type_info<glm::ivec3> {
-	static const type type = type::int_3;
+	static const type_t type = type_t::int_3;
 };
 template <>
 struct type_info<glm::ivec4> {
-	static const type type = type::int_4;
+	static const type_t type = type_t::int_4;
 };
 
 template <>
 struct type_info<float> {
-	static const type type = type::float_1;
+	static const type_t type = type_t::float_1;
 };
 
 template <>
 struct type_info<glm::vec2> {
-	static const type type = type::float_2;
+	static const type_t type = type_t::float_2;
 };
 
 template <>
 struct type_info<glm::vec3> {
-	static const type type = type::float_3;
+	static const type_t type = type_t::float_3;
 };
 
 template <>
 struct type_info<glm::vec4> {
-	static const type type = type::float_4;
+	static const type_t type = type_t::float_4;
 };
 
 template <>
 struct type_info<glm::quat> {
-	static const type type = type::quaternion;
+	static const type_t type = type_t::quaternion;
 };
 
 template <>
 struct type_info<std::string> {
-	static const type type = type::string;
+	static const type_t type = type_t::string;
+};
+
+template <>
+struct type_info<std::vector<std::string>> {
+	static const type_t type = type_t::string_list;
 };
 
 template <typename T>
