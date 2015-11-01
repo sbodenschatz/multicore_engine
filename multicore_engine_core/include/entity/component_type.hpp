@@ -24,23 +24,29 @@ class component_configuration;
 class entity;
 
 class abstract_component_type {
+public:
+	typedef std::vector<std::unique_ptr<reflection::abstract_property<
+			component, abstract_component_property_assignment, core::engine&>>> property_list;
+
+private:
 	component_type_id_t id_;
 	std::string name_;
 
 protected:
+	property_list properties_;
 	abstract_component_type(component_type_id_t id, const std::string& name) : id_(id), name_(name) {}
 
 public:
-	typedef std::vector<std::unique_ptr<reflection::abstract_property<
-			component, abstract_component_property_assignment, core::engine&>>> property_list;
 	abstract_component_type(const abstract_component_type&) = delete;
 	abstract_component_type(abstract_component_type&&) = delete;
 	abstract_component_type& operator=(const abstract_component_type&) = delete;
 	abstract_component_type& operator=(abstract_component_type&&) = delete;
 	virtual ~abstract_component_type() = default;
 	virtual component_pool_ptr create_component(entity& owner, const component_configuration& config,
-												core::engine& engine) = 0;
-	virtual const property_list& properties() const noexcept = 0;
+												core::engine& engine) const = 0;
+	const property_list& properties() const noexcept {
+		return properties_;
+	}
 
 	component_type_id_t id() const noexcept {
 		return id_;
@@ -54,7 +60,6 @@ public:
 template <typename T, typename F>
 class component_type : public abstract_component_type {
 	F factory_function_;
-	property_list properties_;
 
 public:
 	component_type(const std::string& name, const F& factory_function)
@@ -64,12 +69,8 @@ public:
 	}
 	virtual ~component_type() override = default;
 	virtual component_pool_ptr create_component(entity& owner, const component_configuration& config,
-												core::engine& engine) override {
+												core::engine& engine) const override {
 		return factory_function_(owner, config, engine);
-	}
-
-	virtual const property_list& properties() const noexcept override {
-		return properties_;
 	}
 };
 
