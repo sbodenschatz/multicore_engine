@@ -37,7 +37,7 @@ entity* entity_manager::create_entity(const entity_configuration& config) {
 	assert(!read_only_mode);
 	auto id = next_id++;
 	auto it = entities.emplace(id);
-	config.create_components(*it, engine);
+	config.create_components(*it);
 	std::lock_guard<std::mutex> lock(id_map_mutex);
 	entity_id_map.insert(std::make_pair(id, it));
 	return it;
@@ -91,13 +91,26 @@ void entity_manager::assign_entity_name(const std::string& name, long long id) {
 	std::lock_guard<std::mutex> lock(name_map_mutex);
 	entity_name_map[name] = id;
 }
-entity_configuration* entity_manager::find_entity_configuration(const std::string& name) const {
+const entity_configuration* entity_manager::find_entity_configuration(const std::string& name) const {
 	auto it = entity_configurations.find(name);
 	if(it != entity_configurations.end()) {
 		return it->second.get();
 	} else {
 		return nullptr;
 	}
+}
+const abstract_component_type* entity_manager::find_component_type(const std::string& name) const {
+	auto it = component_types.find(name);
+	if(it != component_types.end()) {
+		return it->second.get();
+	} else {
+		return nullptr;
+	}
+}
+void entity_manager::add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config) {
+	bool success = false;
+	const auto& name = entity_config->name();
+	std::tie(std::ignore, success) = entity_configurations.emplace(name, std::move(entity_config));
 }
 
 } // namespace entity

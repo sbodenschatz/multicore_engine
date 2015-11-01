@@ -23,6 +23,9 @@ namespace core {
 class engine;
 } // namespace core
 namespace entity {
+namespace parser {
+class entity_text_file_parser_backend;
+} // namespace parser
 class entity_configuration;
 class abstract_component_type;
 
@@ -44,6 +47,7 @@ class entity_manager {
 	void register_builtin_components();
 
 public:
+	friend class mce::entity::parser::entity_text_file_parser_backend;
 	entity_manager(core::engine& engine);
 	entity_manager(const entity_manager&) = delete;
 	entity_manager(entity_manager&&) = delete;
@@ -54,6 +58,7 @@ public:
 	void clear_entities();
 	void clear_entities_and_entity_configurations();
 	void load_entities_from_text_file(const std::string& filename);
+	void add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config);
 	entity* create_entity(const entity_configuration& config);
 	void destroy_entity(entity_id_t id);
 	void destroy_entity(entity* entity);
@@ -61,7 +66,8 @@ public:
 	entity* find_entity(long long id) const;
 	entity* find_entity(const std::string& name) const;
 	void assign_entity_name(const std::string& name, long long id);
-	entity_configuration* find_entity_configuration(const std::string& name) const;
+	const entity_configuration* find_entity_configuration(const std::string& name) const;
+	const abstract_component_type* find_component_type(const std::string& name) const;
 
 	template <typename T, typename F>
 	void register_component_type(const std::string& name, const F& factory_function) {

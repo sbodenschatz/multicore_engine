@@ -31,6 +31,7 @@ public:
 };
 
 class entity_text_file_parser_backend {
+	friend class entity_manager;
 	struct ast_definition_visitor : boost::static_visitor<> {
 		entity_text_file_parser_backend& backend;
 		void operator()(const ast::entity_definition& node);
@@ -46,18 +47,22 @@ class entity_text_file_parser_backend {
 		ast_instance_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
 	};
 	struct ast_position_visitor : boost::static_visitor<entity_position_t> {
+		entity_text_file_parser_backend& backend;
 		entity_position_t operator()(const ast::int_list& node);
 		entity_position_t operator()(const ast::float_list& node);
 		entity_position_t operator()(const ast::rotation_list& node);
 		entity_position_t operator()(const ast::marker_evaluation& node);
 		entity_position_t operator()(const ast::entity_reference& node);
+		ast_position_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
 	};
 	struct ast_orientation_visitor : boost::static_visitor<entity_orientation_t> {
+		entity_text_file_parser_backend& backend;
 		entity_orientation_t operator()(const ast::int_list& node);
 		entity_orientation_t operator()(const ast::float_list& node);
 		entity_orientation_t operator()(const ast::rotation_list& node);
 		entity_orientation_t operator()(const ast::marker_evaluation& node);
 		entity_orientation_t operator()(const ast::entity_reference& node);
+		ast_orientation_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
 	};
 
 	entity_manager& em;
