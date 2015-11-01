@@ -17,7 +17,7 @@ component_configuration::component_configuration(core::engine& engine, const abs
 		: engine(engine), type_(type) {}
 
 component_configuration::component_configuration(const component_configuration& other)
-		: engine(engine), type_(other.type_) {
+		: engine(other.engine), type_(other.type_) {
 	std::transform(other.assignments.begin(), other.assignments.end(), std::back_inserter(assignments),
 				   [](const auto& assignment) { return assignment->make_copy(); });
 }
