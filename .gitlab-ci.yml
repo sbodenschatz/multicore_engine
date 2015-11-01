@@ -1,4 +1,10 @@
 before_script:
+  - premake5 --cc=gcc gmake
+  - make CC=gcc CXX=g++ config=debug clean
+  - make CC=gcc CXX=g++ config=release clean
+  - premake5 --cc=clang gmake
+  - make CC=clang CXX=clang++ config=debug clean
+  - make CC=clang CXX=clang++ config=release clean
   - mkdir -p multicore_engine_{core,core_tests,demo,parsers}/build/{bin,obj}-{gcc,clang}/{debug,release}
 
 #stages:
@@ -9,10 +15,6 @@ scan-build:
 #  stage: analyse
   script:
   - premake5 --cc=gcc gmake
-  - make CC=gcc CXX=g++ config=debug clean
-  - make CC=gcc CXX=g++ config=release clean
-  - make CC=clang CXX=clang++ config=debug clean
-  - make CC=clang CXX=clang++ config=release clean
   - export CC=clang
   - export CXX=clang++
   - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=clang CXX=clang++
@@ -23,7 +25,6 @@ gcc-debug-build:
   - premake5 --cc=gcc gmake
   - export CC=gcc
   - export CXX=g++
-  - make CC=gcc CXX=g++ config=debug clean
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin-gcc/debug/multicore_engine_core_tests --report_level=short
 
@@ -33,7 +34,6 @@ gcc-release-build:
   - premake5 --cc=gcc gmake
   - export CC=gcc
   - export CXX=g++
-  - make CC=gcc CXX=g++ config=release clean
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin-gcc/release/multicore_engine_core_tests --report_level=short
 
@@ -43,7 +43,6 @@ clang-debug-build:
   - premake5 --cc=clang gmake
   - export CC=clang
   - export CXX=clang++
-  - make CC=clang CXX=clang++ config=debug clean
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin-clang/debug/multicore_engine_core_tests --report_level=short
 
@@ -53,7 +52,6 @@ clang-release-build:
   - premake5 --cc=clang gmake
   - export CC=clang
   - export CXX=clang++
-  - make CC=clang CXX=clang++ config=release clean
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin-clang/release/multicore_engine_core_tests --report_level=short
 
