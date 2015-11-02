@@ -31,6 +31,7 @@ BOOST_AUTO_TEST_CASE(call_lambda_ref_pass_through) {
 	int x = 0;
 	int& y = f(x);
 	x = 42;
+	static_cast<void>(x); // Silence "value never read" warning
 	BOOST_CHECK(y == 42);
 }
 
