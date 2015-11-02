@@ -11,6 +11,7 @@
 #include <memory>
 #include <cassert>
 #include <memory/align.hpp>
+#include <functional>
 
 namespace mce {
 namespace util {
@@ -29,7 +30,7 @@ class local_function<Max_Size, R(Args...)> {
 		virtual abstract_function_object* move_to(void* location) = 0;
 	};
 	template <typename F>
-	class function_object {
+	class function_object : public abstract_function_object {
 		F f;
 
 	public:
@@ -68,8 +69,8 @@ class local_function<Max_Size, R(Args...)> {
 	std::unique_ptr<abstract_function_object, deleter> function_obj{nullptr};
 
 public:
-	template <size_t Max_Size_2>
-	friend class local_function<Max_Size_2, R(Args...)>;
+	template <size_t Max_Size_2, typename T>
+	friend class local_function;
 	local_function() {}
 	// TODO: Restrict participation in overload resolution
 	template <typename F>
@@ -78,28 +79,28 @@ public:
 		size_t space = Max_Size;
 		if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
 			throw std::bad_alloc();
-		function_obj = new(ptr) function_object<F>(std::move(f));
+		function_obj.reset(new(ptr) function_object<F>(std::move(f)));
 	}
 	template <size_t Max_Size_2>
 	local_function(const local_function<Max_Size_2, R(Args...)>& other) {
-		function_obj = other.function_obj->copy_to(storage);
+		function_obj.reset(other.function_obj->copy_to(storage));
 	}
 	template <size_t Max_Size_2>
 	local_function(local_function<Max_Size_2, R(Args...)>&& other) {
-		function_obj = other.function_obj->move_to(storage);
+		function_obj.reset(other.function_obj->move_to(storage));
 	}
 	template <size_t Max_Size_2>
 	local_function& operator=(const local_function<Max_Size_2, R(Args...)>& other) {
 		if(&other == this) return *this;
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->copy_to(storage);
+		function_obj.reset(other.function_obj->copy_to(storage));
 		return *this;
 	}
 	template <size_t Max_Size_2>
 	local_function& operator=(local_function<Max_Size_2, R(Args...)>&& other) {
 		assert(&other != this);
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->move_to(storage);
+		function_obj.reset(other.function_obj->move_to(storage));
 	}
 	template <typename F>
 	local_function& operator=(F&& new_f) {
@@ -108,14 +109,16 @@ public:
 		size_t space = Max_Size;
 		if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
 			throw std::bad_alloc();
-		function_obj = new(ptr) function_object<F>(std::forward<F>(new_f));
+		function_obj.reset(new(ptr) function_object<F>(std::forward<F>(new_f)));
 	}
 	R operator()(Args... args) const {
 		const abstract_function_object* f = function_obj.get();
+		if(!f) throw std::bad_function_call();
 		return (*f)(std::forward<Args>(args)...);
 	}
 	R operator()(Args... args) {
 		abstract_function_object* f = function_obj.get();
+		if(!f) throw std::bad_function_call();
 		return (*f)(std::forward<Args>(args)...);
 	}
 	operator bool() {
