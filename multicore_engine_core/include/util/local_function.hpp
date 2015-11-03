@@ -19,105 +19,148 @@ namespace util {
 template <size_t, typename>
 class local_function;
 
+namespace detail_local_function {
+
+template <typename R, typename... Args>
+class abstract_function_object;
+
+template <typename R, typename... Args>
+class deleter {
+public:
+	void operator()(detail_local_function::abstract_function_object<R, Args...>* ptr) {
+		ptr->~abstract_function_object();
+	}
+};
+
+template <typename R, typename... Args>
+class abstract_function_object {
+public:
+	virtual ~abstract_function_object() = default;
+	virtual R operator()(Args... args) const = 0;
+	virtual R operator()(Args... args) = 0;
+	virtual std::unique_ptr<abstract_function_object, deleter<R, Args...>> copy_to(void* location) const = 0;
+	virtual std::unique_ptr<abstract_function_object, deleter<R, Args...>> move_to(void* location) = 0;
+};
+
+} // namespace detail_local_function
+
 template <size_t Max_Size, typename R, typename... Args>
 class local_function<Max_Size, R(Args...)> {
-	class abstract_function_object {
-	public:
-		virtual ~abstract_function_object() = default;
-		virtual R operator()(Args... args) const = 0;
-		virtual R operator()(Args... args) = 0;
-		virtual abstract_function_object* copy_to(void* location) const = 0;
-		virtual abstract_function_object* move_to(void* location) = 0;
-	};
+	typedef std::unique_ptr<detail_local_function::abstract_function_object<R, Args...>,
+							detail_local_function::deleter<R, Args...>> abstract_func_obj_ptr;
 	template <typename F>
-	class function_object : public abstract_function_object {
+	class function_object : public detail_local_function::abstract_function_object<R, Args...> {
 		F f;
 
 	public:
 		template <typename T>
 		function_object(T&& f)
 				: f(std::forward<T>(f)) {}
+		virtual ~function_object() = default;
 		virtual R operator()(Args... args) const override {
 			return f(std::forward<Args>(args)...);
 		}
 		virtual R operator()(Args... args) override {
 			return f(std::forward<Args>(args)...);
 		}
-		virtual abstract_function_object* copy_to(void* location) const override {
+		virtual abstract_func_obj_ptr copy_to(void* location) const override {
 			void* ptr = location;
 			size_t space = Max_Size;
 			if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
 				throw std::bad_alloc();
-			return new(ptr) function_object<F>(f);
+			return abstract_func_obj_ptr(new(ptr) function_object<F>(f));
 		}
-		virtual abstract_function_object* move_to(void* location) override {
+		virtual abstract_func_obj_ptr move_to(void* location) override {
 			void* ptr = location;
 			size_t space = Max_Size;
 			if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
 				throw std::bad_alloc();
-			return new(ptr) function_object<F>(std::move(f));
+			return abstract_func_obj_ptr(new(ptr) function_object<F>(std::move(f)));
 		}
 	};
-	class deleter {
-	public:
-		void operator()(abstract_function_object* ptr) {
-			ptr->~abstract_function_object();
-		}
-	};
+	template <typename T>
+	struct is_valid_function_value : std::true_type {};
+	template <size_t Max_Size_2, typename T, typename... Args_2>
+	struct is_valid_function_value<local_function<Max_Size_2, T(Args_2...)>> : std::false_type {};
 
 	char storage[Max_Size];
-	std::unique_ptr<abstract_function_object, deleter> function_obj{nullptr};
+	abstract_func_obj_ptr function_obj{nullptr};
 
 public:
 	template <size_t Max_Size_2, typename T>
 	friend class local_function;
 	local_function() {}
 	// TODO: Restrict participation in overload resolution
-	template <typename F>
+	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>
 	local_function(F f) {
 		void* ptr = storage;
 		size_t space = Max_Size;
-		if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
+		if(!memory::align(alignof(function_object<std::decay_t<F>>), sizeof(function_object<std::decay_t<F>>),
+						  ptr, space))
 			throw std::bad_alloc();
-		function_obj.reset(new(ptr) function_object<F>(std::move(f)));
+		function_obj.reset(new(ptr) function_object<std::decay_t<F>>(std::forward<F>(f)));
+	}
+
+	local_function(const local_function& other) {
+		function_obj = other.function_obj->copy_to(storage);
+	}
+	local_function(local_function&& other) {
+		function_obj = other.function_obj->move_to(storage);
 	}
 	template <size_t Max_Size_2>
 	local_function(const local_function<Max_Size_2, R(Args...)>& other) {
-		function_obj.reset(other.function_obj->copy_to(storage));
+		function_obj = other.function_obj->copy_to(storage);
 	}
 	template <size_t Max_Size_2>
 	local_function(local_function<Max_Size_2, R(Args...)>&& other) {
-		function_obj.reset(other.function_obj->move_to(storage));
+		function_obj = other.function_obj->move_to(storage);
 	}
-	template <size_t Max_Size_2>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size != Max_Size_2>>
 	local_function& operator=(const local_function<Max_Size_2, R(Args...)>& other) {
-		if(&other == this) return *this;
+		// No self-destruction check because the objects are of different type and aliasing them would be
+		// undefined behavior anyway
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj.reset(other.function_obj->copy_to(storage));
+		function_obj = other.function_obj->copy_to(storage);
 		return *this;
 	}
-	template <size_t Max_Size_2>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size != Max_Size_2>>
 	local_function& operator=(local_function<Max_Size_2, R(Args...)>&& other) {
+		// No self-destruction check because the objects are of different type and aliasing them would be
+		// undefined behavior anyway
+		function_obj.reset(); // Destroy current value first because storage is needed for new value
+		function_obj = other.function_obj->move_to(storage);
+		return *this;
+	}
+	local_function& operator=(const local_function& other) {
+		if(&other == this) return *this;
+		function_obj.reset(); // Destroy current value first because storage is needed for new value
+		function_obj = other.function_obj->copy_to(storage);
+		return *this;
+	}
+	local_function& operator=(local_function&& other) {
 		assert(&other != this);
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj.reset(other.function_obj->move_to(storage));
+		function_obj = other.function_obj->move_to(storage);
+		return *this;
 	}
-	template <typename F>
+	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>
 	local_function& operator=(F&& new_f) {
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
 		void* ptr = storage;
 		size_t space = Max_Size;
-		if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
+		if(!memory::align(alignof(function_object<std::decay_t<F>>), sizeof(function_object<std::decay_t<F>>),
+						  ptr, space))
 			throw std::bad_alloc();
-		function_obj.reset(new(ptr) function_object<F>(std::forward<F>(new_f)));
+		function_obj.reset(new(ptr) function_object<std::decay_t<F>>(std::forward<F>(new_f)));
+		return *this;
 	}
 	R operator()(Args... args) const {
-		const abstract_function_object* f = function_obj.get();
+		const detail_local_function::abstract_function_object<R, Args...>* f = function_obj.get();
 		if(!f) throw std::bad_function_call();
 		return (*f)(std::forward<Args>(args)...);
 	}
 	R operator()(Args... args) {
-		abstract_function_object* f = function_obj.get();
+		detail_local_function::abstract_function_object<R, Args...>* f = function_obj.get();
 		if(!f) throw std::bad_function_call();
 		return (*f)(std::forward<Args>(args)...);
 	}
