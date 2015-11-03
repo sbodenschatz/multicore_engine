@@ -52,13 +52,24 @@ class local_function<Max_Size, R(Args...)> {
 	class function_object : public detail_local_function::abstract_function_object<R, Args...> {
 		F f;
 
+		template <typename T = F,
+				  typename Dummy = std::enable_if_t<
+						  std::is_same<R, decltype(std::declval<const T>()(std::declval<Args>()...))>::value>>
+		R call_const_helper(Args... args) const {
+			return f(std::forward<Args>(args)...);
+		}
+
+		R call_const_helper(Args... args, void* dummy = nullptr) const {
+			throw std::bad_function_call();
+		}
+
 	public:
 		template <typename T>
 		function_object(T&& f)
 				: f(std::forward<T>(f)) {}
 		virtual ~function_object() = default;
 		virtual R operator()(Args... args) const override {
-			return f(std::forward<Args>(args)...);
+			return call_const_helper(std::forward<Args>(args)...);
 		}
 		virtual R operator()(Args... args) override {
 			return f(std::forward<Args>(args)...);
@@ -81,7 +92,8 @@ class local_function<Max_Size, R(Args...)> {
 		}
 	};
 	template <typename T>
-	struct is_valid_function_value : std::true_type {};
+	struct is_valid_function_value : std::is_same<R, decltype(std::declval<T>()(std::declval<Args>()...))> {};
+
 	template <size_t Max_Size_2, typename T, typename... Args_2>
 	struct is_valid_function_value<local_function<Max_Size_2, T(Args_2...)>> : std::false_type {};
 
@@ -92,7 +104,6 @@ public:
 	template <size_t Max_Size_2, typename T>
 	friend class local_function;
 	local_function() {}
-	// TODO: Restrict participation in overload resolution
 	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>
 	local_function(F f) {
 		static_assert(sizeof(function_object<std::decay_t<F>>) <= Max_Size,
