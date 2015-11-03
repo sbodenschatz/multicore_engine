@@ -64,6 +64,7 @@ class local_function<Max_Size, R(Args...)> {
 			return f(std::forward<Args>(args)...);
 		}
 		virtual abstract_func_obj_ptr copy_to(void* location) const override {
+			static_assert(sizeof(function_object<F>) <= Max_Size, "Insufficient space for function object.");
 			void* ptr = location;
 			size_t space = Max_Size;
 			if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
@@ -71,6 +72,7 @@ class local_function<Max_Size, R(Args...)> {
 			return abstract_func_obj_ptr(new(ptr) function_object<F>(f));
 		}
 		virtual abstract_func_obj_ptr move_to(void* location) override {
+			static_assert(sizeof(function_object<F>) <= Max_Size, "Insufficient space for function object.");
 			void* ptr = location;
 			size_t space = Max_Size;
 			if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
@@ -93,6 +95,8 @@ public:
 	// TODO: Restrict participation in overload resolution
 	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>
 	local_function(F f) {
+		static_assert(sizeof(function_object<std::decay_t<F>>) <= Max_Size,
+					  "Insufficient space for function object.");
 		void* ptr = storage;
 		size_t space = Max_Size;
 		if(!memory::align(alignof(function_object<std::decay_t<F>>), sizeof(function_object<std::decay_t<F>>),
@@ -145,6 +149,8 @@ public:
 	}
 	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>
 	local_function& operator=(F&& new_f) {
+		static_assert(sizeof(function_object<std::decay_t<F>>) <= Max_Size,
+					  "Insufficient space for function object.");
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
 		void* ptr = storage;
 		size_t space = Max_Size;
