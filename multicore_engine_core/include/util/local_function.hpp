@@ -52,16 +52,35 @@ class local_function<Max_Size, R(Args...)> {
 	class function_object : public detail_local_function::abstract_function_object<R, Args...> {
 		F f;
 
-		template <typename T = F,
-				  typename Dummy = std::enable_if_t<
-						  std::is_same<R, decltype(std::declval<const T>()(std::declval<Args>()...))>::value>>
-		R call_const_helper(Args... args) const {
-			return f(std::forward<Args>(args)...);
-		}
+		/*
+				//		template<typename T=void>
+				R call_const_helper(Args... args, void* = nullptr) const {
+					throw std::bad_function_call();
+				}
 
-		R call_const_helper(Args... args, void* dummy = nullptr) const {
-			throw std::bad_function_call();
-		}
+				template <typename T = F,
+						  typename Dummy = std::enable_if_t<
+								  std::is_same<R, decltype(std::declval<const
+		   T>()(std::declval<Args>()...))>::value>>
+				R call_const_helper(Args... args) const {
+					return f(std::forward<Args>(args)...);
+				}
+				*/
+		template <typename = void, typename = void>
+		struct const_call_helper {
+			static R call(const F&, Args...) {
+				throw std::bad_function_call();
+			}
+		};
+
+		template <typename T>
+		struct const_call_helper<
+				T, std::enable_if_t<std::is_same<R, decltype(std::declval<const T>()(
+															std::declval<Args>()...))>::value>> {
+			static R call(const F& f, Args... args) {
+				return f(std::forward<Args>(args)...);
+			}
+		};
 
 	public:
 		template <typename T>
@@ -69,7 +88,7 @@ class local_function<Max_Size, R(Args...)> {
 				: f(std::forward<T>(f)) {}
 		virtual ~function_object() = default;
 		virtual R operator()(Args... args) const override {
-			return call_const_helper(std::forward<Args>(args)...);
+			return const_call_helper<F>::call(f, std::forward<Args>(args)...);
 		}
 		virtual R operator()(Args... args) override {
 			return f(std::forward<Args>(args)...);
