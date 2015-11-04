@@ -52,20 +52,6 @@ class local_function<Max_Size, R(Args...)> {
 	class function_object : public detail_local_function::abstract_function_object<R, Args...> {
 		F f;
 
-		/*
-				//		template<typename T=void>
-				R call_const_helper(Args... args, void* = nullptr) const {
-					throw std::bad_function_call();
-				}
-
-				template <typename T = F,
-						  typename Dummy = std::enable_if_t<
-								  std::is_same<R, decltype(std::declval<const
-		   T>()(std::declval<Args>()...))>::value>>
-				R call_const_helper(Args... args) const {
-					return f(std::forward<Args>(args)...);
-				}
-				*/
 		template <typename = void, typename = void>
 		struct const_call_helper {
 			static R call(const F&, Args...) {
