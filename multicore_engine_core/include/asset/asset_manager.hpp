@@ -83,13 +83,15 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		std::unique_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
 		// Double check if the asset is still not in the map.
 		auto it = loaded_assets.find(name);
-		if(it != loaded_assets.end()) { result = it->second; } else {
+		if(it != loaded_assets.end()) {
+			result = it->second;
+		} else {
 			auto tmp = std::make_shared<asset>(name);
 			loaded_assets[name] = tmp;
 			tmp->run_when_loaded(completion_handler);
 			task_pool.post([tmp, this]() {
 				for(auto& loader : asset_loaders) {
-					if(loader->load_asset(*tmp)) return;
+					if(loader->start_load_asset(tmp)) return;
 				}
 				tmp->raise_error_flag();
 			});

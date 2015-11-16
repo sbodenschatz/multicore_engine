@@ -37,8 +37,8 @@ std::shared_ptr<const asset> asset_manager::load_asset_sync_core(const std::stri
 		std::shared_ptr<asset> result = std::make_shared<asset>(name);
 		loaded_assets[name] = result;
 		for(auto& loader : asset_loaders) {
-			if(loader->load_asset(*result)) {
-				result->check_error_flag();
+			if(loader->start_load_asset(result)) {
+				result->wait_for_complete();
 				return result;
 			}
 		}

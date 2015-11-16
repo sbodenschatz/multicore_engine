@@ -8,6 +8,7 @@
 #define ASSET_ASSET_LOADER_HPP_
 
 #include <string>
+#include <memory>
 
 namespace mce {
 namespace asset {
@@ -17,7 +18,7 @@ class asset_manager;
 class asset_loader {
 public:
 	virtual ~asset_loader() = default;
-	virtual bool load_asset(asset& asset) = 0;
+	virtual bool start_load_asset(const std::shared_ptr<asset>& asset) = 0;
 	virtual void pin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 	virtual void unpin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 };
