@@ -71,7 +71,7 @@ namespace asset {
 
 template <typename F>
 std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& name, F completion_handler) {
-	std::shared_ptr<asset> result;
+	std::shared_ptr<const asset> result;
 	{
 		// Acquire read lock
 		std::shared_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
@@ -83,19 +83,17 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		std::unique_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
 		// Double check if the asset is still not in the map.
 		auto it = loaded_assets.find(name);
-		if(it != loaded_assets.end()) {
-			result = it->second;
-		} else {
-			result = std::make_shared<asset>(name);
-			loaded_assets[name] = result;
-			result->run_when_loaded(completion_handler);
-			task_pool.post([result, this]() {
+		if(it != loaded_assets.end()) { result = it->second; } else {
+			auto tmp = std::make_shared<asset>(name);
+			loaded_assets[name] = tmp;
+			tmp->run_when_loaded(completion_handler);
+			task_pool.post([tmp, this]() {
 				for(auto& loader : asset_loaders) {
-					if(loader->load_asset(*result)) return;
+					if(loader->load_asset(*tmp)) return;
 				}
-				result->raise_error_flag();
+				tmp->raise_error_flag();
 			});
-			return result;
+			return tmp;
 		}
 	}
 

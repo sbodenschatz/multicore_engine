@@ -7,6 +7,7 @@
 #ifndef ASSET_ASSET_HPP_
 #define ASSET_ASSET_HPP_
 
+#include <string>
 #include <memory>
 #include <atomic>
 #include <mutex>
@@ -44,9 +45,7 @@ public:
 		if(loaded) {
 			lock.unlock();
 			handler(this->shared_from_this());
-		} else {
-			completion_handlers.emplace_back(handler);
-		}
+		} else { completion_handlers.emplace_back(handler); }
 	}
 
 	void complete_loading(std::shared_ptr<const char> data);
