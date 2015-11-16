@@ -17,7 +17,10 @@ solution "multicore_engine_solution"
 		optimize "Full"
 	
 	configuration "windows"
-		defines{"MULTICORE_ENGINE_WINDOWS"}
+		defines{"MULTICORE_ENGINE_WINDOWS",
+				---Target windows 7 or higher with windows api headers
+				"_WIN32_WINNT=0x0601",
+				"WINVER=0x0601"}
 	configuration "not windows"
 		defines{"MULTICORE_ENGINE_NOT_WINDOWS"}
 		includedirs{}
