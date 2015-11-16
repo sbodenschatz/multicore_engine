@@ -16,6 +16,9 @@ class asset;
 class asset_manager;
 
 class asset_loader {
+protected:
+	void finish_loading(const std::shared_ptr<asset>& asset, std::shared_ptr<const char> data, size_t size);
+
 public:
 	virtual ~asset_loader() = default;
 	virtual bool start_load_asset(const std::shared_ptr<asset>& asset) = 0;

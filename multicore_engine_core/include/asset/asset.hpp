@@ -24,12 +24,15 @@ class asset;
 typedef std::shared_ptr<const asset> asset_ptr;
 
 class asset : public std::enable_shared_from_this<asset> {
-	std::atomic<bool> loaded; // true -> can read data unlocked. false -> synchronization is needed with other
-							  // threads that register completion handlers and that load the asset.
-	std::atomic<bool> error_flag;
+public:
+	enum class state { initial, loading, ready, error };
+
+private:
+	std::atomic<state> current_state_;
 	mutable std::mutex modification_mutex;
-	std::string name;
-	std::shared_ptr<const char> data;
+	std::string name_;
+	std::shared_ptr<const char> data_;
+	size_t size_;
 	std::vector<util::local_function<128, void(const asset_ptr& asset)>> completion_handlers;
 	mutable std::condition_variable completed_cv;
 
@@ -40,36 +43,56 @@ public:
 
 	template <typename F>
 	void run_when_loaded(F handler) {
-		if(loaded) { handler(this->shared_from_this()); }
+		if(current_state_ == state::ready) {
+			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
+			handler(this->shared_from_this());
+		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
-		if(loaded) {
+		if(current_state_ == state::ready) {
 			lock.unlock();
 			handler(this->shared_from_this());
-		} else { completion_handlers.emplace_back(handler); }
+		} else {
+			completion_handlers.emplace_back(handler);
+		}
 	}
-
-	void complete_loading(std::shared_ptr<const char> data);
 
 	bool ready() const {
-		return loaded;
-	}
-
-	void raise_error_flag() {
-		error_flag = true;
+		return current_state_ == state::ready;
 	}
 
 	bool has_error() const {
-		return error_flag;
+		return current_state_ == state::error;
 	}
 
-	void wait_for_complete() const {
-		if(loaded) return;
+	void check_error_flag() const {
+		if(current_state_ == state::error) throw std::runtime_error("Error loading asset '" + name_ + "'.");
+	}
+
+	friend class asset_loader;
+	friend class asset_manager;
+
+private:
+	void complete_loading(std::shared_ptr<const char> data, size_t size);
+
+	void raise_error_flag() {
+		current_state_ = state::error;
+	}
+
+	// TODO Prevent a dead-lock where all workers are waiting (sync) for completions of assets whose load
+	// tasks are further back in the thread pools queue (async).
+	void internal_wait_for_complete() const {
+		if(current_state_ == state::ready) return;
 		std::unique_lock<std::mutex> lock(modification_mutex);
-		completed_cv.wait(lock, [this]() { return loaded || error_flag; });
+		completed_cv.wait(lock, [this]() {
+			auto cur_state = current_state_.load();
+			return cur_state == state::ready || cur_state == state::error;
+		});
 		check_error_flag();
 	}
-	void check_error_flag() const {
-		if(error_flag) throw std::runtime_error("Error loading asset '" + name + "'.");
+
+	bool try_obtain_load_ownership() {
+		state expected = state::initial;
+		return current_state_.compare_exchange_strong(expected, state::loading);
 	}
 };
 

@@ -32,7 +32,7 @@ class asset;
 class asset_manager {
 	std::vector<std::unique_ptr<asset_loader>> asset_loaders;
 	std::shared_timed_mutex loaded_assets_rw_lock;
-	boost::container::flat_map<std::string, std::shared_ptr<const asset>> loaded_assets;
+	boost::container::flat_map<std::string, std::shared_ptr<asset>> loaded_assets;
 	boost::asio::io_service task_pool;
 	std::vector<std::thread> workers;
 	std::unique_ptr<boost::asio::io_service::work> work;
@@ -47,6 +47,7 @@ class asset_manager {
 		void operator()();
 	};
 	std::shared_ptr<const asset> load_asset_sync_core(const std::string& name);
+	std::shared_ptr<const asset> call_loaders_sync(const std::shared_ptr<asset>& asset) const;
 
 public:
 	asset_manager();
@@ -90,10 +91,12 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 			loaded_assets[name] = tmp;
 			tmp->run_when_loaded(completion_handler);
 			task_pool.post([tmp, this]() {
-				for(auto& loader : asset_loaders) {
-					if(loader->start_load_asset(tmp)) return;
+				if(tmp->try_obtain_load_ownership()) {
+					for(auto& loader : asset_loaders) {
+						if(loader->start_load_asset(tmp)) return;
+					}
+					tmp->raise_error_flag();
 				}
-				tmp->raise_error_flag();
 			});
 			return tmp;
 		}

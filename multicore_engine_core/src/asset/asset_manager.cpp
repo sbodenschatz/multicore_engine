@@ -25,38 +25,49 @@ asset_manager::~asset_manager() {
 	task_pool.stop();
 	for(auto& worker : workers) { worker.join(); }
 }
+std::shared_ptr<const asset>
+asset_manager::call_loaders_sync(const std::shared_ptr<asset>& asset_to_load) const {
+	if(asset_to_load->try_obtain_load_ownership()) {
+		for(auto& loader : asset_loaders) {
+			if(loader->start_load_asset(asset_to_load)) {
+				asset_to_load->internal_wait_for_complete();
+				return asset_to_load;
+			}
+		}
+		asset_to_load->raise_error_flag();
+		asset_to_load->check_error_flag();
+		return std::shared_ptr<const asset>();
+	} else {
+		asset_to_load->internal_wait_for_complete();
+		return asset_to_load;
+	}
+}
+
 std::shared_ptr<const asset> asset_manager::load_asset_sync_core(const std::string& name) {
+	// Acquire write lock
 	std::unique_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
 	auto it = loaded_assets.find(name);
 	if(it != loaded_assets.end()) {
 		auto res = it->second;
 		lock.unlock();
-		res->wait_for_complete();
-		return res;
+		return call_loaders_sync(res);
 	} else {
 		std::shared_ptr<asset> result = std::make_shared<asset>(name);
 		loaded_assets[name] = result;
-		for(auto& loader : asset_loaders) {
-			if(loader->start_load_asset(result)) {
-				result->wait_for_complete();
-				return result;
-			}
-		}
-		result->raise_error_flag();
-		result->check_error_flag();
-		return std::shared_ptr<const asset>();
+		lock.unlock();
+		return call_loaders_sync(result);
 	}
 }
 
 std::shared_ptr<const asset> asset_manager::load_asset_sync(const std::string& name) {
-	{ // Acquire read lock
+	{
+		// Acquire read lock
 		std::shared_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
 		auto it = loaded_assets.find(name);
 		if(it != loaded_assets.end()) {
 			auto res = it->second;
 			lock.unlock();
-			res->wait_for_complete();
-			return res;
+			return call_loaders_sync(res);
 		}
 	}
 	return load_asset_sync_core(name);
@@ -76,7 +87,7 @@ boost::unique_future<std::shared_ptr<const asset>> asset_manager::load_asset_fut
 		std::shared_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
 		auto it = loaded_assets.find(name);
 		if(it != loaded_assets.end()) {
-			if(it->second->ready()) return boost::make_ready_future(it->second);
+			if(it->second->ready()) return boost::make_ready_future(std::shared_ptr<const asset>(it->second));
 		}
 	}
 	future_load_task load_task{name, this};
