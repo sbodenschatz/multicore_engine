@@ -50,6 +50,7 @@ class asset_manager {
 	std::shared_ptr<const asset> call_loaders_sync(const std::shared_ptr<asset>& asset) const;
 
 public:
+	friend class asset_loader;
 	asset_manager();
 	~asset_manager();
 	template <typename F>

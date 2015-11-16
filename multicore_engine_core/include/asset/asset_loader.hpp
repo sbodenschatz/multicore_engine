@@ -17,7 +17,10 @@ class asset_manager;
 
 class asset_loader {
 protected:
-	void finish_loading(const std::shared_ptr<asset>& asset, std::shared_ptr<const char> data, size_t size);
+	template <typename F>
+	static void launch_async_task(asset_manager& asset_manager, F&& f);
+	static void finish_loading(const std::shared_ptr<asset>& asset, std::shared_ptr<const char> data,
+							   size_t size);
 
 public:
 	virtual ~asset_loader() = default;
@@ -25,6 +28,18 @@ public:
 	virtual void pin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 	virtual void unpin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 };
+
+} // namespace asset
+} // namespace mce
+
+#include "asset_manager.hpp"
+
+namespace mce {
+namespace asset {
+template <typename F>
+void asset_loader::launch_async_task(asset_manager& asset_manager, F&& f) {
+	asset_manager.task_pool.post(std::forward<F>(f));
+}
 
 } // namespace asset
 } // namespace mce
