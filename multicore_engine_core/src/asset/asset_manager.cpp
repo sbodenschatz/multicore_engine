@@ -28,11 +28,16 @@ asset_manager::~asset_manager() {
 std::shared_ptr<const asset>
 asset_manager::call_loaders_sync(const std::shared_ptr<asset>& asset_to_load) const {
 	if(asset_to_load->try_obtain_load_ownership()) {
-		for(auto& loader : asset_loaders) {
-			if(loader->start_load_asset(asset_to_load)) {
-				asset_to_load->internal_wait_for_complete();
-				return asset_to_load;
+		try {
+			for(auto& loader : asset_loaders) {
+				if(loader->start_load_asset(asset_to_load)) {
+					asset_to_load->internal_wait_for_complete();
+					return asset_to_load;
+				}
 			}
+		} catch(...) {
+			asset_to_load->raise_error_flag();
+			throw;
 		}
 		asset_to_load->raise_error_flag();
 		asset_to_load->check_error_flag();

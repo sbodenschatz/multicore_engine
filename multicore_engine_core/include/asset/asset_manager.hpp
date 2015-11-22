@@ -93,8 +93,13 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 			tmp->run_when_loaded(completion_handler);
 			task_pool.post([tmp, this]() {
 				if(tmp->try_obtain_load_ownership()) {
-					for(auto& loader : asset_loaders) {
-						if(loader->start_load_asset(tmp)) return;
+					try {
+						for(auto& loader : asset_loaders) {
+							if(loader->start_load_asset(tmp)) return;
+						}
+					} catch(...) {
+						tmp->raise_error_flag();
+						throw;
 					}
 					tmp->raise_error_flag();
 				}
