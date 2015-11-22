@@ -14,6 +14,12 @@ namespace mce {
 namespace asset {
 class asset;
 class asset_manager;
+class file_reader;
+
+struct path_prefix {
+	std::shared_ptr<file_reader> reader;
+	std::string prefix;
+};
 
 class asset_loader {
 protected:

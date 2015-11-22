@@ -34,6 +34,9 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.902118531" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1005330771" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1921901379" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
@@ -41,6 +44,9 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.2098860767" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.906289021" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -95,6 +101,9 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.102887474" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033980625" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1068879121" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
@@ -102,6 +111,9 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.457364909" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.851904731" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
