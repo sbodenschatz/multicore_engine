@@ -68,6 +68,26 @@ public:
 		if(current_state_ == state::error) throw std::runtime_error("Error loading asset '" + name_ + "'.");
 	}
 
+	state current_state() const {
+		return current_state_;
+	}
+
+	const char* data() const {
+		return data_.get();
+	}
+
+	const std::shared_ptr<const char>& data_shared() const {
+		return data_;
+	}
+
+	const std::string& name() const {
+		return name_;
+	}
+
+	size_t size() const {
+		return size_;
+	}
+
 	friend class asset_loader;
 	friend class asset_manager;
 
