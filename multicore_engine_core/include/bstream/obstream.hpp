@@ -8,6 +8,7 @@
 #define BSTREAM_OBSTREAM_HPP_
 
 #include <cstdint>
+#include <cstddef>
 
 namespace mce {
 namespace bstream {
