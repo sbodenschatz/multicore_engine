@@ -27,6 +27,9 @@ protected:
 public:
 	virtual ~ibstream() = default;
 	virtual size_t read_bytes(char* buffer, size_t count) noexcept = 0;
+	virtual size_t size() const noexcept = 0;
+	virtual size_t tell_read() const noexcept = 0;
+	virtual void seek_read(size_t position) = 0;
 	void clear_read_errors() noexcept {
 		eof_ = false;
 		invalid_ = false;
