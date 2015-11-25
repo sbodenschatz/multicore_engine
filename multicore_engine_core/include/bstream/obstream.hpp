@@ -27,7 +27,7 @@ protected:
 
 public:
 	virtual ~obstream() = default;
-	virtual size_t write_bytes(const char* buffer, size_t count) noexcept = 0;
+	virtual bool write_bytes(const char* buffer, size_t count) noexcept = 0;
 	virtual size_t size() const noexcept = 0;
 	virtual size_t tell_write() const noexcept = 0;
 	virtual void seek_write(size_t position) = 0;
