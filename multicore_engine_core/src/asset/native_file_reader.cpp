@@ -18,6 +18,7 @@ native_file_reader::read_file(const std::string& prefix, const std::string& file
 	sanitize_path_inplace(full_path);
 	std::ifstream stream(full_path, std::ios::binary);
 	if(stream) {
+		stream.seekg(0, std::ios::end);
 		auto size_tmp = stream.tellg();
 		file_size size = size_tmp;
 		decltype(size_tmp) size_check = size;
