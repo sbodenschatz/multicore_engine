@@ -13,9 +13,6 @@
 #include <istream>
 
 namespace mce {
-namespace asset {
-class asset;
-} // namespace asset
 namespace bstream {
 
 class iostream_bstream : public iobstream {
