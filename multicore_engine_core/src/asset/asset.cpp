@@ -11,7 +11,7 @@ namespace asset {
 
 asset::asset(const std::string& name) : current_state_{state::initial}, name_{name}, size_{0} {}
 
-void asset::complete_loading(std::shared_ptr<const char> loaded_data, size_t size) {
+void asset::complete_loading(const std::shared_ptr<const char>& loaded_data, size_t size) {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	this->data_ = loaded_data;
 	size_ = size;

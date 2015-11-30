@@ -92,7 +92,7 @@ public:
 	friend class asset_manager;
 
 private:
-	void complete_loading(std::shared_ptr<const char> data, size_t size);
+	void complete_loading(const std::shared_ptr<const char>& data, size_t size);
 
 	void raise_error_flag() {
 		current_state_ = state::error;
