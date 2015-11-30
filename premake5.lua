@@ -129,3 +129,24 @@ solution "multicore_engine_solution"
 		links {"multicore_engine_core","multicore_engine_parsers"}
 		configuration {"vs2015"}
 			debugdir "multicore_engine_demo"
+
+	project "multicore_engine_pack_file_gen"
+		kind "ConsoleApp"
+		--kind "WindowedApp"
+		language "C++"
+		location "multicore_engine_pack_file_gen/build"
+		files { "multicore_engine_pack_file_gen/include/**.hpp", "multicore_engine_pack_file_gen/src/**.cpp"}
+		links {"multicore_engine_core","multicore_engine_parsers"}
+		configuration {"vs2015"}
+			debugdir "multicore_engine_pack_file_gen"
+
+	project "multicore_engine_load_unit_gen"
+		kind "ConsoleApp"
+		--kind "WindowedApp"
+		language "C++"
+		location "multicore_engine_load_unit_gen/build"
+		files { "multicore_engine_load_unit_gen/include/**.hpp", "multicore_engine_load_unit_gen/src/**.cpp"}
+		links {"multicore_engine_core","multicore_engine_parsers"}
+		configuration {"vs2015"}
+			debugdir "multicore_engine_load_unit_gen"
+
