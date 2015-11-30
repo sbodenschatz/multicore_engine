@@ -108,7 +108,7 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		}
 	}
 
-	result->run_when_loaded(completion_handler);
+	if(result) result->run_when_loaded(completion_handler);
 	return result;
 }
 
