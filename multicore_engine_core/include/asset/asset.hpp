@@ -96,6 +96,7 @@ private:
 
 	void raise_error_flag() {
 		current_state_ = state::error;
+		completed_cv.notify_all();
 	}
 
 	// TODO Prevent a dead-lock where all workers are waiting (sync) for completions of assets whose load
