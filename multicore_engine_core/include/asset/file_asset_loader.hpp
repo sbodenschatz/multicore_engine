@@ -21,7 +21,8 @@ class file_asset_loader : public asset_loader {
 	const std::vector<path_prefix> prefixes;
 
 public:
-	file_asset_loader(std::vector<path_prefix> prefixes);
+	explicit file_asset_loader(const std::vector<path_prefix>& prefixes);
+	explicit file_asset_loader(std::vector<path_prefix>&& prefixes);
 	virtual bool start_load_asset(const std::shared_ptr<asset>& asset) override;
 	virtual void pin_load_unit(const std::string& name, asset_manager& asset_manager) override;
 	virtual void unpin_load_unit(const std::string& name, asset_manager& asset_manager) override;

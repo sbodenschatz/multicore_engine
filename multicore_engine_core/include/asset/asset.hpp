@@ -37,7 +37,8 @@ private:
 	mutable std::condition_variable completed_cv;
 
 public:
-	asset(const std::string& name);
+	explicit asset(const std::string& name);
+	explicit asset(std::string&& name);
 	asset(const asset&) = delete;
 	asset& operator=(const asset&) = delete;
 
