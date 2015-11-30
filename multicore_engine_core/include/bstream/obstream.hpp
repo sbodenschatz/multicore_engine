@@ -9,6 +9,8 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <vector>
+#include <string>
 
 namespace mce {
 namespace bstream {
@@ -17,7 +19,7 @@ class obstream {
 	bool eof_ = false;
 	bool invalid_ = false;
 
-protected:
+public:
 	void raise_write_eof() noexcept {
 		eof_ = true;
 	}
@@ -25,7 +27,6 @@ protected:
 		invalid_ = true;
 	}
 
-public:
 	virtual ~obstream() = default;
 	virtual bool write_bytes(const char* buffer, size_t count) noexcept = 0;
 	virtual size_t size() const noexcept = 0;
@@ -63,6 +64,14 @@ public:
 	obstream& operator<<(const float& value);
 	obstream& operator<<(const double& value);
 	obstream& operator<<(const long double& value);
+	template <typename T>
+	obstream& operator<<(const std::vector<T>& value) {
+		uint64_t size = value.size();
+		(*this) << size;
+		for(auto& entry : value) { (*this) << entry; }
+		return *this;
+	}
+	obstream& operator<<(const std::string& value);
 };
 
 } // namespace bstream

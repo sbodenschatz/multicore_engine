@@ -9,6 +9,8 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <vector>
+#include <string>
 
 namespace mce {
 namespace bstream {
@@ -17,7 +19,7 @@ class ibstream {
 	bool eof_ = false;
 	bool invalid_ = false;
 
-protected:
+public:
 	void raise_read_eof() noexcept {
 		eof_ = true;
 	}
@@ -25,7 +27,6 @@ protected:
 		invalid_ = true;
 	}
 
-public:
 	virtual ~ibstream() = default;
 	virtual size_t read_bytes(char* buffer, size_t count) noexcept = 0;
 	virtual size_t size() const noexcept = 0;
@@ -63,6 +64,24 @@ public:
 	ibstream& operator>>(float& value);
 	ibstream& operator>>(double& value);
 	ibstream& operator>>(long double& value);
+	template <typename T>
+	ibstream& operator>>(std::vector<T>& value) {
+		uint64_t size = 0;
+		value.clear();
+		(*this) >> size;
+		if(size > value.max_size()) {
+			raise_read_eof();
+		} else {
+			value.reserve(size_t(size));
+			T entry;
+			for(uint64_t i = 0; i < size; ++i) {
+				(*this) >> entry;
+				value.push_back(entry);
+			}
+		}
+		return *this;
+	}
+	ibstream& operator>>(std::string& value);
 };
 
 } // namespace bstream

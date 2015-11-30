@@ -53,6 +53,17 @@ obstream& obstream::operator<<(const long double& value) {
 	if(!write_bytes(reinterpret_cast<const char*>(&value), sizeof(value))) raise_write_eof();
 	return *this;
 }
+obstream& obstream::operator<<(const std::string& value) {
+	uint64_t size = value.size();
+	(*this) << size;
+	for(const auto& entry : value) {
+		uint8_t entry_uint8 = uint8_t(*reinterpret_cast<const unsigned char*>(&entry));
+		if(static_cast<unsigned char>(entry_uint8) != *reinterpret_cast<const unsigned char*>(&entry))
+			raise_write_invalid();
+		(*this) << entry_uint8;
+	}
+	return *this;
+}
 
 } // namespace bstream
 } // namespace mce
