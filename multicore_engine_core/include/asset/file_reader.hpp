@@ -25,7 +25,7 @@ protected:
 public:
 	virtual ~file_reader() = default;
 	virtual std::tuple<file_content_ptr, file_size> read_file(const std::string& prefix,
-															  const std::string& file) const = 0;
+															  const std::string& file) = 0;
 };
 
 } // namespace asset

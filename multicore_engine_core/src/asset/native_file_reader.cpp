@@ -11,7 +11,7 @@ namespace mce {
 namespace asset {
 
 std::tuple<file_reader::file_content_ptr, file_reader::file_size>
-native_file_reader::read_file(const std::string& prefix, const std::string& file) const {
+native_file_reader::read_file(const std::string& prefix, const std::string& file) {
 	std::string full_path = prefix;
 	full_path += '/';
 	full_path += file;
