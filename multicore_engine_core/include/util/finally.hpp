@@ -16,6 +16,7 @@ class finally_t {
 
 public:
 	finally_t(const F& f) : f{f} {};
+	finally_t(F&& f) : f{std::move(f)} {};
 	~finally_t() {
 		f();
 	}
