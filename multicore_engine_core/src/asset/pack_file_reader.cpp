@@ -20,12 +20,12 @@ pack_file_reader::get_source_stream(const std::string& prefix) {
 		auto equal_range = opened_pack_file_sources.equal_range(prefix);
 		for(auto it = equal_range.first; it != equal_range.second; ++it) {
 			if(it->second) {
-				if(it->second->lock()) return it->second;
+				if(it->second->try_lock()) return it->second;
 			}
 		}
 	}
 	auto ptr = std::make_shared<pack_file_source>(prefix);
-	ptr->lock();
+	ptr->try_lock();
 	// Take write lock
 	std::unique_lock<std::shared_timed_mutex> lock(sources_rw_lock);
 	opened_pack_file_sources.emplace(prefix, ptr);
@@ -38,9 +38,7 @@ pack_file_reader::read_file(const std::string& prefix, const std::string& file) 
 	auto at_exit = util::finally([&]() { source->unlock(); });
 	auto pos = std::find_if(source->metadata.elements.begin(), source->metadata.elements.end(),
 							[&](const pack_file_element_meta_data& elem) { return elem.name == file; });
-	if(pos == source->metadata.elements.end()) {
-		return std::make_tuple(file_content_ptr(), 0ull);
-	} else {
+	if(pos == source->metadata.elements.end()) { return std::make_tuple(file_content_ptr(), 0ull); } else {
 		std::shared_ptr<char> content =
 				std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });
 		source->stream.seekg(pos->offset, std::ios::beg);

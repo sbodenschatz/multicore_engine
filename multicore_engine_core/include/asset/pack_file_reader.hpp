@@ -33,8 +33,8 @@ class pack_file_reader : public file_reader {
 			if(!bstr)
 				throw std::runtime_error("Unable to read meta data from file '" + pack_file_name + "'.");
 		}
-		bool lock() {
-			return lock_flag.test_and_set();
+		bool try_lock() {
+			return !lock_flag.test_and_set();
 		}
 		void unlock() {
 			lock_flag.clear();
