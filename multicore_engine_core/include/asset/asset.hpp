@@ -15,13 +15,10 @@
 #include <condition_variable>
 #include <stdexcept>
 #include <util/local_function.hpp>
+#include "asset_defs.hpp"
 
 namespace mce {
 namespace asset {
-
-class asset;
-
-typedef std::shared_ptr<const asset> asset_ptr;
 
 class asset : public std::enable_shared_from_this<asset> {
 public:
@@ -33,7 +30,7 @@ private:
 	std::string name_;
 	std::shared_ptr<const char> data_;
 	size_t size_;
-	std::vector<util::local_function<128, void(const asset_ptr& asset)>> completion_handlers;
+	std::vector<asset_completion_handler> completion_handlers;
 	mutable std::condition_variable completed_cv;
 
 public:

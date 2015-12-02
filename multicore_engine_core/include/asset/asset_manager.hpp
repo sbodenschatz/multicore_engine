@@ -12,6 +12,7 @@
 #include <vector>
 #include <shared_mutex>
 #include <thread>
+#include "asset_defs.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
@@ -58,8 +59,9 @@ public:
 	std::shared_ptr<const asset> load_asset_sync(const std::string& name);
 	boost::unique_future<std::shared_ptr<const asset>> load_asset_future(const std::string& name);
 	void clean();
-	void pin_load_unit(const std::string& name);
-	void unpin_load_unit(const std::string& name);
+	void start_pin_load_unit(const std::string& name);
+	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler);
+	void start_unpin_load_unit(const std::string& name);
 };
 
 } // namespace asset

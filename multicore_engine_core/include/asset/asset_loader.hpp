@@ -9,6 +9,7 @@
 
 #include <string>
 #include <memory>
+#include "asset_defs.hpp"
 
 namespace mce {
 namespace asset {
@@ -31,8 +32,10 @@ protected:
 public:
 	virtual ~asset_loader() = default;
 	virtual bool start_load_asset(const std::shared_ptr<asset>& asset) = 0;
-	virtual void pin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
-	virtual void unpin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
+	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
+	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager,
+									 const simple_completion_handler& completion_handler) = 0;
+	virtual void start_unpin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 };
 
 } // namespace asset
