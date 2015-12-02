@@ -13,12 +13,24 @@ namespace util {
 template <typename F>
 class finally_t {
 	F f;
+	bool active = true;
 
 public:
 	finally_t(const F& f) : f{f} {};
 	finally_t(F&& f) : f{std::move(f)} {};
 	~finally_t() {
-		f();
+		if(active) f();
+	}
+	finally_t(const finally_t&) = delete;
+	finally_t(finally_t&& other) : f{std::move(other.f)} {
+		other.active = false;
+	}
+	finally_t& operator=(const finally_t&) = delete;
+	finally_t& operator=(finally_t&& other) {
+		f = std::move(other.f);
+		active = true;
+		other.active = false;
+		return *this;
 	}
 };
 
