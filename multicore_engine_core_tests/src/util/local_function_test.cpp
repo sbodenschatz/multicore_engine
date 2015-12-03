@@ -6,6 +6,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <util/local_function.hpp>
+#include <util/unused.hpp>
 
 namespace mce {
 namespace util {
@@ -31,7 +32,7 @@ BOOST_AUTO_TEST_CASE(call_lambda_ref_pass_through) {
 	int x = 0;
 	int& y = f(x);
 	x = 42;
-	static_cast<void>(x); // Silence "value never read" warning
+	UNUSED(x); // Silence "value never read" warning
 	BOOST_CHECK(y == 42);
 }
 
