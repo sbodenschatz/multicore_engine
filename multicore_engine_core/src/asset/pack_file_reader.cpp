@@ -9,6 +9,7 @@
 #include <util/finally.hpp>
 #include <algorithm>
 #include <cassert>
+#include <util/unused.hpp>
 
 namespace mce {
 namespace asset {
@@ -31,7 +32,7 @@ pack_file_reader::get_source_stream(const std::string& prefix) {
 	auto ptr = std::make_shared<pack_file_source>(prefix);
 	bool locked = ptr->try_lock();
 	assert(locked);
-	static_cast<void>(locked); // Silence unused variable warning in release mode
+	UNUSED(locked); // Silence unused variable warning in release mode
 	// Take write lock
 	std::unique_lock<std::shared_timed_mutex> lock(sources_rw_lock);
 	opened_pack_file_sources.emplace(prefix, ptr);

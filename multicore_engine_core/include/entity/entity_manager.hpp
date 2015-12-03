@@ -17,6 +17,7 @@
 #include <mutex>
 #include <atomic>
 #include "parser/entity_text_file_ast.hpp"
+#include <util/unused.hpp>
 
 namespace mce {
 namespace core {
@@ -83,17 +84,15 @@ public:
 
 #define REGISTER_COMPONENT_TYPE(ENTITYMANAGER, TYPE, NAME, FACTORYEXPR)                                      \
 	ENTITYMANAGER.register_component_type<TYPE>(NAME, [](auto&& owner, auto&& config, auto&& engine) {       \
-		/*Silence unused parameter warnings:*/                                                               \
-		static_cast<void>(owner), static_cast<void>(config), static_cast<void>(engine);                      \
+		UNUSED(owner), UNUSED(config), UNUSED(engine);                                                       \
 		return FACTORYEXPR;                                                                                  \
 	})
 
-#define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR)                                     \
-	ENTITYMANAGER.register_component_type<NAME##_component>(                                                 \
-			#NAME, [](auto&& owner, auto&& config, auto&& engine) {                                          \
-				/*Silence unused parameter warnings:*/                                                       \
-				static_cast<void>(owner), static_cast<void>(config), static_cast<void>(engine);              \
-				return FACTORYEXPR;                                                                          \
-			})
+#define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR)                                       \
+	ENTITYMANAGER.register_component_type<NAME##_component>(#NAME,                                             \
+															[](auto&& owner, auto&& config, auto&& engine) {   \
+																UNUSED(owner), UNUSED(config), UNUSED(engine); \
+																return FACTORYEXPR;                            \
+															})
 
 #endif /* ENTITY_ENTITY_MANAGER_HPP_ */
