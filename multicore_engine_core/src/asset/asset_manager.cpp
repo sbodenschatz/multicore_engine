@@ -100,11 +100,15 @@ boost::unique_future<std::shared_ptr<const asset>> asset_manager::load_asset_fut
 	task_pool.post(load_task);
 	return future;
 }
-void asset_manager::pin_load_unit(const std::string& name) {
-	for(auto& loader : asset_loaders) { loader->pin_load_unit(name, *this); }
+void asset_manager::start_pin_load_unit(const std::string& name) {
+	for(auto& loader : asset_loaders) { loader->start_pin_load_unit(name, *this); }
 }
-void asset_manager::unpin_load_unit(const std::string& name) {
-	for(auto& loader : asset_loaders) { loader->unpin_load_unit(name, *this); }
+void asset_manager::start_pin_load_unit(const std::string& name,
+										const simple_completion_handler& completion_handler) {
+	for(auto& loader : asset_loaders) { loader->start_pin_load_unit(name, *this, completion_handler); }
+}
+void asset_manager::start_unpin_load_unit(const std::string& name) {
+	for(auto& loader : asset_loaders) { loader->start_unpin_load_unit(name, *this); }
 }
 
 } // namespace asset

@@ -38,11 +38,18 @@ bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset) {
 	}
 	return false;
 }
-void file_asset_loader::pin_load_unit(const std::string& name, asset_manager&) {
+void file_asset_loader::start_pin_load_unit(const std::string& name, asset_manager&) {
 	std::unique_lock<std::shared_timed_mutex> lock(load_units_rw_lock);
 	load_units.push_back(name);
 }
-void file_asset_loader::unpin_load_unit(const std::string& name, asset_manager&) {
+void file_asset_loader::start_pin_load_unit(const std::string& name, asset_manager& manager,
+											const simple_completion_handler& completion_handler) {
+	// In this class the start_pin_load_unit method is blocking (only adds an entry to load_units list),
+	// therefore delegate to non-completion-handler implementation and run completion handler after this.
+	start_pin_load_unit(name, manager);
+	completion_handler();
+}
+void file_asset_loader::start_unpin_load_unit(const std::string& name, asset_manager&) {
 	std::unique_lock<std::shared_timed_mutex> lock(load_units_rw_lock);
 	load_units.erase(std::remove(load_units.begin(), load_units.end(), name), load_units.end());
 }

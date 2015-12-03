@@ -15,13 +15,10 @@
 #include <vector>
 #include <util/local_function.hpp>
 #include "load_unit_meta_data.hpp"
+#include "asset_defs.hpp"
 
 namespace mce {
 namespace asset {
-
-class load_unit;
-
-typedef std::shared_ptr<const load_unit> load_unit_ptr;
 
 class load_unit : public std::enable_shared_from_this<load_unit> {
 public:
@@ -41,7 +38,7 @@ private:
 	load_unit_meta_data meta_data_;
 	std::shared_ptr<const char> payload_data_;
 	size_t size_;
-	std::vector<util::local_function<128, void(const load_unit_ptr& asset)>> completion_handlers;
+	std::vector<load_unit_completion_handler> completion_handlers;
 	mutable std::condition_variable completed_cv;
 
 public:
