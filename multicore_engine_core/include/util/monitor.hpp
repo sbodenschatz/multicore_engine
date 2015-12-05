@@ -32,7 +32,7 @@ namespace util {
 template <typename T, typename Lock = spin_lock>
 class monitor {
 	T value;
-	Lock lock;
+	mutable Lock lock;
 
 public:
 	monitor() noexcept = default;
