@@ -64,5 +64,5 @@ BOOST_AUTO_TEST_CASE(thread_safety_try_lock) {
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace memory
+} // namespace util
 } // namespace mce
