@@ -10,6 +10,11 @@
 #include <mutex>
 #include <util/spin_lock.hpp>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4522)
+#endif
+
 namespace mce {
 namespace util {
 
@@ -42,23 +47,31 @@ public:
 	monitor& operator=(const monitor&) = delete;
 	monitor& operator=(const monitor&) volatile = delete;
 	T operator=(const T& desired) {
+		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
-		value = desired;
+		using std::swap;
+		swap(value, new_value);
 		return value;
 	}
 	T operator=(const T& desired) volatile {
+		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
-		value = desired;
+		using std::swap;
+		swap(value, new_value);
 		return value;
 	}
 	T operator=(T&& desired) {
+		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
-		value = std::move(desired);
+		using std::swap;
+		swap(value, new_value);
 		return value;
 	}
 	T operator=(T&& desired) volatile {
+		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
-		value = std::move(desired);
+		using std::swap;
+		swap(value, new_value);
 		return value;
 	}
 	bool is_lock_free() const {
@@ -68,20 +81,28 @@ public:
 		return false;
 	}
 	void store(const T& desired) {
+		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
-		value = desired;
+		using std::swap;
+		swap(value, new_value);
 	}
 	void store(const T& desired) volatile {
+		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
-		value = desired;
+		using std::swap;
+		swap(value, new_value);
 	}
 	void store(T&& desired) {
+		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
-		value = std::move(desired);
+		using std::swap;
+		swap(value, new_value);
 	}
 	void store(T&& desired) volatile {
+		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
-		value = std::move(desired);
+		using std::swap;
+		swap(value, new_value);
 	}
 	T load() const {
 		std::lock_guard<Lock> guard(lock);
@@ -124,116 +145,73 @@ public:
 		return std::move_if_noexcept(temp);
 	}
 
+	/// desired is moved from in both cases.
 	bool compare_exchange_strong(T& expected, const T& desired) {
+		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
-			value = desired;
+			using std::swap;
+			// desired is not assigned directly to value but swapped into it to let the clean up of the old
+			// value run outside the lock to avoid a potential circular wait.
+			swap(value, new_value);
 			return true;
 		} else {
 			expected = value;
 			return false;
 		}
 	}
+	/// desired is moved from in both cases.
 	bool compare_exchange_strong(T& expected, const T& desired) volatile {
+		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
-			value = desired;
+			using std::swap;
+			// desired is not assigned directly to value but swapped into it to let the clean up of the old
+			// value run outside the lock to avoid a potential circular wait.
+			swap(value, new_value);
 			return true;
 		} else {
 			expected = value;
 			return false;
 		}
 	}
+	/// desired is moved from in both cases.
 	bool compare_exchange_strong(T& expected, T&& desired) {
+		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
-			value = std::move(desired);
+			using std::swap;
+			// desired is not assigned directly to value but swapped into it to let the clean up of the old
+			// value run outside the lock to avoid a potential circular wait.
+			swap(value, new_value);
 			return true;
 		} else {
 			expected = value;
 			return false;
 		}
 	}
+	/// desired is moved from in both cases.
 	bool compare_exchange_strong(T& expected, T&& desired) volatile {
+		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
-			value = std::move(desired);
+			using std::swap;
+			// desired is not assigned directly to value but swapped into it to let the clean up of the old
+			// value run outside the lock to avoid a potential circular wait.
+			swap(value, new_value);
 			return true;
 		} else {
 			expected = value;
 			return false;
 		}
 	}
-	/*
-	bool compare_exchange_weak(T& expected, const T& desired) {
-		std::unique_lock<Lock> guard(lock, std::defer_lock);
-		if(guard.try_lock()) {
-			if(expected == value) {
-				value = desired;
-				return true;
-			} else {
-				expected = value;
-				return false;
-			}
-		} else {
-			// Problem: can't update expected here
-			return false;
-		}
-	}
-	bool compare_exchange_weak(T& expected, const T& desired) volatile {
-		std::unique_lock<Lock> guard(lock, std::defer_lock);
-		if(guard.try_lock()) {
-			if(expected == value) {
-				value = desired;
-				return true;
-			} else {
-				expected = value;
-
-				return false;
-			}
-		} else {
-			// Problem: can't update expected here
-			return false;
-		}
-	}
-	bool compare_exchange_weak(T& expected, T&& desired) {
-		std::unique_lock<Lock> guard(lock, std::defer_lock);
-		if(guard.try_lock()) {
-			if(expected == value) {
-				value = std::move(desired);
-				return true;
-			} else {
-				expected = value;
-				return false;
-			}
-		} else {
-			// Problem: can't update expected here
-			return false;
-		}
-	}
-	bool compare_exchange_weak(T& expected, T&& desired) volatile {
-		std::unique_lock<Lock> guard(lock, std::defer_lock);
-		if(guard.try_lock()) {
-			if(expected == value) {
-				value = std::move(desired);
-				return true;
-			} else {
-				expected = value;
-				return false;
-			}
-		} else {
-			// Problem: can't update expected here
-			return false;
-		}
-	}
-	*/
 	template <typename F>
-	void do_atomically(F f) {
+	void do_atomically(F&& f) {
 		std::lock_guard<Lock> guard(lock);
 		f(value);
 	}
 	template <typename F>
-	void do_atomically(F f) volatile {
+	void do_atomically(F&& f) volatile {
 		std::lock_guard<Lock> guard(lock);
 		f(value);
 	}
@@ -241,5 +219,9 @@ public:
 
 } // namespace util
 } // namespace mce
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif /* UTIL_MONITOR_HPP_ */
