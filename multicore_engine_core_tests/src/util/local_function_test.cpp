@@ -143,5 +143,5 @@ BOOST_AUTO_TEST_CASE(move_assign_different_size) {
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace memory
+} // namespace util
 } // namespace mce
