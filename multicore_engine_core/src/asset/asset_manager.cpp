@@ -9,6 +9,7 @@
 
 #include <asset/asset_manager.hpp>
 #include <asset/asset_loader.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
 
 namespace mce {
 namespace asset {
@@ -22,8 +23,16 @@ asset_manager::asset_manager() {
 }
 asset_manager::~asset_manager() {
 	work.reset();
-	task_pool.stop();
 	for(auto& worker : workers) { worker.join(); }
+}
+
+void asset_manager::start_clean() {
+	task_pool.post([this]() {
+		std::unique_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
+		// TODO Validate if usage of remove_erase_if on flat_map is allowed by flat_map, otherwise possibly
+		// extend and switch to generic_flat_map
+		boost::remove_erase_if(loaded_assets, [](const auto& element) { return element.second.unique(); });
+	});
 }
 std::shared_ptr<const asset> asset_manager::call_loaders_sync(const std::shared_ptr<asset>& asset_to_load) {
 	if(asset_to_load->try_obtain_load_ownership()) {

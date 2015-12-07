@@ -60,8 +60,7 @@ public:
 	std::shared_ptr<const asset> load_asset_async(const std::string& name, F completion_handler);
 	std::shared_ptr<const asset> load_asset_sync(const std::string& name);
 	boost::unique_future<std::shared_ptr<const asset>> load_asset_future(const std::string& name);
-	// TODO Explicit unloading?
-	void clean();
+	void start_clean();
 	void start_pin_load_unit(const std::string& name);
 	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler);
 	void start_unpin_load_unit(const std::string& name);
