@@ -47,13 +47,13 @@ private:
 public:
 	class asset_resolution_cookie {
 		friend class load_unit;
-		const load_unit* load_unit;
+		const mce::asset::load_unit* load_unit;
 		uint64_t offset;
 		uint64_t size;
 
 	public:
 		operator bool() const {
-			return load_unit!=nullptr;
+			return load_unit != nullptr;
 		}
 		asset_resolution_cookie() : load_unit{nullptr}, offset{0}, size{0} {}
 		asset_resolution_cookie(const mce::asset::load_unit* load_unit, uint64_t offset, uint64_t size)
