@@ -15,6 +15,7 @@ namespace util {
 
 template <typename T>
 class copy_on_write {
+	// TODO replace monitor<std::shared_ptr<T>> with std::atomic_shared_ptr<T> when available.
 	monitor<std::shared_ptr<T>> ptr;
 
 public:
