@@ -39,23 +39,23 @@ pack_file_reader::get_source_stream(const std::string& prefix) {
 	return ptr;
 }
 
-std::tuple<file_reader::file_content_ptr, file_reader::file_size>
-pack_file_reader::read_file(const std::string& prefix, const std::string& file) {
+std::pair<file_content_ptr, file_size> pack_file_reader::read_file(const std::string& prefix,
+																   const std::string& file) {
 	auto source = get_source_stream(prefix);
 	auto at_exit = util::finally([&]() { source->unlock(); });
 	auto pos = std::find_if(source->metadata.elements.begin(), source->metadata.elements.end(),
 							[&](const pack_file_element_meta_data& elem) { return elem.name == file; });
 	if(pos == source->metadata.elements.end()) {
-		return std::make_tuple(file_content_ptr(), 0ull);
+		return std::make_pair(file_content_ptr(), 0ull);
 	} else {
 		std::shared_ptr<char> content =
 				std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });
 		source->stream.seekg(pos->offset, std::ios::beg);
 		source->stream.read(content.get(), pos->size);
 		if(!(source->stream))
-			return std::make_tuple(file_content_ptr(), 0ull);
+			return std::make_pair(file_content_ptr(), 0ull);
 		else
-			return std::make_tuple(content, pos->size);
+			return std::make_pair(content, pos->size);
 	}
 }
 

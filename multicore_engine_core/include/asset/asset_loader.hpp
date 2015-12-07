@@ -26,12 +26,13 @@ class asset_loader {
 protected:
 	template <typename F>
 	static void launch_async_task(asset_manager& asset_manager, F&& f);
-	static void finish_loading(const std::shared_ptr<asset>& asset, std::shared_ptr<const char> data,
-							   size_t size);
+	static void finish_loading(const std::shared_ptr<asset>& asset, const file_content_ptr& data,
+							   file_size size);
+	static void raise_error_flag(const std::shared_ptr<asset>& asset);
 
 public:
 	virtual ~asset_loader() = default;
-	virtual bool start_load_asset(const std::shared_ptr<asset>& asset) = 0;
+	virtual bool start_load_asset(const std::shared_ptr<asset>& asset, asset_manager& asset_manager) = 0;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager,
 									 const simple_completion_handler& completion_handler) = 0;

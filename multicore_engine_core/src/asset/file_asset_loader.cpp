@@ -18,7 +18,7 @@ file_asset_loader::file_asset_loader(std::vector<path_prefix>&& prefixes) : pref
 	load_units.push_back("");
 }
 
-bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset) {
+bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset, asset_manager&) {
 	std::shared_lock<std::shared_timed_mutex> lock(load_units_rw_lock);
 	std::string file_path;
 	file_path.reserve(128);
@@ -27,10 +27,11 @@ bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset) {
 			file_path = load_unit;
 			file_path += '/';
 			file_path += asset->name();
-			file_reader::file_content_ptr file_content;
-			file_reader::file_size file_size = 0u;
+			file_content_ptr file_content;
+			file_size file_size = 0u;
 			std::tie(file_content, file_size) = prefix.reader->read_file(prefix.prefix, file_path);
 			if(file_content) {
+				lock.unlock();
 				finish_loading(asset, file_content, file_size);
 				return true;
 			}

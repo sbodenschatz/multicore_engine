@@ -25,12 +25,11 @@ asset_manager::~asset_manager() {
 	task_pool.stop();
 	for(auto& worker : workers) { worker.join(); }
 }
-std::shared_ptr<const asset>
-asset_manager::call_loaders_sync(const std::shared_ptr<asset>& asset_to_load) const {
+std::shared_ptr<const asset> asset_manager::call_loaders_sync(const std::shared_ptr<asset>& asset_to_load) {
 	if(asset_to_load->try_obtain_load_ownership()) {
 		try {
 			for(auto& loader : asset_loaders) {
-				if(loader->start_load_asset(asset_to_load)) {
+				if(loader->start_load_asset(asset_to_load, *this)) {
 					asset_to_load->internal_wait_for_complete();
 					return asset_to_load;
 				}
@@ -44,6 +43,7 @@ asset_manager::call_loaders_sync(const std::shared_ptr<asset>& asset_to_load) co
 		return std::shared_ptr<const asset>();
 	} else {
 		asset_to_load->internal_wait_for_complete();
+		asset_to_load->check_error_flag();
 		return asset_to_load;
 	}
 }

@@ -48,16 +48,19 @@ class asset_manager {
 		void operator()();
 	};
 	std::shared_ptr<const asset> load_asset_sync_core(const std::string& name);
-	std::shared_ptr<const asset> call_loaders_sync(const std::shared_ptr<asset>& asset) const;
+	std::shared_ptr<const asset> call_loaders_sync(const std::shared_ptr<asset>& asset);
 
 public:
 	friend class asset_loader;
 	asset_manager();
 	~asset_manager();
+	asset_manager(const asset_manager&) = delete;
+	asset_manager& operator=(const asset_manager&) = delete;
 	template <typename F>
 	std::shared_ptr<const asset> load_asset_async(const std::string& name, F completion_handler);
 	std::shared_ptr<const asset> load_asset_sync(const std::string& name);
 	boost::unique_future<std::shared_ptr<const asset>> load_asset_future(const std::string& name);
+	// TODO Explicit unloading?
 	void clean();
 	void start_pin_load_unit(const std::string& name);
 	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler);
@@ -97,7 +100,7 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 				if(tmp->try_obtain_load_ownership()) {
 					try {
 						for(auto& loader : asset_loaders) {
-							if(loader->start_load_asset(tmp)) return;
+							if(loader->start_load_asset(tmp, *this)) return;
 						}
 					} catch(...) {
 						tmp->raise_error_flag();

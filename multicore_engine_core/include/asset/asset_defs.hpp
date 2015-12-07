@@ -22,6 +22,9 @@ class asset;
 typedef std::shared_ptr<const asset> asset_ptr;
 typedef util::local_function<128, void(const asset_ptr& asset)> asset_completion_handler;
 
+typedef std::shared_ptr<const char> file_content_ptr;
+typedef size_t file_size;
+
 } // namespace asset
 } // namespace mce
 

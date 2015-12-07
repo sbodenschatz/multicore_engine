@@ -10,8 +10,8 @@
 namespace mce {
 namespace asset {
 
-std::tuple<file_reader::file_content_ptr, file_reader::file_size>
-native_file_reader::read_file(const std::string& prefix, const std::string& file) {
+std::pair<file_content_ptr, file_size> native_file_reader::read_file(const std::string& prefix,
+																	 const std::string& file) {
 	std::string full_path = prefix;
 	full_path += '/';
 	full_path += file;
@@ -28,9 +28,9 @@ native_file_reader::read_file(const std::string& prefix, const std::string& file
 				std::shared_ptr<char>(new char[size], [](char* ptr) { delete[] ptr; });
 		stream.read(content.get(), size);
 		stream.close();
-		return std::make_tuple(content, size);
+		return std::make_pair(content, size);
 	} else {
-		return std::make_tuple(file_content_ptr(), file_size(0ull));
+		return std::make_pair(file_content_ptr(), file_size(0ull));
 	}
 }
 

@@ -101,6 +101,7 @@ private:
 	// tasks are further back in the thread pools queue (async).
 	void internal_wait_for_complete() const {
 		if(current_state_ == state::ready) return;
+		check_error_flag();
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		completed_cv.wait(lock, [this]() {
 			auto cur_state = current_state_.load();

@@ -46,8 +46,8 @@ class pack_file_reader : public file_reader {
 	std::shared_ptr<pack_file_source> get_source_stream(const std::string& prefix);
 
 public:
-	virtual std::tuple<file_content_ptr, file_size> read_file(const std::string& prefix,
-															  const std::string& file);
+	virtual std::pair<file_content_ptr, file_size> read_file(const std::string& prefix,
+															 const std::string& file);
 };
 
 } // namespace asset
