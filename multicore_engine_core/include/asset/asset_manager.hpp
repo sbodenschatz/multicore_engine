@@ -13,6 +13,7 @@
 #include <shared_mutex>
 #include <thread>
 #include "asset_defs.hpp"
+#include <util/copy_on_write.hpp>
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
@@ -31,7 +32,7 @@ class asset_loader;
 class asset;
 
 class asset_manager {
-	std::vector<std::unique_ptr<asset_loader>> asset_loaders;
+	util::copy_on_write<std::vector<std::shared_ptr<asset_loader>>> asset_loaders;
 	std::shared_timed_mutex loaded_assets_rw_lock;
 	boost::container::flat_map<std::string, std::shared_ptr<asset>> loaded_assets;
 	boost::asio::io_service task_pool;
@@ -64,6 +65,9 @@ public:
 	void start_pin_load_unit(const std::string& name);
 	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler);
 	void start_unpin_load_unit(const std::string& name);
+
+	void add_asset_loader(std::shared_ptr<asset_loader>&& loader);
+	void clear_asset_loaders();
 };
 
 } // namespace asset
@@ -98,7 +102,8 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 			task_pool.post([tmp, this]() {
 				if(tmp->try_obtain_load_ownership()) {
 					try {
-						for(auto& loader : asset_loaders) {
+						auto local_asset_loaders = asset_loaders.get();
+						for(auto& loader : *local_asset_loaders) {
 							if(loader->start_load_asset(tmp, *this)) return;
 						}
 					} catch(...) {
