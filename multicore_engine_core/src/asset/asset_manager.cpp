@@ -22,7 +22,6 @@ asset_manager::asset_manager() {
 }
 asset_manager::~asset_manager() {
 	work.reset();
-	task_pool.stop();
 	for(auto& worker : workers) { worker.join(); }
 }
 std::shared_ptr<const asset> asset_manager::call_loaders_sync(const std::shared_ptr<asset>& asset_to_load) {
