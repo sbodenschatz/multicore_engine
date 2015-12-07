@@ -17,6 +17,7 @@
 #include "pack_file_meta_data.hpp"
 #include <bstream/istream_bstream.hpp>
 #include <atomic>
+#include <util/lock_ptr_wrapper.hpp>
 
 namespace mce {
 namespace asset {
@@ -43,7 +44,7 @@ class pack_file_reader : public file_reader {
 	std::shared_timed_mutex sources_rw_lock;
 	boost::container::flat_multimap<std::string, std::shared_ptr<pack_file_source>> opened_pack_file_sources;
 
-	std::shared_ptr<pack_file_source> get_source_stream(const std::string& prefix);
+	util::lock_ptr_wrapper<pack_file_source> get_source_stream(const std::string& prefix);
 
 public:
 	virtual std::pair<file_content_ptr, file_size> read_file(const std::string& prefix,
