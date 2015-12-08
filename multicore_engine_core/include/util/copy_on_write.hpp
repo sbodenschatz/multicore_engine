@@ -25,8 +25,8 @@ public:
 	copy_on_write(const copy_on_write&) = delete;
 	copy_on_write& operator=(const copy_on_write&) = delete;
 
-	std::shared_ptr<T> get() const {
-		return ptr;
+	std::shared_ptr<const T> get() const {
+		return ptr.load();
 	}
 
 	template <typename F>
