@@ -10,7 +10,8 @@ namespace mce {
 namespace bstream {
 
 size_t iostream_bstream::read_bytes(char* buffer, size_t count) noexcept {
-	return iostream.readsome(buffer, count);
+	iostream.read(buffer, count);
+	return iostream.gcount();
 }
 size_t iostream_bstream::size() const noexcept {
 	auto old_pos = iostream.tellg();

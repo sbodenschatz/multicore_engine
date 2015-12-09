@@ -9,7 +9,6 @@
 
 #include <bstream/iobstream.hpp>
 #include <cstdint>
-#include <memory>
 #include <istream>
 
 namespace mce {
