@@ -16,8 +16,6 @@ namespace mce {
 namespace asset {
 
 class file_reader {
-protected:
-	static void sanitize_path_inplace(std::string& path) noexcept;
 
 public:
 	virtual ~file_reader() = default;

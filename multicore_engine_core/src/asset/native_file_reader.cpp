@@ -6,6 +6,7 @@
 
 #include <asset/native_file_reader.hpp>
 #include <fstream>
+#include <util/path_util.hpp>
 
 namespace mce {
 namespace asset {
@@ -15,7 +16,7 @@ std::pair<file_content_ptr, file_size> native_file_reader::read_file(const std::
 	std::string full_path = prefix;
 	full_path += '/';
 	full_path += file;
-	sanitize_path_inplace(full_path);
+	util::sanitize_path_inplace(full_path);
 	std::ifstream stream(full_path, std::ios::binary);
 	if(stream) {
 		stream.seekg(0, std::ios::end);
