@@ -29,23 +29,9 @@ uint64_t load_unit_gen::read_file_size(const std::string& path) {
 	} else
 		throw std::runtime_error("Couldn't open asset file '" + path + "'.");
 }
-void load_unit_gen::update_content_offset(uint64_t new_content_offset) {
-	for(auto& entry : entries) {
-		entry.meta_data.offset -= content_offset;
-		entry.meta_data.offset += new_content_offset;
-	}
-	next_pos -= content_offset;
-	next_pos += new_content_offset;
-	content_offset = new_content_offset;
-}
 void load_unit_gen::compile_meta_data() {
 	std::transform(entries.begin(), entries.end(), std::back_inserter(meta_data.assets),
 				   [](const auto& entry) { return entry.meta_data; });
-}
-uint64_t load_unit_gen::calculate_meta_data_size() const {
-	bstream::vector_iobstream temp_stream;
-	temp_stream << meta_data;
-	return temp_stream.tell_write();
 }
 void load_unit_gen::copy_file_content(std::fstream& into, const load_unit_entry& entry) {
 	std::string sanitized_path = entry.path;
@@ -69,11 +55,15 @@ void load_unit_gen::copy_file_content(std::fstream& into, const load_unit_entry&
 	} else
 		throw std::runtime_error("Couldn't open asset file '" + entry.path + "'.");
 }
-void load_unit_gen::write_load_unit_file(const std::string& output_file) {
+void load_unit_gen::write_load_unit_metadata_file(const std::string& output_file) {
 	std::fstream file_stream(output_file, std::ios::out | std::ios::trunc | std::ios::binary);
 	if(!file_stream) throw std::runtime_error("Can't open '" + output_file + "' for writing.");
 	bstream::iostream_bstream stream(file_stream);
 	stream << meta_data;
+}
+void load_unit_gen::write_load_unit_payload_file(const std::string& output_file) {
+	std::fstream file_stream(output_file, std::ios::out | std::ios::trunc | std::ios::binary);
+	if(!file_stream) throw std::runtime_error("Can't open '" + output_file + "' for writing.");
 	for(const auto& entry : entries) copy_file_content(file_stream, entry);
 }
 void load_unit_gen::add_file(const std::string& path, const std::string& name) {
@@ -81,15 +71,11 @@ void load_unit_gen::add_file(const std::string& path, const std::string& name) {
 	entries.emplace_back(path, name, next_pos, size);
 	next_pos += size;
 }
-void load_unit_gen::compile_load_unit(const std::string& output_file) {
+void load_unit_gen::compile_load_unit(const std::string& metadata_output_file,
+									  const std::string& payload_output_file) {
 	compile_meta_data();
-	auto start_offset = calculate_meta_data_size();
-	update_content_offset(start_offset);
-	compile_meta_data();
-	auto start_offset2 = calculate_meta_data_size();
-	if(start_offset != start_offset2)
-		std::logic_error("Meta data size mismatch after applying start_offset.");
-	write_load_unit_file(output_file);
+	write_load_unit_metadata_file(metadata_output_file);
+	write_load_unit_payload_file(payload_output_file);
 }
 
 } // namespace asset_gen
