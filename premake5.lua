@@ -29,7 +29,7 @@ solution "multicore_engine_solution"
 		targetdir "%{prj.location}/bin-gcc/%{cfg.buildcfg}"
 		objdir "%{prj.location}/obj-gcc/%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
-		links {"pthread"}
+		links {"pthread","boost_program_options"}
 		buildoptions "-Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations"
 
 	configuration {"gmake"}
