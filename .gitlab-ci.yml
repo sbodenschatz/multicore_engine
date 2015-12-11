@@ -1,11 +1,11 @@
 before_script:
-  - premake5 --cc=gcc gmake
-  - make CC=gcc CXX=g++ config=debug clean
-  - make CC=gcc CXX=g++ config=release clean
-  - premake5 --cc=clang gmake
-  - make CC=clang CXX=clang++ config=debug clean
-  - make CC=clang CXX=clang++ config=release clean
-  - mkdir -p multicore_engine_{core,core_tests,demo,parsers}/build/{bin,obj}-{gcc,clang}/{debug,release}
+  - premake5 --cc=gcc gmake > /dev/null
+  - make CC=gcc CXX=g++ config=debug clean > /dev/null
+  - make CC=gcc CXX=g++ config=release clean > /dev/null
+  - premake5 --cc=clang gmake > /dev/null
+  - make CC=clang CXX=clang++ config=debug clean > /dev/null
+  - make CC=clang CXX=clang++ config=release clean > /dev/null
+  - mkdir -p multicore_engine_{core,core_tests,demo,parsers,load_unit_gen,pack_file_gen}/build/{bin,obj}-{gcc,clang}/{debug,release}
 
 #stages:
 #  - analyse
