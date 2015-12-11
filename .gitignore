@@ -4,3 +4,5 @@
 *.sln
 build
 Makefile
+/doc
+*.VC.opendb
