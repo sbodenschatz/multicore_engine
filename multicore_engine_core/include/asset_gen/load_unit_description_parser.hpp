@@ -21,7 +21,7 @@ class load_unit_description_parser {
 	std::unique_ptr<load_unit_description_grammar> grammar;
 	std::unique_ptr<load_unit_description_skipper> skipper;
 
-	bool parse(const char*& first, const char* last, ast::ast_root& ast_root);
+	bool parse(const char*& first, const char* last, ast::load_unit_ast_root& ast_root);
 
 public:
 	load_unit_description_parser();

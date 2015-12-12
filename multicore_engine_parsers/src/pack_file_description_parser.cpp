@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_parsers/src/load_unit_description_parser.cpp
+ * File /multicore_engine_parsers/src/pack_file_description_parser.cpp
  * Copyright 2015 by Stefan Bodenschatz
  */
 
@@ -23,9 +23,9 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
-#include <asset_gen/load_unit_description_parser.hpp>
-#include <asset_gen/load_unit_description_ast.hpp>
-#include <asset_gen/load_unit_description_ast_fusion.hpp>
+#include <asset_gen/pack_file_description_parser.hpp>
+#include <asset_gen/pack_file_description_ast.hpp>
+#include <asset_gen/pack_file_description_ast_fusion.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;
@@ -35,9 +35,9 @@ namespace mce {
 namespace asset_gen {
 namespace parser {
 
-struct load_unit_description_skipper : qi::grammar<const char*> {
+struct pack_file_description_skipper : qi::grammar<const char*> {
 	qi::rule<const char*> skip;
-	load_unit_description_skipper() : load_unit_description_skipper::base_type(skip, "Skipper") {
+	pack_file_description_skipper() : pack_file_description_skipper::base_type(skip, "Skipper") {
 		using qi::lit;
 		using qi::char_;
 		using qi::eol;
@@ -46,14 +46,14 @@ struct load_unit_description_skipper : qi::grammar<const char*> {
 	}
 };
 
-struct load_unit_description_grammar
-		: qi::grammar<const char*, load_unit_description_skipper, ast::load_unit_ast_root()> {
+struct pack_file_description_grammar
+		: qi::grammar<const char*, pack_file_description_skipper, ast::pack_file_ast_root()> {
 	template <typename Signature>
-	using rule = qi::rule<const char*, load_unit_description_skipper, Signature>;
+	using rule = qi::rule<const char*, pack_file_description_skipper, Signature>;
 
-	rule<ast::load_unit_ast_root()> start;
+	rule<ast::pack_file_ast_root()> start;
 
-	load_unit_description_grammar() : load_unit_description_grammar::base_type(start) {
+	pack_file_description_grammar() : pack_file_description_grammar::base_type(start) {
 		using qi::_1;
 		using spirit::_val;
 		using phoenix::at_c;
@@ -71,13 +71,13 @@ struct load_unit_description_grammar
 	}
 };
 
-load_unit_description_parser::load_unit_description_parser()
-		: grammar(std::make_unique<load_unit_description_grammar>()),
-		  skipper(std::make_unique<load_unit_description_skipper>()) {}
-load_unit_description_parser::~load_unit_description_parser() {}
+pack_file_description_parser::pack_file_description_parser()
+		: grammar(std::make_unique<pack_file_description_grammar>()),
+		  skipper(std::make_unique<pack_file_description_skipper>()) {}
+pack_file_description_parser::~pack_file_description_parser() {}
 
-bool load_unit_description_parser::parse(const char*& first, const char* last,
-										 ast::load_unit_ast_root& ast_root) {
+bool pack_file_description_parser::parse(const char*& first, const char* last,
+										 ast::pack_file_ast_root& ast_root) {
 	bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
 	return result;
 }

@@ -15,7 +15,7 @@ namespace mce {
 namespace asset_gen {
 namespace ast {
 
-struct ast_root {};
+struct load_unit_ast_root {};
 
 } // namespace ast
 } // namespace asset_gen
