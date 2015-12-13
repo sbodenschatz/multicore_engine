@@ -15,7 +15,17 @@ namespace mce {
 namespace asset_gen {
 namespace ast {
 
-struct pack_file_ast_root {};
+struct pack_file_entry {
+	std::string external_path;
+	std::string internal_path;
+};
+
+struct pack_file_section {
+	std::string name;
+	std::vector<pack_file_entry> entries;
+};
+
+typedef std::vector<pack_file_section> pack_file_ast_root;
 
 } // namespace ast
 } // namespace asset_gen
