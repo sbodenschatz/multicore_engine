@@ -21,11 +21,10 @@ class load_unit_description_parser {
 	std::unique_ptr<load_unit_description_grammar> grammar;
 	std::unique_ptr<load_unit_description_skipper> skipper;
 
-	bool parse(const char*& first, const char* last, ast::load_unit_ast_root& ast_root);
-
 public:
 	load_unit_description_parser();
 	~load_unit_description_parser();
+	bool parse(const char*& first, const char* last, ast::load_unit_ast_root& ast_root);
 	void load_and_process_file(const std::string& filename);
 };
 

@@ -20,7 +20,7 @@ inline bool operator!=(const load_unit_entry& o1, const load_unit_entry& o2) {
 	return !(o1 == o2);
 }
 inline bool operator==(const load_unit_section& o1, const load_unit_section& o2) {
-	return o1.external_path == o2.external_path && o1.internal_path == o2.internal_path;
+	return o1.name == o2.name && o1.entries == o2.entries;
 }
 inline bool operator!=(const load_unit_section& o1, const load_unit_section& o2) {
 	return !(o1 == o2);

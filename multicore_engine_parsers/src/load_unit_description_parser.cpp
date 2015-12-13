@@ -52,6 +52,9 @@ struct load_unit_description_grammar
 	using rule = qi::rule<const char*, load_unit_description_skipper, Signature>;
 
 	rule<ast::load_unit_ast_root()> start;
+	rule<ast::load_unit_section()> section;
+	rule<ast::load_unit_entry()> entry;
+	rule<std::string()> string_literal;
 
 	load_unit_description_grammar() : load_unit_description_grammar::base_type(start) {
 		using qi::_1;
@@ -67,7 +70,14 @@ struct load_unit_description_grammar
 		using spirit::long_long;
 		using spirit::float_;
 
+		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
+		entry %= string_literal >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
+		section %= string_literal >> lit('{') >> *(entry) >> lit('}');
+		start %= *(section);
+
 		BOOST_SPIRIT_DEBUG_NODE(start);
+		BOOST_SPIRIT_DEBUG_NODE(section);
+		BOOST_SPIRIT_DEBUG_NODE(entry);
 	}
 };
 
