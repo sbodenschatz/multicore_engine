@@ -26,7 +26,8 @@ solution "multicore_engine_solution"
 		includedirs{}
 	
 	configuration{"gmake"}
-		targetdir "%{prj.location}/bin-gcc-%{cfg.buildcfg}"
+		targetsuffix "-gcc-%{cfg.buildcfg}"
+		targetdir "%{prj.location}/bin"
 		objdir "%{prj.location}/obj-gcc-%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
 		links {"pthread","boost_program_options"}
@@ -34,8 +35,9 @@ solution "multicore_engine_solution"
 
 	configuration {"gmake"}
 		if _OPTIONS["cc"] == "clang" then
+			targetsuffix "-clang-%{cfg.buildcfg}"
 			buildoptions "-stdlib=libc++  -Wno-unused-private-field"
-			targetdir "%{prj.location}/bin-clang-%{cfg.buildcfg}"
+			targetdir "%{prj.location}/bin"
 			objdir "%{prj.location}/obj-clang-%{cfg.buildcfg}"
 			toolset "clang"
 			links "c++"
@@ -70,11 +72,12 @@ solution "multicore_engine_solution"
 		buildoptions "-isystemC:/Libs/Boost/include -isystemC:/Libs/glm/include"
 	
 	configuration {"vs2015"}
+		targetsuffix "-vc-%{cfg.buildcfg}"
 		defines{"GLM_FORCE_CXX11"}
 		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
 		architecture "x64"
 		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild","MultiProcessorCompile"}
-		targetdir "%{prj.location}/bin-vc-%{cfg.buildcfg}"
+		targetdir "%{prj.location}/bin"
 		objdir "%{prj.location}/obj-vc-%{cfg.buildcfg}"
 
 	configuration {"vs2015"}
