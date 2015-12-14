@@ -5,7 +5,7 @@ before_script:
   - premake5 --cc=clang gmake > /dev/null
   - make CC=clang CXX=clang++ config=debug clean > /dev/null
   - make CC=clang CXX=clang++ config=release clean > /dev/null
-  - mkdir -p multicore_engine_{core,core_tests,demo,parsers,load_unit_gen,pack_file_gen}/build/{bin,obj}-{gcc,clang}/{debug,release}
+  - mkdir -p multicore_engine_{core,core_tests,demo,parsers,load_unit_gen,pack_file_gen}/build/{bin,obj}-{gcc,clang}-{debug,release}
 
 #stages:
 #  - analyse
@@ -26,7 +26,7 @@ gcc-debug-build:
   - export CC=gcc
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=gcc CXX=g++
-  - multicore_engine_core_tests/build/bin-gcc/debug/multicore_engine_core_tests --report_level=short
+  - multicore_engine_core_tests/build/bin-gcc-debug/multicore_engine_core_tests --report_level=short
 
 gcc-release-build:
 #  stage: build_and_test
@@ -35,7 +35,7 @@ gcc-release-build:
   - export CC=gcc
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=gcc CXX=g++
-  - multicore_engine_core_tests/build/bin-gcc/release/multicore_engine_core_tests --report_level=short
+  - multicore_engine_core_tests/build/bin-gcc-release/multicore_engine_core_tests --report_level=short
 
 clang-debug-build:
 #  stage: build_and_test
@@ -44,7 +44,7 @@ clang-debug-build:
   - export CC=clang
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=clang CXX=clang++
-  - multicore_engine_core_tests/build/bin-clang/debug/multicore_engine_core_tests --report_level=short
+  - multicore_engine_core_tests/build/bin-clang-debug/multicore_engine_core_tests --report_level=short
 
 clang-release-build:
 #  stage: build_and_test
@@ -53,5 +53,5 @@ clang-release-build:
   - export CC=clang
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=clang CXX=clang++
-  - multicore_engine_core_tests/build/bin-clang/release/multicore_engine_core_tests --report_level=short
+  - multicore_engine_core_tests/build/bin-clang-release/multicore_engine_core_tests --report_level=short
 

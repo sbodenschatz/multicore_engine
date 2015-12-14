@@ -26,8 +26,8 @@ solution "multicore_engine_solution"
 		includedirs{}
 	
 	configuration{"gmake"}
-		targetdir "%{prj.location}/bin-gcc/%{cfg.buildcfg}"
-		objdir "%{prj.location}/obj-gcc/%{cfg.buildcfg}"
+		targetdir "%{prj.location}/bin-gcc-%{cfg.buildcfg}"
+		objdir "%{prj.location}/obj-gcc-%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
 		links {"pthread","boost_program_options"}
 		buildoptions "-Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations"
@@ -35,8 +35,8 @@ solution "multicore_engine_solution"
 	configuration {"gmake"}
 		if _OPTIONS["cc"] == "clang" then
 			buildoptions "-stdlib=libc++  -Wno-unused-private-field"
-			targetdir "%{prj.location}/bin-clang/%{cfg.buildcfg}"
-			objdir "%{prj.location}/obj-clang/%{cfg.buildcfg}"
+			targetdir "%{prj.location}/bin-clang-%{cfg.buildcfg}"
+			objdir "%{prj.location}/obj-clang-%{cfg.buildcfg}"
 			toolset "clang"
 			links "c++"
 		end
@@ -74,8 +74,8 @@ solution "multicore_engine_solution"
 		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include"}
 		architecture "x64"
 		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild","MultiProcessorCompile"}
-		targetdir "%{prj.location}/bin-vc/%{cfg.buildcfg}"
-		objdir "%{prj.location}/obj-vc/%{cfg.buildcfg}"
+		targetdir "%{prj.location}/bin-vc-%{cfg.buildcfg}"
+		objdir "%{prj.location}/obj-vc-%{cfg.buildcfg}"
 
 	configuration {"vs2015"}
 		libdirs {"C:/Libs/Boost/lib_x64_vc"}
