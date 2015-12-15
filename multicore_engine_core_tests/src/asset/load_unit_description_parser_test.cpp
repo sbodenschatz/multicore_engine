@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(only_comment_valid) {
 
 BOOST_AUTO_TEST_CASE(single_empty_section) {
 	load_unit_description_parser parser;
-	std::string testdata = "\"test\"{}";
+	std::string testdata = "test{}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(single_empty_section) {
 
 BOOST_AUTO_TEST_CASE(single_comment_in_section) {
 	load_unit_description_parser parser;
-	std::string testdata = "\"test\"{//Comment\n}";
+	std::string testdata = "test{//Comment\n}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(single_comment_in_section) {
 }
 BOOST_AUTO_TEST_CASE(single_section_single_entry) {
 	load_unit_description_parser parser;
-	std::string testdata = "\"test\"{\"test1\"->\"test2\";}";
+	std::string testdata = "test{\"test1\"->\"test2\";}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(single_section_single_entry) {
 }
 BOOST_AUTO_TEST_CASE(single_section_multi_entry) {
 	load_unit_description_parser parser;
-	std::string testdata = "\"test\"{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	std::string testdata = "test{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(single_section_multi_entry) {
 }
 BOOST_AUTO_TEST_CASE(multi_section_single_entry) {
 	load_unit_description_parser parser;
-	std::string testdata = "\"testA\"{\"test1\"->\"test2\";}\"testB\"{\"test1\"->\"test2\";}";
+	std::string testdata = "testA{\"test1\"->\"test2\";}testB{\"test1\"->\"test2\";}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -112,8 +112,8 @@ BOOST_AUTO_TEST_CASE(multi_section_single_entry) {
 }
 BOOST_AUTO_TEST_CASE(multi_section_multi_entry) {
 	load_unit_description_parser parser;
-	std::string testdata = "\"testA\"{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
-						   "\"testB\"{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -130,8 +130,8 @@ BOOST_AUTO_TEST_CASE(multi_section_multi_entry) {
 
 BOOST_AUTO_TEST_CASE(no_internal_path) {
 	load_unit_description_parser parser;
-	std::string testdata = "\"testA\"{\"test1\";\"test3\";\"test5\";}"
-						   "\"testB\"{\"test1\";\"test3\";\"test5\";}";
+	std::string testdata = "testA{\"test1\";\"test3\";\"test5\";}"
+						   "testB{\"test1\";\"test3\";\"test5\";}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -149,8 +149,8 @@ BOOST_AUTO_TEST_CASE(no_internal_path) {
 BOOST_AUTO_TEST_CASE(whitespace_skipping) {
 	load_unit_description_parser parser;
 	std::string testdata =
-			"\"testA\"\n{\"test1\"\n->\n\"test2\";\"test3\" -> \"test4\"\n;\"test5\"\t-> \"test6\";}"
-			"\"testB\"{\n\"test1\" ->\n\"test2\";\"test3\"\t->\t\"test4\"   ;\n    \"test5\"   ->    "
+			"testA\n{\"test1\"\n->\n\"test2\";\"test3\" -> \"test4\"\n;\"test5\"\t-> \"test6\";}"
+			"testB{\n\"test1\" ->\n\"test2\";\"test3\"\t->\t\"test4\"   ;\n    \"test5\"   ->    "
 			"\"test6\"//test\n;}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
