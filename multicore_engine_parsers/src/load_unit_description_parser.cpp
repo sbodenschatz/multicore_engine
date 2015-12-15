@@ -9,6 +9,7 @@
 #include <istream>
 #include <string>
 #include <vector>
+#include <fstream>
 #ifdef _MSC_VER
 #pragma warning(disable : 4459)
 #pragma warning(disable : 4503)
@@ -55,6 +56,7 @@ struct load_unit_description_grammar
 	rule<ast::load_unit_section()> section;
 	rule<ast::load_unit_entry()> entry;
 	rule<std::string()> string_literal;
+	rule<std::string()> identifier;
 
 	load_unit_description_grammar() : load_unit_description_grammar::base_type(start) {
 		using qi::_1;
@@ -70,9 +72,10 @@ struct load_unit_description_grammar
 		using spirit::long_long;
 		using spirit::float_;
 
+		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
 		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
 		entry %= string_literal >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
-		section %= string_literal >> lit('{') >> *(entry) >> lit('}');
+		section %= identifier >> lit('{') >> *(entry) >> lit('}');
 		start %= *(section);
 
 		BOOST_SPIRIT_DEBUG_NODE(start);
@@ -90,6 +93,29 @@ bool load_unit_description_parser::parse(const char*& first, const char* last,
 										 ast::load_unit_ast_root& ast_root) {
 	bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
 	return result;
+}
+
+ast::load_unit_ast_root load_unit_description_parser::load_file(const std::string& filename) {
+	ast::load_unit_ast_root ast_root;
+	std::ifstream stream(filename);
+	std::vector<char> buffer;
+	if(!stream.is_open()) { throw std::runtime_error("Couldn't open file '" + filename + "'."); }
+
+	stream.seekg(0, std::ios::end);
+	auto size_tmp = stream.tellg();
+	size_t size = size_tmp;
+	decltype(size_tmp) size_check = size;
+	if(size_check != size_tmp) throw std::runtime_error("Asset too big to fit in address space.");
+	stream.seekg(0, std::ios::beg);
+
+	buffer.resize(size);
+	stream.read(buffer.data(), size);
+
+	const char* start = buffer.data();
+	const char* end = buffer.data() + size;
+	bool r = parse(start, end, ast_root);
+	if(!r || start != end) { std::runtime_error("Parse error in file '" + filename + "'."); }
+	return ast_root;
 }
 
 } // namespace parser

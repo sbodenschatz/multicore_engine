@@ -25,7 +25,7 @@ public:
 	load_unit_description_parser();
 	~load_unit_description_parser();
 	bool parse(const char*& first, const char* last, ast::load_unit_ast_root& ast_root);
-	void load_and_process_file(const std::string& filename);
+	ast::load_unit_ast_root load_file(const std::string& filename);
 };
 
 } // namespace parser

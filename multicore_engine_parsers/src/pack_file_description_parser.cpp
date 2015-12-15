@@ -55,6 +55,7 @@ struct pack_file_description_grammar
 	rule<ast::pack_file_section()> section;
 	rule<ast::pack_file_entry()> entry;
 	rule<std::string()> string_literal;
+	rule<std::string()> identifier;
 
 	pack_file_description_grammar() : pack_file_description_grammar::base_type(start) {
 		using qi::_1;
@@ -70,9 +71,10 @@ struct pack_file_description_grammar
 		using spirit::long_long;
 		using spirit::float_;
 
+		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
 		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
 		entry %= string_literal >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
-		section %= string_literal >> lit('{') >> *(entry) >> lit('}');
+		section %= identifier >> lit('{') >> *(entry) >> lit('}');
 		start %= *(section);
 
 		BOOST_SPIRIT_DEBUG_NODE(start);
