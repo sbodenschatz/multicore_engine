@@ -39,6 +39,12 @@ int main(int argc, char* argv[]) {
 		std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
 		std::cout << desc;
 	}
+	if(payload_output_file.empty()) {
+		payload_output_file = fs::path(description_file).replace_extension("lup").string();
+	}
+	if(metadata_output_file.empty()) {
+		metadata_output_file = fs::path(description_file).replace_extension("lum").string();
+	}
 	std::cout << description_file << std::endl;
 	std::cout << payload_output_file << std::endl;
 	std::cout << metadata_output_file << std::endl;
