@@ -52,16 +52,29 @@ int main(int argc, char* argv[]) {
 	mce::asset_gen::parser::load_unit_description_parser parser;
 	auto ast = parser.load_file(description_file);
 	fs::path desc_dir = fs::path(description_file).parent_path();
+	bool incomplete = false;
 	for(const auto& section : ast) {
 		for(const auto& entry : section.entries) {
 			fs::path entry_path(entry.external_path);
-			if(entry_path.is_relative()) {
-				entry_path = fs::absolute(entry_path, desc_dir);
-				auto internal_path = entry.internal_path;
-				if(internal_path.empty()) { internal_path = entry.external_path; }
-				gen.add_file(entry_path.string(), internal_path);
+			auto entry_path_abs = entry_path;
+			if(entry_path.is_relative()) { entry_path_abs = fs::absolute(entry_path, desc_dir); }
+			if(!fs::exists(entry_path_abs)) {
+				std::cerr << "File '" << entry_path << "' not found." << std::endl;
+				incomplete = true;
+				continue;
 			}
+			auto internal_path = entry.internal_path;
+			if(internal_path.empty()) {
+				if(entry_path.is_relative()) {
+					internal_path = entry.external_path;
+				} else {
+					// TODO: make entry path relative to desc file ?
+					internal_path = entry_path.filename().string();
+				}
+			}
+			gen.add_file(entry_path_abs.string(), internal_path);
 		}
 	}
 	gen.compile_load_unit(metadata_output_file, payload_output_file);
+	if(incomplete) return -1;
 }
