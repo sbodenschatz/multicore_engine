@@ -38,6 +38,7 @@ int main(int argc, char* argv[]) {
 	if(vars.count("help") || argc == 1) {
 		std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
 		std::cout << desc;
+		return -1;
 	}
 	if(payload_output_file.empty()) {
 		payload_output_file = fs::path(description_file).replace_extension("lup").string();
@@ -76,5 +77,5 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	gen.compile_load_unit(metadata_output_file, payload_output_file);
-	if(incomplete) return -1;
+	if(incomplete) return -2;
 }
