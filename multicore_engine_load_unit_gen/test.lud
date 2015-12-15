@@ -1,0 +1,4 @@
+test {
+	"src/main.cpp" -> "test.cpp";
+	"build/bin/multicore_engine_load_unit_gen-gcc-debug.exe" -> "test.exe";
+}

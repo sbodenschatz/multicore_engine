@@ -6,3 +6,5 @@ build
 Makefile
 /doc
 *.VC.opendb
+*.lum
+*.lup
