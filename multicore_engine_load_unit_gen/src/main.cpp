@@ -57,7 +57,9 @@ int main(int argc, char* argv[]) {
 			fs::path entry_path(entry.external_path);
 			if(entry_path.is_relative()) {
 				entry_path = fs::absolute(entry_path, desc_dir);
-				gen.add_file(entry_path.string(), entry.internal_path);
+				auto internal_path = entry.internal_path;
+				if(internal_path.empty()) { internal_path = entry.external_path; }
+				gen.add_file(entry_path.string(), internal_path);
 			}
 		}
 	}
