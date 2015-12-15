@@ -152,4 +152,5 @@ solution "multicore_engine_solution"
 		links {"multicore_engine_core","multicore_engine_parsers"}
 		configuration {"vs2015"}
 			debugdir "multicore_engine_load_unit_gen"
+			debugargs "-d test.lud"
 
