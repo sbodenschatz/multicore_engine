@@ -81,6 +81,8 @@ struct load_unit_description_grammar
 		BOOST_SPIRIT_DEBUG_NODE(start);
 		BOOST_SPIRIT_DEBUG_NODE(section);
 		BOOST_SPIRIT_DEBUG_NODE(entry);
+		BOOST_SPIRIT_DEBUG_NODE(identifier);
+		BOOST_SPIRIT_DEBUG_NODE(string_literal);
 	}
 };
 
@@ -105,7 +107,7 @@ ast::load_unit_ast_root load_unit_description_parser::load_file(const std::strin
 	auto size_tmp = stream.tellg();
 	size_t size = size_tmp;
 	decltype(size_tmp) size_check = size;
-	if(size_check != size_tmp) throw std::runtime_error("Asset too big to fit in address space.");
+	if(size_check != size_tmp) throw std::runtime_error("File too big to fit in address space.");
 	stream.seekg(0, std::ios::beg);
 
 	buffer.resize(size);

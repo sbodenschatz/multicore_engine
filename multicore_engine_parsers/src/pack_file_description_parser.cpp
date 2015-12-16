@@ -6,6 +6,7 @@
 
 //#define BOOST_SPIRIT_DEBUG
 
+#include <fstream>
 #include <istream>
 #include <string>
 #include <vector>
@@ -80,6 +81,8 @@ struct pack_file_description_grammar
 		BOOST_SPIRIT_DEBUG_NODE(start);
 		BOOST_SPIRIT_DEBUG_NODE(section);
 		BOOST_SPIRIT_DEBUG_NODE(entry);
+		BOOST_SPIRIT_DEBUG_NODE(identifier);
+		BOOST_SPIRIT_DEBUG_NODE(string_literal);
 	}
 };
 
@@ -92,6 +95,28 @@ bool pack_file_description_parser::parse(const char*& first, const char* last,
 										 ast::pack_file_ast_root& ast_root) {
 	bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
 	return result;
+}
+ast::pack_file_ast_root pack_file_description_parser::load_file(const std::string& filename) {
+	ast::pack_file_ast_root ast_root;
+	std::ifstream stream(filename);
+	std::vector<char> buffer;
+	if(!stream.is_open()) { throw std::runtime_error("Couldn't open file '" + filename + "'."); }
+
+	stream.seekg(0, std::ios::end);
+	auto size_tmp = stream.tellg();
+	size_t size = size_tmp;
+	decltype(size_tmp) size_check = size;
+	if(size_check != size_tmp) throw std::runtime_error("File too big to fit in address space.");
+	stream.seekg(0, std::ios::beg);
+
+	buffer.resize(size);
+	stream.read(buffer.data(), size);
+
+	const char* start = buffer.data();
+	const char* end = buffer.data() + size;
+	bool r = parse(start, end, ast_root);
+	if(!r || start != end) { std::runtime_error("Parse error in file '" + filename + "'."); }
+	return ast_root;
 }
 
 } // namespace parser
