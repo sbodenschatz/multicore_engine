@@ -39,6 +39,7 @@ void pack_file_gen::update_content_offset(uint64_t new_content_offset) {
 	content_offset = new_content_offset;
 }
 void pack_file_gen::compile_meta_data() {
+	meta_data.elements.clear();
 	std::transform(entries.begin(), entries.end(), std::back_inserter(meta_data.elements),
 				   [](const auto& entry) { return entry.meta_data; });
 }
@@ -74,6 +75,8 @@ void pack_file_gen::write_pack_file(const std::string& output_file) {
 	if(!file_stream) throw std::runtime_error("Can't open '" + output_file + "' for writing.");
 	bstream::iostream_bstream stream(file_stream);
 	stream << meta_data;
+	auto test = file_stream.tellp();
+	static_cast<void>(test);
 	for(const auto& entry : entries) copy_file_content(file_stream, entry);
 }
 void pack_file_gen::add_file(const std::string& path, const std::string& name) {
@@ -88,7 +91,7 @@ void pack_file_gen::compile_pack_file(const std::string& output_file) {
 	compile_meta_data();
 	auto start_offset2 = calculate_meta_data_size();
 	if(start_offset != start_offset2)
-		std::logic_error("Meta data size mismatch after applying start_offset.");
+		throw std::logic_error("Meta data size mismatch after applying start_offset.");
 	write_pack_file(output_file);
 }
 
