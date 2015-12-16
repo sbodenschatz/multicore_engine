@@ -23,15 +23,16 @@ int main(int argc, char* argv[]) {
 	std::string metadata_output_file;
 	std::string deps_file;
 	po::options_description desc;
-	desc.add_options()																					  //
-			("help,h", "Display help message.")															  //
-			("description-file,d", po::value(&description_file), "The description file to use.")		  //
-			("payload-output,p", po::value(&payload_output_file),										  //
-			 "The output file name for the payload data.")												  //
-			("meta-output,m", po::value(&metadata_output_file),											  //
-			 "The output file name for the metadata.")													  //
-			/*("deps", po::value(&deps_file),														 //
-			 "Generate makefile-style dependency rules into given file")*/; //
+	desc.add_options()																			 //
+			("help,h", "Display help message.")													 //
+			("description-file,d", po::value(&description_file), "The description file to use.") //
+			("payload-output,p", po::value(&payload_output_file),								 //
+			 "The output file name for the payload data.")										 //
+			("meta-output,m", po::value(&metadata_output_file),									 //
+			 "The output file name for the metadata.")											 //
+			/*TODO:
+			 * ("deps", po::value(&deps_file),														 //
+			 "Generate makefile-style dependency rules into given file")*/;																			 //
 	po::variables_map vars;
 	po::store(po::parse_command_line(argc, argv, desc), vars);
 	po::notify(vars);
@@ -39,6 +40,10 @@ int main(int argc, char* argv[]) {
 		std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
 		std::cout << desc;
 		return -1;
+	}
+	if(!fs::exists(fs::path(description_file))) {
+		std::cerr << "Description file '" << description_file << "' does not exist." << std::endl;
+		return -3;
 	}
 	if(payload_output_file.empty()) {
 		payload_output_file = fs::path(description_file).replace_extension("lup").string();
