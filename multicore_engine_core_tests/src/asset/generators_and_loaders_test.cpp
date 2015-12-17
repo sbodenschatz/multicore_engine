@@ -28,7 +28,7 @@ struct asset_gen_and_load_test_fixture {
 		template <typename F>
 		test_file(const std::string& name, F f)
 				: name(name) {
-			std::fstream out(name, std::ios::binary | std::ios::trunc);
+			std::fstream out(name, std::ios::binary | std::ios::trunc | std::ios::in | std::ios::out);
 			BOOST_CHECK(out);
 			f(out);
 			BOOST_CHECK(out);
@@ -43,7 +43,7 @@ struct asset_gen_and_load_test_fixture {
 			fs::remove(name);
 		}
 		bool check(const std::string& filename) const {
-			std::ifstream in(filename, std::ios::binary);
+			std::ifstream in(filename, std::ios::binary | std::ios::in);
 			BOOST_CHECK(in);
 			in.seekg(0, std::ios::end);
 			auto size = in.tellg();
