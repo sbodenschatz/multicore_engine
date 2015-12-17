@@ -70,6 +70,7 @@ solution "multicore_engine_solution"
 		
 	configuration{"gmake","windows"}
 		buildoptions "-isystemC:/Libs/Boost/include -isystemC:/Libs/glm/include"
+		links {"ws2_32","mswsock"}
 	
 	configuration {"vs2015"}
 		targetsuffix "-vc-%{cfg.buildcfg}"
