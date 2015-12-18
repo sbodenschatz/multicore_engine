@@ -11,11 +11,11 @@
 namespace mce {
 namespace asset {
 file_asset_loader::file_asset_loader(const std::vector<path_prefix>& prefixes) : prefixes(prefixes) {
-	load_units.push_back("");
+	load_units.push_back(".");
 }
 
 file_asset_loader::file_asset_loader(std::vector<path_prefix>&& prefixes) : prefixes(std::move(prefixes)) {
-	load_units.push_back("");
+	load_units.push_back(".");
 }
 
 bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset, asset_manager&) {
