@@ -81,7 +81,7 @@ namespace asset {
 
 template <typename F>
 std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& name, F completion_handler) {
-	std::shared_ptr<const asset> result;
+	std::shared_ptr<asset> result;
 	{
 		// Acquire read lock
 		std::shared_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
