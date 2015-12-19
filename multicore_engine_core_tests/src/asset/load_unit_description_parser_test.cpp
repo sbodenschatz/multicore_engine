@@ -13,7 +13,7 @@ namespace mce {
 namespace asset_gen {
 namespace parser {
 
-BOOST_AUTO_TEST_SUITE(asset_gen)
+BOOST_AUTO_TEST_SUITE(assets)
 BOOST_AUTO_TEST_SUITE(load_unit_description_parser_test)
 
 BOOST_AUTO_TEST_CASE(empty_file_valid) {
