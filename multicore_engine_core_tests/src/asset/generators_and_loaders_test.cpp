@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_sync) {
 	gen.add_file(file_b->name, "file_b");
 	gen.add_file(file_c->name, "file_c");
 	gen.add_file(file_d->name, "file_d");
-	util::finally([]() {
+	auto f = util::finally([]() {
 		fs::remove("test.lum");
 		fs::remove("test.lup");
 	});
@@ -193,6 +193,43 @@ BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_sync) {
 	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
 	auto a4 = m.load_asset_sync("file_d");
 	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+}
+BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_async) {
+	mce::asset_gen::load_unit_gen gen;
+	gen.add_file(file_a->name, "file_a");
+	gen.add_file(file_b->name, "file_b");
+	gen.add_file(file_c->name, "file_c");
+	gen.add_file(file_d->name, "file_d");
+	auto f = util::finally([]() {
+		fs::remove("test.lum");
+		fs::remove("test.lup");
+	});
+	gen.compile_load_unit("test.lum", "test.lup");
+	asset_manager m;
+	auto loader = std::make_shared<load_unit_asset_loader>(
+			std::vector<path_prefix>({{std::make_unique<native_file_reader>(), "."}}));
+	m.add_asset_loader(loader);
+	m.start_pin_load_unit("test");
+	std::promise<bool> p1;
+	std::promise<bool> p2;
+	std::promise<bool> p3;
+	std::promise<bool> p4;
+	auto f1 = p1.get_future();
+	auto f2 = p2.get_future();
+	auto f3 = p3.get_future();
+	auto f4 = p4.get_future();
+	auto a1 = m.load_asset_async(
+			"file_a", [&p1, this](const auto& a) { p1.set_value(file_a->check(a->data(), a->size())); });
+	auto a2 = m.load_asset_async(
+			"file_b", [&p2, this](const auto& a) { p2.set_value(file_b->check(a->data(), a->size())); });
+	auto a3 = m.load_asset_async(
+			"file_c", [&p3, this](const auto& a) { p3.set_value(file_c->check(a->data(), a->size())); });
+	auto a4 = m.load_asset_async(
+			"file_d", [&p4, this](const auto& a) { p4.set_value(file_d->check(a->data(), a->size())); });
+	BOOST_CHECK(f1.get());
+	BOOST_CHECK(f2.get());
+	BOOST_CHECK(f3.get());
+	BOOST_CHECK(f4.get());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
