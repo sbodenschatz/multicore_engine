@@ -98,7 +98,7 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		} else {
 			auto tmp = std::make_shared<asset>(name);
 			loaded_assets[name] = tmp;
-			tmp->run_when_loaded(completion_handler);
+			tmp->run_when_loaded(std::move(completion_handler));
 			task_pool.post([tmp, this]() {
 				if(tmp->try_obtain_load_ownership()) {
 					try {
@@ -117,7 +117,7 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		}
 	}
 
-	if(result) result->run_when_loaded(completion_handler);
+	if(result) result->run_when_loaded(std::move(completion_handler));
 	return result;
 }
 
