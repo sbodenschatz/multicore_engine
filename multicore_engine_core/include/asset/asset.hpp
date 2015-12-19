@@ -51,7 +51,7 @@ public:
 			lock.unlock();
 			handler(this->shared_from_this());
 		} else {
-			completion_handlers.emplace_back(handler);
+			completion_handlers.emplace_back(std::move(handler));
 		}
 	}
 
