@@ -6,7 +6,11 @@
 
 #include <asset/file_asset_loader.hpp>
 #include <asset/native_file_reader.hpp>
+#include <asset/asset_manager.hpp>
+#include <asset/load_unit_asset_loader.hpp>
+#include <asset_gen/load_unit_gen.hpp>
 #include <boost/test/unit_test.hpp>
+#include <util/finally.hpp>
 #include <string>
 #include <fstream>
 #include <boost/filesystem.hpp>
@@ -109,13 +113,13 @@ BOOST_AUTO_TEST_CASE(load_files_sync) {
 	auto loader = std::make_shared<file_asset_loader>(
 			std::vector<path_prefix>({{std::make_unique<native_file_reader>(), "."}}));
 	m.add_asset_loader(loader);
-	auto a1 = m.load_asset_sync("bin_sequence.test");
+	auto a1 = m.load_asset_sync(file_a->name);
 	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
-	auto a2 = m.load_asset_sync("txt_sequence.test");
+	auto a2 = m.load_asset_sync(file_b->name);
 	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
-	auto a3 = m.load_asset_sync("strings.test");
+	auto a3 = m.load_asset_sync(file_c->name);
 	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
-	auto a4 = m.load_asset_sync("pseudorandom.test");
+	auto a4 = m.load_asset_sync(file_d->name);
 	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
 }
 
@@ -124,10 +128,10 @@ BOOST_AUTO_TEST_CASE(load_files_future) {
 	auto loader = std::make_shared<file_asset_loader>(
 			std::vector<path_prefix>({{std::make_unique<native_file_reader>(), "."}}));
 	m.add_asset_loader(loader);
-	auto f1 = m.load_asset_future("bin_sequence.test");
-	auto f2 = m.load_asset_future("txt_sequence.test");
-	auto f3 = m.load_asset_future("strings.test");
-	auto f4 = m.load_asset_future("pseudorandom.test");
+	auto f1 = m.load_asset_future(file_a->name);
+	auto f2 = m.load_asset_future(file_b->name);
+	auto f3 = m.load_asset_future(file_c->name);
+	auto f4 = m.load_asset_future(file_d->name);
 	auto a1 = f1.get();
 	auto a2 = f2.get();
 	auto a3 = f3.get();
@@ -151,26 +155,44 @@ BOOST_AUTO_TEST_CASE(load_files_async) {
 	auto f2 = p2.get_future();
 	auto f3 = p3.get_future();
 	auto f4 = p4.get_future();
-	auto a1 = m.load_asset_async("bin_sequence.test", [&p1, this](const auto& a) {
-		p1.set_value(file_a->check(a->data(), a->size()));
-	});
-	auto a2 = m.load_asset_async("txt_sequence.test", [&p2, this](const auto& a) {
-		p2.set_value(file_b->check(a->data(), a->size()));
-	});
-	auto a3 = m.load_asset_async("strings.test", [&p3, this](const auto& a) {
-		p3.set_value(file_c->check(a->data(), a->size()));
-	});
-	auto a4 = m.load_asset_async("pseudorandom.test", [&p4, this](const auto& a) {
-		p4.set_value(file_d->check(a->data(), a->size()));
-	});
+	auto a1 = m.load_asset_async(
+			file_a->name, [&p1, this](const auto& a) { p1.set_value(file_a->check(a->data(), a->size())); });
+	auto a2 = m.load_asset_async(
+			file_b->name, [&p2, this](const auto& a) { p2.set_value(file_b->check(a->data(), a->size())); });
+	auto a3 = m.load_asset_async(
+			file_c->name, [&p3, this](const auto& a) { p3.set_value(file_c->check(a->data(), a->size())); });
+	auto a4 = m.load_asset_async(
+			file_d->name, [&p4, this](const auto& a) { p4.set_value(file_d->check(a->data(), a->size())); });
 	BOOST_CHECK(f1.get());
 	BOOST_CHECK(f2.get());
 	BOOST_CHECK(f3.get());
 	BOOST_CHECK(f4.get());
 }
 
-BOOST_AUTO_TEST_CASE(gen_and_load_load_unit) {
-	BOOST_CHECK(true);
+BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_sync) {
+	mce::asset_gen::load_unit_gen gen;
+	gen.add_file(file_a->name, "file_a");
+	gen.add_file(file_b->name, "file_b");
+	gen.add_file(file_c->name, "file_c");
+	gen.add_file(file_d->name, "file_d");
+	util::finally([]() {
+		fs::remove("test.lum");
+		fs::remove("test.lup");
+	});
+	gen.compile_load_unit("test.lum", "test.lup");
+	asset_manager m;
+	auto loader = std::make_shared<load_unit_asset_loader>(
+			std::vector<path_prefix>({{std::make_unique<native_file_reader>(), "."}}));
+	m.add_asset_loader(loader);
+	m.start_pin_load_unit("test");
+	auto a1 = m.load_asset_sync("file_a");
+	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
+	auto a2 = m.load_asset_sync("file_b");
+	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
+	auto a3 = m.load_asset_sync("file_c");
+	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
+	auto a4 = m.load_asset_sync("file_d");
+	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
