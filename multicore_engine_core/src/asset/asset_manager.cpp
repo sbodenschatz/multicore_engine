@@ -16,9 +16,11 @@ namespace asset {
 
 asset_manager::asset_manager() {
 	work = std::make_unique<boost::asio::io_service::work>(task_pool);
-	unsigned int worker_thread_count = 2 * std::min(std::thread::hardware_concurrency(), 1u);
+	unsigned int worker_thread_count = 2 * std::max(std::thread::hardware_concurrency(), 1u);
 	for(unsigned int i = 0; i < worker_thread_count; ++i) {
-		workers.emplace_back([this]() { task_pool.run(); });
+		workers.emplace_back([this]() {
+			task_pool.run(); // Enter thread pool
+		});
 	}
 }
 asset_manager::~asset_manager() {
@@ -41,7 +43,7 @@ std::shared_ptr<const asset> asset_manager::call_loaders_sync(const std::shared_
 		try {
 			auto local_asset_loaders = asset_loaders.get();
 			for(auto& loader : *local_asset_loaders) {
-				if(loader->start_load_asset(asset_to_load, *this)) {
+				if(loader->start_load_asset(asset_to_load, *this, true)) {
 					asset_to_load->internal_wait_for_complete();
 					return asset_to_load;
 				}

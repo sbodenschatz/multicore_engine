@@ -18,7 +18,7 @@ file_asset_loader::file_asset_loader(std::vector<path_prefix>&& prefixes) : pref
 	load_units.push_back(".");
 }
 
-bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset, asset_manager&) {
+bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset, asset_manager&, bool) {
 	std::shared_lock<std::shared_timed_mutex> lock(load_units_rw_lock);
 	std::string file_path;
 	file_path.reserve(128);

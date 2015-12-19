@@ -31,12 +31,16 @@ void load_unit_asset_loader::start_payload_loading(const std::shared_ptr<load_un
 												   asset_manager& asset_manager) const {
 	launch_async_task(asset_manager, [load_unit, this]() {
 		if(load_unit->try_obtain_data_load_ownership()) {
-			file_content_ptr content;
-			file_size size;
-			std::tie(content, size) = load_file_from_prefixes(load_unit->name() + ".lup");
-			if(content) {
-				load_unit->complete_loading(content, size);
-			} else {
+			try {
+				file_content_ptr content;
+				file_size size;
+				std::tie(content, size) = load_file_from_prefixes(load_unit->name() + ".lup");
+				if(content) {
+					load_unit->complete_loading(content, size);
+				} else {
+					load_unit->raise_error_flag();
+				}
+			} catch(...) {
 				load_unit->raise_error_flag();
 			}
 		}
@@ -69,7 +73,7 @@ void load_unit_asset_loader::prepare_load_unit_meta_data(const std::shared_ptr<l
 }
 
 bool load_unit_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset,
-											  asset_manager& asset_manager) {
+											  asset_manager& asset_manager, bool sync_hint) {
 	auto local_load_units = load_unit_scratch.get();
 	{
 		std::shared_lock<std::shared_timed_mutex> lock(load_units_rw_lock);
@@ -90,6 +94,24 @@ bool load_unit_asset_loader::start_load_asset(const std::shared_ptr<asset>& asse
 						raise_error_flag(asset);
 					}
 				});
+				if(sync_hint) {
+					if(!load_unit->ready()) {
+						if(load_unit->try_obtain_data_load_ownership()) {
+							try {
+								file_content_ptr content;
+								file_size size;
+								std::tie(content, size) = load_file_from_prefixes(load_unit->name() + ".lup");
+								if(content) {
+									load_unit->complete_loading(content, size);
+								} else {
+									load_unit->raise_error_flag();
+								}
+							} catch(...) {
+								load_unit->raise_error_flag();
+							}
+						}
+					}
+				}
 				return true;
 			}
 		} catch(...) {
@@ -126,7 +148,6 @@ std::shared_ptr<load_unit> load_unit_asset_loader::start_pin_load_unit_helper(co
 				}
 			} catch(...) {
 				load_unit_ptr->raise_error_flag();
-				throw;
 			}
 		}
 	});

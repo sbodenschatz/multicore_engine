@@ -106,7 +106,7 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 					try {
 						auto local_asset_loaders = asset_loaders.get();
 						for(auto& loader : *local_asset_loaders) {
-							if(loader->start_load_asset(tmp, *this)) return;
+							if(loader->start_load_asset(tmp, *this, false)) return;
 						}
 					} catch(...) {
 						tmp->raise_error_flag();

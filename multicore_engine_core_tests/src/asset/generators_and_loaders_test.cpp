@@ -194,6 +194,35 @@ BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_sync) {
 	auto a4 = m.load_asset_sync("file_d");
 	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
 }
+BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_future) {
+	mce::asset_gen::load_unit_gen gen;
+	gen.add_file(file_a->name, "file_a");
+	gen.add_file(file_b->name, "file_b");
+	gen.add_file(file_c->name, "file_c");
+	gen.add_file(file_d->name, "file_d");
+	auto f = util::finally([]() {
+		fs::remove("test.lum");
+		fs::remove("test.lup");
+	});
+	gen.compile_load_unit("test.lum", "test.lup");
+	asset_manager m;
+	auto loader = std::make_shared<load_unit_asset_loader>(
+			std::vector<path_prefix>({{std::make_unique<native_file_reader>(), "."}}));
+	m.add_asset_loader(loader);
+	m.start_pin_load_unit("test");
+	auto f1 = m.load_asset_future("file_a");
+	auto f2 = m.load_asset_future("file_b");
+	auto f3 = m.load_asset_future("file_c");
+	auto f4 = m.load_asset_future("file_d");
+	auto a1 = f1.get();
+	auto a2 = f2.get();
+	auto a3 = f3.get();
+	auto a4 = f4.get();
+	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
+	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
+	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
+	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+}
 BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_async) {
 	mce::asset_gen::load_unit_gen gen;
 	gen.add_file(file_a->name, "file_a");

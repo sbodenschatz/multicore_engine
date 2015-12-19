@@ -36,7 +36,8 @@ class load_unit_asset_loader : public asset_loader {
 public:
 	explicit load_unit_asset_loader(const std::vector<path_prefix>& prefixes);
 	explicit load_unit_asset_loader(std::vector<path_prefix>&& prefixes);
-	virtual bool start_load_asset(const std::shared_ptr<asset>& asset, asset_manager& asset_manager) override;
+	virtual bool start_load_asset(const std::shared_ptr<asset>& asset, asset_manager& asset_manager,
+								  bool sync_hint) override;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager) override;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager,
 									 const simple_completion_handler& completion_handler) override;
