@@ -6,7 +6,6 @@
 
 #include <asset/pack_file_reader.hpp>
 #include <fstream>
-#include <util/finally.hpp>
 #include <algorithm>
 #include <cassert>
 #include <util/unused.hpp>
