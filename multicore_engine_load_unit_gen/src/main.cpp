@@ -63,7 +63,9 @@ int main(int argc, char* argv[]) {
 		for(const auto& entry : section.entries) {
 			fs::path entry_path(entry.external_path);
 			auto entry_path_abs = entry_path;
-			if(entry_path.is_relative()) { entry_path_abs = fs::absolute(entry_path, desc_dir); }
+			if(entry_path.is_relative()) {
+				entry_path_abs = fs::absolute(entry_path, desc_dir);
+			}
 			if(!fs::exists(entry_path_abs)) {
 				std::cerr << "File '" << entry_path << "' not found." << std::endl;
 				incomplete = true;

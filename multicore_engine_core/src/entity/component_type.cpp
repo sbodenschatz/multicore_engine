@@ -5,4 +5,3 @@
  */
 
 #include <entity/component_type.hpp>
-

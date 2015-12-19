@@ -86,7 +86,9 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		// Acquire read lock
 		std::shared_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
 		auto it = loaded_assets.find(name);
-		if(it != loaded_assets.end()) { result = it->second; }
+		if(it != loaded_assets.end()) {
+			result = it->second;
+		}
 	}
 	if(!result) {
 		// Acquire write lock

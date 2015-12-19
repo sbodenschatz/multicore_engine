@@ -100,7 +100,9 @@ ast::pack_file_ast_root pack_file_description_parser::load_file(const std::strin
 	ast::pack_file_ast_root ast_root;
 	std::ifstream stream(filename);
 	std::vector<char> buffer;
-	if(!stream.is_open()) { throw std::runtime_error("Couldn't open file '" + filename + "'."); }
+	if(!stream.is_open()) {
+		throw std::runtime_error("Couldn't open file '" + filename + "'.");
+	}
 
 	stream.seekg(0, std::ios::end);
 	auto size_tmp = stream.tellg();
@@ -115,7 +117,9 @@ ast::pack_file_ast_root pack_file_description_parser::load_file(const std::strin
 	const char* start = buffer.data();
 	const char* end = buffer.data() + size;
 	bool r = parse(start, end, ast_root);
-	if(!r || start != end) { std::runtime_error("Parse error in file '" + filename + "'."); }
+	if(!r || start != end) {
+		std::runtime_error("Parse error in file '" + filename + "'.");
+	}
 	return ast_root;
 }
 

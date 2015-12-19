@@ -11,7 +11,9 @@ namespace bstream {
 
 size_t vector_iobstream::read_bytes(char* buffer, size_t count) noexcept {
 	size_t i = 0;
-	for(; i < count && read_position < data.size(); ++i, ++read_position) { buffer[i] = data[read_position]; }
+	for(; i < count && read_position < data.size(); ++i, ++read_position) {
+		buffer[i] = data[read_position];
+	}
 	return i;
 }
 size_t vector_iobstream::size() const noexcept {
@@ -30,7 +32,9 @@ bool vector_iobstream::write_bytes(const char* buffer, size_t count) noexcept {
 		data[write_position] = buffer[i];
 	}
 	try {
-		for(; i < count; ++i, ++write_position) { data.push_back(buffer[i]); }
+		for(; i < count; ++i, ++write_position) {
+			data.push_back(buffer[i]);
+		}
 		return true;
 	} catch(...) {
 		write_position = old_write_position;

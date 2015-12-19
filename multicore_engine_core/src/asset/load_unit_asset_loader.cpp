@@ -21,7 +21,9 @@ std::pair<file_content_ptr, file_size>
 load_unit_asset_loader::load_file_from_prefixes(const std::string& name) const {
 	for(const auto& prefix : prefixes) {
 		auto file = prefix.reader->read_file(prefix.prefix, name);
-		if(file.first) { return file; }
+		if(file.first) {
+			return file;
+		}
 	}
 	return std::make_pair(file_content_ptr(), file_size(0));
 }
@@ -90,7 +92,8 @@ bool load_unit_asset_loader::start_load_asset(const std::shared_ptr<asset>& asse
 				});
 				return true;
 			}
-		} catch(...) {}
+		} catch(...) {
+		}
 	}
 	return false;
 }

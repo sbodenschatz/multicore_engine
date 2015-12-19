@@ -21,7 +21,9 @@ void asset::complete_loading(const std::shared_ptr<const char>& loaded_data, siz
 	lock.unlock();
 	// From here on the asset object is immutable and can therefore be read without holding a lock
 	completed_cv.notify_all();
-	for(auto& handler : completion_handlers) { handler(this_shared); }
+	for(auto& handler : completion_handlers) {
+		handler(this_shared);
+	}
 	completion_handlers.clear();
 	completion_handlers.shrink_to_fit();
 }

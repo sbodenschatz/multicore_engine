@@ -29,15 +29,23 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_pop_spin_lock) {
 	actual.reserve(thread_count * elements_per_thread);
 	expected.reserve(thread_count * elements_per_thread);
 	for(int i = 0; i < thread_count; i++) {
-		for(int j = 0; j < elements_per_thread; ++j) { expected.emplace(i, j); }
+		for(int j = 0; j < elements_per_thread; ++j) {
+			expected.emplace(i, j);
+		}
 	}
 	for(int i = 0; i < thread_count; i++) {
 		threads.emplace_back([&, i]() {
-			for(int j = 0; j < elements_per_thread; ++j) { queue.push(std::make_pair(i, j)); }
+			for(int j = 0; j < elements_per_thread; ++j) {
+				queue.push(std::make_pair(i, j));
+			}
 		});
 	}
-	for(int i = 0; i < thread_count * elements_per_thread; ++i) { actual.emplace(queue.pop()); }
-	for(auto& thread : threads) { thread.join(); }
+	for(int i = 0; i < thread_count * elements_per_thread; ++i) {
+		actual.emplace(queue.pop());
+	}
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(queue.empty());
 	BOOST_CHECK(actual == expected);
 }
@@ -52,15 +60,23 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_pop_mutex) {
 	actual.reserve(thread_count * elements_per_thread);
 	expected.reserve(thread_count * elements_per_thread);
 	for(int i = 0; i < thread_count; i++) {
-		for(int j = 0; j < elements_per_thread; ++j) { expected.emplace(i, j); }
+		for(int j = 0; j < elements_per_thread; ++j) {
+			expected.emplace(i, j);
+		}
 	}
 	for(int i = 0; i < thread_count; i++) {
 		threads.emplace_back([&, i]() {
-			for(int j = 0; j < elements_per_thread; ++j) { queue.push(std::make_pair(i, j)); }
+			for(int j = 0; j < elements_per_thread; ++j) {
+				queue.push(std::make_pair(i, j));
+			}
 		});
 	}
-	for(int i = 0; i < thread_count * elements_per_thread; ++i) { actual.emplace(queue.pop()); }
-	for(auto& thread : threads) { thread.join(); }
+	for(int i = 0; i < thread_count * elements_per_thread; ++i) {
+		actual.emplace(queue.pop());
+	}
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(queue.empty());
 	BOOST_CHECK(actual == expected);
 }
@@ -75,11 +91,15 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_try_pop_spin_lock) {
 	actual.reserve(thread_count * elements_per_thread);
 	expected.reserve(thread_count * elements_per_thread);
 	for(int i = 0; i < thread_count; i++) {
-		for(int j = 0; j < elements_per_thread; ++j) { expected.emplace(i, j); }
+		for(int j = 0; j < elements_per_thread; ++j) {
+			expected.emplace(i, j);
+		}
 	}
 	for(int i = 0; i < thread_count; i++) {
 		threads.emplace_back([&, i]() {
-			for(int j = 0; j < elements_per_thread; ++j) { queue.push(std::make_pair(i, j)); }
+			for(int j = 0; j < elements_per_thread; ++j) {
+				queue.push(std::make_pair(i, j));
+			}
 		});
 	}
 	for(int i = 0; i < thread_count * elements_per_thread;) {
@@ -89,7 +109,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_try_pop_spin_lock) {
 			++i;
 		}
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(queue.empty());
 	BOOST_CHECK(actual == expected);
 }
@@ -104,11 +126,15 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_try_pop_mutex) {
 	actual.reserve(thread_count * elements_per_thread);
 	expected.reserve(thread_count * elements_per_thread);
 	for(int i = 0; i < thread_count; i++) {
-		for(int j = 0; j < elements_per_thread; ++j) { expected.emplace(i, j); }
+		for(int j = 0; j < elements_per_thread; ++j) {
+			expected.emplace(i, j);
+		}
 	}
 	for(int i = 0; i < thread_count; i++) {
 		threads.emplace_back([&, i]() {
-			for(int j = 0; j < elements_per_thread; ++j) { queue.push(std::make_pair(i, j)); }
+			for(int j = 0; j < elements_per_thread; ++j) {
+				queue.push(std::make_pair(i, j));
+			}
 		});
 	}
 	for(int i = 0; i < thread_count * elements_per_thread;) {
@@ -118,7 +144,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_try_pop_mutex) {
 			++i;
 		}
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(queue.empty());
 	BOOST_CHECK(actual == expected);
 }

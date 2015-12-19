@@ -23,7 +23,9 @@ asset_manager::asset_manager() {
 }
 asset_manager::~asset_manager() {
 	work.reset();
-	for(auto& worker : workers) { worker.join(); }
+	for(auto& worker : workers) {
+		worker.join();
+	}
 }
 
 void asset_manager::start_clean() {
@@ -93,7 +95,8 @@ void asset_manager::future_load_task::operator()() {
 	} catch(...) {
 		try {
 			promise->set_exception(std::current_exception());
-		} catch(...) {}
+		} catch(...) {
+		}
 	}
 }
 boost::unique_future<std::shared_ptr<const asset>> asset_manager::load_asset_future(const std::string& name) {
@@ -112,16 +115,22 @@ boost::unique_future<std::shared_ptr<const asset>> asset_manager::load_asset_fut
 }
 void asset_manager::start_pin_load_unit(const std::string& name) {
 	auto local_asset_loaders = asset_loaders.get();
-	for(auto& loader : *local_asset_loaders) { loader->start_pin_load_unit(name, *this); }
+	for(auto& loader : *local_asset_loaders) {
+		loader->start_pin_load_unit(name, *this);
+	}
 }
 void asset_manager::start_pin_load_unit(const std::string& name,
 										const simple_completion_handler& completion_handler) {
 	auto local_asset_loaders = asset_loaders.get();
-	for(auto& loader : *local_asset_loaders) { loader->start_pin_load_unit(name, *this, completion_handler); }
+	for(auto& loader : *local_asset_loaders) {
+		loader->start_pin_load_unit(name, *this, completion_handler);
+	}
 }
 void asset_manager::start_unpin_load_unit(const std::string& name) {
 	auto local_asset_loaders = asset_loaders.get();
-	for(auto& loader : *local_asset_loaders) { loader->start_unpin_load_unit(name, *this); }
+	for(auto& loader : *local_asset_loaders) {
+		loader->start_unpin_load_unit(name, *this);
+	}
 }
 
 void asset_manager::add_asset_loader(std::shared_ptr<asset_loader>&& loader) {
