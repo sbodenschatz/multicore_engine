@@ -101,7 +101,7 @@ struct asset_gen_and_load_test_fixture {
 	~asset_gen_and_load_test_fixture() {}
 };
 
-BOOST_AUTO_TEST_SUITE(asset_tests)
+BOOST_AUTO_TEST_SUITE(assets)
 BOOST_FIXTURE_TEST_SUITE(generators_and_loaders, asset_gen_and_load_test_fixture)
 
 BOOST_AUTO_TEST_CASE(load_files_sync) {
