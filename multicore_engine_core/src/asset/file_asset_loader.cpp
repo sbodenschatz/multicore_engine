@@ -28,6 +28,9 @@ bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset, as
 				file_path = load_unit;
 				file_path += '/';
 			}
+			else {
+				file_path = "";
+			}
 			file_path += asset->name();
 			file_content_ptr file_content;
 			file_size file_size = 0u;
