@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <thread>
 #include <future>
+#include <iostream>
 
 namespace fs = boost::filesystem;
 
@@ -449,6 +450,53 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_async) {
 	BOOST_CHECK(f2.get());
 	BOOST_CHECK(f3.get());
 	BOOST_CHECK(f4.get());
+}
+
+BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_async_mt) {
+	mce::asset_gen::load_unit_gen gen;
+	gen.add_file(file_a->name, "file_a");
+	gen.add_file(file_b->name, "file_b");
+	gen.add_file(file_c->name, "file_c");
+	gen.add_file(file_d->name, "file_d");
+	auto f = util::finally([]() {
+		fs::remove("test.lum");
+		fs::remove("test.lup");
+		fs::remove("test.pack");
+	});
+	gen.compile_load_unit("test.lum", "test.lup");
+	mce::asset_gen::pack_file_gen gen2;
+	gen2.add_file("test.lum", "test_lu.lum");
+	gen2.add_file("test.lup", "test_lu.lup");
+	gen2.compile_pack_file("test.pack");
+
+	asset_manager m;
+	auto loader = std::make_shared<load_unit_asset_loader>(
+			std::vector<path_prefix>({{std::make_unique<pack_file_reader>(), "test.pack"}}));
+	m.add_asset_loader(loader);
+	m.start_pin_load_unit("test_lu");
+	const int thread_count = 32;
+	std::vector<std::future<bool>> futures;
+	test_file* files[] = {file_a.get(), file_b.get(), file_c.get(), file_d.get()};
+	std::string file_names[] = {"file_a", "file_b", "file_c", "file_d"};
+	for(int i = 0; i < thread_count; ++i) {
+		futures.emplace_back(std::async([&m, &files, &file_names]() {
+			const int loads = 8;
+			std::promise<bool> promises[loads];
+			std::shared_ptr<const asset> assets[loads];
+			for(int j = 0; j < loads; ++j) {
+				assets[j] = m.load_asset_async(file_names[j % 4], [j, &files, &promises](const auto& a) {
+					promises[j].set_value(files[j % 4]->check(a->data(), a->size()));
+				});
+			}
+			return std::all_of(std::begin(promises), std::end(promises),
+							   [](auto& p) { return p.get_future().get(); });
+		}));
+	}
+	std::cout << "test" << std::endl;
+	for(auto& future : futures) {
+		BOOST_CHECK(future.get());
+	}
+	std::cout << "test" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
