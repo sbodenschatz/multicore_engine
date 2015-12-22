@@ -57,6 +57,7 @@ struct pack_file_description_grammar
 	rule<ast::pack_file_entry()> entry;
 	rule<std::string()> string_literal;
 	rule<std::string()> identifier;
+	rule<bool> zip_modifier;
 
 	pack_file_description_grammar() : pack_file_description_grammar::base_type(start) {
 		using qi::_1;
@@ -71,11 +72,13 @@ struct pack_file_description_grammar
 		using qi::no_case;
 		using spirit::long_long;
 		using spirit::float_;
+		using qi::eps;
 
 		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
 		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
 		entry %= string_literal >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
-		section %= identifier >> lit('{') >> *(entry) >> lit('}');
+		zip_modifier = (lit("zip")[_val = true]) | (eps[_val = false]);
+		section %= identifier >> zip_modifier >> lit('{') >> *(entry) >> lit('}');
 		start %= *(section);
 
 		BOOST_SPIRIT_DEBUG_NODE(start);
@@ -83,6 +86,7 @@ struct pack_file_description_grammar
 		BOOST_SPIRIT_DEBUG_NODE(entry);
 		BOOST_SPIRIT_DEBUG_NODE(identifier);
 		BOOST_SPIRIT_DEBUG_NODE(string_literal);
+		BOOST_SPIRIT_DEBUG_NODE(zip_modifier);
 	}
 };
 

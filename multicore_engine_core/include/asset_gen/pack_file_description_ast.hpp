@@ -22,6 +22,7 @@ struct pack_file_entry {
 
 struct pack_file_section {
 	std::string name;
+	bool zip;
 	std::vector<pack_file_entry> entries;
 };
 
