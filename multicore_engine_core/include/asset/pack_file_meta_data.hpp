@@ -27,8 +27,10 @@ struct pack_file_element_meta_data {
 };
 
 struct pack_file_meta_data {
+	static constexpr uint8_t current_version[3] = {0, 1, 0};
+	static constexpr uint64_t magic_number = 0x4d43455053422015ULL; /*MCEPSB2015*/
 	std::vector<pack_file_element_meta_data> elements;
-	static const uint64_t magic_number = 0x4d43455053422015ULL; /*MCEPSB2015*/
+	uint8_t version[3] = {current_version[0], current_version[1], current_version[2]};
 	friend bstream::ibstream& operator>>(bstream::ibstream& ibs, pack_file_meta_data& value);
 	friend bstream::obstream& operator<<(bstream::obstream& obs, const pack_file_meta_data& value);
 };

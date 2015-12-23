@@ -13,8 +13,6 @@
 namespace mce {
 namespace asset {
 
-const uint64_t pack_file_meta_data::magic_number;
-
 util::lock_ptr_wrapper<pack_file_reader::pack_file_source>
 pack_file_reader::get_source_stream(const std::string& prefix) {
 	{
