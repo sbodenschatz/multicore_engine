@@ -21,7 +21,7 @@ class pack_file_gen {
 		asset::pack_file_element_meta_data meta_data;
 		asset::pack_file_element_meta_data orig_meta_data;
 		pack_file_entry(const std::string& path, const std::string& name, uint64_t offset, uint64_t size)
-				: path{path}, meta_data{offset, size, name}, orig_meta_data{offset, size, name} {}
+				: path{path}, meta_data{offset, size, 0ull, name}, orig_meta_data{offset, size, 0ull, name} {}
 	};
 	std::vector<pack_file_entry> entries;
 	uint64_t next_pos = 0;

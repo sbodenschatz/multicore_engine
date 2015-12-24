@@ -17,12 +17,14 @@ constexpr uint8_t pack_file_meta_data::current_version[3];
 bstream::ibstream& operator>>(bstream::ibstream& ibs, pack_file_element_meta_data& value) {
 	ibs >> value.offset;
 	ibs >> value.size;
+	ibs >> value.compressed_size;
 	ibs >> value.name;
 	return ibs;
 }
 bstream::obstream& operator<<(bstream::obstream& obs, const pack_file_element_meta_data& value) {
 	obs << value.offset;
 	obs << value.size;
+	obs << value.compressed_size;
 	obs << value.name;
 	return obs;
 }

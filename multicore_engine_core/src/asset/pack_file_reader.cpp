@@ -45,7 +45,7 @@ std::pair<file_content_ptr, file_size> pack_file_reader::read_file(const std::st
 							[&](const pack_file_element_meta_data& elem) { return elem.name == file; });
 	if(pos == source->metadata.elements.end()) {
 		return std::make_pair(file_content_ptr(), 0ull);
-	} else {
+	} else if(pos->compressed_size == 0) {
 		std::shared_ptr<char> content =
 				std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });
 		source->stream.seekg(pos->offset, std::ios::beg);
@@ -54,6 +54,8 @@ std::pair<file_content_ptr, file_size> pack_file_reader::read_file(const std::st
 			return std::make_pair(file_content_ptr(), 0ull);
 		else
 			return std::make_pair(content, pos->size);
+	} else {
+		throw std::runtime_error("Loading compressed assets is not yet implemented.");
 	}
 }
 
