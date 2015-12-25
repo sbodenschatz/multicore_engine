@@ -70,13 +70,13 @@ solution "multicore_engine_solution"
 		end
 		
 	configuration{"gmake","windows"}
-		buildoptions "-isystemC:/Libs/Boost/include -isystemC:/Libs/glm/include -isystemC:\Libs\zlib\include"
+		buildoptions "-isystemC:/Libs/Boost/include -isystemC:/Libs/glm/include -isystemC:/Libs/zlib/include"
 		links {"ws2_32","mswsock","zstatic"}
 	
 	configuration {"vs2015"}
 		targetsuffix "-vc-%{cfg.buildcfg}"
 		defines{"GLM_FORCE_CXX11"}
-		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include","C:\Libs\zlib\include"}
+		includedirs{"C:/Libs/Boost/include","C:/Libs/glm/include","C:/Libs/zlib/include"}
 		architecture "x64"
 		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild","MultiProcessorCompile"}
 		targetdir "%{prj.location}/bin"
