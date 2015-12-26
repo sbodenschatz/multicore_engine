@@ -1,6 +1,6 @@
 solution "multicore_engine_solution"
 	configurations{"debug", "release"}
-	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH"}
+	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH","ZLIB_CONST"}
 	includedirs{"multicore_engine_core/include","multicore_engine_parsers/include"}
 	vectorextensions "SSE2"
 	startproject "multicore_engine_demo"

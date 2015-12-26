@@ -8,6 +8,9 @@
 #include <zlib.h>
 #include <util/unused.hpp>
 
+// TODO Cite in sources
+// Based on http://www.zlib.net/zlib_how.html
+
 namespace mce {
 namespace util {
 
