@@ -36,7 +36,7 @@ enum class flush_mode {
 
 enum class return_code {
 	ok = Z_OK,
-	end = Z_STREAM_END,
+	stream_end = Z_STREAM_END,
 	need_dict = Z_NEED_DICT,
 	error_no = Z_ERRNO,
 	error_stream = Z_STREAM_ERROR,
@@ -46,7 +46,7 @@ enum class return_code {
 	error_version = Z_VERSION_ERROR
 };
 
-void zlib_check_error(return_code rc) {
+inline void zlib_check_error(return_code rc) {
 	if(rc == return_code::error_no)
 		throw std::runtime_error("ZLIB error number " + std::to_string(errno) + ".");
 	if(rc == return_code::error_data) throw std::runtime_error("ZLIB data error.");
@@ -57,7 +57,9 @@ void zlib_check_error(return_code rc) {
 
 class zlib_deflate_stream {
 	z_stream stream;
-	zlib_deflate_stream(int level) {
+
+public:
+	zlib_deflate_stream(int level = -1) {
 		stream.zalloc = Z_NULL;
 		stream.zfree = Z_NULL;
 		stream.opaque = Z_NULL;
@@ -79,7 +81,7 @@ class zlib_deflate_stream {
 		stream.next_in = buffer;
 		stream.avail_in = uInt(size);
 	}
-	void provide_out(unsigned char* buffer, size_t size) {
+	void provide_output(unsigned char* buffer, size_t size) {
 		if(size > std::numeric_limits<unsigned int>::max()) {
 			throw std::runtime_error("Buffer too big for ZLIB.");
 		}
@@ -96,10 +98,14 @@ class zlib_deflate_stream {
 
 class zlib_inflate_stream {
 	z_stream stream;
+
+public:
 	zlib_inflate_stream() {
 		stream.zalloc = Z_NULL;
 		stream.zfree = Z_NULL;
 		stream.opaque = Z_NULL;
+		stream.avail_in = 0;
+		stream.next_in = Z_NULL;
 		return_code rc = static_cast<return_code>(inflateInit(&stream));
 		zlib_check_error(rc);
 	}
@@ -118,7 +124,7 @@ class zlib_inflate_stream {
 		stream.next_in = buffer;
 		stream.avail_in = uInt(size);
 	}
-	void provide_out(unsigned char* buffer, size_t size) {
+	void provide_output(unsigned char* buffer, size_t size) {
 		if(size > std::numeric_limits<unsigned int>::max()) {
 			throw std::runtime_error("Buffer too big for ZLIB.");
 		}

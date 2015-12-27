@@ -81,6 +81,11 @@ solution "multicore_engine_solution"
 		flags {"LinkTimeOptimization","NoIncrementalLink","NoMinimalRebuild","MultiProcessorCompile"}
 		targetdir "%{prj.location}/bin"
 		objdir "%{prj.location}/obj-vc-%{cfg.buildcfg}"
+		
+	configuration {"vs2015","debug"}
+		links {"zlibstaticd"}
+	configuration {"vs2015","release"}
+		links {"zlibstatic"}
 
 	configuration {"vs2015"}
 		libdirs {"C:/Libs/Boost/lib_x64_vc","C:/Libs/zlib/lib_x64_vc"}
