@@ -17,10 +17,12 @@ namespace mce {
 namespace util {
 
 std::vector<char> compress(const std::vector<char>& input, int level) {
-	return compress(input, level, std::vector<char>());
+	std::vector<char> ret;
+	compress(input, level, ret);
+	return ret;
 }
-std::vector<char> compress(const std::vector<char>& input, int level, std::vector<char>&& buffer) {
-	std::vector<char> ret = std::move(buffer);
+void compress(const std::vector<char>& input, int level, std::vector<char>& out_buffer) {
+	out_buffer.clear();
 	using namespace zlib_wrappers;
 	{
 		zlib_deflate_stream strm(level);
@@ -38,9 +40,9 @@ std::vector<char> compress(const std::vector<char>& input, int level, std::vecto
 				strm.provide_output(reinterpret_cast<unsigned char*>(output_chunk), output_chunk_size);
 				strm.deflate(flush);
 				size_t have = output_chunk_size - strm.output_available();
-				auto offset = ret.size();
-				ret.resize(offset + have);
-				std::memcpy(ret.data() + offset, output_chunk, have);
+				auto offset = out_buffer.size();
+				out_buffer.resize(offset + have);
+				std::memcpy(out_buffer.data() + offset, output_chunk, have);
 			} while(strm.output_available() == 0);
 
 			remaining_input -= input_chunk_size;
@@ -48,13 +50,14 @@ std::vector<char> compress(const std::vector<char>& input, int level, std::vecto
 			input_chunk_size = std::min(remaining_input, size_t(std::numeric_limits<unsigned int>::max()));
 		} while(flush != flush_mode::finish);
 	}
-	return ret;
 }
 std::vector<char> decompress(const std::vector<char>& input) {
-	return decompress(input, std::vector<char>());
+	std::vector<char> ret;
+	decompress(input, ret);
+	return ret;
 }
-std::vector<char> decompress(const std::vector<char>& input, std::vector<char>&& buffer) {
-	std::vector<char> ret = std::move(buffer);
+void decompress(const std::vector<char>& input, std::vector<char>& out_buffer) {
+	out_buffer.clear();
 	using namespace zlib_wrappers;
 	{
 		zlib_inflate_stream strm;
@@ -72,9 +75,9 @@ std::vector<char> decompress(const std::vector<char>& input, std::vector<char>&&
 				rc = strm.inflate(flush_mode::no);
 				if(rc == return_code::need_dict) zlib_check_error(return_code::error_data);
 				size_t have = output_chunk_size - strm.output_available();
-				auto offset = ret.size();
-				ret.resize(offset + have);
-				std::memcpy(ret.data() + offset, output_chunk, have);
+				auto offset = out_buffer.size();
+				out_buffer.resize(offset + have);
+				std::memcpy(out_buffer.data() + offset, output_chunk, have);
 			} while(strm.output_available() == 0);
 
 			remaining_input -= input_chunk_size;
@@ -82,7 +85,6 @@ std::vector<char> decompress(const std::vector<char>& input, std::vector<char>&&
 			input_chunk_size = std::min(remaining_input, size_t(std::numeric_limits<unsigned int>::max()));
 		} while(rc != return_code::stream_end);
 	}
-	return ret;
 }
 
 } // namespace util

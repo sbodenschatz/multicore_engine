@@ -18,9 +18,9 @@ namespace mce {
 namespace util {
 
 std::vector<char> compress(const std::vector<char>& input, int level = -1);
-std::vector<char> compress(const std::vector<char>& input, int level, std::vector<char>&& buffer);
+void compress(const std::vector<char>& input, int level, std::vector<char>& out_buffer);
 std::vector<char> decompress(const std::vector<char>& input);
-std::vector<char> decompress(const std::vector<char>& input, std::vector<char>&& buffer);
+void decompress(const std::vector<char>& input, std::vector<char>& out_buffer);
 
 namespace zlib_wrappers {
 
