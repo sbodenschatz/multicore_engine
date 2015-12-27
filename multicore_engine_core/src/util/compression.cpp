@@ -28,7 +28,7 @@ std::vector<char> compress(const std::vector<char>& input, int level, std::vecto
 		size_t input_chunk_size = std::min(remaining_input, size_t(std::numeric_limits<unsigned int>::max()));
 		const unsigned char* input_chunk_ptr = reinterpret_cast<const unsigned char*>(input.data());
 		constexpr size_t output_chunk_size = 0x40000;
-		flush_mode flush = remaining_input ? flush_mode::no : flush_mode::finish;
+		flush_mode flush = flush_mode::no;
 		do {
 			char output_chunk[output_chunk_size];
 			flush = remaining_input < size_t(std::numeric_limits<unsigned int>::max()) ? flush_mode::finish
