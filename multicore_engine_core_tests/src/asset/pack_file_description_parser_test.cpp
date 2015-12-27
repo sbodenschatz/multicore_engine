@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(single_empty_section) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
-	ast::pack_file_section sec1{"test", false, {}};
+	ast::pack_file_section sec1{"test", -2, {}};
 	root_expected.emplace_back(sec1);
 	BOOST_CHECK(root == root_expected);
 }
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(single_comment_in_section) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
-	ast::pack_file_section sec1{"test", false, {}};
+	ast::pack_file_section sec1{"test", -2, {}};
 	root_expected.emplace_back(sec1);
 	BOOST_CHECK(root == root_expected);
 }
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(single_section_single_entry) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
-	ast::pack_file_section sec1{"test", false, {{"test1", "test2"}}};
+	ast::pack_file_section sec1{"test", -2, {{"test1", "test2"}}};
 	root_expected.emplace_back(sec1);
 	BOOST_CHECK(root == root_expected);
 }
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(single_section_multi_entry) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
-	ast::pack_file_section sec1{"test", false, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}};
+	ast::pack_file_section sec1{"test", -2, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}};
 	root_expected.emplace_back(sec1);
 	BOOST_CHECK(root == root_expected);
 }
@@ -106,8 +106,8 @@ BOOST_AUTO_TEST_CASE(multi_section_single_entry) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
-	root_expected.emplace_back(ast::pack_file_section{"testA", false, {{"test1", "test2"}}});
-	root_expected.emplace_back(ast::pack_file_section{"testB", false, {{"test1", "test2"}}});
+	root_expected.emplace_back(ast::pack_file_section{"testA", -2, {{"test1", "test2"}}});
+	root_expected.emplace_back(ast::pack_file_section{"testB", -2, {{"test1", "test2"}}});
 	BOOST_CHECK(root == root_expected);
 }
 BOOST_AUTO_TEST_CASE(multi_section_multi_entry) {
@@ -122,9 +122,9 @@ BOOST_AUTO_TEST_CASE(multi_section_multi_entry) {
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
 	root_expected.emplace_back(ast::pack_file_section{
-			"testA", false, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
+			"testA", -2, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
 	root_expected.emplace_back(ast::pack_file_section{
-			"testB", false, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
+			"testB", -2, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
 	BOOST_CHECK(root == root_expected);
 }
 
@@ -140,9 +140,9 @@ BOOST_AUTO_TEST_CASE(no_internal_path) {
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
 	root_expected.emplace_back(
-			ast::pack_file_section{"testA", false, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+			ast::pack_file_section{"testA", -2, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
 	root_expected.emplace_back(
-			ast::pack_file_section{"testB", false, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+			ast::pack_file_section{"testB", -2, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
 	BOOST_CHECK(root == root_expected);
 }
 
@@ -158,9 +158,9 @@ BOOST_AUTO_TEST_CASE(multi_section_multi_entry_zip) {
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
 	root_expected.emplace_back(ast::pack_file_section{
-			"testA", true, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
+			"testA", -1, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
 	root_expected.emplace_back(ast::pack_file_section{
-			"testB", false, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
+			"testB", -2, {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
 	BOOST_CHECK(root == root_expected);
 }
 
@@ -176,9 +176,45 @@ BOOST_AUTO_TEST_CASE(no_internal_path_zip) {
 	BOOST_CHECK(first == last);
 	ast::pack_file_ast_root root_expected;
 	root_expected.emplace_back(
-			ast::pack_file_section{"testA", true, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+			ast::pack_file_section{"testA", -1, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
 	root_expected.emplace_back(
-			ast::pack_file_section{"testB", true, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+			ast::pack_file_section{"testB", -1, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+	BOOST_CHECK(root == root_expected);
+}
+
+BOOST_AUTO_TEST_CASE(no_internal_path_zip_level_0_1) {
+	pack_file_description_parser parser;
+	std::string testdata = "testA zip(0){\"test1\";\"test3\";\"test5\";}"
+						   "testB zip(1){\"test1\";\"test3\";\"test5\";}";
+	ast::pack_file_ast_root root;
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	bool result = parser.parse(first, last, root);
+	BOOST_CHECK(result);
+	BOOST_CHECK(first == last);
+	ast::pack_file_ast_root root_expected;
+	root_expected.emplace_back(
+			ast::pack_file_section{"testA", 0, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+	root_expected.emplace_back(
+			ast::pack_file_section{"testB", 1, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+	BOOST_CHECK(root == root_expected);
+}
+
+BOOST_AUTO_TEST_CASE(no_internal_path_zip_level_7_9) {
+	pack_file_description_parser parser;
+	std::string testdata = "testA zip(7){\"test1\";\"test3\";\"test5\";}"
+						   "testB zip(9){\"test1\";\"test3\";\"test5\";}";
+	ast::pack_file_ast_root root;
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	bool result = parser.parse(first, last, root);
+	BOOST_CHECK(result);
+	BOOST_CHECK(first == last);
+	ast::pack_file_ast_root root_expected;
+	root_expected.emplace_back(
+			ast::pack_file_section{"testA", 7, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+	root_expected.emplace_back(
+			ast::pack_file_section{"testB", 9, {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
 	BOOST_CHECK(root == root_expected);
 }
 

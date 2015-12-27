@@ -16,7 +16,7 @@ BOOST_FUSION_ADAPT_STRUCT(mce::asset_gen::ast::pack_file_entry, //
 
 BOOST_FUSION_ADAPT_STRUCT(mce::asset_gen::ast::pack_file_section,						//
 						  (std::string, name)											//
-						  (bool, zip)													//
+						  (int, zip_level)												//
 						  (std::vector<mce::asset_gen::ast::pack_file_entry>, entries)) //
 
 #endif /* ASSET_GEN_PACK_FILE_DESCRIPTION_AST_FUSION_HPP_ */
