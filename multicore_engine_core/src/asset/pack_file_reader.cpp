@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cassert>
 #include <util/unused.hpp>
+#include <util/compression.hpp>
 
 namespace mce {
 namespace asset {
@@ -55,7 +56,23 @@ std::pair<file_content_ptr, file_size> pack_file_reader::read_file(const std::st
 		else
 			return std::make_pair(content, pos->size);
 	} else {
-		throw std::runtime_error("Loading compressed assets is not yet implemented.");
+		source->compressed_buffer.clear();
+		source->compressed_buffer.resize(pos->compressed_size, '\0');
+		source->stream.seekg(pos->offset, std::ios::beg);
+		source->stream.read(source->compressed_buffer.data(), pos->compressed_size);
+		if(!(source->stream)) {
+			return std::make_pair(file_content_ptr(), 0ull);
+		} else {
+			source->decompressed_buffer.clear();
+			util::decompress(source->compressed_buffer, source->decompressed_buffer);
+			if(source->decompressed_buffer.size() != pos->size)
+				throw std::runtime_error(
+						"Pack file appears corrupt: asset size and decompressed data size differ.");
+			std::shared_ptr<char> content =
+					std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });
+			std::memcpy(content.get(), source->decompressed_buffer.data(), pos->size);
+			return std::make_pair(content, pos->size);
+		}
 	}
 }
 
