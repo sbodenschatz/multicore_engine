@@ -71,7 +71,11 @@ int main(int argc, char* argv[]) {
 					internal_path = entry_path.filename().string();
 				}
 			}
-			gen.add_file(entry_path_abs.string(), internal_path);
+			if(section.zip_level > -2) {
+				gen.add_file_compressed(entry_path_abs.string(), internal_path, section.zip_level);
+			} else {
+				gen.add_file(entry_path_abs.string(), internal_path);
+			}
 		}
 	}
 	gen.compile_pack_file(output_file);

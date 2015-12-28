@@ -1,4 +1,4 @@
-test {
+test zip {
 	"src/main.cpp" -> "test.cpp";
 	"../multicore_engine_parsers/src/entity_text_file_parser_frontend.cpp"->"test2.cpp";
 	"build/bin/multicore_engine_pack_file_gen-gcc-debug.exe" -> "test.exe";
