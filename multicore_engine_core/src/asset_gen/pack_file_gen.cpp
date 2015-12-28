@@ -110,7 +110,7 @@ void pack_file_gen::copy_file_content_compressed(std::fstream& into, const pack_
 		stream.read(input_buffer.data(), size);
 		util::compress(input_buffer, entry.compression_level, compressed_buffer);
 		into.write(compressed_buffer.data(), compressed_buffer.size());
-		if(std::max(uint64_t(stream.gcount()), 0ull) != entry.meta_data.size)
+		if(std::max(uint64_t(stream.gcount()), uint64_t(0)) != entry.meta_data.size)
 			throw std::runtime_error("Size mismatch for file '" + entry.path + "'.");
 		if(compressed_buffer.size() != entry.meta_data.compressed_size)
 			throw std::runtime_error("Compressed size mismatch for file '" + entry.path + "'.");
