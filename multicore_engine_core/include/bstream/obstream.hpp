@@ -68,10 +68,19 @@ public:
 	obstream& operator<<(const std::vector<T>& value) {
 		uint64_t size = value.size();
 		(*this) << size;
-		for(auto& entry : value) { (*this) << entry; }
+		for(auto& entry : value) {
+			(*this) << entry;
+		}
 		return *this;
 	}
 	obstream& operator<<(const std::string& value);
+	template <typename T, size_t N>
+	obstream& operator<<(const T(&value)[N]) {
+		for(size_t i = 0; i < N && *this; ++i) {
+			*this << value[i];
+		}
+		return *this;
+	}
 };
 
 } // namespace bstream

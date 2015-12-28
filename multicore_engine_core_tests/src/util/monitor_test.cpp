@@ -54,7 +54,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_assign_convert_spin_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -75,7 +77,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_assign_convert_spin_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -97,7 +101,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_store_load_spin_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -118,7 +124,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_store_load_spin_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -139,7 +147,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_exchange_spin_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -159,7 +169,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_exchange_spin_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -183,7 +195,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_compare_exchange_spin_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	monitor_test_object val = monitor.load();
 	BOOST_CHECK(val.check());
 	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
@@ -209,7 +223,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_compare_exchange_spin_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	monitor_test_object val = monitor.load();
 	BOOST_CHECK(val.check());
 	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
@@ -227,13 +243,17 @@ BOOST_AUTO_TEST_CASE(thread_safety_do_atomically_spin_lock) {
 		threads.emplace_back([&, i]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				monitor.do_atomically([&ok](monitor_test_object& value) {
-					for(int i = 0; i < 64; ++i) { value.data[i]++; }
+					for(int i = 0; i < 64; ++i) {
+						value.data[i]++;
+					}
 					if(!value.check()) ok = false;
 				});
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	monitor_test_object val = monitor.load();
 	BOOST_CHECK(val.check());
 	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
@@ -258,7 +278,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_assign_convert_mutex) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -279,7 +301,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_assign_convert_mutex) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -301,7 +325,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_store_load_mutex) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -322,7 +348,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_store_load_mutex) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -343,7 +371,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_exchange_mutex) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -363,7 +393,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_exchange_mutex) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(ok);
 }
 
@@ -387,7 +419,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_compare_exchange_mutex) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	monitor_test_object val = monitor.load();
 	BOOST_CHECK(val.check());
 	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
@@ -413,7 +447,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_compare_exchange_mutex) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	monitor_test_object val = monitor.load();
 	BOOST_CHECK(val.check());
 	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
@@ -431,13 +467,17 @@ BOOST_AUTO_TEST_CASE(thread_safety_do_atomically_mutex) {
 		threads.emplace_back([&, i]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				monitor.do_atomically([&ok](monitor_test_object& value) {
-					for(int i = 0; i < 64; ++i) { value.data[i]++; }
+					for(int i = 0; i < 64; ++i) {
+						value.data[i]++;
+					}
 					if(!value.check()) ok = false;
 				});
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	monitor_test_object val = monitor.load();
 	BOOST_CHECK(val.check());
 	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);

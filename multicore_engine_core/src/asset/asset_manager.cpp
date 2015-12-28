@@ -16,14 +16,18 @@ namespace asset {
 
 asset_manager::asset_manager() {
 	work = std::make_unique<boost::asio::io_service::work>(task_pool);
-	unsigned int worker_thread_count = 2 * std::min(std::thread::hardware_concurrency(), 1u);
+	unsigned int worker_thread_count = 2 * std::max(std::thread::hardware_concurrency(), 1u);
 	for(unsigned int i = 0; i < worker_thread_count; ++i) {
-		workers.emplace_back([this]() { task_pool.run(); });
+		workers.emplace_back([this]() {
+			task_pool.run(); // Enter thread pool
+		});
 	}
 }
 asset_manager::~asset_manager() {
 	work.reset();
-	for(auto& worker : workers) { worker.join(); }
+	for(auto& worker : workers) {
+		worker.join();
+	}
 }
 
 void asset_manager::start_clean() {
@@ -39,7 +43,7 @@ std::shared_ptr<const asset> asset_manager::call_loaders_sync(const std::shared_
 		try {
 			auto local_asset_loaders = asset_loaders.get();
 			for(auto& loader : *local_asset_loaders) {
-				if(loader->start_load_asset(asset_to_load, *this)) {
+				if(loader->start_load_asset(asset_to_load, *this, true)) {
 					asset_to_load->internal_wait_for_complete();
 					return asset_to_load;
 				}
@@ -93,7 +97,8 @@ void asset_manager::future_load_task::operator()() {
 	} catch(...) {
 		try {
 			promise->set_exception(std::current_exception());
-		} catch(...) {}
+		} catch(...) {
+		}
 	}
 }
 boost::unique_future<std::shared_ptr<const asset>> asset_manager::load_asset_future(const std::string& name) {
@@ -112,16 +117,22 @@ boost::unique_future<std::shared_ptr<const asset>> asset_manager::load_asset_fut
 }
 void asset_manager::start_pin_load_unit(const std::string& name) {
 	auto local_asset_loaders = asset_loaders.get();
-	for(auto& loader : *local_asset_loaders) { loader->start_pin_load_unit(name, *this); }
+	for(auto& loader : *local_asset_loaders) {
+		loader->start_pin_load_unit(name, *this);
+	}
 }
 void asset_manager::start_pin_load_unit(const std::string& name,
 										const simple_completion_handler& completion_handler) {
 	auto local_asset_loaders = asset_loaders.get();
-	for(auto& loader : *local_asset_loaders) { loader->start_pin_load_unit(name, *this, completion_handler); }
+	for(auto& loader : *local_asset_loaders) {
+		loader->start_pin_load_unit(name, *this, completion_handler);
+	}
 }
 void asset_manager::start_unpin_load_unit(const std::string& name) {
 	auto local_asset_loaders = asset_loaders.get();
-	for(auto& loader : *local_asset_loaders) { loader->start_unpin_load_unit(name, *this); }
+	for(auto& loader : *local_asset_loaders) {
+		loader->start_unpin_load_unit(name, *this);
+	}
 }
 
 void asset_manager::add_asset_loader(std::shared_ptr<asset_loader>&& loader) {

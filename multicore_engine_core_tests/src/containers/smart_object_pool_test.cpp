@@ -15,22 +15,22 @@ namespace mce {
 namespace containers {
 
 struct smart_object_pool_fixture {
-	struct X{
+	struct X {
 		long long x;
-		X(const long long& o):x(o){}
-		X& operator=(const long long & o){
-			x=o;
+		X(const long long& o) : x(o) {}
+		X& operator=(const long long& o) {
+			x = o;
 			return *this;
 		}
-		X(const X& o):x(o.x){}
-		X& operator=(const X& o){
-			x=o.x;
+		X(const X& o) : x(o.x) {}
+		X& operator=(const X& o) {
+			x = o.x;
 			return *this;
 		}
-		~X(){
-			x=0xdeadbeefdeadbeef;
+		~X() {
+			x = 0xdeadbeefdeadbeef;
 		}
-		operator long long () const{
+		operator long long() const {
 			return x;
 		}
 	};
@@ -60,7 +60,9 @@ BOOST_AUTO_TEST_CASE(emplace_and_destroy_many) {
 		BOOST_CHECK(*ptr == i);
 	}
 	BOOST_CHECK(sop.size() == 512);
-	for(int i = 0; i < 512; ++i) { BOOST_CHECK(*(elem_ptrs[i]) == i); }
+	for(int i = 0; i < 512; ++i) {
+		BOOST_CHECK(*(elem_ptrs[i]) == i);
+	}
 	elem_ptrs.clear();
 	BOOST_CHECK(sop.size() == 0);
 }
@@ -84,7 +86,7 @@ BOOST_AUTO_TEST_CASE(rescue_object) {
 	auto it = sop.begin();
 	weak_pool_ptr<element> wptr = ptr;
 	ptr.reset();
-	ptr=wptr.lock();
+	ptr = wptr.lock();
 	BOOST_CHECK(ptr);
 	BOOST_CHECK(sop.size() == 1);
 	it = decltype(sop)::iterator();
@@ -118,7 +120,9 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 			return res;
 		}, t));
 	}
-	for(auto& f : futures) { BOOST_CHECK(f.get()); }
+	for(auto& f : futures) {
+		BOOST_CHECK(f.get());
+	}
 	auto t3 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> diff2 = t3 - t2;
 	std::cout << diff2.count() << std::endl;

@@ -73,6 +73,7 @@ public:
 		if(current_state_ == state::data_ready) {
 			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
 			handler(this->shared_from_this());
+			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		if(current_state_ == state::data_ready) {
@@ -88,6 +89,7 @@ public:
 		if(current_state_ == state::data_ready) {
 			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
 			handler();
+			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		if(current_state_ == state::data_ready) {

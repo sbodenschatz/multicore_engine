@@ -9,7 +9,7 @@ SpaceBeforeParens: Never
 AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: Empty
-AllowShortBlocksOnASingleLine: true
+AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
 ColumnLimit:     110
 AlwaysBreakTemplateDeclarations: true

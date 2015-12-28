@@ -24,7 +24,9 @@ component_configuration::component_configuration(const component_configuration& 
 
 component_pool_ptr component_configuration::create_component(entity& owner) const {
 	component_pool_ptr comp = type_.create_component(owner, *this, engine);
-	for(const auto& assignment : assignments) { assignment->assign(*comp); }
+	for(const auto& assignment : assignments) {
+		assignment->assign(*comp);
+	}
 	return comp;
 }
 

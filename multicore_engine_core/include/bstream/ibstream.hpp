@@ -82,6 +82,13 @@ public:
 		return *this;
 	}
 	ibstream& operator>>(std::string& value);
+	template <typename T, size_t N>
+	ibstream& operator>>(T(&value)[N]) {
+		for(size_t i = 0; i < N && *this; ++i) {
+			*this >> value[i];
+		}
+		return *this;
+	}
 };
 
 } // namespace bstream

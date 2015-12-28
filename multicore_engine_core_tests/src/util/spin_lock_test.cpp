@@ -27,14 +27,16 @@ BOOST_AUTO_TEST_CASE(thread_safety_lock) {
 
 	test.reserve(thread_count * static_cast<size_t>(elements_per_thread));
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&,i]() {
+		threads.emplace_back([&, i]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				std::lock_guard<mce::util::spin_lock> guard(lock);
 				test.emplace_back((static_cast<uint64_t>(i) << 32) | static_cast<uint64_t>(j));
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(test.size() == thread_count * elements_per_thread);
 }
 BOOST_AUTO_TEST_CASE(thread_safety_try_lock) {
@@ -47,7 +49,7 @@ BOOST_AUTO_TEST_CASE(thread_safety_try_lock) {
 
 	test.reserve(thread_count * static_cast<size_t>(elements_per_thread));
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&,i]() {
+		threads.emplace_back([&, i]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				if(lock.try_lock()) {
 					successful_insertions++;
@@ -57,7 +59,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_try_lock) {
 			}
 		});
 	}
-	for(auto& thread : threads) { thread.join(); }
+	for(auto& thread : threads) {
+		thread.join();
+	}
 	BOOST_CHECK(test.size() == successful_insertions.load());
 }
 

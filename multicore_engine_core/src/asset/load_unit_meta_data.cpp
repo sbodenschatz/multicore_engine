@@ -11,6 +11,8 @@
 namespace mce {
 namespace asset {
 
+const uint64_t load_unit_meta_data::magic_number;
+
 bstream::ibstream& operator>>(bstream::ibstream& ibs, asset_meta_data& value) {
 	ibs >> value.offset;
 	ibs >> value.size;

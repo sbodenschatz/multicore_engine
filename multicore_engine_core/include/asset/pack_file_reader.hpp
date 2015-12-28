@@ -27,6 +27,8 @@ class pack_file_reader : public file_reader {
 		std::atomic_flag lock_flag = ATOMIC_FLAG_INIT;
 		std::ifstream stream;
 		pack_file_meta_data metadata;
+		std::vector<char> compressed_buffer;
+		std::vector<char> decompressed_buffer;
 		pack_file_source(const std::string& pack_file_name) : stream{pack_file_name, std::ios::binary} {
 			if(!stream) throw std::runtime_error("Unable to open file '" + pack_file_name + "'.");
 			bstream::istream_bstream bstr(stream);

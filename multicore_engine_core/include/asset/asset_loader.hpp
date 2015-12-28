@@ -32,7 +32,8 @@ protected:
 
 public:
 	virtual ~asset_loader() = default;
-	virtual bool start_load_asset(const std::shared_ptr<asset>& asset, asset_manager& asset_manager) = 0;
+	virtual bool start_load_asset(const std::shared_ptr<asset>& asset, asset_manager& asset_manager,
+								  bool sync_hint) = 0;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager,
 									 const simple_completion_handler& completion_handler) = 0;

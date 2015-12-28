@@ -37,8 +37,12 @@ void load_unit::complete_loading(std::shared_ptr<const char> data, size_t size) 
 	lock.unlock();
 	// From here on the load_unit object is immutable and can therefore be read without holding a lock
 	completed_cv.notify_all();
-	for(auto& handler : completion_handlers) { handler(this_shared); }
-	for(auto& handler : simple_completion_handlers) { handler(); }
+	for(auto& handler : completion_handlers) {
+		handler(this_shared);
+	}
+	for(auto& handler : simple_completion_handlers) {
+		handler();
+	}
 	completion_handlers.clear();
 	simple_completion_handlers.clear();
 	completion_handlers.shrink_to_fit();

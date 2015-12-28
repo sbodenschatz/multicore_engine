@@ -11,21 +11,26 @@
 namespace mce {
 namespace asset {
 file_asset_loader::file_asset_loader(const std::vector<path_prefix>& prefixes) : prefixes(prefixes) {
-	load_units.push_back(".");
+	load_units.push_back("");
 }
 
 file_asset_loader::file_asset_loader(std::vector<path_prefix>&& prefixes) : prefixes(std::move(prefixes)) {
-	load_units.push_back(".");
+	load_units.push_back("");
 }
 
-bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset, asset_manager&) {
+bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset, asset_manager&, bool) {
 	std::shared_lock<std::shared_timed_mutex> lock(load_units_rw_lock);
 	std::string file_path;
 	file_path.reserve(128);
 	for(const auto& prefix : prefixes) {
 		for(const auto& load_unit : load_units) {
-			file_path = load_unit;
-			file_path += '/';
+			if(!load_unit.empty()) {
+				file_path = load_unit;
+				file_path += '/';
+			}
+			else {
+				file_path = "";
+			}
 			file_path += asset->name();
 			file_content_ptr file_content;
 			file_size file_size = 0u;

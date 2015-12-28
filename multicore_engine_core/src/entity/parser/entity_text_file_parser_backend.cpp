@@ -71,13 +71,17 @@ void entity_text_file_parser_backend::ast_instance_visitor::operator()(const ast
 entity_position_t entity_text_file_parser_backend::ast_position_visitor::
 operator()(const ast::int_list& node) {
 	entity_position_t pos;
-	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) { pos[i] = float(node[i]); }
+	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) {
+		pos[i] = float(node[i]);
+	}
 	return pos;
 }
 entity_position_t entity_text_file_parser_backend::ast_position_visitor::
 operator()(const ast::float_list& node) {
 	entity_position_t pos;
-	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) { pos[i] = node[i]; }
+	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) {
+		pos[i] = node[i];
+	}
 	return pos;
 }
 entity_position_t entity_text_file_parser_backend::ast_position_visitor::

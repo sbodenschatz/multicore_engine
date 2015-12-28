@@ -1,0 +1,6 @@
+test {
+	"src/main.cpp" -> "test.cpp";
+	"../multicore_engine_parsers/src/entity_text_file_parser_frontend.cpp"->"test2.cpp";
+	"build/bin/multicore_engine_load_unit_gen-gcc-debug.exe" -> "test.exe";
+	"../multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug.exe";
+}
