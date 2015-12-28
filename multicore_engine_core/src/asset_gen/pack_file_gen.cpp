@@ -12,6 +12,7 @@
 #include <bstream/iostream_bstream.hpp>
 #include <algorithm>
 #include <iterator>
+#include <util/compression.hpp>
 
 namespace mce {
 namespace asset_gen {
@@ -26,6 +27,25 @@ uint64_t pack_file_gen::read_file_size(const std::string& path) {
 		decltype(size_tmp) size_check = size;
 		if(size_check != size_tmp) throw std::runtime_error("Asset too big to fit in address space.");
 		return size;
+	} else
+		throw std::runtime_error("Couldn't open asset file '" + path + "'.");
+}
+std::pair<uint64_t, uint64_t> pack_file_gen::read_file_size_compressed(const std::string& path, int level) {
+	std::string sanitized_path = path;
+	util::sanitize_path_inplace(sanitized_path);
+	std::ifstream stream(sanitized_path, std::ios::binary);
+	if(stream) {
+		stream.seekg(0, std::ios::end);
+		auto size_tmp = stream.tellg();
+		uint64_t size = size_tmp;
+		decltype(size_tmp) size_check = size;
+		if(size_check != size_tmp) throw std::runtime_error("Asset too big to fit in address space.");
+		stream.seekg(0, std::ios::beg);
+		input_buffer.clear();
+		input_buffer.resize(size, '\0');
+		stream.read(input_buffer.data(), size);
+		util::compress(input_buffer, level, compressed_buffer);
+		return std::make_pair(size, compressed_buffer.size());
 	} else
 		throw std::runtime_error("Couldn't open asset file '" + path + "'.");
 }
@@ -70,6 +90,33 @@ void pack_file_gen::copy_file_content(std::fstream& into, const pack_file_entry&
 	} else
 		throw std::runtime_error("Couldn't open asset file '" + entry.path + "'.");
 }
+void pack_file_gen::copy_file_content_compressed(std::fstream& into, const pack_file_entry& entry) {
+	std::string sanitized_path = entry.path;
+	util::sanitize_path_inplace(sanitized_path);
+	std::ifstream stream(sanitized_path, std::ios::binary);
+	if(stream) {
+		auto pos = into.tellp();
+		if(pos < 0) throw std::runtime_error("Error getting write position for file '" + entry.path + "'.");
+		if(uint64_t(pos) != entry.meta_data.offset)
+			throw std::runtime_error("Offset mismatch for file '" + entry.path + "'.");
+		stream.seekg(0, std::ios::end);
+		auto size_tmp = stream.tellg();
+		uint64_t size = size_tmp;
+		decltype(size_tmp) size_check = size;
+		if(size_check != size_tmp) throw std::runtime_error("Asset too big to fit in address space.");
+		stream.seekg(0, std::ios::beg);
+		input_buffer.clear();
+		input_buffer.resize(size, '\0');
+		stream.read(input_buffer.data(), size);
+		util::compress(input_buffer, entry.compression_level, compressed_buffer);
+		into.write(compressed_buffer.data(), compressed_buffer.size());
+		if(std::max(uint64_t(stream.gcount()), 0ull) != entry.meta_data.size)
+			throw std::runtime_error("Size mismatch for file '" + entry.path + "'.");
+		if(compressed_buffer.size() != entry.meta_data.compressed_size)
+			throw std::runtime_error("Compressed size mismatch for file '" + entry.path + "'.");
+	} else
+		throw std::runtime_error("Couldn't open asset file '" + entry.path + "'.");
+}
 void pack_file_gen::write_pack_file(const std::string& output_file) {
 	std::fstream file_stream(output_file, std::ios::out | std::ios::trunc | std::ios::binary);
 	if(!file_stream) throw std::runtime_error("Can't open '" + output_file + "' for writing.");
@@ -77,12 +124,26 @@ void pack_file_gen::write_pack_file(const std::string& output_file) {
 	stream << meta_data;
 	auto test = file_stream.tellp();
 	static_cast<void>(test);
-	for(const auto& entry : entries) copy_file_content(file_stream, entry);
+	for(const auto& entry : entries) {
+		if(entry.compression_level > -2) {
+			copy_file_content_compressed(file_stream, entry);
+		} else {
+			copy_file_content(file_stream, entry);
+		}
+	}
 }
 void pack_file_gen::add_file(const std::string& path, const std::string& name) {
 	auto size = read_file_size(path);
 	entries.emplace_back(path, name, next_pos, size);
 	next_pos += size;
+}
+void pack_file_gen::add_file_compressed(const std::string& path, const std::string& name, int level) {
+	if(level > 9) level = 9;
+	uint64_t size;
+	uint64_t compressed_size;
+	std::tie(size, compressed_size) = read_file_size_compressed(path, level);
+	entries.emplace_back(path, name, next_pos, size, compressed_size, level);
+	next_pos += compressed_size;
 }
 void pack_file_gen::compile_pack_file(const std::string& output_file) {
 	compile_meta_data();
