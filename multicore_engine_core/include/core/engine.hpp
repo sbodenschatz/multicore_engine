@@ -10,12 +10,14 @@
 #include <cassert>
 #include <memory>
 #include <entity/entity_manager.hpp>
+#include <asset/asset_manager.hpp>
 
 namespace mce {
 namespace core {
 
 class engine {
 	std::unique_ptr<entity::entity_manager> entity_manager_;
+	std::unique_ptr<asset::asset_manager> asset_manager_;
 
 public:
 	engine();
@@ -27,6 +29,15 @@ public:
 	entity::entity_manager& entity_manager() {
 		assert(entity_manager_);
 		return *entity_manager_;
+	}
+
+	const asset::asset_manager& asset_manager() const {
+		assert(asset_manager_);
+		return *asset_manager_;
+	}
+	asset::asset_manager& asset_manager() {
+		assert(asset_manager_);
+		return *asset_manager_;
 	}
 };
 

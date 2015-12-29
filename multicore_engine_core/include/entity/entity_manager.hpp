@@ -18,6 +18,7 @@
 #include <atomic>
 #include "parser/entity_text_file_ast.hpp"
 #include <util/unused.hpp>
+#include <asset/asset_defs.hpp>
 
 namespace mce {
 namespace core {
@@ -58,7 +59,7 @@ public:
 
 	void clear_entities();
 	void clear_entities_and_entity_configurations();
-	void load_entities_from_text_file(const std::string& filename);
+	void load_entities_from_text_file(const asset::asset_ptr& text_file_asset);
 	void add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config);
 	entity* create_entity(const entity_configuration& config);
 	void destroy_entity(entity_id_t id);

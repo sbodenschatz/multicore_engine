@@ -8,6 +8,8 @@
 #include <entity/entity_manager.hpp>
 #include <entity/entity_configuration.hpp>
 #include <entity/component_configuration.hpp>
+#include <asset/asset.hpp>
+#include <core/engine.hpp>
 
 namespace mce {
 namespace entity {
@@ -48,7 +50,8 @@ void entity_text_file_parser_backend::ast_definition_visitor::operator()(const a
 }
 void entity_text_file_parser_backend::ast_definition_visitor::operator()(ast::include_instruction& node) {
 	// TODO Handle relative paths if needed
-	node.included_ast = std::make_shared<ast::ast_wrapper>(backend.load_file(node.filename));
+	auto included = backend.em.engine.asset_manager().load_asset_sync(node.filename);
+	node.included_ast = std::make_shared<ast::ast_wrapper>(backend.load_file(included));
 	backend.process_entity_definitions(node.included_ast->root);
 }
 void entity_text_file_parser_backend::ast_definition_visitor::operator()(const ast::entity_instance&) {}
@@ -152,15 +155,18 @@ void entity_text_file_parser_backend::process_entity_instances(ast::ast_root& ro
 	ast_instance_visitor visitor{*this};
 	for(auto&& element : root_node) element.apply_visitor(visitor);
 }
-ast::ast_root entity_text_file_parser_backend::load_file(const std::string& filename) {
+ast::ast_root entity_text_file_parser_backend::load_file(const asset::asset_ptr& text_file_asset) {
 	ast::ast_root root;
-	(void)filename;
-	// TODO: Implement loading of file when asset manager is available.
-	// TODO: Parse loaded file using frontend
+	const char* start = text_file_asset->data();
+	const char* end = text_file_asset->data() + text_file_asset->size();
+	parser::entity_text_file_parser_frontend fe;
+	bool r = fe.parse(start, end, root);
+	if(!r) throw std::runtime_error("Syntax error in '" + text_file_asset->name() + "'.");
+	if(start != end) throw std::runtime_error("Partial parse of '" + text_file_asset->name() + "'.");
 	return root;
 }
-void entity_text_file_parser_backend::load_and_process_file(const std::string& filename) {
-	ast::ast_root root = load_file(filename);
+void entity_text_file_parser_backend::load_and_process_file(const asset::asset_ptr& text_file_asset) {
+	ast::ast_root root = load_file(text_file_asset);
 	process_entity_definitions(root);
 	process_entity_instances(root);
 }

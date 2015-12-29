@@ -10,6 +10,7 @@
 #include "../ecs_types.hpp"
 #include "entity_text_file_ast.hpp"
 #include <memory>
+#include <asset/asset_defs.hpp>
 
 namespace mce {
 namespace entity {
@@ -69,11 +70,11 @@ class entity_text_file_parser_backend {
 
 	void process_entity_definitions(ast::ast_root& root_node);
 	void process_entity_instances(ast::ast_root& root_node);
-	ast::ast_root load_file(const std::string& filename);
+	ast::ast_root load_file(const asset::asset_ptr& text_file_asset);
 
 public:
 	entity_text_file_parser_backend(entity_manager& em) : em(em) {}
-	void load_and_process_file(const std::string& filename);
+	void load_and_process_file(const asset::asset_ptr& text_file_asset);
 };
 
 } // namespace parser

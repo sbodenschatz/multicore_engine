@@ -29,9 +29,9 @@ void entity_manager::clear_entities_and_entity_configurations() {
 	clear_entities();
 	entity_configurations.clear();
 }
-void entity_manager::load_entities_from_text_file(const std::string& filename) {
+void entity_manager::load_entities_from_text_file(const asset::asset_ptr& text_file_asset) {
 	parser::entity_text_file_parser_backend parser_backend(*this);
-	parser_backend.load_and_process_file(filename);
+	parser_backend.load_and_process_file(text_file_asset);
 }
 entity* entity_manager::create_entity(const entity_configuration& config) {
 	assert(!read_only_mode);
