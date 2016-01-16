@@ -31,7 +31,7 @@ solution "multicore_engine_solution"
 		objdir "%{prj.location}/obj-gcc-%{cfg.buildcfg}"
 		buildoptions "-std=gnu++14"
 		links {"pthread","boost_program_options","boost_filesystem","boost_system","boost_thread"}
-		buildoptions "-Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations"
+		buildoptions "-Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations -Wno-unused-local-typedef"
 
 	configuration {"gmake"}
 		if _OPTIONS["cc"] == "clang" then
