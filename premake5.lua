@@ -36,7 +36,7 @@ solution "multicore_engine_solution"
 	configuration {"gmake"}
 		if _OPTIONS["cc"] == "clang" then
 			targetsuffix "-clang-%{cfg.buildcfg}"
-			buildoptions "-stdlib=libc++  -Wno-unused-private-field"
+			buildoptions "-stdlib=libc++  -Wno-unused-private-field -Wno-unused-local-typedef"
 			targetdir "%{prj.location}/bin"
 			objdir "%{prj.location}/obj-clang-%{cfg.buildcfg}"
 			toolset "clang"
