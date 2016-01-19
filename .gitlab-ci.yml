@@ -18,6 +18,8 @@ scan-build:
   - export CC=clang
   - export CXX=clang++
   - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=clang CXX=clang++
+  tags:
+  - cpp
 
 gcc-debug-build:
 #  stage: build_and_test
@@ -27,6 +29,8 @@ gcc-debug-build:
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug --report_level=short
+  tags:
+  - cpp
 
 gcc-release-build:
 #  stage: build_and_test
@@ -36,6 +40,8 @@ gcc-release-build:
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release --report_level=short
+  tags:
+  - cpp
 
 clang-debug-build:
 #  stage: build_and_test
@@ -45,6 +51,8 @@ clang-debug-build:
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug --report_level=short
+  tags:
+  - cpp
 
 clang-release-build:
 #  stage: build_and_test
@@ -54,4 +62,5 @@ clang-release-build:
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release --report_level=short
-
+  tags:
+  - cpp
