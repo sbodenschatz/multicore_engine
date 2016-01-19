@@ -47,7 +47,7 @@ clang-release-build:
   tags:
   - cpp
 
- api-doc:
+api-doc:
   script:
   - doxygen Doxyfile
   - cd doc\latex
