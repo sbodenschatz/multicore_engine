@@ -1,18 +1,4 @@
-before_script:
-  - premake5 --cc=gcc gmake > /dev/null
-  - make CC=gcc CXX=g++ config=debug clean > /dev/null
-  - make CC=gcc CXX=g++ config=release clean > /dev/null
-  - premake5 --cc=clang gmake > /dev/null
-  - make CC=clang CXX=clang++ config=debug clean > /dev/null
-  - make CC=clang CXX=clang++ config=release clean > /dev/null
-  - mkdir -p multicore_engine_{core,core_tests,demo,parsers,load_unit_gen,pack_file_gen}/build/{bin,obj-{gcc,clang}-{debug,release}}
-
-#stages:
-#  - analyse
-#  - build_and_test
-
 scan-build:
-#  stage: analyse
   script:
   - premake5 --cc=gcc gmake
   - export CC=clang
@@ -22,7 +8,6 @@ scan-build:
   - cpp
 
 gcc-debug-build:
-#  stage: build_and_test
   script:
   - premake5 --cc=gcc gmake
   - export CC=gcc
@@ -33,7 +18,6 @@ gcc-debug-build:
   - cpp
 
 gcc-release-build:
-#  stage: build_and_test
   script:
   - premake5 --cc=gcc gmake
   - export CC=gcc
@@ -44,7 +28,6 @@ gcc-release-build:
   - cpp
 
 clang-debug-build:
-#  stage: build_and_test
   script:
   - premake5 --cc=clang gmake
   - export CC=clang
@@ -55,7 +38,6 @@ clang-debug-build:
   - cpp
 
 clang-release-build:
-#  stage: build_and_test
   script:
   - premake5 --cc=clang gmake
   - export CC=clang
