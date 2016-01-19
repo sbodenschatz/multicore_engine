@@ -50,7 +50,7 @@ clang-release-build:
 api-doc:
   script:
   - doxygen Doxyfile
-  - cd doc\latex
+  - cd doc/latex
   - pdflatex refman.tex > refman.1.log
   - bibtex refman > refman.2.log
   - makeindex refman > refman.3.log
