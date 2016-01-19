@@ -1,3 +1,6 @@
+before_script:
+  - mkdir -p multicore_engine_{core,core_tests,demo,parsers,load_unit_gen,pack_file_gen}/build/{bin,obj-{gcc,clang}-{debug,release}}
+
 scan-build:
   script:
   - premake5 --cc=gcc gmake
