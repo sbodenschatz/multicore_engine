@@ -46,3 +46,17 @@ clang-release-build:
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release --report_level=short
   tags:
   - cpp
+
+api-doc:
+  script:
+  - doxygen Doxyfile
+  - cd doc/latex
+  - pdflatex refman.tex
+#  - bibtex refman
+  - makeindex refman
+  - pdflatex refman.tex
+  - pdflatex refman.tex
+  - mv refman.pdf ..
+  tags:
+  - latex
+
