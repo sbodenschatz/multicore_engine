@@ -62,4 +62,5 @@ api-doc:
   - mv refman.pdf ..
   tags:
   - latex
+  - doxygen
 
