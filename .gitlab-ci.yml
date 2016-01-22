@@ -21,7 +21,7 @@ gcc-debug-build:
   - cpp
   artifacts:
     paths:
-	- */build/bin/
+    - */build/bin/
 
 gcc-release-build:
   script:
@@ -34,7 +34,7 @@ gcc-release-build:
   - cpp
   artifacts:
     paths:
-	- */build/bin/
+    - */build/bin/
 
 clang-debug-build:
   script:
@@ -47,7 +47,7 @@ clang-debug-build:
   - cpp
   artifacts:
     paths:
-	- */build/bin/
+    - */build/bin/
 
 clang-release-build:
   script:
@@ -60,7 +60,7 @@ clang-release-build:
   - cpp
   artifacts:
     paths:
-	- */build/bin/
+    - */build/bin/
 
 api-doc:
   script:
@@ -77,6 +77,6 @@ api-doc:
   - doxygen
   artifacts:
     paths:
-	- doc/html
-	- doc/refman.pdf
+    - doc/html
+    - doc/refman.pdf
 
