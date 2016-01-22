@@ -21,7 +21,12 @@ gcc-debug-build:
   - cpp
   artifacts:
     paths:
-    - */build/bin/
+    - multicore_engine_core/build/bin/
+    - multicore_engine_core_tests/build/bin/
+    - multicore_engine_demo/build/bin/
+    - multicore_engine_load_unit_gen/build/bin/
+    - multicore_engine_pack_file_gen/build/bin/
+    - multicore_engine_parsers/build/bin/
 
 gcc-release-build:
   script:
@@ -34,7 +39,12 @@ gcc-release-build:
   - cpp
   artifacts:
     paths:
-    - */build/bin/
+    - multicore_engine_core/build/bin/
+    - multicore_engine_core_tests/build/bin/
+    - multicore_engine_demo/build/bin/
+    - multicore_engine_load_unit_gen/build/bin/
+    - multicore_engine_pack_file_gen/build/bin/
+    - multicore_engine_parsers/build/bin/
 
 clang-debug-build:
   script:
@@ -47,7 +57,12 @@ clang-debug-build:
   - cpp
   artifacts:
     paths:
-    - */build/bin/
+    - multicore_engine_core/build/bin/
+    - multicore_engine_core_tests/build/bin/
+    - multicore_engine_demo/build/bin/
+    - multicore_engine_load_unit_gen/build/bin/
+    - multicore_engine_pack_file_gen/build/bin/
+    - multicore_engine_parsers/build/bin/
 
 clang-release-build:
   script:
@@ -60,7 +75,12 @@ clang-release-build:
   - cpp
   artifacts:
     paths:
-    - */build/bin/
+    - multicore_engine_core/build/bin/
+    - multicore_engine_core_tests/build/bin/
+    - multicore_engine_demo/build/bin/
+    - multicore_engine_load_unit_gen/build/bin/
+    - multicore_engine_pack_file_gen/build/bin/
+    - multicore_engine_parsers/build/bin/
 
 api-doc:
   script:
