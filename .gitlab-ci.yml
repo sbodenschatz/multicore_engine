@@ -19,14 +19,6 @@ gcc-debug-build:
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug --report_level=short
   tags:
   - cpp
-  artifacts:
-    paths:
-    - multicore_engine_core/build/bin/
-    - multicore_engine_core_tests/build/bin/
-    - multicore_engine_demo/build/bin/
-    - multicore_engine_load_unit_gen/build/bin/
-    - multicore_engine_pack_file_gen/build/bin/
-    - multicore_engine_parsers/build/bin/
 
 gcc-release-build:
   script:
@@ -35,16 +27,16 @@ gcc-release-build:
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release --report_level=short
+  - cp multicore_engine_demo/build/bin/multicore_engine_demo-gcc-release demo-gcc
+  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-release load_unit_gen-gcc
+  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-release pack_file_gen-gcc
   tags:
   - cpp
   artifacts:
     paths:
-    - multicore_engine_core/build/bin/
-    - multicore_engine_core_tests/build/bin/
-    - multicore_engine_demo/build/bin/
-    - multicore_engine_load_unit_gen/build/bin/
-    - multicore_engine_pack_file_gen/build/bin/
-    - multicore_engine_parsers/build/bin/
+    - demo-gcc
+    - load_unit_gen-gcc
+    - pack_file_gen-gcc
 
 clang-debug-build:
   script:
@@ -55,14 +47,6 @@ clang-debug-build:
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug --report_level=short
   tags:
   - cpp
-  artifacts:
-    paths:
-    - multicore_engine_core/build/bin/
-    - multicore_engine_core_tests/build/bin/
-    - multicore_engine_demo/build/bin/
-    - multicore_engine_load_unit_gen/build/bin/
-    - multicore_engine_pack_file_gen/build/bin/
-    - multicore_engine_parsers/build/bin/
 
 clang-release-build:
   script:
@@ -71,16 +55,16 @@ clang-release-build:
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release --report_level=short
+  - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-release demo-clang
+  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang
+  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-release pack_file_gen-clang
   tags:
   - cpp
   artifacts:
     paths:
-    - multicore_engine_core/build/bin/
-    - multicore_engine_core_tests/build/bin/
-    - multicore_engine_demo/build/bin/
-    - multicore_engine_load_unit_gen/build/bin/
-    - multicore_engine_pack_file_gen/build/bin/
-    - multicore_engine_parsers/build/bin/
+    - demo-clang
+    - load_unit_gen-clang
+    - pack_file_gen-clang
 
 api-doc:
   script:
@@ -91,12 +75,11 @@ api-doc:
   - makeindex refman
   - pdflatex refman.tex
   - pdflatex refman.tex
-  - mv refman.pdf ..
+  - mv refman.pdf ../..
   tags:
   - latex
   - doxygen
   artifacts:
     paths:
-    - doc/html
-    - doc/refman.pdf
+    - refman.pdf
 
