@@ -19,6 +19,9 @@ gcc-debug-build:
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug --report_level=short
   tags:
   - cpp
+  artifacts:
+    paths:
+	- */build/bin/
 
 gcc-release-build:
   script:
@@ -29,6 +32,9 @@ gcc-release-build:
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release --report_level=short
   tags:
   - cpp
+  artifacts:
+    paths:
+	- */build/bin/
 
 clang-debug-build:
   script:
@@ -39,6 +45,9 @@ clang-debug-build:
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug --report_level=short
   tags:
   - cpp
+  artifacts:
+    paths:
+	- */build/bin/
 
 clang-release-build:
   script:
@@ -49,6 +58,9 @@ clang-release-build:
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release --report_level=short
   tags:
   - cpp
+  artifacts:
+    paths:
+	- */build/bin/
 
 api-doc:
   script:
@@ -63,4 +75,8 @@ api-doc:
   tags:
   - latex
   - doxygen
+  artifacts:
+    paths:
+	- doc/html
+	- doc/refman.pdf
 
