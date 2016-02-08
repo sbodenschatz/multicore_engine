@@ -573,11 +573,9 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_async_mt) {
 							   [](auto& p) { return p.get_future().get(); });
 		}));
 	}
-	std::cout << "test" << std::endl;
 	for(auto& future : futures) {
 		BOOST_CHECK(future.get());
 	}
-	std::cout << "test" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
