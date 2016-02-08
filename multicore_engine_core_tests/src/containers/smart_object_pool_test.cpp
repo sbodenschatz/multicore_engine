@@ -4,6 +4,7 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <util/unused.hpp>
 #include <containers/smart_object_pool.hpp>
 #include <boost/test/unit_test.hpp>
 #include <unordered_set>
@@ -101,7 +102,8 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 	sop.reserve(128 * 0x1000);
 	auto t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> diff1 = t2 - t1;
-	std::cout << diff1.count() << std::endl;
+	// std::cout << diff1.count() << std::endl;
+	UNUSED(diff1);
 	std::vector<std::future<bool>> futures;
 	for(int t = 0; t < 256; ++t) {
 		futures.emplace_back(std::async(std::launch::async, [&](int t) {
@@ -125,7 +127,8 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 	}
 	auto t3 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> diff2 = t3 - t2;
-	std::cout << diff2.count() << std::endl;
+	// std::cout << diff2.count() << std::endl;
+	UNUSED(diff2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
