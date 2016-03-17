@@ -136,10 +136,10 @@ solution "multicore_engine_solution"
 		language "C++"
 		location "multicore_engine_demo/build"
 		files { "multicore_engine_demo/include/**.hpp", "multicore_engine_demo/src/**.cpp"}
-		links { "mingw32","multicore_engine_core","multicore_engine_parsers"}
+		links { "multicore_engine_core","multicore_engine_parsers"}
 
 		configuration {"windows"}
-			links {"vulkan-1"}
+			links {"mingw32","vulkan-1"}
 			libdirs {tostring(os.getenv("VK_SDK_PATH")) .. "/Bin"}
 		--	postbuildcommands {
 		--		os.getenv("VK_SDK_PATH") .. "\\Bin\\glslangValidator.exe -s -V -o ..\\cube-vert.spv ..\\cube.vert",
