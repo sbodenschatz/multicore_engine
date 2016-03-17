@@ -1,7 +1,10 @@
 solution "multicore_engine_solution"
 	configurations{"debug", "release"}
-	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH","ZLIB_CONST"}
-	includedirs{"multicore_engine_core/include","multicore_engine_parsers/include"}
+	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH","ZLIB_CONST","_USE_MATH_DEFINES"}
+	includedirs{
+		"multicore_engine_core/include",
+		"multicore_engine_parsers/include"
+	}
 	vectorextensions "SSE2"
 	startproject "multicore_engine_demo"
 	warnings "Extra"
@@ -21,6 +24,9 @@ solution "multicore_engine_solution"
 				---Target windows 7 or higher with windows api headers
 				"_WIN32_WINNT=0x0601",
 				"WINVER=0x0601"}
+		includedirs{
+			"C:/Libs/TBB/include"
+		}
 	configuration "not windows"
 		defines{"MULTICORE_ENGINE_NOT_WINDOWS"}
 		includedirs{}
