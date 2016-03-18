@@ -145,12 +145,15 @@ solution "multicore_engine_solution"
 		links { "multicore_engine_core","multicore_engine_parsers"}
 
 		configuration {"windows"}
-			links {"mingw32","vulkan-1"}
+			links {"vulkan-1"}
 			libdirs {tostring(os.getenv("VK_SDK_PATH")) .. "/Bin"}
 		--	postbuildcommands {
 		--		os.getenv("VK_SDK_PATH") .. "\\Bin\\glslangValidator.exe -s -V -o ..\\cube-vert.spv ..\\cube.vert",
 		--		os.getenv("VK_SDK_PATH") .. "\\Bin\\glslangValidator.exe -s -V -o ..\\cube-frag.spv ..\\cube.frag"
 		--	}
+		
+		configuration {"windows","gmake"}
+			links {"mingw32"}
 
 		configuration {"vs2015"}
 			debugdir "multicore_engine_demo"
