@@ -6,7 +6,7 @@ scan-build:
   - premake5 --cc=gcc gmake
   - export CC=clang
   - export CXX=clang++
-  - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=clang CXX=clang++
+  - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
   tags:
   - cpp
 
@@ -15,7 +15,7 @@ gcc-debug-build:
   - premake5 --cc=gcc gmake
   - export CC=gcc
   - export CXX=g++
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=gcc CXX=g++
+  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug --report_level=short
   tags:
   - cpp
@@ -25,7 +25,7 @@ gcc-release-build:
   - premake5 --cc=gcc gmake
   - export CC=gcc
   - export CXX=g++
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=gcc CXX=g++
+  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=release CC=gcc CXX=g++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release --report_level=short
   - cp multicore_engine_demo/build/bin/multicore_engine_demo-gcc-release demo-gcc
   - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-release load_unit_gen-gcc
@@ -43,7 +43,7 @@ clang-debug-build:
   - premake5 --cc=clang gmake
   - export CC=clang
   - export CXX=clang++
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=debug CC=clang CXX=clang++
+  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug --report_level=short
   tags:
   - cpp
@@ -53,7 +53,7 @@ clang-release-build:
   - premake5 --cc=clang gmake
   - export CC=clang
   - export CXX=clang++
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)*2] config=release CC=clang CXX=clang++
+  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=release CC=clang CXX=clang++
   - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release --report_level=short
   - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-release demo-clang
   - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang
