@@ -47,6 +47,7 @@ std::pair<file_content_ptr, file_size> pack_file_reader::read_file(const std::st
 	if(pos == source->metadata.elements.end()) {
 		return std::make_pair(file_content_ptr(), 0ull);
 	} else if(pos->compressed_size == 0) {
+		// TODO Maybe use 64-bit aligned storage for content
 		std::shared_ptr<char> content =
 				std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });
 		source->stream.seekg(pos->offset, std::ios::beg);
