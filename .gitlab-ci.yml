@@ -1,3 +1,7 @@
+stages:
+  - build
+  - test
+
 before_script:
   - mkdir -p multicore_engine_{core,core_tests,demo,parsers,load_unit_gen,pack_file_gen}/build/{bin,obj-{gcc,clang}-{debug,release}}
 
@@ -28,17 +32,9 @@ gcc-debug-build:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
     - core_tests-gcc-debug
-    - demo-gcc
-    - load_unit_gen-gcc
-    - pack_file_gen-gcc
-
-all-tests:
-  stage: test
-  script:
-  - core_tests-gcc-debug --report_level=short
-  - core_tests-gcc-release --report_level=short
-  - core_tests-clang-debug --report_level=short
-  - core_tests-clang-release --report_level=short
+    - demo-gcc-debug
+    - load_unit_gen-gcc-debug
+    - pack_file_gen-gcc-debug
 
 gcc-release-build:
   stage: build
@@ -120,4 +116,14 @@ api-doc:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
     - refman.pdf
+
+all-tests:
+  stage: test
+  script:
+  - core_tests-gcc-debug --report_level=short
+  - core_tests-gcc-release --report_level=short
+  - core_tests-clang-debug --report_level=short
+  - core_tests-clang-release --report_level=short
+  tags:
+  - cpp
 
