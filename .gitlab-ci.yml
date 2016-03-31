@@ -65,9 +65,9 @@ clang-debug-build:
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
   - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug core_tests-clang-debug
-  - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-release demo-clang-debug
-  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang-debug
-  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-release pack_file_gen-clang-debug
+  - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-debug demo-clang-debug
+  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-debug load_unit_gen-clang-debug
+  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-debug pack_file_gen-clang-debug
   tags:
   - cpp
   artifacts:
