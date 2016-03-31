@@ -2,6 +2,7 @@ before_script:
   - mkdir -p multicore_engine_{core,core_tests,demo,parsers,load_unit_gen,pack_file_gen}/build/{bin,obj-{gcc,clang}-{debug,release}}
 
 scan-build:
+  stage: build
   script:
   - premake5 --cc=gcc gmake
   - export CC=clang
@@ -11,69 +12,103 @@ scan-build:
   - cpp
 
 gcc-debug-build:
+  stage: build
   script:
   - premake5 --cc=gcc gmake
   - export CC=gcc
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=gcc CXX=g++
-  - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug --report_level=short
+  - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug core_tests-gcc-debug
+  - cp multicore_engine_demo/build/bin/multicore_engine_demo-gcc-debug demo-gcc-debug
+  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-debug load_unit_gen-gcc-debug
+  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-debug pack_file_gen-gcc-debug
   tags:
   - cpp
+  artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    paths:
+    - core_tests-gcc-debug
+    - demo-gcc
+    - load_unit_gen-gcc
+    - pack_file_gen-gcc
+
+all-tests:
+  stage: test
+  script:
+  - core_tests-gcc-debug --report_level=short
+  - core_tests-gcc-release --report_level=short
+  - core_tests-clang-debug --report_level=short
+  - core_tests-clang-release --report_level=short
 
 gcc-release-build:
+  stage: build
   script:
   - premake5 --cc=gcc gmake
   - export CC=gcc
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=release CC=gcc CXX=g++
-  - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release --report_level=short
-  - cp multicore_engine_demo/build/bin/multicore_engine_demo-gcc-release demo-gcc
-  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-release load_unit_gen-gcc
-  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-release pack_file_gen-gcc
+  - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release core_tests-gcc-release
+  - cp multicore_engine_demo/build/bin/multicore_engine_demo-gcc-release demo-gcc-release
+  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-release load_unit_gen-gcc-release
+  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-release pack_file_gen-gcc-release
   tags:
   - cpp
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
-    - demo-gcc
-    - load_unit_gen-gcc
-    - pack_file_gen-gcc
+    - core_tests-gcc-release
+    - demo-gcc-release
+    - load_unit_gen-gcc-release
+    - pack_file_gen-gcc-release
 
 clang-debug-build:
+  stage: build
   script:
   - premake5 --cc=clang gmake
   - export CC=clang
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
-  - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug --report_level=short
-  tags:
-  - cpp
-
-clang-release-build:
-  script:
-  - premake5 --cc=clang gmake
-  - export CC=clang
-  - export CXX=clang++
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=release CC=clang CXX=clang++
-  - multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release --report_level=short
-  - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-release demo-clang
-  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang
-  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-release pack_file_gen-clang
+  - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug core_tests-clang-debug
+  - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-release demo-clang-debug
+  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang-debug
+  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-release pack_file_gen-clang-debug
   tags:
   - cpp
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
-    - demo-clang
-    - load_unit_gen-clang
-    - pack_file_gen-clang
+    - core_tests-clang-debug
+    - demo-clang-debug
+    - load_unit_gen-clang-debug
+    - pack_file_gen-clang-debug
+
+clang-release-build:
+  stage: build
+  script:
+  - premake5 --cc=clang gmake
+  - export CC=clang
+  - export CXX=clang++
+  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=release CC=clang CXX=clang++
+  - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release core_tests-clang-release
+  - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-release demo-clang-release
+  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang-release
+  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-release pack_file_gen-clang-release
+  tags:
+  - cpp
+  artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    paths:
+    - core_tests-clang-release
+    - demo-clang-release
+    - load_unit_gen-clang-release
+    - pack_file_gen-clang-release
 
 api-doc:
+  stage: build
   script:
   - doxygen Doxyfile
   - cd doc/latex
   - pdflatex refman.tex
-#  - bibtex refman
   - makeindex refman
   - pdflatex refman.tex
   - pdflatex refman.tex
