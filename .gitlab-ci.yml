@@ -1,6 +1,5 @@
 stages:
   - build
-  - test
   - deploy
 
 before_script:
@@ -23,19 +22,13 @@ gcc-debug-build:
   - export CC=gcc
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=gcc CXX=g++
-  - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug core_tests-gcc-debug
-  - cp multicore_engine_demo/build/bin/multicore_engine_demo-gcc-debug demo-gcc-debug
-  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-debug load_unit_gen-gcc-debug
-  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-debug pack_file_gen-gcc-debug
+  - mv multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug core_tests-gcc-debug
+  - mv multicore_engine_demo/build/bin/multicore_engine_demo-gcc-debug demo-gcc-debug
+  - mv multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-debug load_unit_gen-gcc-debug
+  - mv multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-debug pack_file_gen-gcc-debug
+  - ./core_tests-gcc-debug --report_level=short
   tags:
   - cpp
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    paths:
-    - core_tests-gcc-debug
-    - demo-gcc-debug
-    - load_unit_gen-gcc-debug
-    - pack_file_gen-gcc-debug
 
 gcc-release-build:
   stage: build
@@ -44,16 +37,16 @@ gcc-release-build:
   - export CC=gcc
   - export CXX=g++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=release CC=gcc CXX=g++
-  - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release core_tests-gcc-release
-  - cp multicore_engine_demo/build/bin/multicore_engine_demo-gcc-release demo-gcc-release
-  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-release load_unit_gen-gcc-release
-  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-release pack_file_gen-gcc-release
+  - mv multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release core_tests-gcc-release
+  - mv multicore_engine_demo/build/bin/multicore_engine_demo-gcc-release demo-gcc-release
+  - mv multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-release load_unit_gen-gcc-release
+  - mv multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-release pack_file_gen-gcc-release
+  - ./core_tests-gcc-release --report_level=short
   tags:
   - cpp
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
-    - core_tests-gcc-release
     - demo-gcc-release
     - load_unit_gen-gcc-release
     - pack_file_gen-gcc-release
@@ -65,19 +58,13 @@ clang-debug-build:
   - export CC=clang
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
-  - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug core_tests-clang-debug
-  - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-debug demo-clang-debug
-  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-debug load_unit_gen-clang-debug
-  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-debug pack_file_gen-clang-debug
+  - mv multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-debug core_tests-clang-debug
+  - mv multicore_engine_demo/build/bin/multicore_engine_demo-clang-debug demo-clang-debug
+  - mv multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-debug load_unit_gen-clang-debug
+  - mv multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-debug pack_file_gen-clang-debug
+  - ./core_tests-clang-debug --report_level=short
   tags:
   - cpp
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    paths:
-    - core_tests-clang-debug
-    - demo-clang-debug
-    - load_unit_gen-clang-debug
-    - pack_file_gen-clang-debug
 
 clang-release-build:
   stage: build
@@ -86,16 +73,16 @@ clang-release-build:
   - export CC=clang
   - export CXX=clang++
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=release CC=clang CXX=clang++
-  - cp multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release core_tests-clang-release
-  - cp multicore_engine_demo/build/bin/multicore_engine_demo-clang-release demo-clang-release
-  - cp multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang-release
-  - cp multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-release pack_file_gen-clang-release
+  - mv multicore_engine_core_tests/build/bin/multicore_engine_core_tests-clang-release core_tests-clang-release
+  - mv multicore_engine_demo/build/bin/multicore_engine_demo-clang-release demo-clang-release
+  - mv multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang-release
+  - mv multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-clang-release pack_file_gen-clang-release
+  - ./core_tests-clang-release --report_level=short
   tags:
   - cpp
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
-    - core_tests-clang-release
     - demo-clang-release
     - load_unit_gen-clang-release
     - pack_file_gen-clang-release
@@ -117,34 +104,6 @@ api-doc:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
     - refman.pdf
-
-test-gcc-debug:
-  stage: test
-  script:
-  - ./core_tests-gcc-debug --report_level=short
-  tags:
-  - cpp-test
-
-test-gcc-release:
-  stage: test
-  script:
-  - ./core_tests-gcc-release --report_level=short
-  tags:
-  - cpp-test
-
-test-clang-debug:
-  stage: test
-  script:
-  - ./core_tests-clang-debug --report_level=short
-  tags:
-  - cpp-test
-
-test-clang-release:
-  stage: test
-  script:
-  - ./core_tests-clang-release --report_level=short
-  tags:
-  - cpp-test
 
 deploy-all:
   stage: deploy
