@@ -134,4 +134,14 @@ deploy-all:
   - ls
   tags:
   - cpp
+  artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
+    paths:
+    - refman.pdf
+    - demo-gcc-release
+    - load_unit_gen-gcc-release
+    - pack_file_gen-gcc-release
+    - demo-clang-release
+    - load_unit_gen-clang-release
+    - pack_file_gen-clang-release
 
