@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - deploy
 
 before_script:
   - mkdir -p multicore_engine_{core,core_tests,demo,parsers,load_unit_gen,pack_file_gen}/build/{bin,obj-{gcc,clang}-{debug,release}}
@@ -117,13 +118,17 @@ api-doc:
     paths:
     - refman.pdf
 
-all-tests:
+test-all:
   stage: test
   script:
-  - core_tests-gcc-debug --report_level=short
-  - core_tests-gcc-release --report_level=short
-  - core_tests-clang-debug --report_level=short
-  - core_tests-clang-release --report_level=short
+  - ./core_tests-gcc-debug --report_level=short
+  - ./core_tests-gcc-release --report_level=short
+  - ./core_tests-clang-debug --report_level=short
+  - ./core_tests-clang-release --report_level=short
   tags:
   - cpp
 
+deploy-all:
+  stage: deploy
+  tags:
+  - ls
