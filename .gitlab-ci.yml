@@ -33,6 +33,7 @@ gcc-release-build:
   tags:
   - cpp
   artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
     - demo-gcc
     - load_unit_gen-gcc
@@ -61,6 +62,7 @@ clang-release-build:
   tags:
   - cpp
   artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
     - demo-clang
     - load_unit_gen-clang
@@ -80,6 +82,7 @@ api-doc:
   - latex
   - doxygen
   artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
     - refman.pdf
 
