@@ -118,15 +118,33 @@ api-doc:
     paths:
     - refman.pdf
 
-test-all:
+test-gcc-debug:
   stage: test
   script:
   - ./core_tests-gcc-debug --report_level=short
+  tags:
+  - cpp-test
+
+test-gcc-release:
+  stage: test
+  script:
   - ./core_tests-gcc-release --report_level=short
+  tags:
+  - cpp-test
+
+test-clang-debug:
+  stage: test
+  script:
   - ./core_tests-clang-debug --report_level=short
+  tags:
+  - cpp-test
+
+test-clang-release:
+  stage: test
+  script:
   - ./core_tests-clang-release --report_level=short
   tags:
-  - cpp
+  - cpp-test
 
 deploy-all:
   stage: deploy
