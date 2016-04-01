@@ -25,6 +25,7 @@ BOOST_AUTO_TEST_CASE(thread_safety_stress_test) {
 		bool do_test() {
 			if(a - 1 != b) return false;
 			a++;
+			std::this_thread::yield();
 			b++;
 			if(a - 1 != b) return false;
 			return true;
