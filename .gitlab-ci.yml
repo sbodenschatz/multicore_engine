@@ -90,6 +90,7 @@ clang-release-build:
 api-doc:
   stage: build
   script:
+  - ./generate_cloc_report.sh
   - doxygen Doxyfile
   - cd doc/latex
   - pdflatex refman.tex
@@ -98,7 +99,6 @@ api-doc:
   - pdflatex refman.tex
   - mv refman.pdf ../..
   - chmod +x generate_cloc_report.sh
-  - ./generate_cloc_report.sh
   tags:
   - latex
   - doxygen
