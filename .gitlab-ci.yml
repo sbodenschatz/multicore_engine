@@ -97,6 +97,8 @@ api-doc:
   - pdflatex refman.tex
   - pdflatex refman.tex
   - mv refman.pdf ../..
+  - chmod +x generate_cloc_report.sh
+  - ./generate_cloc_report.sh
   tags:
   - latex
   - doxygen
@@ -104,6 +106,7 @@ api-doc:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     paths:
     - refman.pdf
+    - cloc_report.txt
 
 deploy-all:
   stage: deploy
@@ -126,4 +129,5 @@ deploy-all:
     - demo-clang
     - load_unit_gen-clang
     - pack_file_gen-clang
+    - cloc_report.txt
 
