@@ -73,6 +73,26 @@ BOOST_AUTO_TEST_CASE(mutex_mock_test) {
 	BOOST_CHECK(mocked_mutex_counter == 0);
 }
 
+BOOST_AUTO_TEST_CASE(mutex_mock_test_explicit_transaction) {
+	static int mocked_mutex_counter = 0;
+	struct mocked_mutex {
+		void lock() {
+			mocked_mutex_counter++;
+		}
+		void unlock() {
+			mocked_mutex_counter--;
+		}
+	};
+	struct mocked_value_object {};
+	locked<mocked_value_object, mocked_mutex> locked_test_object;
+	BOOST_CHECK(mocked_mutex_counter == 0);
+	{
+		auto transaction = locked_test_object.start_transaction();
+		BOOST_CHECK(mocked_mutex_counter == 1);
+	}
+	BOOST_CHECK(mocked_mutex_counter == 0);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 }

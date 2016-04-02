@@ -46,6 +46,12 @@ public:
 	locked_transaction<T, Sync_Object> operator->() {
 		return locked_transaction<T, Sync_Object>(&value, sync_object);
 	}
+	locked_transaction<const T, Sync_Object> start_transaction() const {
+		return locked_transaction<const T, Sync_Object>(&value, sync_object);
+	}
+	locked_transaction<T, Sync_Object> start_transaction() {
+		return locked_transaction<T, Sync_Object>(&value, sync_object);
+	}
 };
 
 } // namespace util
