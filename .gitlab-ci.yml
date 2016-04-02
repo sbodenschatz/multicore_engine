@@ -98,6 +98,8 @@ api-doc:
   - pdflatex refman.tex
   - pdflatex refman.tex
   - mv refman.pdf ../..
+  - chmod +x generate_cloc_report.sh
+  - ./generate_cloc_report.sh
   tags:
   - latex
   - doxygen
