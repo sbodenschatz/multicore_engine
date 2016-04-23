@@ -1,0 +1,6 @@
+cmake_minimum_required (VERSION 2.6)
+project(multicore_engine_pack_file_gen)
+file(GLOB_RECURSE PACK_FILE_GEN_SRC "src/*.cpp")
+file(GLOB_RECURSE PACK_FILE_GEN_HEADERS "include/*.hpp" "include/*.h")
+add_executable(multicore_engine_pack_file_gen ${PACK_FILE_GEN_SRC} ${PACK_FILE_GEN_HEADERS})
+target_link_libraries(multicore_engine_pack_file_gen multicore_engine_core)

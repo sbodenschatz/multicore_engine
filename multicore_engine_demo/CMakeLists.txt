@@ -1,0 +1,6 @@
+cmake_minimum_required (VERSION 2.6)
+project(multicore_engine_demo)
+file(GLOB_RECURSE DEMO_SRC "src/*.cpp")
+file(GLOB_RECURSE DEMO_HEADERS "include/*.hpp" "include/*.h")
+add_executable(multicore_engine_demo ${DEMO_SRC} ${DEMO_HEADERS})
+target_link_libraries(multicore_engine_demo multicore_engine_core)

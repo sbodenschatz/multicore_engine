@@ -1,0 +1,7 @@
+cmake_minimum_required (VERSION 2.6)
+project(multicore_engine_core)
+file(GLOB_RECURSE CORE_SRC "src/*.cpp")
+file(GLOB_RECURSE CORE_HEADERS "include/*.hpp" "include/*.h")
+MESSAGE(STATUS "VK: " $ENV{VULKAN_SDK})
+add_library(multicore_engine_core STATIC ${CORE_SRC} ${CORE_HEADERS})
+target_link_libraries(multicore_engine_core multicore_engine_parsers)
