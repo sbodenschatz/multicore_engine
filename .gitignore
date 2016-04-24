@@ -10,3 +10,4 @@ Makefile
 *.lup
 *.pack
 *.db
+cloc_report.txt
