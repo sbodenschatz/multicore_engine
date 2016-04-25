@@ -58,10 +58,10 @@ clang-debug-build:
   - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug ..
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
   - cd ..
-  - mv build/multicore_engine_core_tests/multicore_engine_core_tests-clang-debug core_tests-clang-debug
-  - mv build/multicore_engine_demo/multicore_engine_demo-clang-debug demo-clang-debug
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen-clang-debug load_unit_gen-clang-debug
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen-clang-debug pack_file_gen-clang-debug
+  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-clang-debug
+  - mv build/multicore_engine_demo/multicore_engine_demo demo-clang-debug
+  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-clang-debug
+  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-clang-debug
   - ./core_tests-clang-debug --report_level=short
   tags:
   - cpp
@@ -74,9 +74,9 @@ clang-release-build:
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
   - cd ..
   - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-clang-release
-  - mv build/multicore_engine_demo/multicore_engine_demo-clang-release demo-clang-release
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen-clang-release load_unit_gen-clang-release
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen-clang-release pack_file_gen-clang-release
+  - mv build/multicore_engine_demo/multicore_engine_demo demo-clang-release
+  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-clang-release
+  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-clang-release
   - ./core_tests-clang-release --report_level=short
   tags:
   - cpp
