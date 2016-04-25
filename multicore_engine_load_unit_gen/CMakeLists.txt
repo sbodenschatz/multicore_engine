@@ -1,0 +1,8 @@
+cmake_minimum_required (VERSION 2.6)
+project(multicore_engine_load_unit_gen)
+file(GLOB_RECURSE LOAD_UNIT_GEN_SRC "src/*.cpp")
+add_executable(multicore_engine_load_unit_gen ${LOAD_UNIT_GEN_SRC})
+target_link_libraries(multicore_engine_load_unit_gen multicore_engine_core)
+if(MSVC)
+	set_target_properties(multicore_engine_load_unit_gen PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
+endif()
