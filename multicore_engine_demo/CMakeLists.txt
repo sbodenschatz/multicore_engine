@@ -1,0 +1,8 @@
+cmake_minimum_required (VERSION 2.6)
+project(multicore_engine_demo)
+file(GLOB_RECURSE DEMO_SRC "src/*.cpp")
+add_executable(multicore_engine_demo ${DEMO_SRC})
+target_link_libraries(multicore_engine_demo multicore_engine_core)
+if(MSVC)
+	set_target_properties(multicore_engine_demo PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
+endif()

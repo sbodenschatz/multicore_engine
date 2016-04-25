@@ -125,6 +125,7 @@ private:
 	typedef unsigned int ref_count_tag_t;
 
 	struct tagged_ref_count {
+		alignas(sizeof(ref_count_t)+sizeof(ref_count_tag_t))
 		ref_count_t count;
 		ref_count_tag_t version;
 	};

@@ -9,3 +9,5 @@ Makefile
 *.lum
 *.lup
 *.pack
+*.db
+cloc_report.txt
