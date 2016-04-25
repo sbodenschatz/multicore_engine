@@ -8,9 +8,8 @@ before_script:
 scan-build:
   stage: build
   script:
-  - premake5 --cc=gcc gmake
-  - export CC=clang
-  - export CXX=clang++
+  - mkdir build && cd build
+  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug ..
   - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
   tags:
   - cpp
@@ -18,14 +17,14 @@ scan-build:
 gcc-debug-build:
   stage: build
   script:
-  - premake5 --cc=gcc gmake
-  - export CC=gcc
-  - export CXX=g++
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=gcc CXX=g++
-  - mv multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-debug core_tests-gcc-debug
-  - mv multicore_engine_demo/build/bin/multicore_engine_demo-gcc-debug demo-gcc-debug
-  - mv multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-debug load_unit_gen-gcc-debug
-  - mv multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-debug pack_file_gen-gcc-debug
+  - mkdir build && cd build
+  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
+  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
+  - cd ..
+  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-gcc-debug
+  - mv build/multicore_engine_demo/multicore_engine_demo demo-gcc-debug
+  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-gcc-debug
+  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-gcc-debug
   - ./core_tests-gcc-debug --report_level=short
   tags:
   - cpp
@@ -33,14 +32,14 @@ gcc-debug-build:
 gcc-release-build:
   stage: build
   script:
-  - premake5 --cc=gcc gmake
-  - export CC=gcc
-  - export CXX=g++
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=release CC=gcc CXX=g++
-  - mv multicore_engine_core_tests/build/bin/multicore_engine_core_tests-gcc-release core_tests-gcc-release
-  - mv multicore_engine_demo/build/bin/multicore_engine_demo-gcc-release demo-gcc-release
-  - mv multicore_engine_load_unit_gen/build/bin/multicore_engine_load_unit_gen-gcc-release load_unit_gen-gcc-release
-  - mv multicore_engine_pack_file_gen/build/bin/multicore_engine_pack_file_gen-gcc-release pack_file_gen-gcc-release
+  - mkdir build && cd build
+  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
+  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
+  - cd ..
+  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-gcc-release
+  - mv build/multicore_engine_demo/multicore_engine_demo demo-gcc-release
+  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-gcc-release
+  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-gcc-release
   - ./core_tests-gcc-release --report_level=short
   tags:
   - cpp
