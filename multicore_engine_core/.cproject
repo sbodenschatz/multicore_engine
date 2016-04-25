@@ -18,7 +18,7 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1830712584" name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.1309551844" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.169021340" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
-							<builder arguments="CC=gcc config=debug -j16" buildPath="${workspace_loc:/multicore_engine_core}/build" command="make" id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1864019754" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder">
+							<builder arguments="-j16" buildPath="${workspace_loc:}/eclipse_build_debug/multicore_engine_core" command="make" id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1864019754" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="build"/>
 								</outputEntries>
@@ -92,7 +92,7 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.541781603" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.312912805" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
-							<builder arguments="CC=gcc config=release -j16" buildPath="${workspace_loc:/multicore_engine_core}/build" command="make" id="org.eclipse.cdt.build.core.settings.default.builder.964515743" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<builder arguments="-j16" buildPath="${workspace_loc:}/eclipse_build_release/multicore_engine_core" command="make" id="org.eclipse.cdt.build.core.settings.default.builder.964515743" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.832309887" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.512312975" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
@@ -108,7 +108,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.102887474" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.102887474" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033980625" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -119,7 +119,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.457364909" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.457364909" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.851904731" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
