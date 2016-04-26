@@ -17,6 +17,7 @@
 #pragma warning(disable : 4714)
 #pragma warning(disable : 4127)
 #pragma warning(disable : 4100)
+#pragma warning(disable : 4348)
 #endif
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
