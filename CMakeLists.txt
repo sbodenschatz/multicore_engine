@@ -3,6 +3,8 @@ project (multicore_engine)
 
 include(CMakeUtils.txt)
 
+make_build_scripts_project(.gitlab-ci.yml Doxyfile .clang-format)
+
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 if(NOT MSVC)
 	if(NOT (${CMAKE_BUILD_TYPE} STREQUAL Debug) AND NOT (${CMAKE_BUILD_TYPE} STREQUAL Release))
