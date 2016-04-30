@@ -90,6 +90,7 @@ elseif(UNIX)
 endif()
 
 add_subdirectory(multicore_engine_parsers)
+add_subdirectory(multicore_engine_assets)
 add_subdirectory(multicore_engine_core)
 add_subdirectory(multicore_engine_core_tests)
 add_subdirectory(multicore_engine_demo)
