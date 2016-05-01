@@ -17,9 +17,11 @@ namespace asset_gen {
 namespace ast {
 
 struct load_unit_entry {
-	load_unit_entry(const std::string& external_path, lookup_type lookup, const std::string& internal_path) :external_path(external_path), lookup(lookup), internal_path(internal_path) {}
-	load_unit_entry(const std::string& external_path, const std::string& internal_path) :external_path(external_path), internal_path(internal_path) {}
-	load_unit_entry(){}
+	load_unit_entry(const std::string& external_path, lookup_type lookup, const std::string& internal_path)
+			: external_path(external_path), lookup(lookup), internal_path(internal_path) {}
+	load_unit_entry(const std::string& external_path, const std::string& internal_path)
+			: external_path(external_path), internal_path(internal_path) {}
+	load_unit_entry() {}
 	std::string external_path;
 	lookup_type lookup = lookup_type::w;
 	std::string internal_path;
