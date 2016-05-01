@@ -10,13 +10,20 @@
 #include <string>
 #include <vector>
 #include <ostream>
+#include "base_ast.hpp"
 
 namespace mce {
 namespace asset_gen {
 namespace ast {
 
 struct pack_file_entry {
+	pack_file_entry(const std::string& external_path, lookup_type lookup, const std::string& internal_path)
+			: external_path(external_path), lookup(lookup), internal_path(internal_path) {}
+	pack_file_entry(const std::string& external_path, const std::string& internal_path)
+			: external_path(external_path), internal_path(internal_path) {}
+	pack_file_entry() {}
 	std::string external_path;
+	lookup_type lookup = lookup_type::w;
 	std::string internal_path;
 };
 

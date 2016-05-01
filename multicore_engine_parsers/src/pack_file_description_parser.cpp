@@ -59,6 +59,7 @@ struct pack_file_description_grammar
 	rule<std::string()> string_literal;
 	rule<std::string()> identifier;
 	rule<int> zip_level;
+	rule<ast::lookup_type> lookup_spec;
 
 	pack_file_description_grammar() : pack_file_description_grammar::base_type(start) {
 		using qi::_1;
@@ -78,7 +79,8 @@ struct pack_file_description_grammar
 
 		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
 		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
-		entry %= string_literal >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
+		lookup_spec = no_case[lit("w")[_val = ast::lookup_type::w] | lit("d")[_val = ast::lookup_type::d]];
+		entry %= string_literal >> -(lookup_spec) >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
 		zip_level = ((lit("zip(") >> int_ >> lit(')'))[_val = _1]) // Explicit level
 					| (lit("zip")[_val = -1])					   // Default level
 					| (eps[_val = -2]);							   // Uncompressed

@@ -14,7 +14,8 @@ namespace asset_gen {
 namespace ast {
 
 inline bool operator==(const pack_file_entry& o1, const pack_file_entry& o2) {
-	return o1.external_path == o2.external_path && o1.internal_path == o2.internal_path;
+	return o1.external_path == o2.external_path && o1.lookup == o2.lookup &&
+		   o1.internal_path == o2.internal_path;
 }
 inline bool operator!=(const pack_file_entry& o1, const pack_file_entry& o2) {
 	return !(o1 == o2);
