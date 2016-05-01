@@ -12,4 +12,7 @@ endforeach()
 file(GLOB_RECURSE SHADERS_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.vert" "*.tesc" "*.tese" "*.geom" "*.frag" "*.comp")
 compile_glsl_to_spirv(SPV_OBJ ${SHADERS_SRC})
 
-add_custom_target(multicore_engine_assets ALL SOURCES ${SHADERS_SRC} DEPENDS ${SPV_OBJ})
+file(GLOB_RECURSE LOAD_UNIT_DESCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.lud")
+build_load_units(LOAD_UNIT_METAS, LOAD_UNIT_PAYLOADS ${LOAD_UNIT_DESCS})
+
+add_custom_target(multicore_engine_assets ALL SOURCES ${SHADERS_SRC} ${LOAD_UNIT_DESCS} DEPENDS ${SPV_OBJ} ${LOAD_UNIT_METAS} ${LOAD_UNIT_PAYLOADS})
