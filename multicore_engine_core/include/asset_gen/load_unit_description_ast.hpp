@@ -7,10 +7,10 @@
 #ifndef ASSET_GEN_LOAD_UNIT_DESCRIPTION_AST_HPP_
 #define ASSET_GEN_LOAD_UNIT_DESCRIPTION_AST_HPP_
 
+#include "base_ast.hpp"
+#include <ostream>
 #include <string>
 #include <vector>
-#include <ostream>
-#include "base_ast.hpp"
 
 namespace mce {
 namespace asset_gen {
