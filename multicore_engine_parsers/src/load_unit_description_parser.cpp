@@ -58,6 +58,7 @@ struct load_unit_description_grammar
 	rule<ast::load_unit_entry()> entry;
 	rule<std::string()> string_literal;
 	rule<std::string()> identifier;
+	rule<ast::lookup_type> lookup_spec;
 
 	load_unit_description_grammar() : load_unit_description_grammar::base_type(start) {
 		using qi::_1;
@@ -75,7 +76,8 @@ struct load_unit_description_grammar
 
 		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
 		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
-		entry %= string_literal >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
+		lookup_spec = no_case[lit("w")[_val = ast::lookup_type::w] | lit("d")[_val = ast::lookup_type::d]];
+		entry %= string_literal >> -(lookup_spec) >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
 		section %= identifier >> lit('{') >> *(entry) >> lit('}');
 		start %= *(section);
 

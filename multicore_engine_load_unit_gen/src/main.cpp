@@ -51,9 +51,9 @@ int main(int argc, char* argv[]) {
 	if(metadata_output_file.empty()) {
 		metadata_output_file = fs::path(description_file).replace_extension("lum").string();
 	}
-	std::cout << description_file << std::endl;
-	std::cout << payload_output_file << std::endl;
-	std::cout << metadata_output_file << std::endl;
+	//	std::cout << description_file << std::endl;
+	//	std::cout << payload_output_file << std::endl;
+	//	std::cout << metadata_output_file << std::endl;
 	mce::asset_gen::load_unit_gen gen;
 	mce::asset_gen::parser::load_unit_description_parser parser;
 	auto ast = parser.load_file(description_file);
@@ -64,7 +64,11 @@ int main(int argc, char* argv[]) {
 			fs::path entry_path(entry.external_path);
 			auto entry_path_abs = entry_path;
 			if(entry_path.is_relative()) {
-				entry_path_abs = fs::absolute(entry_path, desc_dir);
+				if(entry.lookup == mce::asset_gen::ast::lookup_type::d) {
+					entry_path_abs = fs::absolute(entry_path, desc_dir);
+				} else {
+					entry_path_abs = fs::absolute(entry_path, fs::current_path());
+				}
 			}
 			if(!fs::exists(entry_path_abs)) {
 				std::cerr << "File '" << entry_path << "' not found." << std::endl;

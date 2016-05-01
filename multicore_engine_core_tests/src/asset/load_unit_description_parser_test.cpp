@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(single_section_single_entry) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::load_unit_ast_root root_expected;
-	ast::load_unit_section sec1{"test", {{"test1", "test2"}}};
+	ast::load_unit_section sec1{"test", {{"test1", ast::lookup_type::w, "test2"}}};
 	root_expected.emplace_back(sec1);
 	BOOST_CHECK(root == root_expected);
 }
@@ -92,7 +92,10 @@ BOOST_AUTO_TEST_CASE(single_section_multi_entry) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::load_unit_ast_root root_expected;
-	ast::load_unit_section sec1{"test", {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}};
+	ast::load_unit_section sec1{"test",
+								{{"test1", ast::lookup_type::w, "test2"},
+								 {"test3", ast::lookup_type::w, "test4"},
+								 {"test5", ast::lookup_type::w, "test6"}}};
 	root_expected.emplace_back(sec1);
 	BOOST_CHECK(root == root_expected);
 }
@@ -106,14 +109,14 @@ BOOST_AUTO_TEST_CASE(multi_section_single_entry) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::load_unit_ast_root root_expected;
-	root_expected.emplace_back(ast::load_unit_section{"testA", {{"test1", "test2"}}});
-	root_expected.emplace_back(ast::load_unit_section{"testB", {{"test1", "test2"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testA", {{"test1", ast::lookup_type::w, "test2"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testB", {{"test1", ast::lookup_type::w, "test2"}}});
 	BOOST_CHECK(root == root_expected);
 }
 BOOST_AUTO_TEST_CASE(multi_section_multi_entry) {
 	load_unit_description_parser parser;
-	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
-						   "testB{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"d->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"d->\"test6\";}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -121,17 +124,21 @@ BOOST_AUTO_TEST_CASE(multi_section_multi_entry) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::load_unit_ast_root root_expected;
-	root_expected.emplace_back(
-			ast::load_unit_section{"testA", {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
-	root_expected.emplace_back(
-			ast::load_unit_section{"testB", {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testA",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::d, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testB",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::d, "test6"}}});
 	BOOST_CHECK(root == root_expected);
 }
 
 BOOST_AUTO_TEST_CASE(no_internal_path) {
 	load_unit_description_parser parser;
-	std::string testdata = "testA{\"test1\";\"test3\";\"test5\";}"
-						   "testB{\"test1\";\"test3\";\"test5\";}";
+	std::string testdata = "testA{\"test1\";\"test3\"D;\"test5\";}"
+						   "testB{\"test1\";\"test3\";\"test5\"d;}";
 	ast::load_unit_ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -139,10 +146,14 @@ BOOST_AUTO_TEST_CASE(no_internal_path) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::load_unit_ast_root root_expected;
-	root_expected.emplace_back(
-			ast::load_unit_section{"testA", {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
-	root_expected.emplace_back(
-			ast::load_unit_section{"testB", {{"test1", {}}, {"test3", {}}, {"test5", {}}}});
+	root_expected.emplace_back(ast::load_unit_section{"testA",
+													  {{"test1", ast::lookup_type::w, {}},
+													   {"test3", ast::lookup_type::d, {}},
+													   {"test5", ast::lookup_type::w, {}}}});
+	root_expected.emplace_back(ast::load_unit_section{"testB",
+													  {{"test1", ast::lookup_type::w, {}},
+													   {"test3", ast::lookup_type::w, {}},
+													   {"test5", ast::lookup_type::d, {}}}});
 	BOOST_CHECK(root == root_expected);
 }
 
@@ -159,10 +170,14 @@ BOOST_AUTO_TEST_CASE(whitespace_skipping) {
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::load_unit_ast_root root_expected;
-	root_expected.emplace_back(
-			ast::load_unit_section{"testA", {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
-	root_expected.emplace_back(
-			ast::load_unit_section{"testB", {{"test1", "test2"}, {"test3", "test4"}, {"test5", "test6"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testA",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testB",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
 	BOOST_CHECK(root == root_expected);
 }
 
