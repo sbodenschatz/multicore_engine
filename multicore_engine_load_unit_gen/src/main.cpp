@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
 	std::string payload_output_file;
 	std::string metadata_output_file;
 	std::string deps_file;
+
 	po::options_description desc;
 	desc.add_options()																			 //
 			("help,h", "Display help message.")													 //
@@ -30,9 +31,8 @@ int main(int argc, char* argv[]) {
 			 "The output file name for the payload data.")										 //
 			("meta-output,m", po::value(&metadata_output_file),									 //
 			 "The output file name for the metadata.")											 //
-			/*TODO:
-			 * ("deps", po::value(&deps_file),														 //
-			 "Generate makefile-style dependency rules into given file")*/;																			 //
+			("deps", po::value(&deps_file),														 //
+			 "Generate makefile-style dependency rules into given file");						 //
 	po::variables_map vars;
 	po::store(po::parse_command_line(argc, argv, desc), vars);
 	po::notify(vars);
@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
 	auto ast = parser.load_file(description_file);
 	fs::path desc_dir = fs::path(description_file).parent_path();
 	bool incomplete = false;
+	std::ofstream deps_file_stream(deps_file, std::ios_base::out | std::ios_base::trunc);
 	for(const auto& section : ast) {
 		for(const auto& entry : section.entries) {
 			fs::path entry_path(entry.external_path);
@@ -74,6 +75,9 @@ int main(int argc, char* argv[]) {
 				std::cerr << "File '" << entry_path << "' not found." << std::endl;
 				incomplete = true;
 				continue;
+			}
+			if(!deps_file.empty()) {
+				deps_file_stream << entry_path_abs.generic_string() << ";";
 			}
 			auto internal_path = entry.internal_path;
 			if(internal_path.empty()) {

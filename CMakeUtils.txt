@@ -57,10 +57,16 @@ function(build_load_units OUTPUT_META_LIST OUTPUT_PAYLOAD_LIST)
 		get_filename_component(DIR ${DESC_FILE} DIRECTORY)
 		set(PL_FILE ${DIR}${BASE_NAME}.lup)
 		set(META_FILE ${DIR}${BASE_NAME}.lum)
+		set(DEPS_FILE ${CMAKE_CURRENT_BINARY_DIR}/${DIR}${BASE_NAME}.deps)
+		set(DEPS_LIST)
+		if(EXISTS ${DEPS_FILE})
+			file(READ ${DEPS_FILE} DEPS_LIST)
+		endif()
 		add_custom_command(
 			OUTPUT ${META_FILE} ${PL_FILE}
-			COMMAND multicore_engine_load_unit_gen -m ${META_FILE} -p ${PL_FILE} -d ${CMAKE_CURRENT_SOURCE_DIR}/${DESC_FILE}
-			MAIN_DEPENDENCY ${DESC_FILE} 
+			COMMAND multicore_engine_load_unit_gen -m ${META_FILE} -p ${PL_FILE} --deps ${DEPS_FILE} -d ${CMAKE_CURRENT_SOURCE_DIR}/${DESC_FILE}
+			MAIN_DEPENDENCY ${DESC_FILE}
+			DEPENDS ${DEPS_LIST}
 			COMMENT "Building load unit from \"${DESC_FILE}\" to meta file \"${META_FILE}\" and payload file \"${PL_FILE}\""
 		)
 		list(APPEND LUM_LIST ${META_FILE})
