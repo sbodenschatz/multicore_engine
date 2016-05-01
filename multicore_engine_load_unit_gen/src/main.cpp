@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <util/program_name.hpp>
+#include <fstream>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
