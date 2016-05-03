@@ -77,14 +77,14 @@ int main(int argc, char* argv[]) {
 					entry_path_abs = fs::absolute(entry_path, fs::current_path());
 				}
 			}
-			if(!fs::exists(entry_path_abs)) {
-				std::cerr << "File '" << entry_path << "' not found." << std::endl;
-				incomplete = true;
-				continue;
-			}
 			if(deps) {
 				std::cout << entry_path_abs.generic_string() << ";";
 			} else {
+				if(!fs::exists(entry_path_abs)) {
+					std::cerr << "File '" << entry_path << "' not found." << std::endl;
+					incomplete = true;
+					continue;
+				}
 				auto internal_path = entry.internal_path;
 				if(internal_path.empty()) {
 					if(entry_path.is_relative()) {
