@@ -4,6 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4505)
+#endif
+
 #include <asset_gen/load_unit_gen.hpp>
 #include <asset_gen/load_unit_description_parser.hpp>
 #include <asset_gen/load_unit_description_ast.hpp>
@@ -22,7 +26,8 @@ int main(int argc, char* argv[]) {
 	std::string description_file;
 	std::string payload_output_file;
 	std::string metadata_output_file;
-	std::string deps_file;
+	// std::string deps_file;
+	bool deps = false;
 
 	po::options_description desc;
 	desc.add_options()																			 //
@@ -32,8 +37,9 @@ int main(int argc, char* argv[]) {
 			 "The output file name for the payload data.")										 //
 			("meta-output,m", po::value(&metadata_output_file),									 //
 			 "The output file name for the metadata.")											 //
-			("deps", po::value(&deps_file),														 //
-			 "Generate makefile-style dependency rules into given file");						 //
+			("deps", po::bool_switch(&deps), "Only generate list of dependencies.")
+			/*("deps", po::value(&deps_file),														 //
+			 "Generate makefile-style dependency rules into given file")*/; //
 	po::variables_map vars;
 	po::store(po::parse_command_line(argc, argv, desc), vars);
 	po::notify(vars);
@@ -60,7 +66,6 @@ int main(int argc, char* argv[]) {
 	auto ast = parser.load_file(description_file);
 	fs::path desc_dir = fs::path(description_file).parent_path();
 	bool incomplete = false;
-	std::ofstream deps_file_stream(deps_file, std::ios_base::out | std::ios_base::trunc);
 	for(const auto& section : ast) {
 		for(const auto& entry : section.entries) {
 			fs::path entry_path(entry.external_path);
@@ -77,21 +82,23 @@ int main(int argc, char* argv[]) {
 				incomplete = true;
 				continue;
 			}
-			if(!deps_file.empty()) {
-				deps_file_stream << entry_path_abs.generic_string() << ";";
-			}
-			auto internal_path = entry.internal_path;
-			if(internal_path.empty()) {
-				if(entry_path.is_relative()) {
-					internal_path = entry.external_path;
-				} else {
-					// TODO: make entry path relative to desc file ?
-					internal_path = entry_path.filename().string();
+			if(deps) {
+				std::cout << entry_path_abs.generic_string() << ";";
+			} else {
+				auto internal_path = entry.internal_path;
+				if(internal_path.empty()) {
+					if(entry_path.is_relative()) {
+						internal_path = entry.external_path;
+					} else {
+						// TODO: make entry path relative to desc file ?
+						internal_path = entry_path.filename().string();
+					}
 				}
+				gen.add_file(entry_path_abs.string(), internal_path);
 			}
-			gen.add_file(entry_path_abs.string(), internal_path);
 		}
 	}
-	gen.compile_load_unit(metadata_output_file, payload_output_file);
+	std::cout.flush();
+	if(!deps) gen.compile_load_unit(metadata_output_file, payload_output_file);
 	if(incomplete) return -2;
 }

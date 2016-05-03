@@ -4,6 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4505)
+#endif
+
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <string>
