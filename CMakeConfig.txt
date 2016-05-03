@@ -41,6 +41,7 @@ if (MSVC)
 endif ()
 
 add_definitions(-DGLM_FORCE_RADIANS -DGLM_SWIZZLE -DGLM_FORCE_SIZE_T_LENGTH -DZLIB_CONST -DVKCPP_ENHANCED_MODE -DGLFW_INCLUDE_VULKAN)
+include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_base/include)
 include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_core/include)
 include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_parsers/include)
 

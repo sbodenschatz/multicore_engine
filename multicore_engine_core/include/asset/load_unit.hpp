@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <vector>
 #include <util/local_function.hpp>
-#include "load_unit_meta_data.hpp"
+#include <asset/load_unit_meta_data.hpp>
 #include "asset_defs.hpp"
 
 namespace mce {

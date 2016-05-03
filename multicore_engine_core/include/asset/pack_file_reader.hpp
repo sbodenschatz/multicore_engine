@@ -14,7 +14,7 @@
 #include <memory>
 #include <string>
 #include <stdexcept>
-#include "pack_file_meta_data.hpp"
+#include <asset/pack_file_meta_data.hpp>
 #include <bstream/istream_bstream.hpp>
 #include <atomic>
 #include <util/lock_ptr_wrapper.hpp>

@@ -5,11 +5,12 @@ include(../CMakeUtils.txt)
 set(CMAKE_CONFIGURATION_TYPES "Release")
 include(../CMakeConfig.txt)
 
+include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_base/include)
 include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_core/include)
 include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_parsers/include)
 
 add_subdirectory(../multicore_engine_parsers multicore_engine_parsers)
-add_subdirectory(../multicore_engine_core multicore_engine_core)
+add_subdirectory(../multicore_engine_base multicore_engine_base)
 add_subdirectory(../multicore_engine_load_unit_gen multicore_engine_load_unit_gen)
 add_subdirectory(../multicore_engine_pack_file_gen multicore_engine_pack_file_gen)
 
