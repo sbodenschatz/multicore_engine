@@ -23,15 +23,18 @@ namespace fs = boost::filesystem;
 int main(int argc, char* argv[]) {
 	std::string description_file;
 	std::string output_file;
-	std::string deps_file;
+	// std::string deps_file;
 	po::options_description desc;
+	bool deps = false;
+
 	desc.add_options()																			 //
 			("help,h", "Display help message.")													 //
 			("description-file,d", po::value(&description_file), "The description file to use.") //
 			("output,o", po::value(&output_file), "The output file name.")						 //
+			("deps", po::bool_switch(&deps), "Only generate list of dependencies.")
 			/*TODO:
 			 * ("deps", po::value(&deps_file),														 //
-			 "Generate makefile-style dependency rules into given file")*/;																			 //
+			 "Generate makefile-style dependency rules into given file")*/; //
 	po::variables_map vars;
 	po::store(po::parse_command_line(argc, argv, desc), vars);
 	po::notify(vars);
@@ -65,27 +68,32 @@ int main(int argc, char* argv[]) {
 					entry_path_abs = fs::absolute(entry_path, fs::current_path());
 				}
 			}
-			if(!fs::exists(entry_path_abs)) {
-				std::cerr << "File '" << entry_path << "' not found." << std::endl;
-				incomplete = true;
-				continue;
-			}
-			auto internal_path = entry.internal_path;
-			if(internal_path.empty()) {
-				if(entry_path.is_relative()) {
-					internal_path = entry.external_path;
-				} else {
-					// TODO: make entry path relative to desc file ?
-					internal_path = entry_path.filename().string();
-				}
-			}
-			if(section.zip_level > -2) {
-				gen.add_file_compressed(entry_path_abs.string(), internal_path, section.zip_level);
+			if(deps) {
+				std::cout << entry_path_abs.generic_string() << ";";
 			} else {
-				gen.add_file(entry_path_abs.string(), internal_path);
+				if(!fs::exists(entry_path_abs)) {
+					std::cerr << "File '" << entry_path.generic_string() << "' not found." << std::endl;
+					incomplete = true;
+					continue;
+				}
+				auto internal_path = entry.internal_path;
+				if(internal_path.empty()) {
+					if(entry_path.is_relative()) {
+						internal_path = entry.external_path;
+					} else {
+						// TODO: make entry path relative to desc file ?
+						internal_path = entry_path.filename().string();
+					}
+				}
+				if(section.zip_level > -2) {
+					gen.add_file_compressed(entry_path_abs.string(), internal_path, section.zip_level);
+				} else {
+					gen.add_file(entry_path_abs.string(), internal_path);
+				}
 			}
 		}
 	}
-	gen.compile_pack_file(output_file);
+	std::cout.flush();
+	if(!deps) gen.compile_pack_file(output_file);
 	if(incomplete) return -2;
 }
