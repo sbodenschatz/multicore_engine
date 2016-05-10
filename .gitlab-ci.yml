@@ -123,6 +123,8 @@ deploy-all:
   - mv load_unit_gen-clang-release clang/load_unit_gen
   - mv pack_file_gen-clang-release clang/pack_file_gen
   - mv assets-clang-release.pack clang/assets.pack
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen gcc/assets.pack clang/assets.pack > checksums.txt
+  - cat checksums.txt
   tags:
   - deploy
   artifacts:
@@ -138,3 +140,4 @@ deploy-all:
     - clang/load_unit_gen
     - clang/pack_file_gen
     - clang/assets.pack
+    - checksums.txt
