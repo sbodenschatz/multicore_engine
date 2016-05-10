@@ -37,6 +37,7 @@ gcc-release-build:
   - mv build/multicore_engine_demo/multicore_engine_demo demo-gcc-release
   - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-gcc-release
   - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-gcc-release
+  - mv build/multicore_engine_assets/assets.pack assets-gcc-release.pack
   - ./core_tests-gcc-release --report_level=short
   tags:
   - cpp
@@ -46,6 +47,7 @@ gcc-release-build:
     - demo-gcc-release
     - load_unit_gen-gcc-release
     - pack_file_gen-gcc-release
+    - assets-gcc-release.pack
 
 clang-debug-build:
   stage: build
@@ -73,6 +75,7 @@ clang-release-build:
   - mv build/multicore_engine_demo/multicore_engine_demo demo-clang-release
   - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-clang-release
   - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-clang-release
+  - mv build/multicore_engine_assets/assets.pack assets-clang-release.pack
   - ./core_tests-clang-release --report_level=short
   tags:
   - cpp
@@ -82,6 +85,7 @@ clang-release-build:
     - demo-clang-release
     - load_unit_gen-clang-release
     - pack_file_gen-clang-release
+    - assets-clang-release.pack
 
 api-doc:
   stage: build
@@ -109,23 +113,28 @@ api-doc:
 deploy-all:
   stage: deploy
   script:
-  - mv demo-gcc-release demo-gcc
-  - mv load_unit_gen-gcc-release load_unit_gen-gcc
-  - mv pack_file_gen-gcc-release pack_file_gen-gcc
-  - mv demo-clang-release demo-clang
-  - mv load_unit_gen-clang-release load_unit_gen-clang
-  - mv pack_file_gen-clang-release pack_file_gen-clang
+  - mkdir gcc
+  - mkdir clang
+  - mv demo-gcc-release gcc/demo
+  - mv load_unit_gen-gcc-release gcc/load_unit_gen
+  - mv pack_file_gen-gcc-release gcc/pack_file_gen
+  - mv assets-gcc-release.pack gcc/assets.pack
+  - mv demo-clang-release clang/demo
+  - mv load_unit_gen-clang-release clang/load_unit_gen
+  - mv pack_file_gen-clang-release clang/pack_file_gen
+  - mv assets-clang-release.pack clang/assets.pack
   tags:
   - deploy
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
     paths:
     - refman.pdf
-    - demo-gcc
-    - load_unit_gen-gcc
-    - pack_file_gen-gcc
-    - demo-clang
-    - load_unit_gen-clang
-    - pack_file_gen-clang
     - cloc_report.txt
-
+    - gcc/demo
+    - gcc/load_unit_gen
+    - gcc/pack_file_gen
+    - gcc/assets.pack
+    - clang/demo
+    - clang/load_unit_gen
+    - clang/pack_file_gen
+    - clang/assets.pack
