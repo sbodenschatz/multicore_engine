@@ -8,7 +8,7 @@ make_build_scripts_project(.gitlab-ci.yml Doxyfile .clang-format)
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 include(CMakeConfig.txt)
 
-if(NOT DEFINED STATIC_ANALYSIS_ONLY)
+if(NOT STATIC_ANALYSIS_ONLY)
 	bootstrap_tools()
 	add_subdirectory(multicore_engine_assets)
 endif()
