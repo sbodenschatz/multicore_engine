@@ -47,7 +47,7 @@ gcc-release-build:
     - demo-gcc-release
     - load_unit_gen-gcc-release
     - pack_file_gen-gcc-release
-    - assets-gcc-release.pack
+#    - assets-gcc-release.pack
 
 clang-debug-build:
   stage: build
@@ -85,7 +85,7 @@ clang-release-build:
     - demo-clang-release
     - load_unit_gen-clang-release
     - pack_file_gen-clang-release
-    - assets-clang-release.pack
+#    - assets-clang-release.pack
 
 api-doc:
   stage: build
@@ -99,8 +99,6 @@ api-doc:
   - pdflatex refman.tex
   - pdflatex refman.tex
   - mv refman.pdf ../..
-  - chmod +x generate_cloc_report.sh
-  - ./generate_cloc_report.sh
   tags:
   - latex
   - doxygen
@@ -118,12 +116,13 @@ deploy-all:
   - mv demo-gcc-release gcc/demo
   - mv load_unit_gen-gcc-release gcc/load_unit_gen
   - mv pack_file_gen-gcc-release gcc/pack_file_gen
-  - mv assets-gcc-release.pack gcc/assets.pack
+#  - mv assets-gcc-release.pack gcc/assets.pack
   - mv demo-clang-release clang/demo
   - mv load_unit_gen-clang-release clang/load_unit_gen
   - mv pack_file_gen-clang-release clang/pack_file_gen
-  - mv assets-clang-release.pack clang/assets.pack
-  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen gcc/assets.pack clang/assets.pack > checksums.txt
+#  - mv assets-clang-release.pack clang/assets.pack
+#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen gcc/assets.pack clang/assets.pack > checksums.txt
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen > checksums.txt
   - cat checksums.txt
   tags:
   - deploy
@@ -135,9 +134,9 @@ deploy-all:
     - gcc/demo
     - gcc/load_unit_gen
     - gcc/pack_file_gen
-    - gcc/assets.pack
+#    - gcc/assets.pack
     - clang/demo
     - clang/load_unit_gen
     - clang/pack_file_gen
     - clang/assets.pack
-    - checksums.txt
+#    - checksums.txt
