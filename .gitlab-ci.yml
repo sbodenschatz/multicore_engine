@@ -37,7 +37,7 @@ gcc-release-build:
   - mv build/multicore_engine_demo/multicore_engine_demo demo-gcc-release
   - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-gcc-release
   - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-gcc-release
-  - mv build/multicore_engine_assets/assets.pack assets-gcc-release.pack
+#  - mv build/multicore_engine_assets/assets.pack assets-gcc-release.pack
   - ./core_tests-gcc-release --report_level=short
   tags:
   - cpp
@@ -75,7 +75,7 @@ clang-release-build:
   - mv build/multicore_engine_demo/multicore_engine_demo demo-clang-release
   - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-clang-release
   - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-clang-release
-  - mv build/multicore_engine_assets/assets.pack assets-clang-release.pack
+#  - mv build/multicore_engine_assets/assets.pack assets-clang-release.pack
   - ./core_tests-clang-release --report_level=short
   tags:
   - cpp
