@@ -20,4 +20,5 @@ add_subdirectory(multicore_engine_core_tests)
 add_subdirectory(multicore_engine_demo)
 add_subdirectory(multicore_engine_load_unit_gen)
 add_subdirectory(multicore_engine_pack_file_gen)
+add_subdirectory(multicore_engine_model_converter)
 

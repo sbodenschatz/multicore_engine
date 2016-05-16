@@ -83,12 +83,14 @@ function(bootstrap_tools)
 		execute_process(COMMAND cmake --build . --config Release WORKING_DIRECTORY tools_bootstrap)
 		set(BOOTSTRAP_LOAD_UNIT_GEN ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_load_unit_gen/Release/multicore_engine_load_unit_gen PARENT_SCOPE)
 		set(BOOTSTRAP_PACK_FILE_GEN ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_pack_file_gen/Release/multicore_engine_pack_file_gen PARENT_SCOPE)
+		set(BOOTSTRAP_PACK_MODEL_CONV ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_model_converter/Release/multicore_engine_model_converter PARENT_SCOPE)
 	else()
 		file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools_bootstrap)
 		execute_process(COMMAND cmake -G "${CMAKE_GENERATOR}" ${CMAKE_SOURCE_DIR}/tools_bootstrap -DCMAKE_BUILD_TYPE=Release WORKING_DIRECTORY tools_bootstrap)
 		execute_process(COMMAND cmake --build . --config Release -- -j ${CPU_COUNT} WORKING_DIRECTORY tools_bootstrap)
 		set(BOOTSTRAP_LOAD_UNIT_GEN ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen PARENT_SCOPE)
 		set(BOOTSTRAP_PACK_FILE_GEN ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen PARENT_SCOPE)
+		set(BOOTSTRAP_PACK_MODEL_CONV ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_model_converter/multicore_engine_model_converter PARENT_SCOPE)
 	endif()
 	MESSAGE(STATUS "Bootstrapped asset tools.")
 endfunction()
@@ -110,5 +112,22 @@ function(build_pack_files OUTPUT_LIST)
 		list(APPEND PACK_LIST ${PACK_FILE})
 	endforeach()
 	set(${OUTPUT_LIST} ${PACK_LIST} PARENT_SCOPE)
+endfunction()
+
+function(convert_models OUTPUT_LIST)
+	set(MODEL_LIST)
+	foreach(SRC_FILE ${ARGN})
+		get_filename_component(BASE_NAME ${SRC_FILE} NAME_WE)
+		get_filename_component(DIR ${SRC_FILE} DIRECTORY)
+		set(MODEL_FILE ${DIR}${BASE_NAME}.model)
+		add_custom_command(
+			OUTPUT ${MODEL_FILE}
+			COMMAND multicore_engine_model_converter -o ${MODEL_FILE} -m ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
+			MAIN_DEPENDENCY ${SRC_FILE}
+			COMMENT "Converting model file \"${SRC_FILE}\" to \"${MODEL_FILE}\""
+		)
+		list(APPEND MODEL_LIST ${MODEL_FILE})
+	endforeach()
+	set(${OUTPUT_LIST} ${MODEL_LIST} PARENT_SCOPE)
 endfunction()
 
