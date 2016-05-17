@@ -9,19 +9,100 @@
 #endif
 
 #include <algorithm>
+#include <asset_gen/model.hpp>
+#include <asset_gen/model_exporter.hpp>
+#include <asset_gen/obj_model_parser.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <util/program_name.hpp>
+#include <util/string_tools.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
+namespace mce {
+namespace model_converter {
+enum class file_format { automatic, obj };
+std::istream& operator>>(std::istream& in, file_format& fmt) {
+	std::string token;
+	in >> token;
+	std::string orig_token;
+	for(auto& c : token) {
+		c = char(std::tolower(c));
+	}
+	if(token == "obj") {
+		fmt = file_format::obj;
+	} else {
+		throw boost::program_options::invalid_option_value(orig_token);
+	}
+	return in;
+}
+std::ostream& operator<<(std::ostream& out, const file_format& fmt) {
+	if(fmt == file_format::automatic) {
+		out << "automatic";
+	} else if(fmt == file_format::obj) {
+		out << "obj";
+	}
+	return out;
+}
+}
+}
+
 int main(int argc, char* argv[]) {
+	std::string model_output_file;
+	std::string collision_output_file;
+	std::string input_file;
+	mce::model_converter::file_format format;
 	po::options_description desc;
+	desc.add_options()																					   //
+			("help,h", "Display help message.")															   //
+			("model,m", po::value(&model_output_file), "The output model file name.")					   //
+			("collision,c", po::value(&collision_output_file), "The output collision geometry file name.") //
+			("input,i", po::value(&input_file), "The input file name.")									   //
+			("format,f", po::value(&format)->default_value(mce::model_converter::file_format::automatic),  //
+			 "Override input format. \nSupported formats:\n"											   //
+			 " obj - Wavefront OBJ")																	   //
+			;																							   //
+
 	po::variables_map vars;
 	po::store(po::parse_command_line(argc, argv, desc), vars);
 	po::notify(vars);
+	if(vars.count("help") || argc == 1) {
+		std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
+		std::cout << desc;
+		return -1;
+	}
+	if(format == mce::model_converter::file_format::automatic) {
+		if(mce::util::ends_with_ignore_case(input_file, "obj")) {
+			format = mce::model_converter::file_format::obj;
+		} else {
+			std::cerr << "Could not determine input format for file name '" << input_file
+					  << "' and no format given." << std::endl;
+			return -2;
+		}
+	}
+	if(!fs::exists(fs::path(input_file))) {
+		std::cerr << "Input file '" << input_file << "' does not exist." << std::endl;
+		return -3;
+	}
+	if(model_output_file.empty()) {
+		model_output_file = fs::path(input_file).replace_extension("model").string();
+	}
+	if(collision_output_file.empty()) {
+		collision_output_file = fs::path(input_file).replace_extension("col").string();
+	}
+	mce::asset_gen::model model_data;
+	mce::asset_gen::model_collision_data collision_data;
+	if(format == mce::model_converter::file_format::obj) {
+		mce::asset_gen::obj_model_parser parser;
+		parser.parse_file(input_file);
+		std::tie(model_data, collision_data) = parser.finalize_model();
+	}
+	mce::asset_gen::model_exporter exporter;
+	exporter.export_model(model_data, model_output_file);
+	exporter.export_model(collision_data, collision_output_file);
 }
