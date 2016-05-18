@@ -9,6 +9,10 @@ include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_base/include)
 include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_core/include)
 include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_parsers/include)
 
+message(STATUS "Branch: " ${BUILD_BRANCH})
+message(STATUS "Version: " ${BUILD_VERSION})
+message(STATUS "Version string: " ${BUILD_VERSION_STRING})
+
 add_subdirectory(../multicore_engine_parsers multicore_engine_parsers)
 add_subdirectory(../multicore_engine_base multicore_engine_base)
 add_subdirectory(../multicore_engine_load_unit_gen multicore_engine_load_unit_gen)
