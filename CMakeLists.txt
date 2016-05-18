@@ -4,6 +4,7 @@ project (multicore_engine)
 include(CMakeUtils.txt)
 
 make_build_scripts_project(.gitlab-ci.yml Doxyfile .clang-format)
+get_version_info()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 include(CMakeConfig.txt)

@@ -37,6 +37,44 @@ function(make_src_grp_dir)
 	endforeach()
 endfunction()
 
+function(get_version_info)
+	execute_process(COMMAND git describe --tags --always --dirty=-modified 
+					WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+					RESULT_VARIABLE GIT_RESULT1
+					OUTPUT_VARIABLE GIT_DESCRIBE_VERSION
+					OUTPUT_STRIP_TRAILING_WHITESPACE)
+	if(GIT_RESULT1 EQUAL 0)
+		message(STATUS "Version (from git describe): " ${GIT_DESCRIBE_VERSION})
+		set(BUILD_VERSION ${GIT_DESCRIBE_VERSION})
+	elseif(DEFINED VERSION)
+		set(BUILD_VERSION ${VERSION})
+	else()		
+		set(BUILD_VERSION "[unknown version]")
+	endif()
+
+	execute_process(COMMAND git rev-parse --abbrev-ref HEAD 
+					WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+					RESULT_VARIABLE GIT_RESULT2
+					OUTPUT_VARIABLE GIT_BRANCH
+					OUTPUT_STRIP_TRAILING_WHITESPACE)
+	if(GIT_RESULT2 EQUAL 0)
+		message(STATUS "Branch (from git rev-parse): " ${GIT_BRANCH})
+		set(BUILD_BRANCH ${GIT_BRANCH})
+	elseif(DEFINED BRANCH)
+		set(BUILD_BRANCH ${BRANCH})
+	else()
+		set(BUILD_BRANCH "[unknown branch]")
+	endif()
+
+	string(CONCAT BUILD_VERSION_STRING ${BUILD_BRANCH} "-" ${BUILD_VERSION})
+	message(STATUS "Branch: " ${BUILD_BRANCH})
+	message(STATUS "Version: " ${BUILD_VERSION})
+	message(STATUS "Version string: " ${BUILD_VERSION_STRING})
+	set(BUILD_BRANCH ${BUILD_BRANCH} PARENT_SCOPE)
+	set(BUILD_VERSION ${BUILD_VERSION} PARENT_SCOPE)
+	set(BUILD_VERSION_STRING ${BUILD_VERSION_STRING} PARENT_SCOPE)
+endfunction()
+
 function(compile_glsl_to_spirv OUTPUT_LIST)
 	set(SPV_LIST)
 	foreach(SRC_FILE ${ARGN})
@@ -79,14 +117,14 @@ function(bootstrap_tools)
 	MESSAGE(STATUS "Bootstraping asset tools ...")
 	if(MSVC)
 		file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools_bootstrap)
-		execute_process(COMMAND cmake -G "${CMAKE_GENERATOR}" ${CMAKE_SOURCE_DIR}/tools_bootstrap WORKING_DIRECTORY tools_bootstrap)
+		execute_process(COMMAND cmake -G "${CMAKE_GENERATOR}" ${CMAKE_SOURCE_DIR}/tools_bootstrap -DBUILD_BRANCH=${BUILD_BRANCH} -DBUILD_VERSION=${BUILD_VERSION} -DBUILD_VERSION_STRING=${BUILD_VERSION_STRING} WORKING_DIRECTORY tools_bootstrap)
 		execute_process(COMMAND cmake --build . --config Release WORKING_DIRECTORY tools_bootstrap)
 		set(BOOTSTRAP_LOAD_UNIT_GEN ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_load_unit_gen/Release/multicore_engine_load_unit_gen PARENT_SCOPE)
 		set(BOOTSTRAP_PACK_FILE_GEN ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_pack_file_gen/Release/multicore_engine_pack_file_gen PARENT_SCOPE)
 		set(BOOTSTRAP_PACK_MODEL_CONV ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_model_converter/Release/multicore_engine_model_converter PARENT_SCOPE)
 	else()
 		file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools_bootstrap)
-		execute_process(COMMAND cmake -G "${CMAKE_GENERATOR}" ${CMAKE_SOURCE_DIR}/tools_bootstrap -DCMAKE_BUILD_TYPE=Release WORKING_DIRECTORY tools_bootstrap)
+		execute_process(COMMAND cmake -G "${CMAKE_GENERATOR}" ${CMAKE_SOURCE_DIR}/tools_bootstrap -DCMAKE_BUILD_TYPE=Release -DBUILD_BRANCH=${BUILD_BRANCH} -DBUILD_VERSION=${BUILD_VERSION} -DBUILD_VERSION_STRING=${BUILD_VERSION_STRING} WORKING_DIRECTORY tools_bootstrap)
 		execute_process(COMMAND cmake --build . --config Release -- -j ${CPU_COUNT} WORKING_DIRECTORY tools_bootstrap)
 		set(BOOTSTRAP_LOAD_UNIT_GEN ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen PARENT_SCOPE)
 		set(BOOTSTRAP_PACK_FILE_GEN ${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen PARENT_SCOPE)

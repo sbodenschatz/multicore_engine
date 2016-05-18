@@ -1,0 +1,17 @@
+/*
+ * Multi-Core Engine project
+ * File /multicore_engine_base/src/core/version.cpp
+ * Copyright 2016 by Stefan Bodenschatz
+ */
+
+#include <core/version.hpp>
+
+namespace mce {
+namespace core {
+
+std::string get_version_string() {
+	return "${BUILD_VERSION_STRING}";
+}
+
+} // namespace core
+} // namespace mce
