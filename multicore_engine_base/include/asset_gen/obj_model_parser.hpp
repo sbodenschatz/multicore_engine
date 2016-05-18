@@ -7,7 +7,7 @@
 #ifndef ASSET_GEN_OBJ_MODEL_PARSER_HPP_
 #define ASSET_GEN_OBJ_MODEL_PARSER_HPP_
 
-#include "model.hpp"
+#include "static_model.hpp"
 #include <boost/container/flat_map.hpp>
 #include <glm/glm.hpp>
 #include <tuple>
@@ -34,7 +34,7 @@ private:
 public:
 	obj_model_parser(bool indexed = true) : indexed(indexed){};
 	void parse_file(const std::string& filename);
-	std::tuple<model, model_collision_data> finalize_model();
+	std::tuple<static_model, static_model_collision_data> finalize_model();
 };
 
 } /* namespace asset_gen */

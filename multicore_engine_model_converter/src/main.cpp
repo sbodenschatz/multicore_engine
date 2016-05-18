@@ -9,9 +9,9 @@
 #endif
 
 #include <algorithm>
-#include <asset_gen/model.hpp>
-#include <asset_gen/model_exporter.hpp>
 #include <asset_gen/obj_model_parser.hpp>
+#include <asset_gen/static_model.hpp>
+#include <asset_gen/static_model_exporter.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <cctype>
@@ -95,14 +95,17 @@ int main(int argc, char* argv[]) {
 	if(collision_output_file.empty()) {
 		collision_output_file = fs::path(input_file).replace_extension("col").string();
 	}
-	mce::asset_gen::model model_data;
-	mce::asset_gen::model_collision_data collision_data;
+	bool static_format = true;
+	mce::asset_gen::static_model model_data;
+	mce::asset_gen::static_model_collision_data collision_data;
 	if(format == mce::model_converter::file_format::obj) {
 		mce::asset_gen::obj_model_parser parser;
 		parser.parse_file(input_file);
 		std::tie(model_data, collision_data) = parser.finalize_model();
 	}
-	mce::asset_gen::model_exporter exporter;
-	exporter.export_model(model_data, model_output_file);
-	exporter.export_model(collision_data, collision_output_file);
+	if(static_format) {
+		mce::asset_gen::static_model_exporter exporter;
+		exporter.export_model(model_data, model_output_file);
+		exporter.export_model(collision_data, collision_output_file);
+	}
 }
