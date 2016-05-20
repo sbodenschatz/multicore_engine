@@ -9,8 +9,16 @@
 namespace mce {
 namespace core {
 
-std::string get_version_string() {
+std::string get_build_version_string() {
 	return "${BUILD_VERSION_STRING}";
+}
+
+std::string get_build_version() {
+	return "${BUILD_VERSION}";
+}
+
+std::string get_build_branch() {
+	return "${BUILD_BRANCH}";
 }
 
 } // namespace core

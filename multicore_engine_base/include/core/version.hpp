@@ -12,7 +12,9 @@
 namespace mce {
 namespace core {
 
-std::string get_version_string();
+std::string get_build_version_string();
+std::string get_build_version();
+std::string get_build_branch();
 
 } // namespace core
 } // namespace mce
