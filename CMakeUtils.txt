@@ -38,7 +38,7 @@ function(make_src_grp_dir)
 endfunction()
 
 function(get_version_info)
-	execute_process(COMMAND git describe --tags --always --dirty=-modified 
+	execute_process(COMMAND ${GIT_BINARY} describe --tags --always --dirty=-modified 
 					WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 					RESULT_VARIABLE GIT_RESULT1
 					OUTPUT_VARIABLE GIT_DESCRIBE_VERSION
@@ -52,7 +52,7 @@ function(get_version_info)
 		set(BUILD_VERSION "[unknown version]")
 	endif()
 
-	execute_process(COMMAND git rev-parse --abbrev-ref HEAD 
+	execute_process(COMMAND ${GIT_BINARY} rev-parse --abbrev-ref HEAD 
 					WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 					RESULT_VARIABLE GIT_RESULT2
 					OUTPUT_VARIABLE GIT_BRANCH

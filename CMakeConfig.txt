@@ -9,6 +9,8 @@ if(NOT MSVC)
 	string(TOLOWER ${CMAKE_BUILD_TYPE} CONFIG_LOWER)
 endif()
 
+set(GIT_BINARY git CACHE FILEPATH "Git binary to use for version determination.")
+
 MESSAGE(STATUS "Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wno-unused-private-field -fno-strict-aliasing")
