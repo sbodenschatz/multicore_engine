@@ -94,6 +94,58 @@ BOOST_AUTO_TEST_CASE(merge_adjacent_if_ranges_1_element) {
 	BOOST_CHECK(data == data_expected);
 }
 
+BOOST_AUTO_TEST_CASE(n_unique_full_groups) {
+	int groups = 10;
+	int elements = 20;
+	std::vector<int> data;
+	data.reserve(groups * elements);
+	std::vector<int> data_expected;
+	data_expected.reserve(groups * elements);
+	for (int n = 0; n < 20; ++n) {
+		data.clear();
+		data_expected.clear();
+		for (int i = 0; i < groups; ++i) {
+			for (int j = 0; j < elements; ++j) {
+				data.push_back(i);
+			}
+		}
+		auto new_end = n_unique(data.begin(), data.end(), std::equal_to<>(), n);
+		data.erase(new_end, data.end());
+		for (int i = 0; i < groups; ++i) {
+			for (int j = 0; j < n; ++j) {
+				data_expected.push_back(i);
+			}
+		}
+		BOOST_CHECK(data == data_expected);
+	}
+}
+
+BOOST_AUTO_TEST_CASE(n_unique_partial_groups) {
+	int groups = 10;
+	int elements = 5;
+	std::vector<int> data;
+	data.reserve(groups * elements);
+	std::vector<int> data_expected;
+	data_expected.reserve(groups * elements);
+	for (int n = 10; n < 20; ++n) {
+		data.clear();
+		data_expected.clear();
+		for (int i = 0; i < groups; ++i) {
+			for (int j = 0; j < elements; ++j) {
+				data.push_back(i);
+			}
+		}
+		auto new_end = n_unique(data.begin(), data.end(), std::equal_to<>(), n);
+		data.erase(new_end, data.end());
+		for (int i = 0; i < groups; ++i) {
+			for (int j = 0; j < elements; ++j) {
+				data_expected.push_back(i);
+			}
+		}
+		BOOST_CHECK(data == data_expected);
+	}
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 

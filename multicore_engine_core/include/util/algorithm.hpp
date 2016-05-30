@@ -31,6 +31,28 @@ It merge_adjacent_if(It begin, It end, Pred predicate, Merge merge) {
 	return cur;
 }
 
+template <typename It, typename Eq>
+It n_unique(It begin, It end, Eq eq, size_t n) {
+	if(begin == end) return end;
+	It cur = begin;
+	It group_start = cur;
+	It out = begin;
+	size_t i = 0;
+	while(cur != end) {
+		if(!eq(*group_start, *cur)) {
+			i = 0;
+			group_start = cur;
+		}
+		if(i < n) {
+			*out = std::move_if_noexcept(*cur);
+			++out;
+		}
+		++i;
+		++cur;
+	}
+	return out;
+}
+
 } // namespace util
 } // namespace mce
 
