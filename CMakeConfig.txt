@@ -10,6 +10,8 @@ if(NOT MSVC)
 endif()
 
 set(GIT_BINARY git CACHE FILEPATH "Git binary to use for version determination.")
+set(VERSION "[unknown version]" CACHE STRING "Fallback version to use if auto-detection fails.")
+set(BRANCH "[unknown branch]" CACHE STRING "Fallback branch name to use if auto-detection fails.")
 
 MESSAGE(STATUS "Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
