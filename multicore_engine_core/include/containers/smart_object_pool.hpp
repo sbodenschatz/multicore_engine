@@ -23,6 +23,8 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4324)
+#pragma warning(disable : 4458)
+#pragma warning(disable : 4459)
 #endif
 
 namespace mce {
@@ -401,7 +403,7 @@ public:
 
 		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
 			++(pool->active_iterators);
-			skip_until_valid();
+			skip_until_valid(this->target);
 		}
 
 		void drop_iterator() {
@@ -479,7 +481,7 @@ public:
 
 		iterator_& operator++() {
 			target.entry++;
-			skip_until_valid();
+			skip_until_valid(this->target);
 			return *this;
 		}
 		iterator_ operator++(int) {
@@ -499,7 +501,7 @@ public:
 		}
 
 	private:
-		void skip_empty_blocks() {
+		static void skip_empty_blocks(Target_T& target) {
 			// Skip over empty blocks without looking at individual entries
 			while(target.containing_block) {
 				if(target.containing_block->active_objects)
@@ -509,12 +511,12 @@ public:
 			}
 			target.entry = target.containing_block ? target.containing_block->entries : nullptr;
 		}
-		void skip_until_valid() {
+		static void skip_until_valid(Target_T& target) {
 			if(!target.containing_block) {
 				target.entry = nullptr;
 				return;
 			} else if(target.containing_block->active_objects == 0) {
-				skip_empty_blocks();
+				skip_empty_blocks(target);
 			}
 			for(;;) {
 				if(!target.containing_block) {
@@ -524,7 +526,7 @@ public:
 				if(target.entry >= target.containing_block->entries + block_size) {
 					target.containing_block = target.containing_block->next_block;
 					if(target.containing_block) {
-						skip_empty_blocks();
+						skip_empty_blocks(target);
 					}
 					if(!target.containing_block) {
 						target.entry = nullptr;
