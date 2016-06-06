@@ -7,10 +7,10 @@
 #ifndef CONTAINERS_SCRATCH_PAD_POOL_HPP_
 #define CONTAINERS_SCRATCH_PAD_POOL_HPP_
 
-#include <mutex>
 #include <deque>
-#include <stack>
 #include <memory>
+#include <mutex>
+#include <stack>
 
 namespace mce {
 namespace containers {
@@ -37,7 +37,7 @@ public:
 		object(scratch_pad_pool<T>* pool, T&& obj) : pool(pool), obj(std::move_if_noexcept(obj)) {}
 		object(const object&) = delete;
 		object& operator=(const object&) = delete;
-		object(object&& other) noexcept : pool(other.pool),obj(std::move_if_noexcept(other.obj)) {
+		object(object&& other) noexcept : pool(other.pool), obj(std::move_if_noexcept(other.obj)) {
 			other.pool = nullptr;
 		}
 		object& operator=(object&& other) noexcept {

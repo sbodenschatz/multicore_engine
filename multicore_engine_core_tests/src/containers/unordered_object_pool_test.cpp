@@ -4,11 +4,11 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <containers/unordered_object_pool.hpp>
-#include <boost/test/unit_test.hpp>
-#include <unordered_set>
-#include <string>
 #include <algorithm>
+#include <boost/test/unit_test.hpp>
+#include <containers/unordered_object_pool.hpp>
+#include <string>
+#include <unordered_set>
 
 namespace mce {
 namespace containers {

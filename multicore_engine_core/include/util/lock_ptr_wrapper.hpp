@@ -7,8 +7,8 @@
 #ifndef UTIL_LOCK_PTR_WRAPPER_HPP_
 #define UTIL_LOCK_PTR_WRAPPER_HPP_
 
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 namespace mce {
 namespace util {
@@ -23,7 +23,9 @@ public:
 	lock_ptr_wrapper(const Ptr<T>& ptr_to_lockable, std::try_to_lock_t) noexcept : ptr_{}, guard_{} {
 		if(ptr_to_lockable) {
 			guard_ = Lock_Guard<T>(*ptr_to_lockable, std::defer_lock);
-			if(guard_.try_lock()) { ptr_ = ptr_to_lockable; }
+			if(guard_.try_lock()) {
+				ptr_ = ptr_to_lockable;
+			}
 		}
 	}
 	lock_ptr_wrapper(const Ptr<T>& ptr_to_lockable) noexcept : ptr_{}, guard_{} {

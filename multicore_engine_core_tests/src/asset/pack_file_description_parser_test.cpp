@@ -4,10 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <boost/test/unit_test.hpp>
-#include <asset_gen/pack_file_description_parser.hpp>
 #include <asset_gen/pack_file_description_ast.hpp>
 #include <asset_gen/pack_file_description_ast_compare.hpp>
+#include <asset_gen/pack_file_description_parser.hpp>
+#include <boost/test/unit_test.hpp>
 
 namespace mce {
 namespace asset_gen {

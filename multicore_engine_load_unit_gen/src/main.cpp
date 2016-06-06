@@ -8,16 +8,16 @@
 #pragma warning(disable : 4505)
 #endif
 
-#include <asset_gen/load_unit_gen.hpp>
-#include <asset_gen/load_unit_description_parser.hpp>
+#include <algorithm>
 #include <asset_gen/load_unit_description_ast.hpp>
+#include <asset_gen/load_unit_description_parser.hpp>
+#include <asset_gen/load_unit_gen.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include <fstream>
 #include <iostream>
 #include <string>
-#include <algorithm>
-#include <boost/filesystem.hpp>
 #include <util/program_name.hpp>
-#include <fstream>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

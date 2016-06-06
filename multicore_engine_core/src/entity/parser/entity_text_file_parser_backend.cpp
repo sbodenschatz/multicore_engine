@@ -4,10 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <entity/parser/entity_text_file_parser.hpp>
-#include <entity/entity_manager.hpp>
-#include <entity/entity_configuration.hpp>
 #include <entity/component_configuration.hpp>
+#include <entity/entity_configuration.hpp>
+#include <entity/entity_manager.hpp>
+#include <entity/parser/entity_text_file_parser.hpp>
 
 namespace mce {
 namespace entity {

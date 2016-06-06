@@ -4,11 +4,11 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <iterator>
 #include <algorithm>
 #include <entity/component_configuration.hpp>
 #include <entity/component_property_assignment.hpp>
 #include <entity/component_type.hpp>
+#include <iterator>
 
 namespace mce {
 namespace entity {

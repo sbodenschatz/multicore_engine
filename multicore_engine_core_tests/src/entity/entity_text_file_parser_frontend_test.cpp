@@ -5,11 +5,11 @@
  */
 
 #include <boost/test/unit_test.hpp>
-#include <entity/parser/entity_text_file_parser.hpp>
+#include <boost/variant/get.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_compare.hpp>
+#include <entity/parser/entity_text_file_parser.hpp>
 #include <string>
-#include <boost/variant/get.hpp>
 
 namespace mce {
 namespace entity {

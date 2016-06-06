@@ -7,10 +7,10 @@
 #ifndef BSTREAM_IBSTREAM_HPP_
 #define BSTREAM_IBSTREAM_HPP_
 
-#include <cstdint>
 #include <cstddef>
-#include <vector>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 namespace mce {
 namespace bstream {
@@ -83,7 +83,7 @@ public:
 	}
 	ibstream& operator>>(std::string& value);
 	template <typename T, size_t N>
-	ibstream& operator>>(T(&value)[N]) {
+	ibstream& operator>>(T (&value)[N]) {
 		for(size_t i = 0; i < N && *this; ++i) {
 			*this >> value[i];
 		}

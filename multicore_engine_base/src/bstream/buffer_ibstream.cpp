@@ -4,8 +4,8 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <bstream/buffer_ibstream.hpp>
 #include <algorithm>
+#include <bstream/buffer_ibstream.hpp>
 #include <cstring>
 #include <stdexcept>
 

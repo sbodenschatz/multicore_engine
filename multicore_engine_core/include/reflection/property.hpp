@@ -7,11 +7,11 @@
 #ifndef REFLECTION_PROPERTY_HPP_
 #define REFLECTION_PROPERTY_HPP_
 
+#include "type.hpp"
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include "type.hpp"
 
 namespace mce {
 namespace reflection {

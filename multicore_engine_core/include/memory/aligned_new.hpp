@@ -38,14 +38,12 @@ static void*                                                                    
 	\
 }                                                                                                     \
 	\
-void                                                                                                  \
-	operator delete(void* ptr) {                                                                             \
+void operator delete(void* ptr) {                                                                            \
 		::operator delete(*(reinterpret_cast<void**>(ptr) - 1));                                             \
 	\
 }                                                                                                     \
 	\
-void                                                                                                  \
-	operator delete[](void* ptr) {                                                                           \
+void operator delete[](void* ptr) {                                                                          \
 		::operator delete[](*(reinterpret_cast<void**>(ptr) - 1));                                           \
 	\
 }

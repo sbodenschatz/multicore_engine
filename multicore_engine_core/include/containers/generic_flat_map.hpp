@@ -7,14 +7,14 @@
 #ifndef CONTAINERS_GENERIC_FLAT_MAP_HPP_
 #define CONTAINERS_GENERIC_FLAT_MAP_HPP_
 
-#include <utility>
-#include <functional>
-#include <type_traits>
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
+#include <utility>
 
 namespace mce {
 namespace containers {
@@ -120,7 +120,7 @@ public:
 			++iterator;
 			return *this;
 		}
-		iterator_ operator++(int) noexcept {
+		iterator_ operator++(int)noexcept {
 			auto it = *this;
 			this->operator++();
 			return it;
@@ -129,7 +129,7 @@ public:
 			--iterator;
 			return *this;
 		}
-		iterator_ operator--(int) noexcept {
+		iterator_ operator--(int)noexcept {
 			auto it = *this;
 			this->operator--();
 			return it;
@@ -364,7 +364,8 @@ class generic_flat_map : public generic_flat_map_base<generic_flat_map<Container
 													  Container, Key, Value, Compare> {
 
 	typedef generic_flat_map_base<generic_flat_map<Container, Key, Value, Compare>, Container, Key, Value,
-								  Compare> Base;
+								  Compare>
+			Base;
 
 public:
 	template <typename... Args>
@@ -491,7 +492,9 @@ public:
 		auto it = std::lower_bound(this->values.begin(), this->values.end(), key, comp);
 		if(it != this->values.end())
 			if(comp(key, *it)) it = this->values.end();
-		if(it == this->values.end()) { std::tie(it, std::ignore) = insert(std::forward<K>(key), Value()); }
+		if(it == this->values.end()) {
+			std::tie(it, std::ignore) = insert(std::forward<K>(key), Value());
+		}
 		return *it;
 	}
 
@@ -518,7 +521,8 @@ class generic_flat_multimap
 									   Value, Compare> {
 
 	typedef generic_flat_map_base<generic_flat_multimap<Container, Key, Value, Compare>, Container, Key,
-								  Value, Compare> Base;
+								  Value, Compare>
+			Base;
 
 public:
 	template <typename... Args>

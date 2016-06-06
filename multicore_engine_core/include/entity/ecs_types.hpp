@@ -7,10 +7,10 @@
 #ifndef ENTITY_ECS_TYPES_HPP_
 #define ENTITY_ECS_TYPES_HPP_
 
+#include <containers/smart_pool_ptr.hpp>
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <containers/smart_pool_ptr.hpp>
 
 namespace mce {
 namespace entity {

@@ -7,18 +7,18 @@
 #ifndef CONTAINERS_SMART_OBJECT_POOL_HPP_
 #define CONTAINERS_SMART_OBJECT_POOL_HPP_
 
-#include <memory>
-#include <cassert>
-#include <type_traits>
-#include <vector>
-#include <algorithm>
-#include <iterator>
-#include <atomic>
-#include <iostream>
-#include <mutex>
+#include "../memory/aligned_new.hpp"
 #include "scratch_pad_pool.hpp"
 #include "smart_pool_ptr.hpp"
-#include "../memory/aligned_new.hpp"
+#include <algorithm>
+#include <atomic>
+#include <cassert>
+#include <iostream>
+#include <iterator>
+#include <memory>
+#include <mutex>
+#include <type_traits>
+#include <vector>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -125,8 +125,7 @@ private:
 	typedef unsigned int ref_count_tag_t;
 
 	struct tagged_ref_count {
-		alignas(sizeof(ref_count_t)+sizeof(ref_count_tag_t))
-		ref_count_t count;
+		alignas(sizeof(ref_count_t) + sizeof(ref_count_tag_t)) ref_count_t count;
 		ref_count_tag_t version;
 	};
 
@@ -239,7 +238,9 @@ private:
 		virtual void decrement_weak_ref(void* object) noexcept override {
 			auto* entry = reinterpret_cast<block_entry*>(object);
 			auto& rc = ref_count(entry);
-			if(--(rc.weak) == 0) { owning_pool->deallocate(entry, this); }
+			if(--(rc.weak) == 0) {
+				owning_pool->deallocate(entry, this);
+			}
 		}
 		// Needs to be called for incrementing the strong ref count if it isn't sure that the object is alive.
 		virtual bool upgrade_ref(void* object) noexcept override {
@@ -304,7 +305,9 @@ private:
 
 	block_entry_link allocate() {
 		std::lock_guard<std::mutex> lock(free_list_mutex);
-		if(!first_free_entry.entry) { grow(); }
+		if(!first_free_entry.entry) {
+			grow();
+		}
 		auto free_entry = first_free_entry;
 		first_free_entry = free_entry.entry->next_free;
 		++allocated_objects;
@@ -317,7 +320,9 @@ private:
 		if(blocks.empty()) {
 			blocks.emplace_back(std::make_unique<block>(this, first_free_entry));
 			first_block = blocks.front().get();
-		} else { blocks.emplace_back(std::make_unique<block>(this, first_free_entry, blocks.back().get())); }
+		} else {
+			blocks.emplace_back(std::make_unique<block>(this, first_free_entry, blocks.back().get()));
+		}
 		++block_count;
 	}
 
@@ -362,11 +367,15 @@ private:
 		for(auto& obj : *pending) {
 			if(obj.ptr.containing_block->try_to_destroy_object(obj.ptr.entry, obj.version)) {
 				auto& rc = obj.ptr.containing_block->ref_count(obj.ptr.entry);
-				if(--(rc.weak) == 0) { dealloc->push_back(obj); }
+				if(--(rc.weak) == 0) {
+					dealloc->push_back(obj);
+				}
 			}
 		}
 		std::lock_guard<std::mutex> lock(free_list_mutex);
-		for(auto& obj : *dealloc) { deallocate_inner(obj.ptr.entry, obj.ptr.containing_block); }
+		for(auto& obj : *dealloc) {
+			deallocate_inner(obj.ptr.entry, obj.ptr.containing_block);
+		}
 	}
 
 public:
@@ -374,7 +383,8 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now."
+					  << std::endl;
 			std::terminate();
 		}
 	}
@@ -396,7 +406,9 @@ public:
 
 		void drop_iterator() {
 			if(pool) {
-				if(--(pool->active_iterators) == 0) { pool->process_deferred_destruction(); }
+				if(--(pool->active_iterators) == 0) {
+					pool->process_deferred_destruction();
+				}
 			}
 		}
 
@@ -481,7 +493,9 @@ public:
 			assert(target.entry);
 			if(target.containing_block->upgrade_ref(target.element)) {
 				return smart_pool_ptr<It_T>(target.element, target.containing_block);
-			} else { return smart_pool_ptr<It_T>(); }
+			} else {
+				return smart_pool_ptr<It_T>();
+			}
 		}
 
 	private:
@@ -499,7 +513,9 @@ public:
 			if(!target.containing_block) {
 				target.entry = nullptr;
 				return;
-			} else if(target.containing_block->active_objects == 0) { skip_empty_blocks(); }
+			} else if(target.containing_block->active_objects == 0) {
+				skip_empty_blocks();
+			}
 			for(;;) {
 				if(!target.containing_block) {
 					target.entry = nullptr;
@@ -507,7 +523,9 @@ public:
 				}
 				if(target.entry >= target.containing_block->entries + block_size) {
 					target.containing_block = target.containing_block->next_block;
-					if(target.containing_block) { skip_empty_blocks(); }
+					if(target.containing_block) {
+						skip_empty_blocks();
+					}
 					if(!target.containing_block) {
 						target.entry = nullptr;
 						return;
@@ -548,7 +566,9 @@ public:
 	void reserve(size_t reserved_size) {
 		if(capacity() < reserved_size) {
 			std::lock_guard<std::mutex> lock(free_list_mutex);
-			while(capacity() < reserved_size) { grow(); }
+			while(capacity() < reserved_size) {
+				grow();
+			}
 		}
 	}
 

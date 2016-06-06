@@ -4,15 +4,15 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <boost/test/unit_test.hpp>
-#include <util/monitor.hpp>
-#include <thread>
-#include <vector>
-#include <utility>
-#include <tuple>
 #include <algorithm>
 #include <atomic>
+#include <boost/test/unit_test.hpp>
 #include <mutex>
+#include <thread>
+#include <tuple>
+#include <util/monitor.hpp>
+#include <utility>
+#include <vector>
 
 namespace mce {
 namespace util {

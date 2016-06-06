@@ -7,8 +7,8 @@
 #ifndef CONTAINERS_SMART_POOL_PTR_HPP_
 #define CONTAINERS_SMART_POOL_PTR_HPP_
 
-#include <utility>
 #include <memory>
+#include <utility>
 
 namespace mce {
 namespace containers {
@@ -105,8 +105,12 @@ public:
 	template <typename U>
 	explicit smart_pool_ptr(weak_pool_ptr<U>&& other)
 			: object(other.object), managed_object{other.managed_object}, block{other.block} {
-		if(!block) { throw std::bad_weak_ptr(); }
-		if(!block->upgrade_ref(managed_object)) { throw std::bad_weak_ptr(); }
+		if(!block) {
+			throw std::bad_weak_ptr();
+		}
+		if(!block->upgrade_ref(managed_object)) {
+			throw std::bad_weak_ptr();
+		}
 	}
 	smart_pool_ptr<T>& operator=(const smart_pool_ptr& other) noexcept {
 		if(other.managed_object == managed_object) {

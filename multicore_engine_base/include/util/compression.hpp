@@ -7,12 +7,12 @@
 #ifndef UTIL_COMPRESSION_HPP_
 #define UTIL_COMPRESSION_HPP_
 
-#include <vector>
-#include <zlib.h>
+#include <cerrno>
 #include <limits>
 #include <stdexcept>
-#include <cerrno>
 #include <string>
+#include <vector>
+#include <zlib.h>
 
 namespace mce {
 namespace util {

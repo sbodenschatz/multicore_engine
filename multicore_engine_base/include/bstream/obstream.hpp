@@ -7,10 +7,10 @@
 #ifndef BSTREAM_OBSTREAM_HPP_
 #define BSTREAM_OBSTREAM_HPP_
 
-#include <cstdint>
 #include <cstddef>
-#include <vector>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 namespace mce {
 namespace bstream {
@@ -75,7 +75,7 @@ public:
 	}
 	obstream& operator<<(const std::string& value);
 	template <typename T, size_t N>
-	obstream& operator<<(const T(&value)[N]) {
+	obstream& operator<<(const T (&value)[N]) {
 		for(size_t i = 0; i < N && *this; ++i) {
 			*this << value[i];
 		}

@@ -7,11 +7,11 @@
 #ifndef UTIL_LOCAL_FUNCTION_HPP_
 #define UTIL_LOCAL_FUNCTION_HPP_
 
-#include <type_traits>
-#include <memory>
 #include <cassert>
-#include <memory/align.hpp>
 #include <functional>
+#include <memory/align.hpp>
+#include <memory>
+#include <type_traits>
 
 namespace mce {
 namespace util {
@@ -47,7 +47,8 @@ public:
 template <size_t Max_Size, typename R, typename... Args>
 class local_function<Max_Size, R(Args...)> {
 	typedef std::unique_ptr<detail_local_function::abstract_function_object<R, Args...>,
-							detail_local_function::deleter<R, Args...>> abstract_func_obj_ptr;
+							detail_local_function::deleter<R, Args...>>
+			abstract_func_obj_ptr;
 	template <typename F>
 	class function_object : public detail_local_function::abstract_function_object<R, Args...> {
 		F f;
@@ -70,8 +71,7 @@ class local_function<Max_Size, R(Args...)> {
 
 	public:
 		template <typename T>
-		function_object(T&& f)
-				: f(std::forward<T>(f)) {}
+		function_object(T&& f) : f(std::forward<T>(f)) {}
 		virtual ~function_object() = default;
 		virtual R operator()(Args... args) const override {
 			return const_call_helper<F>::call(f, std::forward<Args>(args)...);

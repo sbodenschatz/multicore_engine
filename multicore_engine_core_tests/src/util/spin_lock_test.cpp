@@ -4,13 +4,13 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <boost/test/unit_test.hpp>
-#include <util/spin_lock.hpp>
-#include <thread>
-#include <vector>
-#include <mutex>
-#include <cstdint>
 #include <atomic>
+#include <boost/test/unit_test.hpp>
+#include <cstdint>
+#include <mutex>
+#include <thread>
+#include <util/spin_lock.hpp>
+#include <vector>
 
 namespace mce {
 namespace util {

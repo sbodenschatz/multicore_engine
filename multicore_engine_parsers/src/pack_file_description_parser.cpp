@@ -19,15 +19,15 @@
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4348)
 #endif
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <asset_gen/pack_file_description_parser.hpp>
 #include <asset_gen/pack_file_description_ast.hpp>
 #include <asset_gen/pack_file_description_ast_fusion.hpp>
+#include <asset_gen/pack_file_description_parser.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/qi.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;

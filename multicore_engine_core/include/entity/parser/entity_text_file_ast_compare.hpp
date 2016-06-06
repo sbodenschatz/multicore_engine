@@ -8,8 +8,8 @@
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_COMPARE_HPP_
 
 #include "entity_text_file_ast.hpp"
-#include <limits>
 #include <cmath>
+#include <limits>
 
 namespace mce {
 namespace entity {

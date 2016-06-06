@@ -8,8 +8,8 @@
 #define CORE_ENGINE_HPP_
 
 #include <cassert>
-#include <memory>
 #include <entity/entity_manager.hpp>
+#include <memory>
 
 namespace mce {
 namespace core {

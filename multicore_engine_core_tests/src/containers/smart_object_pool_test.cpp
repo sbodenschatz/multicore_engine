@@ -4,13 +4,13 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <util/unused.hpp>
-#include <containers/smart_object_pool.hpp>
-#include <boost/test/unit_test.hpp>
-#include <unordered_set>
-#include <string>
 #include <algorithm>
+#include <boost/test/unit_test.hpp>
+#include <containers/smart_object_pool.hpp>
 #include <future>
+#include <string>
+#include <unordered_set>
+#include <util/unused.hpp>
 
 namespace mce {
 namespace containers {
@@ -106,21 +106,23 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 	UNUSED(diff1);
 	std::vector<std::future<bool>> futures;
 	for(int t = 0; t < 256; ++t) {
-		futures.emplace_back(std::async(std::launch::async, [&](int t) {
-			bool res = true;
-			std::vector<smart_pool_ptr<element>> elem_ptrs;
-			elem_ptrs.reserve(0x1000);
-			for(int i = 0; i < 0x1000; ++i) {
-				auto ptr = sop.emplace((t << 16) | i);
-				elem_ptrs.emplace_back(ptr);
-				res = res && (*ptr == ((t << 16) | i));
-			}
-			for(int i = 0; i < 0x1000; ++i) {
-				res = res && (*(elem_ptrs[i]) == ((t << 16) | i));
-			}
-			elem_ptrs.clear();
-			return res;
-		}, t));
+		futures.emplace_back(std::async(std::launch::async,
+										[&](int t) {
+											bool res = true;
+											std::vector<smart_pool_ptr<element>> elem_ptrs;
+											elem_ptrs.reserve(0x1000);
+											for(int i = 0; i < 0x1000; ++i) {
+												auto ptr = sop.emplace((t << 16) | i);
+												elem_ptrs.emplace_back(ptr);
+												res = res && (*ptr == ((t << 16) | i));
+											}
+											for(int i = 0; i < 0x1000; ++i) {
+												res = res && (*(elem_ptrs[i]) == ((t << 16) | i));
+											}
+											elem_ptrs.clear();
+											return res;
+										},
+										t));
 	}
 	for(auto& f : futures) {
 		BOOST_CHECK(f.get());

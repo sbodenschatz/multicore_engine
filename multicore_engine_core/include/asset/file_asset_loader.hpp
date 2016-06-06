@@ -7,10 +7,10 @@
 #ifndef ASSET_FILE_ASSET_LOADER_HPP_
 #define ASSET_FILE_ASSET_LOADER_HPP_
 
+#include "asset_loader.hpp"
+#include <shared_mutex>
 #include <string>
 #include <vector>
-#include <shared_mutex>
-#include "asset_loader.hpp"
 
 namespace mce {
 namespace asset {

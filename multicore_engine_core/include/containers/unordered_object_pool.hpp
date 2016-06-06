@@ -7,14 +7,14 @@
 #ifndef CONTAINERS_UNORDERED_OBJECT_POOL_HPP_
 #define CONTAINERS_UNORDERED_OBJECT_POOL_HPP_
 
-#include <memory>
+#include <algorithm>
+#include <atomic>
 #include <cassert>
+#include <iterator>
+#include <memory>
+#include <mutex>
 #include <type_traits>
 #include <vector>
-#include <algorithm>
-#include <iterator>
-#include <mutex>
-#include <atomic>
 
 namespace mce {
 namespace containers {
@@ -164,7 +164,9 @@ private:
 				: active_objects(other.active_objects), next_block{nullptr}, prev_block{nullptr} {
 			for(size_t i = 0; i < block_size; ++i) {
 				active_flags[i] = other.active_flags[i];
-				if(active_flags[i]) { entries[i].object = other.entries[i].object; } else {
+				if(active_flags[i]) {
+					entries[i].object = other.entries[i].object;
+				} else {
 					entries[i].next_free = {nullptr, nullptr};
 				}
 			}
@@ -173,7 +175,9 @@ private:
 			active_objects = other.active_objects;
 			for(size_t i = 0; i < block_size; ++i) {
 				active_flags[i] = other.active_flags[i];
-				if(active_flags[i]) { entries[i].object = other.entries[i].object; } else {
+				if(active_flags[i]) {
+					entries[i].object = other.entries[i].object;
+				} else {
 					entries[i].next_free = {nullptr, nullptr};
 				}
 			}
@@ -278,7 +282,9 @@ public:
 		size_t free_entries = recalculate_freelist();
 		assert(active_objects + free_entries == capacity());
 		block_count = blocks.size();
-		if(blocks.empty()) { first_block = nullptr; } else {
+		if(blocks.empty()) {
+			first_block = nullptr;
+		} else {
 			first_block = blocks.front().get();
 		}
 		(void)free_entries;
@@ -295,7 +301,9 @@ public:
 		other.first_free_entry = {nullptr, nullptr};
 		other.active_objects = 0;
 		block_count = blocks.size();
-		if(blocks.empty()) { first_block = nullptr; } else {
+		if(blocks.empty()) {
+			first_block = nullptr;
+		} else {
 			first_block = blocks.front().get();
 		}
 	}
@@ -316,7 +324,9 @@ public:
 		assert(active_objects + free_entries == capacity());
 		(void)free_entries;
 		block_count = blocks.size();
-		if(blocks.empty()) { first_block = nullptr; } else {
+		if(blocks.empty()) {
+			first_block = nullptr;
+		} else {
 			first_block = blocks.front().get();
 		}
 		return *this;
@@ -332,7 +342,9 @@ public:
 		other.first_free_entry = {nullptr, nullptr};
 		other.active_objects = 0;
 		block_count = blocks.size();
-		if(blocks.empty()) { first_block = nullptr; } else {
+		if(blocks.empty()) {
+			first_block = nullptr;
+		} else {
 			first_block = blocks.front().get();
 		}
 		return *this;
@@ -413,7 +425,9 @@ public:
 			if(!target.containing_block) {
 				target.entry = nullptr;
 				return;
-			} else if(target.containing_block->active_objects == 0) { skip_empty_blocks(); }
+			} else if(target.containing_block->active_objects == 0) {
+				skip_empty_blocks();
+			}
 			for(;;) {
 				if(!target.containing_block) {
 					target.entry = nullptr;
@@ -421,7 +435,9 @@ public:
 				}
 				if(target.entry >= target.containing_block->entries + block_size) {
 					target.containing_block = target.containing_block->next_block;
-					if(target.containing_block) { skip_empty_blocks(); }
+					if(target.containing_block) {
+						skip_empty_blocks();
+					}
 					if(!target.containing_block) {
 						target.entry = nullptr;
 						return;
@@ -612,11 +628,13 @@ public:
 			}
 		}
 		if(reallocated_objects) {
-			blocks.erase(std::remove_if(blocks.begin(), blocks.end(), [](auto& b) {
-				return b->active_objects == 0;
-			}), blocks.end());
+			blocks.erase(std::remove_if(blocks.begin(), blocks.end(),
+										[](auto& b) { return b->active_objects == 0; }),
+						 blocks.end());
 			block_count = blocks.size();
-			if(blocks.empty()) { first_block = nullptr; } else {
+			if(blocks.empty()) {
+				first_block = nullptr;
+			} else {
 				first_block = blocks.front().get();
 			}
 			size_t free_entries = recalculate_freelist_last_block();
@@ -624,7 +642,9 @@ public:
 			(void)free_entries;
 		}
 		block_count = blocks.size();
-		if(blocks.empty()) { first_block = nullptr; } else {
+		if(blocks.empty()) {
+			first_block = nullptr;
+		} else {
 			first_block = blocks.front().get();
 		}
 		return reallocated_objects;
@@ -645,11 +665,15 @@ public:
 private:
 	// May only be called when holding lock
 	void grow() {
-		if(blocks.empty()) { blocks.emplace_back(std::make_unique<block>(first_free_entry)); } else {
+		if(blocks.empty()) {
+			blocks.emplace_back(std::make_unique<block>(first_free_entry));
+		} else {
 			blocks.emplace_back(std::make_unique<block>(first_free_entry, blocks.back().get()));
 		}
 		block_count = blocks.size();
-		if(blocks.empty()) { first_block = nullptr; } else {
+		if(blocks.empty()) {
+			first_block = nullptr;
+		} else {
 			first_block = blocks.front().get();
 		}
 	}

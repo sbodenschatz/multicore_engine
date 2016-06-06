@@ -4,9 +4,9 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <asset/load_unit.hpp>
 #include <bstream/buffer_ibstream.hpp>
-#include <algorithm>
 #include <stdexcept>
 
 namespace mce {

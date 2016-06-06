@@ -4,8 +4,8 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <asset/file_asset_loader.hpp>
 #include <algorithm>
+#include <asset/file_asset_loader.hpp>
 #include <asset/file_reader.hpp>
 
 namespace mce {
@@ -27,8 +27,7 @@ bool file_asset_loader::start_load_asset(const std::shared_ptr<asset>& asset, as
 			if(!load_unit.empty()) {
 				file_path = load_unit;
 				file_path += '/';
-			}
-			else {
+			} else {
 				file_path = "";
 			}
 			file_path += asset->name();

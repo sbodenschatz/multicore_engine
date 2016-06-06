@@ -34,8 +34,7 @@ private:
 
 public:
 	template <typename... Args>
-	locked(Args&&... args)
-			: value(args...) {}
+	locked(Args&&... args) : value(args...) {}
 	locked(const locked&) = delete;
 	locked& operator=(const locked&) = delete;
 	locked(const locked&&) = delete;
