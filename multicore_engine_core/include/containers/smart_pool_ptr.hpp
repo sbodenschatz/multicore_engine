@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <utility>
+#include <cassert>
 
 namespace mce {
 namespace containers {
