@@ -7,6 +7,8 @@
 #ifndef MEMORY_ALIGN_HPP_
 #define MEMORY_ALIGN_HPP_
 
+#include <cstddef>
+
 namespace mce {
 namespace memory {
 
