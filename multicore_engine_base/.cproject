@@ -164,6 +164,91 @@
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.642296976">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.642296976" moduleId="org.eclipse.cdt.core.settings" name="no_build">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.642296976" name="no_build" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.642296976." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.2085699885" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.2135645109" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
+							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_debug/multicore_engine_base" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="false" id="org.eclipse.cdt.build.core.settings.default.builder.74630115" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="build"/>
+								</outputEntries>
+							</builder>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.2074740089" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
+								<option id="gnu.both.asm.option.include.paths.2130702612" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1889760737" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.507278400" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1429420550" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base">
+								<option id="gnu.cpp.compiler.option.include.paths.201863935" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1166567267" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
+									<listOptionValue builtIn="false" value="VKCPP_ENHANCED_MODE"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1715648921" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1159170675" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
+								<option id="gnu.c.compiler.option.include.paths.709856332" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.585863958" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
+									<listOptionValue builtIn="false" value="VKCPP_ENHANCED_MODE"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.915252217" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.38331627" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.2060923447" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2016481174" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="include|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="mutlicore_engine_core.null.110908101" name="mutlicore_engine_core"/>
@@ -174,6 +259,9 @@
 		<configuration configurationName="release"/>
 		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/mutlicore_engine_core"/>
+		</configuration>
+		<configuration configurationName="no_build">
+			<resource resourceType="PROJECT" workspacePath="/multicore_engine_base"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
