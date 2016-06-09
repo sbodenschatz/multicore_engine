@@ -8,6 +8,7 @@
 #include <boost/test/unit_test.hpp>
 #include <containers/smart_object_pool.hpp>
 #include <future>
+#include <iterator>
 #include <string>
 #include <unordered_set>
 #include <util/unused.hpp>
@@ -131,6 +132,30 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 	std::chrono::duration<double> diff2 = t3 - t2;
 	// std::cout << diff2.count() << std::endl;
 	UNUSED(diff2);
+}
+
+BOOST_AUTO_TEST_CASE(iterator_prevent_skip_over_end) {
+	auto ptr1 = sop.emplace(1);
+	auto ptr2 = sop.emplace(2);
+	auto ptr3 = sop.emplace(3);
+	auto ptr4 = sop.emplace(4);
+	auto ptr5 = sop.emplace(5);
+
+	auto it1 = sop.begin();
+	std::advance(it1, 3);
+	it1 = it1.make_limiter();
+	auto it2 = sop.begin();
+	long long val = 0;
+	for(auto it = it2; it != it1; ++it) {
+		val = *it;
+	}
+	BOOST_CHECK(val == 3);
+	ptr4.reset();
+	val = 0;
+	for(auto it = it2; it != it1; ++it) {
+		val = *it;
+	}
+	BOOST_CHECK(val == 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
