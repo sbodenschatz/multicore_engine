@@ -446,10 +446,8 @@ public:
 
 		iterator_& operator=(iterator_<T, block_entry_link>&& it) noexcept {
 			target = {it.target.entry, it.target.containing_block};
-			if(pool != it.pool) {
-				drop_iterator();
-				pool = it.pool;
-			}
+			drop_iterator();
+			pool = it.pool;
 			it.target.entry = nullptr;
 			it.target.containing_block = nullptr;
 			it.pool = nullptr;
