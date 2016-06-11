@@ -7,21 +7,21 @@
 #ifndef ASSET_ASSET_MANAGER_HPP_
 #define ASSET_ASSET_MANAGER_HPP_
 
-#include <memory>
-#include <string>
-#include <vector>
-#include <shared_mutex>
-#include <thread>
 #include "asset_defs.hpp"
+#include <memory>
+#include <shared_mutex>
+#include <string>
+#include <thread>
 #include <util/copy_on_write.hpp>
+#include <vector>
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4005)
 #endif
-#include <boost/thread/future.hpp>
-#include <boost/container/flat_map.hpp>
 #include <boost/asio/io_service.hpp>
+#include <boost/container/flat_map.hpp>
+#include <boost/thread/future.hpp>
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

@@ -7,10 +7,10 @@
 #ifndef CORE_ENGINE_HPP_
 #define CORE_ENGINE_HPP_
 
-#include <cassert>
-#include <memory>
-#include <entity/entity_manager.hpp>
 #include <asset/asset_manager.hpp>
+#include <cassert>
+#include <entity/entity_manager.hpp>
+#include <memory>
 
 namespace mce {
 namespace core {

@@ -7,13 +7,13 @@
 #ifndef ASSET_LOAD_UNIT_ASSET_LOADER_HPP_
 #define ASSET_LOAD_UNIT_ASSET_LOADER_HPP_
 
-#include <string>
-#include <vector>
+#include "asset_defs.hpp"
+#include "asset_loader.hpp"
+#include <containers/scratch_pad_pool.hpp>
 #include <memory>
 #include <shared_mutex>
-#include "asset_loader.hpp"
-#include "asset_defs.hpp"
-#include <containers/scratch_pad_pool.hpp>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace asset {

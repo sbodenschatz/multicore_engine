@@ -7,22 +7,24 @@
 #ifndef CONTAINERS_SMART_OBJECT_POOL_HPP_
 #define CONTAINERS_SMART_OBJECT_POOL_HPP_
 
-#include <memory>
-#include <cassert>
-#include <type_traits>
-#include <vector>
-#include <algorithm>
-#include <iterator>
-#include <atomic>
-#include <iostream>
-#include <mutex>
+#include "../memory/aligned_new.hpp"
 #include "scratch_pad_pool.hpp"
 #include "smart_pool_ptr.hpp"
-#include "../memory/aligned_new.hpp"
+#include <algorithm>
+#include <atomic>
+#include <cassert>
+#include <iostream>
+#include <iterator>
+#include <memory>
+#include <mutex>
+#include <type_traits>
+#include <vector>
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4324)
+#pragma warning(disable : 4458)
+#pragma warning(disable : 4459)
 #endif
 
 namespace mce {
@@ -125,8 +127,7 @@ private:
 	typedef unsigned int ref_count_tag_t;
 
 	struct tagged_ref_count {
-		alignas(sizeof(ref_count_t)+sizeof(ref_count_tag_t))
-		ref_count_t count;
+		alignas(sizeof(ref_count_t) + sizeof(ref_count_tag_t)) ref_count_t count;
 		ref_count_tag_t version;
 	};
 
@@ -164,6 +165,7 @@ private:
 		alignas(cacheline_alignment) smart_object_pool<T, block_size>* owning_pool;
 		std::atomic<block*> next_block{nullptr};
 		std::atomic<block*> prev_block;
+		const size_t block_index;
 		alignas(cacheline_alignment) std::atomic<size_t> allocated_objects{0};
 		alignas(cacheline_alignment) std::atomic<size_t> active_objects{0};
 
@@ -191,7 +193,8 @@ private:
 		// May only be called inside of a lock on free list
 		block(smart_object_pool<T, block_size>* owning_pool, block_entry_link& prev,
 			  block* prev_block = nullptr) noexcept : owning_pool{owning_pool},
-													  prev_block{prev_block} {
+													  prev_block{prev_block},
+													  block_index{owning_pool->block_count} {
 			ref_counts[block_size - 1].strong = {-1, 0u};
 			ref_counts[block_size - 1].weak = 0;
 			entries[block_size - 1].next_free = prev;
@@ -239,7 +242,9 @@ private:
 		virtual void decrement_weak_ref(void* object) noexcept override {
 			auto* entry = reinterpret_cast<block_entry*>(object);
 			auto& rc = ref_count(entry);
-			if(--(rc.weak) == 0) { owning_pool->deallocate(entry, this); }
+			if(--(rc.weak) == 0) {
+				owning_pool->deallocate(entry, this);
+			}
 		}
 		// Needs to be called for incrementing the strong ref count if it isn't sure that the object is alive.
 		virtual bool upgrade_ref(void* object) noexcept override {
@@ -304,7 +309,9 @@ private:
 
 	block_entry_link allocate() {
 		std::lock_guard<std::mutex> lock(free_list_mutex);
-		if(!first_free_entry.entry) { grow(); }
+		if(!first_free_entry.entry) {
+			grow();
+		}
 		auto free_entry = first_free_entry;
 		first_free_entry = free_entry.entry->next_free;
 		++allocated_objects;
@@ -317,7 +324,9 @@ private:
 		if(blocks.empty()) {
 			blocks.emplace_back(std::make_unique<block>(this, first_free_entry));
 			first_block = blocks.front().get();
-		} else { blocks.emplace_back(std::make_unique<block>(this, first_free_entry, blocks.back().get())); }
+		} else {
+			blocks.emplace_back(std::make_unique<block>(this, first_free_entry, blocks.back().get()));
+		}
 		++block_count;
 	}
 
@@ -362,11 +371,15 @@ private:
 		for(auto& obj : *pending) {
 			if(obj.ptr.containing_block->try_to_destroy_object(obj.ptr.entry, obj.version)) {
 				auto& rc = obj.ptr.containing_block->ref_count(obj.ptr.entry);
-				if(--(rc.weak) == 0) { dealloc->push_back(obj); }
+				if(--(rc.weak) == 0) {
+					dealloc->push_back(obj);
+				}
 			}
 		}
 		std::lock_guard<std::mutex> lock(free_list_mutex);
-		for(auto& obj : *dealloc) { deallocate_inner(obj.ptr.entry, obj.ptr.containing_block); }
+		for(auto& obj : *dealloc) {
+			deallocate_inner(obj.ptr.entry, obj.ptr.containing_block);
+		}
 	}
 
 public:
@@ -374,7 +387,8 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now."
+					  << std::endl;
 			std::terminate();
 		}
 	}
@@ -387,16 +401,19 @@ public:
 	class iterator_ : public std::iterator<std::forward_iterator_tag, It_T> {
 		Target_T target;
 		smart_object_pool<T, block_size>* pool;
+		bool is_limiter = false;
 		friend class smart_object_pool<T, block_size>;
 
 		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
 			++(pool->active_iterators);
-			skip_until_valid();
+			skip_until_valid(this->target);
 		}
 
 		void drop_iterator() {
 			if(pool) {
-				if(--(pool->active_iterators) == 0) { pool->process_deferred_destruction(); }
+				if(--(pool->active_iterators) == 0) {
+					pool->process_deferred_destruction();
+				}
 			}
 		}
 
@@ -408,11 +425,13 @@ public:
 
 		iterator_(const iterator_<T, block_entry_link>& it) noexcept
 				: target{it.target.entry, it.target.containing_block},
-				  pool{it.pool} {
+				  pool{it.pool},
+				  is_limiter{it.is_limiter} {
 			if(pool) ++(pool->active_iterators);
 		}
 
 		iterator_& operator=(const iterator_<T, block_entry_link>& it) noexcept {
+			is_limiter = it.is_limiter;
 			target = {it.target.entry, it.target.containing_block};
 			if(pool != it.pool) {
 				drop_iterator();
@@ -424,21 +443,23 @@ public:
 
 		iterator_(iterator_<T, block_entry_link>&& it) noexcept
 				: target{it.target.entry, it.target.containing_block},
-				  pool{it.pool} {
+				  pool{it.pool},
+				  is_limiter{it.is_limiter} {
 			it.target.entry = nullptr;
 			it.target.containing_block = nullptr;
 			it.pool = nullptr;
+			it.is_limiter = false;
 		}
 
 		iterator_& operator=(iterator_<T, block_entry_link>&& it) noexcept {
+			is_limiter = it.is_limiter;
 			target = {it.target.entry, it.target.containing_block};
-			if(pool != it.pool) {
-				drop_iterator();
-				pool = it.pool;
-			}
+			drop_iterator();
+			pool = it.pool;
 			it.target.entry = nullptr;
 			it.target.containing_block = nullptr;
 			it.pool = nullptr;
+			it.is_limiter = false;
 			return *this;
 		}
 
@@ -453,13 +474,27 @@ public:
 			return &(target.entry->object);
 		}
 		bool operator==(const iterator_<const T, const_block_entry_link>& it) const {
-			return it.target.entry == target.entry && it.target.containing_block == target.containing_block;
+			return (it.target.entry == target.entry &&
+					it.target.containing_block == target.containing_block) ||
+				   (is_limiter &&
+					target.containing_block->block_index <= it.target.containing_block->block_index &&
+					target.entry <= it.target.entry) ||
+				   (it.is_limiter &&
+					it.target.containing_block->block_index <= target.containing_block->block_index &&
+					it.target.entry <= target.entry);
 		}
 		bool operator!=(const iterator_<const T, const_block_entry_link>& it) const {
 			return !(*this == it);
 		}
 		bool operator==(const iterator_<T, block_entry_link>& it) const {
-			return it.target.entry == target.entry && it.target.containing_block == target.containing_block;
+			return (it.target.entry == target.entry &&
+					it.target.containing_block == target.containing_block) ||
+				   (is_limiter &&
+					target.containing_block->block_index <= it.target.containing_block->block_index &&
+					target.entry <= it.target.entry) ||
+				   (it.is_limiter &&
+					it.target.containing_block->block_index <= target.containing_block->block_index &&
+					it.target.entry <= target.entry);
 		}
 		bool operator!=(const iterator_<T, block_entry_link>& it) const {
 			return !(*this == it);
@@ -467,7 +502,7 @@ public:
 
 		iterator_& operator++() {
 			target.entry++;
-			skip_until_valid();
+			skip_until_valid(this->target);
 			return *this;
 		}
 		iterator_ operator++(int) {
@@ -481,11 +516,33 @@ public:
 			assert(target.entry);
 			if(target.containing_block->upgrade_ref(target.element)) {
 				return smart_pool_ptr<It_T>(target.element, target.containing_block);
-			} else { return smart_pool_ptr<It_T>(); }
+			} else {
+				return smart_pool_ptr<It_T>();
+			}
+		}
+
+		void make_limiter_inplace() {
+			is_limiter = true;
+		}
+
+		iterator_ make_limiter() const {
+			iterator_ ret = *this;
+			ret.make_limiter_inplace();
+			return ret;
+		}
+
+		void make_nonlimiter_inplace() {
+			is_limiter = false;
+		}
+
+		iterator_ make_nonlimiter() const {
+			iterator_ ret = *this;
+			ret.make_nonlimiter_inplace();
+			return ret;
 		}
 
 	private:
-		void skip_empty_blocks() {
+		static void skip_empty_blocks(Target_T& target) {
 			// Skip over empty blocks without looking at individual entries
 			while(target.containing_block) {
 				if(target.containing_block->active_objects)
@@ -495,11 +552,13 @@ public:
 			}
 			target.entry = target.containing_block ? target.containing_block->entries : nullptr;
 		}
-		void skip_until_valid() {
+		static void skip_until_valid(Target_T& target) {
 			if(!target.containing_block) {
 				target.entry = nullptr;
 				return;
-			} else if(target.containing_block->active_objects == 0) { skip_empty_blocks(); }
+			} else if(target.containing_block->active_objects == 0) {
+				skip_empty_blocks(target);
+			}
 			for(;;) {
 				if(!target.containing_block) {
 					target.entry = nullptr;
@@ -507,7 +566,9 @@ public:
 				}
 				if(target.entry >= target.containing_block->entries + block_size) {
 					target.containing_block = target.containing_block->next_block;
-					if(target.containing_block) { skip_empty_blocks(); }
+					if(target.containing_block) {
+						skip_empty_blocks(target);
+					}
 					if(!target.containing_block) {
 						target.entry = nullptr;
 						return;
@@ -548,7 +609,9 @@ public:
 	void reserve(size_t reserved_size) {
 		if(capacity() < reserved_size) {
 			std::lock_guard<std::mutex> lock(free_list_mutex);
-			while(capacity() < reserved_size) { grow(); }
+			while(capacity() < reserved_size) {
+				grow();
+			}
 		}
 	}
 

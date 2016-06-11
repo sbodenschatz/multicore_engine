@@ -7,10 +7,10 @@
 #ifndef ENTITY_COMPONENT_CONFIGURATION_HPP_
 #define ENTITY_COMPONENT_CONFIGURATION_HPP_
 
-#include <unordered_map>
-#include <vector>
 #include "ecs_types.hpp"
 #include "parser/entity_text_file_ast.hpp"
+#include <unordered_map>
+#include <vector>
 
 namespace mce {
 namespace core {

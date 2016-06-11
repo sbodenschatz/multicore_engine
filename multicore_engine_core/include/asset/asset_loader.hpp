@@ -7,9 +7,9 @@
 #ifndef ASSET_ASSET_LOADER_HPP_
 #define ASSET_ASSET_LOADER_HPP_
 
-#include <string>
-#include <memory>
 #include "asset_defs.hpp"
+#include <memory>
+#include <string>
 
 namespace mce {
 namespace asset {

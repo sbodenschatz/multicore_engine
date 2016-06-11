@@ -4,14 +4,14 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <boost/container/flat_set.hpp>
 #include <boost/test/unit_test.hpp>
-#include <util/message_queue.hpp>
-#include <util/spin_lock.hpp>
 #include <mutex>
 #include <thread>
-#include <boost/container/flat_set.hpp>
-#include <vector>
+#include <util/message_queue.hpp>
+#include <util/spin_lock.hpp>
 #include <utility>
+#include <vector>
 
 namespace mce {
 namespace util {

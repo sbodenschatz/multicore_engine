@@ -16,16 +16,17 @@
 #pragma warning(disable : 4714)
 #pragma warning(disable : 4127)
 #pragma warning(disable : 4100)
+#pragma warning(disable : 4348)
 #endif
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
-#include <entity/parser/entity_text_file_parser.hpp>
+#include <boost/spirit/include/qi.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_fusion.hpp>
+#include <entity/parser/entity_text_file_parser.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;

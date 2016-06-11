@@ -1,7 +1,10 @@
 solution "multicore_engine_solution"
 	configurations{"debug", "release"}
-	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH","ZLIB_CONST"}
-	includedirs{"multicore_engine_core/include","multicore_engine_parsers/include"}
+	defines{"GLM_FORCE_RADIANS","GLM_SWIZZLE","GLM_FORCE_SIZE_T_LENGTH","ZLIB_CONST","_USE_MATH_DEFINES"}
+	includedirs{
+		"multicore_engine_core/include",
+		"multicore_engine_parsers/include"
+	}
 	vectorextensions "SSE2"
 	startproject "multicore_engine_demo"
 	warnings "Extra"
@@ -21,6 +24,9 @@ solution "multicore_engine_solution"
 				---Target windows 7 or higher with windows api headers
 				"_WIN32_WINNT=0x0601",
 				"WINVER=0x0601"}
+		includedirs{
+			"C:/Libs/TBB/include"
+		}
 	configuration "not windows"
 		defines{"MULTICORE_ENGINE_NOT_WINDOWS"}
 		includedirs{}
@@ -136,9 +142,60 @@ solution "multicore_engine_solution"
 		language "C++"
 		location "multicore_engine_demo/build"
 		files { "multicore_engine_demo/include/**.hpp", "multicore_engine_demo/src/**.cpp"}
-		links {"multicore_engine_core","multicore_engine_parsers"}
+		links { "multicore_engine_core","multicore_engine_parsers"}
+
+		configuration {"windows"}
+			links {"vulkan-1"}
+			libdirs {tostring(os.getenv("VK_SDK_PATH")) .. "/Bin"}
+		--	postbuildcommands {
+		--		os.getenv("VK_SDK_PATH") .. "\\Bin\\glslangValidator.exe -s -V -o ..\\cube-vert.spv ..\\cube.vert",
+		--		os.getenv("VK_SDK_PATH") .. "\\Bin\\glslangValidator.exe -s -V -o ..\\cube-frag.spv ..\\cube.frag"
+		--	}
+		
+		configuration {"windows","gmake"}
+			links {"mingw32"}
+
 		configuration {"vs2015"}
 			debugdir "multicore_engine_demo"
+		
+		configuration {"gmake","not windows"}
+			buildoptions "-std=gnu++1y"
+			links {"pthread","tbb","tbbmalloc","vulkan"}
+			libdirs {os.findlib("TBB2"),os.findlib("Vulkan")}
+			if _OPTIONS["cc"] == "clang" then
+				toolset "clang"
+				buildoptions "-stdlib=libc++"
+				links "c++"
+			end
+
+		configuration {"gmake","windows","Debug"}
+			libdirs {"C:/Libs/TBB/lib/windows_intel64_gcc_mingw_debug"}
+			links{"tbb_debug","tbbmalloc_debug"}
+			postbuildcommands {
+				"{COPY} C:\\Libs\\TBB\\lib\\windows_intel64_gcc_mingw_debug\\*_debug.dll %{cfg.buildtarget.directory}",
+			}
+		
+		configuration {"gmake","windows","Release"}
+			libdirs {"C:/Libs/TBB/lib/windows_intel64_gcc_mingw_release"}   
+			links{"tbb","tbbmalloc"}
+			postbuildcommands {
+				"{COPY} C:\\Libs\\TBB\\lib\\windows_intel64_gcc_mingw_release\\*.dll %{cfg.buildtarget.directory}",
+			}
+		
+		configuration {"vs2015","windows","Debug"}
+			libdirs {"C:/Libs/TBB/lib/windows_intel64_vc/Debug"}
+			links{"tbb_debug","tbbmalloc_debug"}
+			postbuildcommands {
+				"{COPY} C:\\Libs\\TBB\\lib\\windows_intel64_vc\\Debug\\*_debug.dll %{cfg.buildtarget.directory}",
+			}
+		
+		configuration {"vs2015","windows","Release"}
+			libdirs {"C:/Libs/TBB/lib/windows_intel64_vc/Release"}
+			links{"tbb","tbbmalloc"}
+			postbuildcommands {
+				"{COPY} C:\\Libs\\TBB\\lib\\windows_intel64_vc\\Release\\*.dll %{cfg.buildtarget.directory}",
+			}
+
 
 	project "multicore_engine_pack_file_gen"
 		kind "ConsoleApp"

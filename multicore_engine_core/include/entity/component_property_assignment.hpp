@@ -7,11 +7,11 @@
 #ifndef ENTITY_COMPONENT_PROPERTY_ASSIGNMENT_HPP_
 #define ENTITY_COMPONENT_PROPERTY_ASSIGNMENT_HPP_
 
-#include <memory>
-#include <string>
-#include <reflection/property.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_value_mapper.hpp>
+#include <memory>
+#include <reflection/property.hpp>
+#include <string>
 
 namespace mce {
 namespace core {

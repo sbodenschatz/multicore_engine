@@ -4,12 +4,12 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <asset/pack_file_reader.hpp>
-#include <fstream>
 #include <algorithm>
+#include <asset/pack_file_reader.hpp>
 #include <cassert>
-#include <util/unused.hpp>
+#include <fstream>
 #include <util/compression.hpp>
+#include <util/unused.hpp>
 
 namespace mce {
 namespace asset {

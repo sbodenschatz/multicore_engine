@@ -4,13 +4,13 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
+#include <atomic>
 #include <boost/test/unit_test.hpp>
+#include <mutex>
+#include <thread>
 #include <util/locked.hpp>
 #include <utility>
-#include <thread>
 #include <vector>
-#include <atomic>
-#include <mutex>
 
 namespace mce {
 namespace util {

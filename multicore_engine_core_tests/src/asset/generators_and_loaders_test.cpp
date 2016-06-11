@@ -4,26 +4,26 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <asset/asset_manager.hpp>
 #include <asset/file_asset_loader.hpp>
+#include <asset/load_unit_asset_loader.hpp>
 #include <asset/native_file_reader.hpp>
 #include <asset/pack_file_reader.hpp>
-#include <asset/asset_manager.hpp>
-#include <asset/load_unit_asset_loader.hpp>
 #include <asset_gen/load_unit_gen.hpp>
 #include <asset_gen/pack_file_gen.hpp>
-#include <boost/test/unit_test.hpp>
-#include <util/finally.hpp>
-#include <string>
-#include <fstream>
 #include <boost/filesystem.hpp>
-#include <vector>
-#include <memory>
+#include <boost/test/unit_test.hpp>
 #include <cstring>
-#include <random>
-#include <algorithm>
-#include <thread>
+#include <fstream>
 #include <future>
 #include <iostream>
+#include <memory>
+#include <random>
+#include <string>
+#include <thread>
+#include <util/finally.hpp>
+#include <vector>
 
 namespace fs = boost::filesystem;
 
@@ -35,8 +35,7 @@ struct asset_gen_and_load_test_fixture {
 		std::string name;
 		std::vector<char> data;
 		template <typename F>
-		test_file(const std::string& name, F f)
-				: name(name) {
+		test_file(const std::string& name, F f) : name(name) {
 			std::fstream out(name, std::ios::binary | std::ios::trunc | std::ios::in | std::ios::out);
 			BOOST_CHECK(out);
 			f(out);
