@@ -7,11 +7,11 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
 
-#include <type_traits>
-#include <vector>
-#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace mce {
 namespace entity {
@@ -54,7 +54,9 @@ template <>
 struct ast_value_mapper<float_list, glm::vec2> {
 	static void convert(const float_list& ast_val, glm::vec2& val) {
 		val = glm::vec2();
-		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) { val[i] = ast_val[i]; }
+		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) {
+			val[i] = ast_val[i];
+		}
 	}
 };
 
@@ -62,7 +64,9 @@ template <>
 struct ast_value_mapper<float_list, glm::vec3> {
 	static void convert(const float_list& ast_val, glm::vec3& val) {
 		val = glm::vec3();
-		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) { val[i] = ast_val[i]; }
+		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) {
+			val[i] = ast_val[i];
+		}
 	}
 };
 
@@ -70,7 +74,9 @@ template <>
 struct ast_value_mapper<float_list, glm::vec4> {
 	static void convert(const float_list& ast_val, glm::vec4& val) {
 		val = glm::vec4();
-		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) { val[i] = ast_val[i]; }
+		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) {
+			val[i] = ast_val[i];
+		}
 	}
 };
 
@@ -78,7 +84,9 @@ template <typename T, glm::precision p>
 struct ast_value_mapper<int_list, glm::tvec2<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	static void convert(const int_list& ast_val, glm::tvec2<T, p>& val) {
 		val = glm::tvec2<T, p>();
-		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) { val[i] = T(ast_val[i]); }
+		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) {
+			val[i] = T(ast_val[i]);
+		}
 	}
 };
 
@@ -86,7 +94,9 @@ template <typename T, glm::precision p>
 struct ast_value_mapper<int_list, glm::tvec3<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	static void convert(const int_list& ast_val, glm::tvec3<T, p>& val) {
 		val = glm::tvec3<T, p>();
-		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) { val[i] = T(ast_val[i]); }
+		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) {
+			val[i] = T(ast_val[i]);
+		}
 	}
 };
 
@@ -94,7 +104,9 @@ template <typename T, glm::precision p>
 struct ast_value_mapper<int_list, glm::tvec4<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	static void convert(const int_list& ast_val, glm::tvec4<T, p>& val) {
 		val = glm::tvec4<T, p>();
-		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) { val[i] = T(ast_val[i]); }
+		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) {
+			val[i] = T(ast_val[i]);
+		}
 	}
 };
 

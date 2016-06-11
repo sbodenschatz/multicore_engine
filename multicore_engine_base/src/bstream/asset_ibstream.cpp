@@ -4,10 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <bstream/asset_ibstream.hpp>
 #include <algorithm>
-#include <cstring>
 #include <asset/asset.hpp>
+#include <bstream/asset_ibstream.hpp>
+#include <cstring>
 #include <stdexcept>
 
 namespace mce {

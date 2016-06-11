@@ -7,9 +7,9 @@
 #ifndef ENTITY_ENTITY_CONFIGURATION_HPP_
 #define ENTITY_ENTITY_CONFIGURATION_HPP_
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace mce {
 namespace core {

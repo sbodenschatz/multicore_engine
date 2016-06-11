@@ -7,12 +7,12 @@
 #ifndef ENTITY_COMPONENT_TYPE_HPP_
 #define ENTITY_COMPONENT_TYPE_HPP_
 
-#include <memory>
-#include <vector>
-#include <string>
-#include "ecs_types.hpp"
-#include <reflection/property.hpp>
 #include "component_type_id_manager.hpp"
+#include "ecs_types.hpp"
+#include <memory>
+#include <reflection/property.hpp>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace core {
@@ -25,8 +25,9 @@ class entity;
 
 class abstract_component_type {
 public:
-	typedef std::vector<std::unique_ptr<reflection::abstract_property<
-			component, abstract_component_property_assignment, core::engine&>>> property_list;
+	typedef std::vector<std::unique_ptr<
+			reflection::abstract_property<component, abstract_component_property_assignment, core::engine&>>>
+			property_list;
 
 private:
 	component_type_id_t id_;

@@ -7,8 +7,8 @@
 #ifndef UTIL_MESSAGE_QUEUE_HPP_
 #define UTIL_MESSAGE_QUEUE_HPP_
 
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
 #include <queue>
 #include <util/spin_lock.hpp>
 

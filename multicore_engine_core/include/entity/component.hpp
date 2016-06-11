@@ -8,9 +8,9 @@
 #define ENTITY_COMPONENT_HPP_
 
 #include <entity/component_property_assignment.hpp>
-#include <vector>
 #include <memory>
 #include <reflection/property.hpp>
+#include <vector>
 
 namespace mce {
 namespace core {
@@ -32,8 +32,9 @@ protected:
 			  configuration_(configuration) {}
 
 public:
-	typedef std::vector<std::unique_ptr<reflection::abstract_property<
-			component, abstract_component_property_assignment, core::engine&>>> property_list;
+	typedef std::vector<std::unique_ptr<
+			reflection::abstract_property<component, abstract_component_property_assignment, core::engine&>>>
+			property_list;
 	virtual ~component() = default;
 
 	const component_configuration& configuration() const {

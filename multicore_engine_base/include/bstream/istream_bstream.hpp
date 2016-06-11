@@ -9,8 +9,8 @@
 
 #include <bstream/ibstream.hpp>
 #include <cstdint>
-#include <memory>
 #include <istream>
+#include <memory>
 
 namespace mce {
 namespace bstream {

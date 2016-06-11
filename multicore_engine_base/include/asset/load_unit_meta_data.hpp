@@ -8,8 +8,8 @@
 #define ASSET_LOAD_UNIT_META_DATA_HPP_
 
 #include <cstdint>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace mce {
 namespace bstream {

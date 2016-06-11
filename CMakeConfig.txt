@@ -1,5 +1,5 @@
 if(NOT MSVC)
-	if(NOT (${CMAKE_BUILD_TYPE} STREQUAL Debug) AND NOT (${CMAKE_BUILD_TYPE} STREQUAL Release))
+	if(NOT (CMAKE_BUILD_TYPE STREQUAL Debug) AND NOT (CMAKE_BUILD_TYPE STREQUAL Release))
 		set(CMAKE_BUILD_TYPE Release)
 	endif()
 	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
@@ -8,6 +8,10 @@ if(NOT MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
 	string(TOLOWER ${CMAKE_BUILD_TYPE} CONFIG_LOWER)
 endif()
+
+set(GIT_BINARY git CACHE FILEPATH "Git binary to use for version determination.")
+set(VERSION "[unknown version]" CACHE STRING "Fallback version to use if auto-detection fails.")
+set(BRANCH "[unknown branch]" CACHE STRING "Fallback branch name to use if auto-detection fails.")
 
 MESSAGE(STATUS "Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")

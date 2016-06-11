@@ -7,8 +7,10 @@
 #ifndef CONTAINERS_SMART_POOL_PTR_HPP_
 #define CONTAINERS_SMART_POOL_PTR_HPP_
 
-#include <utility>
+#include <cassert>
 #include <memory>
+#include <type_traits>
+#include <utility>
 
 namespace mce {
 namespace containers {
@@ -84,17 +86,13 @@ public:
 		}
 		if(block) block->increment_strong_ref(managed_object);
 	}
-	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
-	// to only participate in overload resolution if U* is convertible to T*.
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr(const smart_pool_ptr<U>& other) noexcept : object(other.object),
 															  managed_object{other.managed_object},
 															  block{other.block} {
 		if(block) block->increment_strong_ref(managed_object);
 	}
-	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
-	// to only participate in overload resolution if U* is convertible to T*.
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr(smart_pool_ptr<U>&& other) noexcept : object(other.object),
 														 managed_object{other.managed_object},
 														 block{other.block} {
@@ -102,11 +100,15 @@ public:
 		other.managed_object = nullptr;
 		other.block = nullptr;
 	}
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	explicit smart_pool_ptr(weak_pool_ptr<U>&& other)
 			: object(other.object), managed_object{other.managed_object}, block{other.block} {
-		if(!block) { throw std::bad_weak_ptr(); }
-		if(!block->upgrade_ref(managed_object)) { throw std::bad_weak_ptr(); }
+		if(!block) {
+			throw std::bad_weak_ptr();
+		}
+		if(!block->upgrade_ref(managed_object)) {
+			throw std::bad_weak_ptr();
+		}
 	}
 	smart_pool_ptr<T>& operator=(const smart_pool_ptr& other) noexcept {
 		if(other.managed_object == managed_object) {
@@ -120,9 +122,7 @@ public:
 		if(block) block->increment_strong_ref(managed_object);
 		return *this;
 	}
-	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
-	// to only participate in overload resolution if U* is convertible to T*.
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr<T>& operator=(const smart_pool_ptr<U>& other) noexcept {
 		if(other.managed_object == managed_object) {
 			object = other.object;
@@ -146,9 +146,7 @@ public:
 		other.block = nullptr;
 		return *this;
 	}
-	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
-	// to only participate in overload resolution if U* is convertible to T*.
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr<T>& operator=(smart_pool_ptr<U>&& other) noexcept {
 		assert(this != &other);
 		if(block) block->decrement_strong_ref(managed_object);
@@ -241,17 +239,13 @@ public:
 		other.managed_object = nullptr;
 		other.block = nullptr;
 	}
-	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
-	// to only participate in overload resolution if U* is convertible to T*.
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr(const weak_pool_ptr<U>& other) noexcept : object(other.object),
 															managed_object{other.managed_object},
 															block{other.block} {
 		if(block) block->increment_weak_ref(managed_object);
 	}
-	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
-	// to only participate in overload resolution if U* is convertible to T*.
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr(weak_pool_ptr<U>&& other) noexcept : object(other.object),
 													   managed_object{other.managed_object},
 													   block{other.block} {
@@ -259,7 +253,7 @@ public:
 		other.managed_object = nullptr;
 		other.block = nullptr;
 	}
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr(smart_pool_ptr<U>& other)
 			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_weak_ref(managed_object);
@@ -276,9 +270,7 @@ public:
 		if(block) block->increment_weak_ref(managed_object);
 		return *this;
 	}
-	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
-	// to only participate in overload resolution if U* is convertible to T*.
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr<T>& operator=(const weak_pool_ptr<U>& other) noexcept {
 		if(other.managed_object == managed_object) {
 			object = other.object;
@@ -291,7 +283,7 @@ public:
 		if(block) block->increment_weak_ref(managed_object);
 		return *this;
 	}
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr<T>& operator=(const smart_pool_ptr<U>& other) noexcept {
 		if(other.managed_object == managed_object) {
 			object = other.object;
@@ -315,9 +307,7 @@ public:
 		other.block = nullptr;
 		return *this;
 	}
-	// TODO: Verify is this satisfies the requirement that also applies to the equivalent in std::shared_ptr
-	// to only participate in overload resolution if U* is convertible to T*.
-	template <typename U>
+	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr<T>& operator=(weak_pool_ptr<U>&& other) noexcept {
 		assert(this != &other);
 		if(block) block->decrement_weak_ref(managed_object);

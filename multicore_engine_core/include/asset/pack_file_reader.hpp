@@ -8,15 +8,15 @@
 #define ASSET_PACK_FILE_READER_HPP_
 
 #include "file_reader.hpp"
+#include <asset/pack_file_meta_data.hpp>
+#include <atomic>
 #include <boost/container/flat_map.hpp>
-#include <shared_mutex>
+#include <bstream/istream_bstream.hpp>
 #include <fstream>
 #include <memory>
-#include <string>
+#include <shared_mutex>
 #include <stdexcept>
-#include <asset/pack_file_meta_data.hpp>
-#include <bstream/istream_bstream.hpp>
-#include <atomic>
+#include <string>
 #include <util/lock_ptr_wrapper.hpp>
 
 namespace mce {

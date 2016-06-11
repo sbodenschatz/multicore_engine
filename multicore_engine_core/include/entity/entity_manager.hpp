@@ -7,17 +7,18 @@
 #ifndef ENTITY_ENTITY_MANAGER_HPP_
 #define ENTITY_ENTITY_MANAGER_HPP_
 
-#include <string>
-#include <memory>
-#include <boost/container/flat_map.hpp>
-#include <containers/unordered_object_pool.hpp>
+#include "component_type.hpp"
 #include "ecs_types.hpp"
 #include "entity.hpp"
-#include "component_type.hpp"
-#include <mutex>
-#include <atomic>
 #include "parser/entity_text_file_ast.hpp"
+#include <atomic>
+#include <boost/container/flat_map.hpp>
+#include <containers/unordered_object_pool.hpp>
+#include <memory>
+#include <mutex>
+#include <string>
 #include <util/unused.hpp>
+#include <asset/asset_defs.hpp>
 
 namespace mce {
 namespace core {
@@ -58,7 +59,7 @@ public:
 
 	void clear_entities();
 	void clear_entities_and_entity_configurations();
-	void load_entities_from_text_file(const std::string& filename);
+	void load_entities_from_text_file(const asset::asset_ptr& text_file_asset);
 	void add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config);
 	entity* create_entity(const entity_configuration& config);
 	void destroy_entity(entity_id_t id);
@@ -88,11 +89,11 @@ public:
 		return FACTORYEXPR;                                                                                  \
 	})
 
-#define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR)                                       \
-	ENTITYMANAGER.register_component_type<NAME##_component>(#NAME,                                             \
-															[](auto&& owner, auto&& config, auto&& engine) {   \
-																UNUSED(owner), UNUSED(config), UNUSED(engine); \
-																return FACTORYEXPR;                            \
-															})
+#define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR)                                     \
+	ENTITYMANAGER.register_component_type<NAME##_component>(                                                 \
+			#NAME, [](auto&& owner, auto&& config, auto&& engine) {                                          \
+				UNUSED(owner), UNUSED(config), UNUSED(engine);                                               \
+				return FACTORYEXPR;                                                                          \
+			})
 
 #endif /* ENTITY_ENTITY_MANAGER_HPP_ */

@@ -7,14 +7,14 @@
 #ifndef CONTAINERS_DUAL_CONTAINER_MAP_HPP_
 #define CONTAINERS_DUAL_CONTAINER_MAP_HPP_
 
-#include <utility>
-#include <functional>
-#include <type_traits>
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
+#include <utility>
 
 namespace mce {
 namespace containers {
@@ -89,8 +89,7 @@ public:
 	struct member_access_wrapper {
 		T value;
 		template <typename... Args>
-		member_access_wrapper(Args&&... args)
-				: value{std::forward<Args>(args)...} {}
+		member_access_wrapper(Args&&... args) : value{std::forward<Args>(args)...} {}
 		T* operator->() noexcept {
 			return &value;
 		}
@@ -137,7 +136,7 @@ public:
 			++index;
 			return *this;
 		}
-		iterator_ operator++(int) noexcept {
+		iterator_ operator++(int)noexcept {
 			auto it = *this;
 			this->operator++();
 			return it;
@@ -146,7 +145,7 @@ public:
 			--index;
 			return *this;
 		}
-		iterator_ operator--(int) noexcept {
+		iterator_ operator--(int)noexcept {
 			auto it = *this;
 			this->operator--();
 			return it;
@@ -380,7 +379,8 @@ class dual_container_map : public dual_container_map_base<dual_container_map<Con
 														  Container, Key, Value, Compare> {
 
 	typedef dual_container_map_base<dual_container_map<Container, Key, Value, Compare>, Container, Key, Value,
-									Compare> Base;
+									Compare>
+			Base;
 
 public:
 	template <typename... Args>
@@ -522,7 +522,9 @@ public:
 		auto it = std::lower_bound(this->keys.begin(), this->keys.end(), key, this->compare);
 		if(it != this->keys.end())
 			if(this->compare(key, *it)) it = this->keys.end();
-		if(it == this->keys.end()) { std::tie(it, std::ignore) = insert(std::forward<K>(key), Value()); }
+		if(it == this->keys.end()) {
+			std::tie(it, std::ignore) = insert(std::forward<K>(key), Value());
+		}
 		return this->values[std::distance(this->keys.begin(), it)];
 	}
 
@@ -547,7 +549,8 @@ class dual_container_multimap
 										 Key, Value, Compare> {
 
 	typedef dual_container_map_base<dual_container_multimap<Container, Key, Value, Compare>, Container, Key,
-									Value, Compare> Base;
+									Value, Compare>
+			Base;
 
 public:
 	template <typename... Args>

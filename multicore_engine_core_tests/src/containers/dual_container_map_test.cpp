@@ -4,14 +4,14 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <boost/container/small_vector.hpp>
 #include <boost/test/unit_test.hpp>
+#include <containers/dual_container_map.hpp>
+#include <future>
+#include <iostream>
 #include <map>
 #include <string>
-#include <algorithm>
-#include <future>
-#include <boost/container/small_vector.hpp>
-#include <containers/dual_container_map.hpp>
-#include <iostream>
 
 namespace mce {
 namespace containers {

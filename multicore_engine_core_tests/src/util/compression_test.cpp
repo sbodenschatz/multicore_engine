@@ -4,10 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <boost/test/unit_test.hpp>
 #include <util/compression.hpp>
 #include <util/unused.hpp>
-#include <algorithm>
 
 namespace mce {
 namespace util {

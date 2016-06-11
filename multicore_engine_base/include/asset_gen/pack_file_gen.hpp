@@ -7,10 +7,10 @@
 #ifndef ASSET_GEN_PACK_FILE_GEN_HPP_
 #define ASSET_GEN_PACK_FILE_GEN_HPP_
 
+#include <asset/pack_file_meta_data.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <asset/pack_file_meta_data.hpp>
 
 namespace mce {
 namespace asset_gen {

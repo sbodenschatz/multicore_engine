@@ -7,11 +7,11 @@
 #ifndef REFLECTION_TYPE_HPP_
 #define REFLECTION_TYPE_HPP_
 
-#include <vector>
-#include <string>
-#include <sstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace reflection {

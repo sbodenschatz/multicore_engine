@@ -7,11 +7,11 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_HPP_
 
-#include <string>
-#include <vector>
+#include <boost/variant.hpp>
 #include <cstdint>
 #include <ostream>
-#include <boost/variant.hpp>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace entity {
@@ -67,7 +67,8 @@ struct entity_reference {
 };
 
 typedef boost::variant<long long, float_node, std::string, int_list, float_list, string_list, rotation_list,
-					   marker_evaluation, entity_reference> variable_value;
+					   marker_evaluation, entity_reference>
+		variable_value;
 
 struct variable {
 	std::string name;

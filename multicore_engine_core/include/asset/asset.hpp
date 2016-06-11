@@ -7,15 +7,15 @@
 #ifndef ASSET_ASSET_HPP_
 #define ASSET_ASSET_HPP_
 
-#include <string>
-#include <memory>
-#include <atomic>
-#include <mutex>
-#include <vector>
-#include <condition_variable>
-#include <stdexcept>
-#include <util/local_function.hpp>
 #include "asset_defs.hpp"
+#include <atomic>
+#include <condition_variable>
+#include <memory>
+#include <mutex>
+#include <stdexcept>
+#include <string>
+#include <util/local_function.hpp>
+#include <vector>
 
 namespace mce {
 namespace asset {

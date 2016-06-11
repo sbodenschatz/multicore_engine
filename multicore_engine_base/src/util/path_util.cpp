@@ -4,8 +4,8 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <util/path_util.hpp>
 #include <algorithm>
+#include <util/path_util.hpp>
 
 namespace mce {
 namespace util {

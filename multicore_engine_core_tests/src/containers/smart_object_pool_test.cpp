@@ -4,13 +4,14 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <util/unused.hpp>
-#include <containers/smart_object_pool.hpp>
-#include <boost/test/unit_test.hpp>
-#include <unordered_set>
-#include <string>
 #include <algorithm>
+#include <boost/test/unit_test.hpp>
+#include <containers/smart_object_pool.hpp>
 #include <future>
+#include <iterator>
+#include <string>
+#include <unordered_set>
+#include <util/unused.hpp>
 
 namespace mce {
 namespace containers {
@@ -106,21 +107,23 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 	UNUSED(diff1);
 	std::vector<std::future<bool>> futures;
 	for(int t = 0; t < 256; ++t) {
-		futures.emplace_back(std::async(std::launch::async, [&](int t) {
-			bool res = true;
-			std::vector<smart_pool_ptr<element>> elem_ptrs;
-			elem_ptrs.reserve(0x1000);
-			for(int i = 0; i < 0x1000; ++i) {
-				auto ptr = sop.emplace((t << 16) | i);
-				elem_ptrs.emplace_back(ptr);
-				res = res && (*ptr == ((t << 16) | i));
-			}
-			for(int i = 0; i < 0x1000; ++i) {
-				res = res && (*(elem_ptrs[i]) == ((t << 16) | i));
-			}
-			elem_ptrs.clear();
-			return res;
-		}, t));
+		futures.emplace_back(std::async(std::launch::async,
+										[&](int t) {
+											bool res = true;
+											std::vector<smart_pool_ptr<element>> elem_ptrs;
+											elem_ptrs.reserve(0x1000);
+											for(int i = 0; i < 0x1000; ++i) {
+												auto ptr = sop.emplace((t << 16) | i);
+												elem_ptrs.emplace_back(ptr);
+												res = res && (*ptr == ((t << 16) | i));
+											}
+											for(int i = 0; i < 0x1000; ++i) {
+												res = res && (*(elem_ptrs[i]) == ((t << 16) | i));
+											}
+											elem_ptrs.clear();
+											return res;
+										},
+										t));
 	}
 	for(auto& f : futures) {
 		BOOST_CHECK(f.get());
@@ -129,6 +132,30 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 	std::chrono::duration<double> diff2 = t3 - t2;
 	// std::cout << diff2.count() << std::endl;
 	UNUSED(diff2);
+}
+
+BOOST_AUTO_TEST_CASE(iterator_prevent_skip_over_end) {
+	auto ptr1 = sop.emplace(1);
+	auto ptr2 = sop.emplace(2);
+	auto ptr3 = sop.emplace(3);
+	auto ptr4 = sop.emplace(4);
+	auto ptr5 = sop.emplace(5);
+
+	auto it1 = sop.begin();
+	std::advance(it1, 3);
+	it1 = it1.make_limiter();
+	auto it2 = sop.begin();
+	long long val = 0;
+	for(auto it = it2; it != it1; ++it) {
+		val = *it;
+	}
+	BOOST_CHECK(val == 3);
+	ptr4.reset();
+	val = 0;
+	for(auto it = it2; it != it1; ++it) {
+		val = *it;
+	}
+	BOOST_CHECK(val == 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
