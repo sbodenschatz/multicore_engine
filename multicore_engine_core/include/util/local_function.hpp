@@ -16,7 +16,7 @@
 namespace mce {
 namespace util {
 
-template <size_t, typename>
+template <size_t Max_Size, typename Signature>
 class local_function;
 
 namespace detail_local_function {
