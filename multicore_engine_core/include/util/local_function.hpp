@@ -110,7 +110,7 @@ public:
 	friend class local_function;
 	local_function() {}
 	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>
-	local_function(F f) {
+	local_function(F&& f) {
 		static_assert(sizeof(function_object<std::decay_t<F>>) <= Max_Size,
 					  "Insufficient space for function object.");
 		void* ptr = storage;
