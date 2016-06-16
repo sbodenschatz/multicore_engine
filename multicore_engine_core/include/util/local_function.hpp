@@ -127,15 +127,15 @@ public:
 	local_function(local_function&& other) {
 		function_obj = other.function_obj->move_to(storage, Max_Size);
 	}
-	template <size_t Max_Size_2>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function(const local_function<Max_Size_2, R(Args...)>& other) {
 		function_obj = other.function_obj->copy_to(storage, Max_Size);
 	}
-	template <size_t Max_Size_2>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function(local_function<Max_Size_2, R(Args...)>&& other) {
 		function_obj = other.function_obj->move_to(storage, Max_Size);
 	}
-	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size != Max_Size_2>>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function& operator=(const local_function<Max_Size_2, R(Args...)>& other) {
 		// No self-destruction check because the objects are of different type and aliasing them would be
 		// undefined behavior anyway
@@ -143,7 +143,7 @@ public:
 		function_obj = other.function_obj->copy_to(storage, Max_Size);
 		return *this;
 	}
-	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size != Max_Size_2>>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function& operator=(local_function<Max_Size_2, R(Args...)>&& other) {
 		// No self-destruction check because the objects are of different type and aliasing them would be
 		// undefined behavior anyway
