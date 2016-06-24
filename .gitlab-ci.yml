@@ -43,6 +43,7 @@ gcc-release-build:
   - cpp
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
     paths:
     - demo-gcc-release
     - load_unit_gen-gcc-release
@@ -81,6 +82,7 @@ clang-release-build:
   - cpp
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
     paths:
     - demo-clang-release
     - load_unit_gen-clang-release
@@ -104,6 +106,7 @@ api-doc:
   - doxygen
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
     paths:
     - refman.pdf
     - cloc_report.txt
