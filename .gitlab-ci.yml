@@ -1,6 +1,6 @@
 stages:
   - build
-  - deploy
+  - package
 
 scan-build:
   stage: build
@@ -111,8 +111,10 @@ api-doc:
     - refman.pdf
     - cloc_report.txt
 
-deploy-all:
-  stage: deploy
+package-base:
+  stage: package
+  except: 
+    - tags
   script:
   - mkdir gcc
   - mkdir clang
@@ -128,7 +130,43 @@ deploy-all:
   - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen > checksums.txt
   - cat checksums.txt
   tags:
-  - deploy
+  - package
+  artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
+    expire_in: 6 months
+    paths:
+    - refman.pdf
+    - cloc_report.txt
+    - gcc/demo
+    - gcc/load_unit_gen
+    - gcc/pack_file_gen
+#    - gcc/assets.pack
+    - clang/demo
+    - clang/load_unit_gen
+    - clang/pack_file_gen
+    - clang/assets.pack
+#    - checksums.txt
+
+package-tags:
+  stage: package
+  only: 
+    - tags
+  script:
+  - mkdir gcc
+  - mkdir clang
+  - mv demo-gcc-release gcc/demo
+  - mv load_unit_gen-gcc-release gcc/load_unit_gen
+  - mv pack_file_gen-gcc-release gcc/pack_file_gen
+#  - mv assets-gcc-release.pack gcc/assets.pack
+  - mv demo-clang-release clang/demo
+  - mv load_unit_gen-clang-release clang/load_unit_gen
+  - mv pack_file_gen-clang-release clang/pack_file_gen
+#  - mv assets-clang-release.pack clang/assets.pack
+#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen gcc/assets.pack clang/assets.pack > checksums.txt
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen > checksums.txt
+  - cat checksums.txt
+  tags:
+  - package
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
     paths:
