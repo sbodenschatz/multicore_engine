@@ -96,7 +96,7 @@ msvc-debug-build:
   - cd build
   - cmake -G "Visual Studio 14 2015 Win64" ..
   - cmake --build . --config Debug
-  - cd ..
+  - multicore_engine_core_tests\Debug\multicore_engine_core_tests.exe
   tags:
   - win-cpp
 
