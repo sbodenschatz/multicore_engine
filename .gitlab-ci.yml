@@ -89,6 +89,17 @@ clang-release-build:
     - pack_file_gen-clang-release
 #    - assets-clang-release.pack
 
+msvc-debug-build:
+  stage: build
+  script:
+  - mkdir build
+  - cd build
+  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - cmake --build . --config Debug
+  - cd ..
+  tags:
+  - win-cpp
+
 api-doc:
   stage: build
   script:
