@@ -100,6 +100,17 @@ msvc-debug-build:
   tags:
   - win-cpp
 
+msvc-release-build:
+  stage: build
+  script:
+  - mkdir build
+  - cd build
+  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - cmake --build . --config Release
+  - multicore_engine_core_tests\Release\multicore_engine_core_tests.exe
+  tags:
+  - win-cpp
+
 api-doc:
   stage: build
   script:
