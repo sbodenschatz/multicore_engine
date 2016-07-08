@@ -1,6 +1,6 @@
 stages:
   - build
-  - deploy
+  - package
 
 scan-build:
   stage: build
@@ -43,6 +43,7 @@ gcc-release-build:
   - cpp
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
     paths:
     - demo-gcc-release
     - load_unit_gen-gcc-release
@@ -81,12 +82,55 @@ clang-release-build:
   - cpp
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
     paths:
     - demo-clang-release
     - load_unit_gen-clang-release
     - pack_file_gen-clang-release
 #    - assets-clang-release.pack
 
+msvc-debug-build:
+  stage: build
+  script:
+  - if not exist build mkdir build
+  - cd build
+  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - cmake --build . --config Debug
+  - cd ..
+  - move build\multicore_engine_core_tests\Debug\multicore_engine_core_tests.exe core_tests-msvc-debug.exe
+  - move build\multicore_engine_demo\Debug\multicore_engine_demo.exe demo-msvc-debug.exe
+  - move build\multicore_engine_load_unit_gen\Debug\multicore_engine_load_unit_gen.exe load_unit_gen-msvc-debug.exe
+  - move build\multicore_engine_pack_file_gen\Debug\multicore_engine_pack_file_gen.exe pack_file_gen-msvc-debug.exe
+#  - move build\multicore_engine_assets\Debug\assets.pack assets-msvc-debug.pack
+  - core_tests-msvc-debug.exe --report_level=short
+  tags:
+  - win-cpp
+
+msvc-release-build:
+  stage: build
+  script:
+  - if not exist build mkdir build
+  - cd build
+  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - cmake --build . --config Release
+  - cd ..
+  - move build\multicore_engine_core_tests\Release\multicore_engine_core_tests.exe core_tests-msvc-release.exe
+  - move build\multicore_engine_demo\Release\multicore_engine_demo.exe demo-msvc-release.exe
+  - move build\multicore_engine_load_unit_gen\Release\multicore_engine_load_unit_gen.exe load_unit_gen-msvc-release.exe
+  - move build\multicore_engine_pack_file_gen\Release\multicore_engine_pack_file_gen.exe pack_file_gen-msvc-release.exe
+#  - move build\multicore_engine_assets\Release\assets.pack assets-msvc-release.pack
+  - core_tests-msvc-release.exe --report_level=short
+  tags:
+  - win-cpp
+  artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
+    paths:
+    - demo-msvc-release.exe
+    - load_unit_gen-msvc-release.exe
+    - pack_file_gen-msvc-release.exe
+#    - assets-msvc-release.pack
+    
 api-doc:
   stage: build
   script:
@@ -104,15 +148,19 @@ api-doc:
   - doxygen
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
     paths:
     - refman.pdf
     - cloc_report.txt
 
-deploy-all:
-  stage: deploy
+package-base:
+  stage: package
+  except: 
+    - tags
   script:
   - mkdir gcc
   - mkdir clang
+  - mkdir msvc
   - mv demo-gcc-release gcc/demo
   - mv load_unit_gen-gcc-release gcc/load_unit_gen
   - mv pack_file_gen-gcc-release gcc/pack_file_gen
@@ -121,11 +169,60 @@ deploy-all:
   - mv load_unit_gen-clang-release clang/load_unit_gen
   - mv pack_file_gen-clang-release clang/pack_file_gen
 #  - mv assets-clang-release.pack clang/assets.pack
-#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen gcc/assets.pack clang/assets.pack > checksums.txt
-  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen > checksums.txt
+  - mv demo-msvc-release.exe msvc/demo.exe
+  - mv load_unit_gen-msvc-release.exe msvc/load_unit_gen.exe
+  - mv pack_file_gen-msvc-release.exe msvc/pack_file_gen.exe
+#  - mv assets-msvc-release.pack msvc/assets.pack
+#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack > checksums.txt
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe > checksums.txt
   - cat checksums.txt
   tags:
-  - deploy
+  - package
+  artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
+    expire_in: 6 months
+    paths:
+    - refman.pdf
+    - cloc_report.txt
+    - gcc/demo
+    - gcc/load_unit_gen
+    - gcc/pack_file_gen
+#    - gcc/assets.pack
+    - clang/demo
+    - clang/load_unit_gen
+    - clang/pack_file_gen
+#    - clang/assets.pack
+    - msvc/demo.exe
+    - msvc/load_unit_gen.exe
+    - msvc/pack_file_gen.exe
+#    - msvc/assets.pack
+    - checksums.txt
+
+package-tags:
+  stage: package
+  only: 
+    - tags
+  script:
+  - mkdir gcc
+  - mkdir clang
+  - mkdir msvc
+  - mv demo-gcc-release gcc/demo
+  - mv load_unit_gen-gcc-release gcc/load_unit_gen
+  - mv pack_file_gen-gcc-release gcc/pack_file_gen
+#  - mv assets-gcc-release.pack gcc/assets.pack
+  - mv demo-clang-release clang/demo
+  - mv load_unit_gen-clang-release clang/load_unit_gen
+  - mv pack_file_gen-clang-release clang/pack_file_gen
+#  - mv assets-clang-release.pack clang/assets.pack
+  - mv demo-msvc-release.exe msvc/demo.exe
+  - mv load_unit_gen-msvc-release.exe msvc/load_unit_gen.exe
+  - mv pack_file_gen-msvc-release.exe msvc/pack_file_gen.exe
+#  - mv assets-msvc-release.pack msvc/assets.pack
+#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack > checksums.txt
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe > checksums.txt
+  - cat checksums.txt
+  tags:
+  - package
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
     paths:
@@ -139,4 +236,8 @@ deploy-all:
     - clang/load_unit_gen
     - clang/pack_file_gen
     - clang/assets.pack
-#    - checksums.txt
+    - msvc/demo.exe
+    - msvc/load_unit_gen.exe
+    - msvc/pack_file_gen.exe
+#    - msvc/assets.pack
+    - checksums.txt

@@ -16,7 +16,7 @@
 namespace mce {
 namespace util {
 
-template <size_t, typename>
+template <size_t Max_Size, typename Signature>
 class local_function;
 
 namespace detail_local_function {
@@ -38,8 +38,10 @@ public:
 	virtual ~abstract_function_object() = default;
 	virtual R operator()(Args... args) const = 0;
 	virtual R operator()(Args... args) = 0;
-	virtual std::unique_ptr<abstract_function_object, deleter<R, Args...>> copy_to(void* location) const = 0;
-	virtual std::unique_ptr<abstract_function_object, deleter<R, Args...>> move_to(void* location) = 0;
+	virtual std::unique_ptr<abstract_function_object, deleter<R, Args...>>
+	copy_to(void* location, size_t storage_size) const = 0;
+	virtual std::unique_ptr<abstract_function_object, deleter<R, Args...>> move_to(void* location,
+																				   size_t storage_size) = 0;
 };
 
 } // namespace detail_local_function
@@ -79,18 +81,16 @@ class local_function<Max_Size, R(Args...)> {
 		virtual R operator()(Args... args) override {
 			return f(std::forward<Args>(args)...);
 		}
-		virtual abstract_func_obj_ptr copy_to(void* location) const override {
-			static_assert(sizeof(function_object<F>) <= Max_Size, "Insufficient space for function object.");
+		virtual abstract_func_obj_ptr copy_to(void* location, size_t storage_size) const override {
 			void* ptr = location;
-			size_t space = Max_Size;
+			size_t space = storage_size;
 			if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
 				throw std::bad_alloc();
 			return abstract_func_obj_ptr(new(ptr) function_object<F>(f));
 		}
-		virtual abstract_func_obj_ptr move_to(void* location) override {
-			static_assert(sizeof(function_object<F>) <= Max_Size, "Insufficient space for function object.");
+		virtual abstract_func_obj_ptr move_to(void* location, size_t storage_size) override {
 			void* ptr = location;
-			size_t space = Max_Size;
+			size_t space = storage_size;
 			if(!memory::align(alignof(function_object<F>), sizeof(function_object<F>), ptr, space))
 				throw std::bad_alloc();
 			return abstract_func_obj_ptr(new(ptr) function_object<F>(std::move(f)));
@@ -110,7 +110,7 @@ public:
 	friend class local_function;
 	local_function() {}
 	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>
-	local_function(F f) {
+	local_function(F&& f) {
 		static_assert(sizeof(function_object<std::decay_t<F>>) <= Max_Size,
 					  "Insufficient space for function object.");
 		void* ptr = storage;
@@ -122,45 +122,45 @@ public:
 	}
 
 	local_function(const local_function& other) {
-		function_obj = other.function_obj->copy_to(storage);
+		function_obj = other.function_obj->copy_to(storage, Max_Size);
 	}
 	local_function(local_function&& other) {
-		function_obj = other.function_obj->move_to(storage);
+		function_obj = other.function_obj->move_to(storage, Max_Size);
 	}
-	template <size_t Max_Size_2>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function(const local_function<Max_Size_2, R(Args...)>& other) {
-		function_obj = other.function_obj->copy_to(storage);
+		function_obj = other.function_obj->copy_to(storage, Max_Size);
 	}
-	template <size_t Max_Size_2>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function(local_function<Max_Size_2, R(Args...)>&& other) {
-		function_obj = other.function_obj->move_to(storage);
+		function_obj = other.function_obj->move_to(storage, Max_Size);
 	}
-	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size != Max_Size_2>>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function& operator=(const local_function<Max_Size_2, R(Args...)>& other) {
 		// No self-destruction check because the objects are of different type and aliasing them would be
 		// undefined behavior anyway
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->copy_to(storage);
+		function_obj = other.function_obj->copy_to(storage, Max_Size);
 		return *this;
 	}
-	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size != Max_Size_2>>
+	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function& operator=(local_function<Max_Size_2, R(Args...)>&& other) {
 		// No self-destruction check because the objects are of different type and aliasing them would be
 		// undefined behavior anyway
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->move_to(storage);
+		function_obj = other.function_obj->move_to(storage, Max_Size);
 		return *this;
 	}
 	local_function& operator=(const local_function& other) {
 		if(&other == this) return *this;
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->copy_to(storage);
+		function_obj = other.function_obj->copy_to(storage, Max_Size);
 		return *this;
 	}
 	local_function& operator=(local_function&& other) {
 		assert(&other != this);
 		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->move_to(storage);
+		function_obj = other.function_obj->move_to(storage, Max_Size);
 		return *this;
 	}
 	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>

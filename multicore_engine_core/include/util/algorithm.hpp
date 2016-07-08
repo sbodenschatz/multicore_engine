@@ -44,7 +44,9 @@ It n_unique(It begin, It end, Eq eq, size_t n) {
 			group_start = cur;
 		}
 		if(i < n) {
-			*out = std::move_if_noexcept(*cur);
+			if(out != cur) {
+				*out = std::move_if_noexcept(*cur);
+			}
 			++out;
 		}
 		++i;

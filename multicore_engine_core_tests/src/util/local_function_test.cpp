@@ -108,24 +108,24 @@ BOOST_AUTO_TEST_CASE(assign_move) {
 
 BOOST_AUTO_TEST_CASE(copy_construct_different_size) {
 	int x = 0;
-	local_function<256, void()> f = [&]() { x = 42; };
-	local_function<128, void()> f2 = f;
+	local_function<128, void()> f = [&]() { x = 42; };
+	local_function<256, void()> f2 = f;
 	f2();
 	BOOST_CHECK(x == 42);
 }
 
 BOOST_AUTO_TEST_CASE(move_construct_different_size) {
 	int x = 0;
-	local_function<256, void()> f = [&]() { x = 42; };
-	local_function<128, void()> f2 = std::move(f);
+	local_function<128, void()> f = [&]() { x = 42; };
+	local_function<256, void()> f2 = std::move(f);
 	f2();
 	BOOST_CHECK(x == 42);
 }
 
 BOOST_AUTO_TEST_CASE(copy_assign_different_size) {
 	int x = 0;
-	local_function<256, void()> f = [&]() { x = 42; };
-	local_function<128, void()> f2 = []() {};
+	local_function<128, void()> f = [&]() { x = 42; };
+	local_function<256, void()> f2 = []() {};
 	f2 = f;
 	f2();
 	BOOST_CHECK(x == 42);
@@ -133,8 +133,8 @@ BOOST_AUTO_TEST_CASE(copy_assign_different_size) {
 
 BOOST_AUTO_TEST_CASE(move_assign_different_size) {
 	int x = 0;
-	local_function<256, void()> f = [&]() { x = 42; };
-	local_function<128, void()> f2 = []() {};
+	local_function<128, void()> f = [&]() { x = 42; };
+	local_function<256, void()> f2 = []() {};
 	f2 = std::move(f);
 	f2();
 	BOOST_CHECK(x == 42);
