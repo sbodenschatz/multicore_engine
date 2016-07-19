@@ -142,7 +142,7 @@ mingw-debug-build:
   - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-debug.exe
   - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-debug.exe
   - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-debug.exe
-  - ./core_tests-mingw-debug.exe --report_level=short
+  - core_tests-mingw-debug.exe --report_level=short
   tags:
   - win-cpp
 
@@ -158,7 +158,7 @@ mingw-release-build:
   - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-release.exe
   - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-release.exe
 #  - cmake -E rename build/multicore_engine_assets/assets.pack assets-mingw-release.pack
-  - ./core_tests-gcc-release.exe --report_level=short
+  - core_tests-gcc-release.exe --report_level=short
   tags:
   - win-cpp
   artifacts:
