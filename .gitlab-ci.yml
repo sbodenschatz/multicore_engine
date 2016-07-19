@@ -131,6 +131,45 @@ msvc-release-build:
     - pack_file_gen-msvc-release.exe
 #    - assets-msvc-release.pack
     
+mingw-debug-build:
+  stage: build
+  script:
+  - mkdir build && cd build
+  - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
+  - cmake --build . -- -j 16
+  - cd ..
+  - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe core_tests-mingw-debug.exe
+  - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-debug.exe
+  - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-debug.exe
+  - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-debug.exe
+  - ./core_tests-mingw-debug.exe --report_level=short
+  tags:
+  - cpp
+
+mingw-release-build:
+  stage: build
+  script:
+  - mkdir build && cd build
+  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
+  - cmake --build . -- -j 16
+  - cd ..
+  - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe core_tests-mingw-release.exe
+  - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-release.exe
+  - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-release.exe
+  - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-release.exe
+#  - cmake -E rename build/multicore_engine_assets/assets.pack assets-mingw-release.pack
+  - ./core_tests-gcc-release.exe --report_level=short
+  tags:
+  - cpp
+  artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
+    paths:
+    - demo-mingw-release.exe
+    - load_unit_gen-mingw-release.exe
+    - pack_file_gen-mingw-release.exe
+#    - assets-mingw-release.pack
+
 api-doc:
   stage: build
   script:
