@@ -212,8 +212,12 @@ package-base:
   - mv load_unit_gen-msvc-release.exe msvc/load_unit_gen.exe
   - mv pack_file_gen-msvc-release.exe msvc/pack_file_gen.exe
 #  - mv assets-msvc-release.pack msvc/assets.pack
-#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack > checksums.txt
-  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe > checksums.txt
+  - mv demo-mingw-release.exe mingw/demo.exe
+  - mv load_unit_gen-mingw-release.exe mingw/load_unit_gen.exe
+  - mv pack_file_gen-mingw-release.exe mingw/pack_file_gen.exe
+#  - mv assets-mingw-release.pack mingw/assets.pack
+#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack mingw/assets.pack > checksums.txt
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe > checksums.txt
   - cat checksums.txt
   tags:
   - package
@@ -235,11 +239,15 @@ package-base:
     - msvc/load_unit_gen.exe
     - msvc/pack_file_gen.exe
 #    - msvc/assets.pack
+    - mingw/demo.exe
+    - mingw/load_unit_gen.exe
+    - mingw/pack_file_gen.exe
+#    - mingw/assets.pack
     - checksums.txt
 
 package-tags:
   stage: package
-  only: 
+  except: 
     - tags
   script:
   - mkdir gcc
@@ -257,8 +265,12 @@ package-tags:
   - mv load_unit_gen-msvc-release.exe msvc/load_unit_gen.exe
   - mv pack_file_gen-msvc-release.exe msvc/pack_file_gen.exe
 #  - mv assets-msvc-release.pack msvc/assets.pack
-#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack > checksums.txt
-  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe > checksums.txt
+  - mv demo-mingw-release.exe mingw/demo.exe
+  - mv load_unit_gen-mingw-release.exe mingw/load_unit_gen.exe
+  - mv pack_file_gen-mingw-release.exe mingw/pack_file_gen.exe
+#  - mv assets-mingw-release.pack mingw/assets.pack
+#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack mingw/assets.pack > checksums.txt
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe > checksums.txt
   - cat checksums.txt
   tags:
   - package
@@ -274,9 +286,13 @@ package-tags:
     - clang/demo
     - clang/load_unit_gen
     - clang/pack_file_gen
-    - clang/assets.pack
+#    - clang/assets.pack
     - msvc/demo.exe
     - msvc/load_unit_gen.exe
     - msvc/pack_file_gen.exe
 #    - msvc/assets.pack
+    - mingw/demo.exe
+    - mingw/load_unit_gen.exe
+    - mingw/pack_file_gen.exe
+#    - mingw/assets.pack
     - checksums.txt
