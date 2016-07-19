@@ -200,6 +200,7 @@ package-base:
   - mkdir gcc
   - mkdir clang
   - mkdir msvc
+  - mkdir mingw
   - mv demo-gcc-release gcc/demo
   - mv load_unit_gen-gcc-release gcc/load_unit_gen
   - mv pack_file_gen-gcc-release gcc/pack_file_gen
