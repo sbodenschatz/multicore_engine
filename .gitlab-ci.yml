@@ -247,7 +247,7 @@ package-base:
 
 package-tags:
   stage: package
-  except: 
+  only: 
     - tags
   script:
   - mkdir gcc
