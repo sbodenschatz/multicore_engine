@@ -92,7 +92,7 @@ clang-release-build:
 msvc-debug-build:
   stage: build
   script:
-  - mkdir build
+  - if not exist build mkdir build
   - cd build
   - cmake -G "Visual Studio 14 2015 Win64" ..
   - cmake --build . --config Debug
@@ -109,7 +109,7 @@ msvc-debug-build:
 msvc-release-build:
   stage: build
   script:
-  - mkdir build
+  - if not exist build mkdir build
   - cd build
   - cmake -G "Visual Studio 14 2015 Win64" ..
   - cmake --build . --config Release
@@ -131,6 +131,45 @@ msvc-release-build:
     - pack_file_gen-msvc-release.exe
 #    - assets-msvc-release.pack
     
+mingw-debug-build:
+  stage: build
+  script:
+  - mkdir build && cd build
+  - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
+  - cmake --build . -- -j 16
+  - cd ..
+  - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe core_tests-mingw-debug.exe
+  - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-debug.exe
+  - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-debug.exe
+  - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-debug.exe
+  - core_tests-mingw-debug.exe --report_level=short
+  tags:
+  - win-cpp
+
+mingw-release-build:
+  stage: build
+  script:
+  - mkdir build && cd build
+  - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
+  - cmake --build . -- -j 16
+  - cd ..
+  - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe core_tests-mingw-release.exe
+  - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-release.exe
+  - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-release.exe
+  - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-release.exe
+#  - cmake -E rename build/multicore_engine_assets/assets.pack assets-mingw-release.pack
+  - core_tests-mingw-release.exe --report_level=short
+  tags:
+  - win-cpp
+  artifacts:
+    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+    expire_in: 1 week
+    paths:
+    - demo-mingw-release.exe
+    - load_unit_gen-mingw-release.exe
+    - pack_file_gen-mingw-release.exe
+#    - assets-mingw-release.pack
+
 api-doc:
   stage: build
   script:
@@ -161,6 +200,7 @@ package-base:
   - mkdir gcc
   - mkdir clang
   - mkdir msvc
+  - mkdir mingw
   - mv demo-gcc-release gcc/demo
   - mv load_unit_gen-gcc-release gcc/load_unit_gen
   - mv pack_file_gen-gcc-release gcc/pack_file_gen
@@ -169,12 +209,16 @@ package-base:
   - mv load_unit_gen-clang-release clang/load_unit_gen
   - mv pack_file_gen-clang-release clang/pack_file_gen
 #  - mv assets-clang-release.pack clang/assets.pack
-  - mv demo-msvc-release msvc/demo
-  - mv load_unit_gen-msvc-release msvc/load_unit_gen
-  - mv pack_file_gen-msvc-release msvc/pack_file_gen
+  - mv demo-msvc-release.exe msvc/demo.exe
+  - mv load_unit_gen-msvc-release.exe msvc/load_unit_gen.exe
+  - mv pack_file_gen-msvc-release.exe msvc/pack_file_gen.exe
 #  - mv assets-msvc-release.pack msvc/assets.pack
-#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo msvc/load_unit_gen msvc/pack_file_gen gcc/assets.pack clang/assets.pack msvc/assets.pack > checksums.txt
-  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo msvc/load_unit_gen msvc/pack_file_gen > checksums.txt
+  - mv demo-mingw-release.exe mingw/demo.exe
+  - mv load_unit_gen-mingw-release.exe mingw/load_unit_gen.exe
+  - mv pack_file_gen-mingw-release.exe mingw/pack_file_gen.exe
+#  - mv assets-mingw-release.pack mingw/assets.pack
+#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack mingw/assets.pack > checksums.txt
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe > checksums.txt
   - cat checksums.txt
   tags:
   - package
@@ -192,10 +236,14 @@ package-base:
     - clang/load_unit_gen
     - clang/pack_file_gen
 #    - clang/assets.pack
-    - msvc/demo
-    - msvc/load_unit_gen
-    - msvc/pack_file_gen
+    - msvc/demo.exe
+    - msvc/load_unit_gen.exe
+    - msvc/pack_file_gen.exe
 #    - msvc/assets.pack
+    - mingw/demo.exe
+    - mingw/load_unit_gen.exe
+    - mingw/pack_file_gen.exe
+#    - mingw/assets.pack
     - checksums.txt
 
 package-tags:
@@ -205,6 +253,7 @@ package-tags:
   script:
   - mkdir gcc
   - mkdir clang
+  - mkdir msvc
   - mv demo-gcc-release gcc/demo
   - mv load_unit_gen-gcc-release gcc/load_unit_gen
   - mv pack_file_gen-gcc-release gcc/pack_file_gen
@@ -213,12 +262,16 @@ package-tags:
   - mv load_unit_gen-clang-release clang/load_unit_gen
   - mv pack_file_gen-clang-release clang/pack_file_gen
 #  - mv assets-clang-release.pack clang/assets.pack
-  - mv demo-msvc-release msvc/demo
-  - mv load_unit_gen-msvc-release msvc/load_unit_gen
-  - mv pack_file_gen-msvc-release msvc/pack_file_gen
+  - mv demo-msvc-release.exe msvc/demo.exe
+  - mv load_unit_gen-msvc-release.exe msvc/load_unit_gen.exe
+  - mv pack_file_gen-msvc-release.exe msvc/pack_file_gen.exe
 #  - mv assets-msvc-release.pack msvc/assets.pack
-#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo msvc/load_unit_gen msvc/pack_file_gen gcc/assets.pack clang/assets.pack msvc/assets.pack > checksums.txt
-  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo msvc/load_unit_gen msvc/pack_file_gen > checksums.txt
+  - mv demo-mingw-release.exe mingw/demo.exe
+  - mv load_unit_gen-mingw-release.exe mingw/load_unit_gen.exe
+  - mv pack_file_gen-mingw-release.exe mingw/pack_file_gen.exe
+#  - mv assets-mingw-release.pack mingw/assets.pack
+#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack mingw/assets.pack > checksums.txt
+  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe > checksums.txt
   - cat checksums.txt
   tags:
   - package
@@ -234,9 +287,13 @@ package-tags:
     - clang/demo
     - clang/load_unit_gen
     - clang/pack_file_gen
-    - clang/assets.pack
-    - msvc/demo
-    - msvc/load_unit_gen
-    - msvc/pack_file_gen
+#    - clang/assets.pack
+    - msvc/demo.exe
+    - msvc/load_unit_gen.exe
+    - msvc/pack_file_gen.exe
 #    - msvc/assets.pack
+    - mingw/demo.exe
+    - mingw/load_unit_gen.exe
+    - mingw/pack_file_gen.exe
+#    - mingw/assets.pack
     - checksums.txt
