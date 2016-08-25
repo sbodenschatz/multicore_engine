@@ -5,6 +5,9 @@
  */
 
 #include <entity/entity.hpp>
+#include <entity/component.hpp>
+#include <entity/component_configuration.hpp>
+#include <entity/component_type.hpp>
 
 namespace mce {
 namespace entity {
@@ -31,7 +34,7 @@ bool entity::has_component(component_type_id_t id) const {
 }
 
 void entity::add_component(component_pool_ptr&& comp) {
-	component_type_id_t id = 0; // TODO get component type id
+	component_type_id_t id = comp->configuration().type().id();
 	bool success = false;
 	std::tie(std::ignore, success) = components_.insert(id, std::move(comp));
 	if(!success) throw std::invalid_argument("Component of this type is already present at this entity.");

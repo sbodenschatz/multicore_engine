@@ -61,7 +61,7 @@ void entity_text_file_parser_backend::ast_instance_visitor::operator()(ast::incl
 	backend.process_entity_instances(node.included_ast->root);
 }
 void entity_text_file_parser_backend::ast_instance_visitor::operator()(const ast::entity_instance& node) {
-	// TODO: Create entity and give it the specified position and orientation
+	// Create entity and give it the specified position and orientation
 	auto entity_conf = backend.em.find_entity_configuration(node.type_name);
 	if(!entity_conf) throw std::runtime_error("Unknown entity configuration '" + node.type_name + "'.");
 	auto entity = backend.em.create_entity(*entity_conf);
