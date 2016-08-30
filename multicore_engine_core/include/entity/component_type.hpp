@@ -35,7 +35,7 @@ private:
 
 protected:
 	property_list properties_;
-	abstract_component_type(component_type_id_t id, const std::string& name) : id_(id), name_(name) {}
+	abstract_component_type(component_type_id_t id, std::string  name) : id_(id), name_(std::move(name)) {}
 
 public:
 	abstract_component_type(const abstract_component_type&) = delete;

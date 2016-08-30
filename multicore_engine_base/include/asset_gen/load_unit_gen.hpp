@@ -19,8 +19,8 @@ class load_unit_gen {
 	struct load_unit_entry {
 		std::string path;
 		asset::asset_meta_data meta_data;
-		load_unit_entry(const std::string& path, const std::string& name, uint64_t offset, uint64_t size)
-				: path{path}, meta_data{offset, size, name} {}
+		load_unit_entry(std::string  path, const std::string& name, uint64_t offset, uint64_t size)
+				: path{std::move(path)}, meta_data{offset, size, name} {}
 	};
 	std::vector<load_unit_entry> entries;
 	uint64_t next_pos = 0;

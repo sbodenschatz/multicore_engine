@@ -7,6 +7,8 @@
 #ifndef UTIL_FINALLY_HPP_
 #define UTIL_FINALLY_HPP_
 
+#include <utility>
+
 namespace mce {
 namespace util {
 

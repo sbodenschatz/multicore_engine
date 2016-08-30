@@ -12,6 +12,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include "entity_text_file_ast.hpp"
 
 namespace mce {
 namespace entity {
