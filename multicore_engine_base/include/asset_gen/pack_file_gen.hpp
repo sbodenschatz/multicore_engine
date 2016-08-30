@@ -21,12 +21,12 @@ class pack_file_gen {
 		asset::pack_file_element_meta_data meta_data;
 		asset::pack_file_element_meta_data orig_meta_data;
 		int compression_level; //-2 no compression, -1 default compression, 0-9 low-high compression
-		pack_file_entry(const std::string& path, const std::string& name, uint64_t offset, uint64_t size)
-				: path{path}, meta_data{offset, size, 0ull, name}, orig_meta_data{offset, size, 0ull, name},
+		pack_file_entry(std::string  path, const std::string& name, uint64_t offset, uint64_t size)
+				: path{std::move(path)}, meta_data{offset, size, 0ull, name}, orig_meta_data{offset, size, 0ull, name},
 				  compression_level{-2} {}
-		pack_file_entry(const std::string& path, const std::string& name, uint64_t offset, uint64_t size,
+		pack_file_entry(std::string  path, const std::string& name, uint64_t offset, uint64_t size,
 						uint64_t compressed_size, int compression_level)
-				: path{path}, meta_data{offset, size, compressed_size, name},
+				: path{std::move(path)}, meta_data{offset, size, compressed_size, name},
 				  orig_meta_data{offset, size, compressed_size, name}, compression_level{compression_level} {}
 	};
 	std::vector<pack_file_entry> entries;

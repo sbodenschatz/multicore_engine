@@ -111,7 +111,7 @@ typedef std::vector<root_element> ast_root;
 
 struct ast_wrapper {
 	ast_root root;
-	ast_wrapper(const ast_root& root) : root(root) {}
+	ast_wrapper(ast_root  root) : root(std::move(root)) {}
 	ast_wrapper(ast_root&& root) : root(std::move(root)) {}
 };
 
