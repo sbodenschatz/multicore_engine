@@ -7,6 +7,9 @@
 #ifndef UTIL_ALGORITHM_HPP_
 #define UTIL_ALGORITHM_HPP_
 
+#include <cstddef>
+#include <utility>
+
 namespace mce {
 namespace util {
 

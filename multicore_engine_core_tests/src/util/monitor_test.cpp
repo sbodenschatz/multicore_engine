@@ -20,10 +20,10 @@ namespace util {
 struct monitor_test_object {
 	int data[64];
 	monitor_test_object() noexcept {
-		for(int i = 0; i < 64; ++i) data[i] = 0;
+		for(auto & elem : data) elem = 0;
 	}
 	monitor_test_object(int val) noexcept {
-		for(int i = 0; i < 64; ++i) data[i] = val;
+		for(auto & elem : data) elem = val;
 	}
 	bool check() const {
 		return std::all_of(std::begin(data), std::end(data), [&](auto val) { return val == data[0]; });

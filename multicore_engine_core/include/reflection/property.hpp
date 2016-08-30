@@ -43,7 +43,7 @@ protected:
 	std::string name_;
 
 public:
-	abstract_property(const std::string& name) : name_(name) {}
+	abstract_property(std::string  name) : name_(std::move(name)) {}
 	abstract_property(const abstract_property&) = delete;
 	abstract_property(abstract_property&&) = delete;
 	abstract_property& operator=(const abstract_property&) = delete;
