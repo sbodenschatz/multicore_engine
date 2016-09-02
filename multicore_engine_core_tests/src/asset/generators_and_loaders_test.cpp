@@ -75,6 +75,7 @@ struct asset_gen_and_load_test_fixture {
 	std::unique_ptr<test_file> file_d;
 
 	asset_gen_and_load_test_fixture() {
+		// cppcheck-suppress useInitializationList
 		file_a = std::make_unique<test_file>("bin_sequence.test", [](std::ostream& str) {
 			for(size_t i = 0; i < 0x10000; ++i) {
 				char tmp[sizeof(size_t)];

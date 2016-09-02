@@ -43,7 +43,8 @@ protected:
 	std::string name_;
 
 public:
-	abstract_property(std::string  name) : name_(std::move(name)) {}
+	// cppcheck-suppress passedByValue
+	explicit abstract_property(std::string name) : name_(std::move(name)) {}
 	abstract_property(const abstract_property&) = delete;
 	abstract_property(abstract_property&&) = delete;
 	abstract_property& operator=(const abstract_property&) = delete;
@@ -81,7 +82,7 @@ public:
 	static_assert(std::is_base_of<Abstract_Assignment<Root_Type>, Assignment<Root_Type, T>>::value,
 				  "The Abstract_Assignment template class has to be a base of the Assignment_Class");
 	typedef typename detail::property_type_helper<T, void>::accessor_value accessor_value;
-	property(const std::string& name)
+	explicit property(const std::string& name)
 			: abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...>(name) {}
 	property(const property&) = delete;
 	property(property&&) = delete;

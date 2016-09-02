@@ -254,6 +254,7 @@ public:
 		other.block = nullptr;
 	}
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
+	// cppcheck-suppress noExplicitConstructor
 	weak_pool_ptr(smart_pool_ptr<U>& other)
 			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_weak_ref(managed_object);

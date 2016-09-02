@@ -129,8 +129,8 @@ public:
 	friend class load_unit_asset_loader;
 
 private:
-	void load_meta_data(std::shared_ptr<const char> data, size_t size);
-	void complete_loading(std::shared_ptr<const char> data, size_t size);
+	void load_meta_data(const std::shared_ptr<const char>& data, size_t size);
+	void complete_loading(const std::shared_ptr<const char>& data, size_t size);
 
 	void raise_error_flag() {
 		current_state_ = state::error;

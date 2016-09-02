@@ -37,7 +37,7 @@ private:
 	};
 
 public:
-	actor(T* target) : target(target) {}
+	explicit actor(T* target) : target(target) {}
 	template <typename F, typename R = decltype(std::declval<std::decay_t<F>>()(std::declval<T*>())),
 			  typename Dummy = std::enable_if<!std::is_member_function_pointer<std::decay<F>>::value>>
 	void enqueue(F&& f) {

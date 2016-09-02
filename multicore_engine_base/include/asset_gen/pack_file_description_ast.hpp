@@ -17,9 +17,12 @@ namespace asset_gen {
 namespace ast {
 
 struct pack_file_entry {
-	pack_file_entry(std::string  external_path, lookup_type lookup, std::string  internal_path)
-			: external_path(std::move(external_path)), lookup(lookup), internal_path(std::move(internal_path)) {}
-	pack_file_entry(std::string  external_path, std::string  internal_path)
+	// cppcheck-suppress passedByValue
+	pack_file_entry(std::string external_path, lookup_type lookup, std::string internal_path)
+			: external_path(std::move(external_path)), lookup(lookup),
+			  internal_path(std::move(internal_path)) {}
+	// cppcheck-suppress passedByValue
+	pack_file_entry(std::string external_path, std::string internal_path)
 			: external_path(std::move(external_path)), internal_path(std::move(internal_path)) {}
 	pack_file_entry() {}
 	std::string external_path;

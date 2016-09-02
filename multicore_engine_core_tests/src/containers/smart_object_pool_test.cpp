@@ -19,7 +19,7 @@ namespace containers {
 struct smart_object_pool_fixture {
 	struct X {
 		long long x;
-		X(const long long& o) : x(o) {}
+		explicit X(const long long& o) : x(o) {}
 		X& operator=(const long long& o) {
 			x = o;
 			return *this;

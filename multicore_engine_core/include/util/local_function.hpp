@@ -73,6 +73,7 @@ class local_function<Max_Size, R(Args...)> {
 
 	public:
 		template <typename T>
+		// cppcheck-suppress noExplicitConstructor
 		function_object(T&& f) : f(std::forward<T>(f)) {}
 		virtual ~function_object() = default;
 		virtual R operator()(Args... args) const override {
@@ -102,7 +103,7 @@ class local_function<Max_Size, R(Args...)> {
 	template <size_t Max_Size_2, typename T, typename... Args_2>
 	struct is_valid_function_value<local_function<Max_Size_2, T(Args_2...)>> : std::false_type {};
 
-	char storage[Max_Size];
+	char storage[Max_Size]{};
 	abstract_func_obj_ptr function_obj{nullptr};
 
 public:
@@ -110,6 +111,7 @@ public:
 	friend class local_function;
 	local_function() {}
 	template <typename F, typename Dummy = std::enable_if_t<is_valid_function_value<std::decay_t<F>>::value>>
+	// cppcheck-suppress noExplicitConstructor
 	local_function(F&& f) {
 		static_assert(sizeof(function_object<std::decay_t<F>>) <= Max_Size,
 					  "Insufficient space for function object.");

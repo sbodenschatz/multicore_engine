@@ -22,7 +22,8 @@ class asset_ibstream : public ibstream {
 	size_t read_position = 0;
 
 public:
-	asset_ibstream(std::shared_ptr<const asset::asset>  asset) : asset(std::move(asset)){};
+	// cppcheck-suppress passedByValue
+	explicit asset_ibstream(std::shared_ptr<const asset::asset> asset) : asset(std::move(asset)){};
 	virtual size_t read_bytes(char* buffer, size_t count) noexcept override;
 	virtual size_t size() const noexcept override;
 	virtual size_t tell_read() const noexcept override;

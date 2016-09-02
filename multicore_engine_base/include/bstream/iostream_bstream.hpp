@@ -18,6 +18,7 @@ class iostream_bstream : public iobstream {
 	std::iostream& iostream;
 
 public:
+	// cppcheck-suppress noExplicitConstructor
 	iostream_bstream(std::iostream& iostream) : iostream(iostream){};
 	virtual size_t read_bytes(char* buffer, size_t count) noexcept override;
 	virtual size_t size() const noexcept override;

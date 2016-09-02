@@ -11,6 +11,7 @@
 #include "ecs_types.hpp"
 #include "entity.hpp"
 #include "parser/entity_text_file_ast.hpp"
+#include <asset/asset_defs.hpp>
 #include <atomic>
 #include <boost/container/flat_map.hpp>
 #include <containers/unordered_object_pool.hpp>
@@ -18,7 +19,6 @@
 #include <mutex>
 #include <string>
 #include <util/unused.hpp>
-#include <asset/asset_defs.hpp>
 
 namespace mce {
 namespace core {
@@ -50,7 +50,7 @@ class entity_manager {
 
 public:
 	friend class mce::entity::parser::entity_text_file_parser_backend;
-	entity_manager(core::engine& engine);
+	explicit entity_manager(core::engine& engine);
 	entity_manager(const entity_manager&) = delete;
 	entity_manager(entity_manager&&) = delete;
 	entity_manager& operator=(const entity_manager&) = delete;

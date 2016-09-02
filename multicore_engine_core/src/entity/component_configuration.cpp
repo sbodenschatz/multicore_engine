@@ -32,7 +32,7 @@ component_pool_ptr component_configuration::create_component(entity& owner) cons
 
 component_configuration::~component_configuration() {}
 
-void component_configuration::make_assignment(const std::string property_name,
+void component_configuration::make_assignment(const std::string& property_name,
 											  const ast::variable_value& ast_value,
 											  const std::string& entity_context) {
 	auto it = std::find_if(assignments.begin(), assignments.end(), [&](const auto& elem) {

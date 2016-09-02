@@ -28,6 +28,7 @@ public:
 			}
 		}
 	}
+	// cppcheck-suppress noExplicitConstructor
 	lock_ptr_wrapper(const Ptr<T>& ptr_to_lockable) noexcept : ptr_{}, guard_{} {
 		if(ptr_to_lockable) {
 			guard_ = Lock_Guard<T>(*ptr_to_lockable);
