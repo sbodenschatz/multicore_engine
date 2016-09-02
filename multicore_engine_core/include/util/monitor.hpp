@@ -41,7 +41,9 @@ class monitor {
 
 public:
 	monitor() noexcept = default;
+	// cppcheck-suppress noExplicitConstructor
 	constexpr monitor(const T& desired) : value{desired} {}
+	// cppcheck-suppress noExplicitConstructor
 	constexpr monitor(T&& desired) : value{std::move(desired)} {}
 	monitor(const monitor&) = delete;
 	monitor& operator=(const monitor&) = delete;

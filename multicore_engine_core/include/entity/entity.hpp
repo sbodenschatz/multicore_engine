@@ -30,7 +30,7 @@ private:
 	bool marker_for_despawn = false;
 
 public:
-	entity(entity_id_t id) noexcept : id_(id) {}
+	explicit entity(entity_id_t id) noexcept : id_(id) {}
 	entity(const entity&) = delete;
 	entity(entity&&) = delete;
 	entity& operator=(const entity&) = delete;

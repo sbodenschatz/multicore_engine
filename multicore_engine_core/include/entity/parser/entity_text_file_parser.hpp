@@ -9,8 +9,8 @@
 
 #include "../ecs_types.hpp"
 #include "entity_text_file_ast.hpp"
-#include <memory>
 #include <asset/asset_defs.hpp>
+#include <memory>
 
 namespace mce {
 namespace entity {
@@ -38,14 +38,14 @@ class entity_text_file_parser_backend {
 		void operator()(const ast::entity_definition& node);
 		void operator()(ast::include_instruction& node);
 		void operator()(const ast::entity_instance& node);
-		ast_definition_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
+		explicit ast_definition_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
 	};
 	struct ast_instance_visitor : boost::static_visitor<> {
 		entity_text_file_parser_backend& backend;
 		void operator()(const ast::entity_definition& node);
 		void operator()(ast::include_instruction& node);
 		void operator()(const ast::entity_instance& node);
-		ast_instance_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
+		explicit ast_instance_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
 	};
 	struct ast_position_visitor : boost::static_visitor<entity_position_t> {
 		entity_text_file_parser_backend& backend;
@@ -54,7 +54,7 @@ class entity_text_file_parser_backend {
 		entity_position_t operator()(const ast::rotation_list& node);
 		entity_position_t operator()(const ast::marker_evaluation& node);
 		entity_position_t operator()(const ast::entity_reference& node);
-		ast_position_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
+		explicit ast_position_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
 	};
 	struct ast_orientation_visitor : boost::static_visitor<entity_orientation_t> {
 		entity_text_file_parser_backend& backend;
@@ -63,7 +63,7 @@ class entity_text_file_parser_backend {
 		entity_orientation_t operator()(const ast::rotation_list& node);
 		entity_orientation_t operator()(const ast::marker_evaluation& node);
 		entity_orientation_t operator()(const ast::entity_reference& node);
-		ast_orientation_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
+		explicit ast_orientation_visitor(entity_text_file_parser_backend& backend) : backend(backend) {}
 	};
 
 	entity_manager& em;
@@ -73,7 +73,7 @@ class entity_text_file_parser_backend {
 	ast::ast_root load_file(const asset::asset_ptr& text_file_asset);
 
 public:
-	entity_text_file_parser_backend(entity_manager& em) : em(em) {}
+	explicit entity_text_file_parser_backend(entity_manager& em) : em(em) {}
 	void load_and_process_file(const asset::asset_ptr& text_file_asset);
 };
 

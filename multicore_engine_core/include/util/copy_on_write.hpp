@@ -20,6 +20,7 @@ class copy_on_write {
 
 public:
 	copy_on_write() : ptr{std::make_shared<T>()} {}
+	// cppcheck-suppress noExplicitConstructor
 	copy_on_write(const std::shared_ptr<T>& object_to_manage) : ptr{object_to_manage} {}
 	copy_on_write(std::shared_ptr<T>&& object_to_manage) : ptr{object_to_manage} {}
 	copy_on_write(const copy_on_write&) = delete;

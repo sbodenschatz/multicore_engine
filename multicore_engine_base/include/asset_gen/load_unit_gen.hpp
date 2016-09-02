@@ -19,7 +19,8 @@ class load_unit_gen {
 	struct load_unit_entry {
 		std::string path;
 		asset::asset_meta_data meta_data;
-		load_unit_entry(std::string  path, const std::string& name, uint64_t offset, uint64_t size)
+		// cppcheck-suppress passedByValue
+		load_unit_entry(std::string path, const std::string& name, uint64_t offset, uint64_t size)
 				: path{std::move(path)}, meta_data{offset, size, name} {}
 	};
 	std::vector<load_unit_entry> entries;

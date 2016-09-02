@@ -89,7 +89,7 @@ public:
 	struct member_access_wrapper {
 		T value;
 		template <typename... Args>
-		member_access_wrapper(Args&&... args) : value{std::forward<Args>(args)...} {}
+		explicit member_access_wrapper(Args&&... args) : value{std::forward<Args>(args)...} {}
 		T* operator->() noexcept {
 			return &value;
 		}
@@ -384,7 +384,7 @@ class dual_container_map : public dual_container_map_base<dual_container_map<Con
 
 public:
 	template <typename... Args>
-	dual_container_map(Args&&... args) noexcept(
+	explicit dual_container_map(Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Compare>::value&&
 					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: dual_container_map(Compare(), std::forward<Args>(args)...) {}
@@ -554,7 +554,7 @@ class dual_container_multimap
 
 public:
 	template <typename... Args>
-	dual_container_multimap(Args&&... args) noexcept(
+	explicit dual_container_multimap(Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Compare>::value&&
 					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: dual_container_multimap(Compare(), std::forward<Args>(args)...) {}
@@ -612,6 +612,8 @@ public:
 		if(it != this->keys.end()) {
 			size_t count = 0;
 			auto erase_check = [this](auto&& it, auto&& key) {
+				// False positive
+				// cppcheck-suppress oppositeInnerCondition
 				if(it == this->keys.end()) return false;
 				return !this->compare(key, *it);
 			};

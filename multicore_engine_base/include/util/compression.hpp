@@ -59,7 +59,7 @@ class zlib_deflate_stream {
 	z_stream stream;
 
 public:
-	zlib_deflate_stream(int level = -1) {
+	explicit zlib_deflate_stream(int level = -1) {
 		stream.zalloc = Z_NULL;
 		stream.zfree = Z_NULL;
 		stream.opaque = Z_NULL;

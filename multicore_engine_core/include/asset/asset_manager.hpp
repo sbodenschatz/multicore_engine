@@ -43,9 +43,10 @@ class asset_manager {
 		std::shared_ptr<boost::promise<std::shared_ptr<const asset>>> promise;
 		std::string name;
 		asset_manager* manager;
-		future_load_task(std::string  name, asset_manager* manager)
-				: promise(std::make_shared<boost::promise<std::shared_ptr<const asset>>>()), name{std::move(name)},
-				  manager{manager} {}
+		// cppcheck-suppress passedByValue
+		future_load_task(std::string name, asset_manager* manager)
+				: promise(std::make_shared<boost::promise<std::shared_ptr<const asset>>>()),
+				  name{std::move(name)}, manager{manager} {}
 		void operator()();
 	};
 	std::shared_ptr<const asset> load_asset_sync_core(const std::string& name);

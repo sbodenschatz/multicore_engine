@@ -29,7 +29,8 @@ class pack_file_reader : public file_reader {
 		pack_file_meta_data metadata;
 		std::vector<char> compressed_buffer;
 		std::vector<char> decompressed_buffer;
-		pack_file_source(const std::string& pack_file_name) : stream{pack_file_name, std::ios::binary} {
+		explicit pack_file_source(const std::string& pack_file_name)
+				: stream{pack_file_name, std::ios::binary} {
 			if(!stream) throw std::runtime_error("Unable to open file '" + pack_file_name + "'.");
 			bstream::istream_bstream bstr(stream);
 			bstr >> metadata;

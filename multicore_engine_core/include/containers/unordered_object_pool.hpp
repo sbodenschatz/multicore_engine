@@ -42,7 +42,7 @@ struct unsafe_internals_policy {
 	};
 	typedef lock_ lock;
 	struct lock_guard {
-		lock_guard(lock&) {}
+		explicit lock_guard(lock&) {}
 	};
 	typedef lock_guard lock_guard_delayed;
 	typedef void unsafe;
@@ -307,6 +307,8 @@ public:
 			first_block = blocks.front().get();
 		}
 	}
+	// False positive:
+	// cppcheck-suppress operatorEqRetRefThis
 	unordered_object_pool& operator=(const unordered_object_pool& other) {
 		if(this == &other) return *this;
 		lock_guard_delayed ul0(management_data_lock);
@@ -355,7 +357,7 @@ public:
 		Target_T target;
 		friend class unordered_object_pool<T, block_size>;
 
-		iterator_(Target_T target) : target(target) {
+		explicit iterator_(Target_T target) : target(target) {
 			skip_until_valid();
 		}
 

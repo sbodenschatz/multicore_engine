@@ -35,7 +35,8 @@ protected:
 	bool valid_;
 
 public:
-	abstract_component_property_assignment(core::engine& engine) noexcept : engine_(engine), valid_(false) {}
+	explicit abstract_component_property_assignment(core::engine& engine) noexcept : engine_(engine),
+																					 valid_(false) {}
 	abstract_component_property_assignment(const abstract_component_property_assignment&) = default;
 	abstract_component_property_assignment(abstract_component_property_assignment&&) = default;
 	abstract_component_property_assignment&

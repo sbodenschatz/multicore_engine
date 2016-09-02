@@ -15,7 +15,7 @@ namespace asset {
 load_unit::load_unit(const std::string& name) : current_state_{state::initial}, name_{name}, size_{0} {}
 load_unit::load_unit(std::string&& name) : current_state_{state::initial}, name_{std::move(name)}, size_{0} {}
 
-void load_unit::load_meta_data(std::shared_ptr<const char> data, size_t size) {
+void load_unit::load_meta_data(const std::shared_ptr<const char>& data, size_t size) {
 	bstream::buffer_ibstream stream(data.get(), size);
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	stream >> meta_data_;
@@ -28,7 +28,7 @@ void load_unit::load_meta_data(std::shared_ptr<const char> data, size_t size) {
 		completed_cv.notify_all();
 	}
 }
-void load_unit::complete_loading(std::shared_ptr<const char> data, size_t size) {
+void load_unit::complete_loading(const std::shared_ptr<const char>& data, size_t size) {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	this->payload_data_ = data;
 	size_ = size;

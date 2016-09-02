@@ -2,6 +2,13 @@ stages:
   - build
   - package
 
+cpp-check:
+  stage: build
+  script:
+  - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
+  tags:
+  - cpp
+  
 scan-build:
   stage: build
   script:
@@ -134,7 +141,8 @@ msvc-release-build:
 mingw-debug-build:
   stage: build
   script:
-  - mkdir build && cd build
+  - if not exist build mkdir build
+  - cd build
   - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
   - cmake --build . -- -j 16
   - cd ..
@@ -149,7 +157,8 @@ mingw-debug-build:
 mingw-release-build:
   stage: build
   script:
-  - mkdir build && cd build
+  - if not exist build mkdir build
+  - cd build
   - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
   - cmake --build . -- -j 16
   - cd ..
