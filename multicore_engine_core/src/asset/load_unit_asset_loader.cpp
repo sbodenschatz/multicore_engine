@@ -52,8 +52,8 @@ void load_unit_asset_loader::prepare_load_unit_meta_data(const std::shared_ptr<l
 	if(!load_unit->meta_data_ready()) {
 		if(load_unit->try_obtain_meta_load_ownership()) {
 			file_content_ptr content;
-			file_size size;
 			try {
+				file_size size;
 				std::tie(content, size) = load_file_from_prefixes(load_unit->name() + ".lum");
 				if(content) {
 					load_unit->load_meta_data(content, size);

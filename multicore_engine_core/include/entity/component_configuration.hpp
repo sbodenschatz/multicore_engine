@@ -35,7 +35,7 @@ public:
 	component_configuration& operator=(component_configuration&&) = delete;
 	~component_configuration();
 	component_pool_ptr create_component(entity& owner) const;
-	void make_assignment(const std::string property_name, const ast::variable_value& ast_value,
+	void make_assignment(const std::string& property_name, const ast::variable_value& ast_value,
 						 const std::string& entity_context);
 
 	const abstract_component_type& type() const {

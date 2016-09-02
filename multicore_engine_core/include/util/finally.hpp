@@ -18,8 +18,8 @@ class finally_t {
 	bool active = true;
 
 public:
-	finally_t(const F& f) : f(f){};
-	finally_t(F&& f) : f(std::move(f)){};
+	explicit finally_t(const F& f) : f(f){};
+	explicit finally_t(F&& f) : f(std::move(f)){};
 	~finally_t() {
 		if(active) f();
 	}

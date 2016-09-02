@@ -21,6 +21,7 @@ namespace ast {
 struct float_node {
 	float value;
 	float_node() : value(0.0f) {}
+	// cppcheck-suppress noExplicitConstructor
 	float_node(float value) : value(value) {}
 	float_node& operator=(float new_value) {
 		value = new_value;
@@ -111,7 +112,8 @@ typedef std::vector<root_element> ast_root;
 
 struct ast_wrapper {
 	ast_root root;
-	ast_wrapper(ast_root  root) : root(std::move(root)) {}
+	// cppcheck-suppress passedByValue
+	explicit ast_wrapper(ast_root root) : root(std::move(root)) {}
 };
 
 } // namespace ast

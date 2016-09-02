@@ -27,7 +27,7 @@ protected:
 	Compare compare;
 
 	struct key_compare {
-		key_compare(const Compare& comp) : comp(comp) {}
+		explicit key_compare(const Compare& comp) : comp(comp) {}
 		const Compare& comp;
 		bool operator()(const std::pair<Key, Value>& a, const Key& b) const {
 			return comp(a.first, b);
@@ -89,7 +89,7 @@ public:
 	class iterator_ : public std::iterator<std::bidirectional_iterator_tag, It_T> {
 		It iterator;
 
-		iterator_(It iterator) noexcept : iterator(iterator) {}
+		explicit iterator_(It iterator) noexcept : iterator(iterator) {}
 
 	public:
 		template <typename M, typename I, typename IT>
@@ -98,6 +98,7 @@ public:
 		template <typename M, template <typename> class Cont, typename K, typename V, typename Comp>
 		friend class generic_flat_map_base;
 		iterator_() = delete;
+		// cppcheck-suppress noExplicitConstructor
 		iterator_(const typename It_Map::iterator& it) noexcept : iterator(it.iterator) {}
 		iterator_& operator=(const typename It_Map::iterator& it) noexcept {
 			iterator = it.iterator;
@@ -369,7 +370,7 @@ class generic_flat_map : public generic_flat_map_base<generic_flat_map<Container
 
 public:
 	template <typename... Args>
-	generic_flat_map(Args&&... args) noexcept(
+	explicit generic_flat_map(Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Compare>::value&&
 					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: generic_flat_map(Compare(), std::forward<Args>(args)...) {}
@@ -526,7 +527,7 @@ class generic_flat_multimap
 
 public:
 	template <typename... Args>
-	generic_flat_multimap(Args&&... args) noexcept(
+	explicit generic_flat_multimap(Args&&... args) noexcept(
 			std::is_nothrow_default_constructible<Compare>::value&&
 					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: generic_flat_multimap(Compare(), std::forward<Args>(args)...) {}
@@ -577,6 +578,8 @@ public:
 		if(it != this->values.end()) {
 			size_t count = 0;
 			auto erase_check = [this, &comp](auto&& it, auto&& key) {
+				// False positive
+				// cppcheck-suppress oppositeInnerCondition
 				if(it == this->values.end()) return false;
 				return !comp(key, *it);
 			};
