@@ -2,6 +2,13 @@ stages:
   - build
   - package
 
+cpp-check:
+  stage: build
+  script:
+  - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
+  tags:
+  - cpp
+  
 scan-build:
   stage: build
   script:
