@@ -26,9 +26,9 @@ class asset_loader {
 protected:
 	template <typename F>
 	static void launch_async_task(asset_manager& asset_manager, F&& f);
-	static void finish_loading(const std::shared_ptr<asset>& asset, const file_content_ptr& data,
+	static void finish_loading(const std::shared_ptr<mce::asset::asset>& asset, const file_content_ptr& data,
 							   file_size size);
-	static void raise_error_flag(const std::shared_ptr<asset>& asset);
+	static void raise_error_flag(const std::shared_ptr<mce::asset::asset>& asset);
 
 public:
 	virtual ~asset_loader() = default;
