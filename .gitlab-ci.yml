@@ -2,6 +2,10 @@ stages:
   - build
   - package
 
+cache:
+    paths:
+        - build
+
 cpp-check:
   stage: build
   script:
