@@ -116,6 +116,8 @@ msvc-debug-build:
   - core_tests-msvc-debug.exe --report_level=short
   tags:
   - win-cpp
+  cache:
+    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 msvc-release-build:
   stage: build
@@ -141,6 +143,8 @@ msvc-release-build:
     - load_unit_gen-msvc-release.exe
     - pack_file_gen-msvc-release.exe
 #    - assets-msvc-release.pack
+  cache:
+    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
     
 mingw-debug-build:
   stage: build
@@ -157,6 +161,8 @@ mingw-debug-build:
   - core_tests-mingw-debug.exe --report_level=short
   tags:
   - win-cpp
+  cache:
+    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 mingw-release-build:
   stage: build
@@ -182,6 +188,8 @@ mingw-release-build:
     - load_unit_gen-mingw-release.exe
     - pack_file_gen-mingw-release.exe
 #    - assets-mingw-release.pack
+  cache:
+    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 api-doc:
   stage: build
