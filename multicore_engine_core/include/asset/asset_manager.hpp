@@ -50,7 +50,7 @@ class asset_manager {
 		void operator()();
 	};
 	std::shared_ptr<const asset> load_asset_sync_core(const std::string& name);
-	std::shared_ptr<const asset> call_loaders_sync(const std::shared_ptr<asset>& asset);
+	std::shared_ptr<const asset> call_loaders_sync(const std::shared_ptr<asset>& asset_to_load);
 
 public:
 	friend class asset_loader;
