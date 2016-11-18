@@ -2,6 +2,10 @@ stages:
   - build
   - package
 
+cache:
+    paths:
+        - build
+
 cpp-check:
   stage: build
   script:
@@ -12,7 +16,7 @@ cpp-check:
 scan-build:
   stage: build
   script:
-  - mkdir build && cd build
+  - mkdir -p build && cd build
   - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
   - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
   tags:
@@ -21,7 +25,7 @@ scan-build:
 gcc-debug-build:
   stage: build
   script:
-  - mkdir build && cd build
+  - mkdir -p build && cd build
   - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
   - cd ..
@@ -36,7 +40,7 @@ gcc-debug-build:
 gcc-release-build:
   stage: build
   script:
-  - mkdir build && cd build
+  - mkdir -p build && cd build
   - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
   - cd ..
@@ -60,7 +64,7 @@ gcc-release-build:
 clang-debug-build:
   stage: build
   script:
-  - mkdir build && cd build
+  - mkdir -p build && cd build
   - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug ..
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
   - cd ..
@@ -75,7 +79,7 @@ clang-debug-build:
 clang-release-build:
   stage: build
   script:
-  - mkdir build && cd build
+  - mkdir -p build && cd build
   - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release ..
   - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
   - cd ..
@@ -112,6 +116,8 @@ msvc-debug-build:
   - core_tests-msvc-debug.exe --report_level=short
   tags:
   - win-cpp
+  cache:
+    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 msvc-release-build:
   stage: build
@@ -137,6 +143,8 @@ msvc-release-build:
     - load_unit_gen-msvc-release.exe
     - pack_file_gen-msvc-release.exe
 #    - assets-msvc-release.pack
+  cache:
+    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
     
 mingw-debug-build:
   stage: build
@@ -153,6 +161,8 @@ mingw-debug-build:
   - core_tests-mingw-debug.exe --report_level=short
   tags:
   - win-cpp
+  cache:
+    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 mingw-release-build:
   stage: build
@@ -178,6 +188,8 @@ mingw-release-build:
     - load_unit_gen-mingw-release.exe
     - pack_file_gen-mingw-release.exe
 #    - assets-mingw-release.pack
+  cache:
+    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 api-doc:
   stage: build
