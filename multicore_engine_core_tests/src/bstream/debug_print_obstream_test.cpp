@@ -144,6 +144,14 @@ BOOST_AUTO_TEST_CASE(write_long_double) {
 	BOOST_CHECK(output.str() == chkstr);
 }
 
+BOOST_AUTO_TEST_CASE(write_string) {
+	std::string text = "Hello World!";
+	stream << text;
+	BOOST_CHECK(output.str() == "[ 0C 00 00 00 00 00 00 00 ]"
+								"\n[ 48 ]\n[ 65 ]\n[ 6C ]\n[ 6C ]\n[ 6F ]\n[ 20 ]"
+								"\n[ 57 ]\n[ 6F ]\n[ 72 ]\n[ 6C ]\n[ 64 ]\n[ 21 ]\n");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 
