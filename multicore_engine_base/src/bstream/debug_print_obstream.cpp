@@ -40,6 +40,7 @@ size_t debug_print_obstream::tell_write() const noexcept {
 }
 void debug_print_obstream::seek_write(size_t position) {
 	write_position = std::min(written_size, position);
+	debug_stream << write_position << ":\n";
 }
 
 } /* namespace bstream */
