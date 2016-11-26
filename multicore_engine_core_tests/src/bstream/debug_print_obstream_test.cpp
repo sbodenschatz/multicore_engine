@@ -152,6 +152,45 @@ BOOST_AUTO_TEST_CASE(write_string) {
 								"\n[ 57 ]\n[ 6F ]\n[ 72 ]\n[ 6C ]\n[ 64 ]\n[ 21 ]\n");
 }
 
+BOOST_AUTO_TEST_CASE(tell_and_size_after_write) {
+	std::string text = "Hello World!";
+	stream << text;
+	BOOST_CHECK(stream.size() == 20);
+	BOOST_CHECK(stream.tell_write() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(tell_and_size_after_write_and_seek) {
+	std::string text = "Hello World!";
+	stream << text;
+	stream.seek_write(10);
+	BOOST_CHECK(stream.size() == 20);
+	BOOST_CHECK(stream.tell_write() == 10);
+	stream.seek_write(20);
+	BOOST_CHECK(stream.size() == 20);
+	BOOST_CHECK(stream.tell_write() == 20);
+	stream.seek_write(30);
+	BOOST_CHECK(stream.size() == 20);
+	BOOST_CHECK(stream.tell_write() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(seek_logging) {
+	std::string text1 = "Hello World!";
+	stream << text1;
+	stream.seek_write(6);
+	std::string text2 = "Test Test!";
+	stream << text2;
+	BOOST_CHECK(stream.size() == 24);
+	BOOST_CHECK(stream.tell_write() == 24);
+
+	BOOST_CHECK(output.str() == "[ 0C 00 00 00 00 00 00 00 ]"
+								"\n[ 48 ]\n[ 65 ]\n[ 6C ]\n[ 6C ]\n[ 6F ]\n[ 20 ]"
+								"\n[ 57 ]\n[ 6F ]\n[ 72 ]\n[ 6C ]\n[ 64 ]\n[ 21 ]"
+								"\n6:"
+								"\n[ 0A 00 00 00 00 00 00 00 ]"
+								"\n[ 54 ]\n[ 65 ]\n[ 73 ]\n[ 74 ]\n[ 20 ]\n[ 54 ]"
+								"\n[ 65 ]\n[ 73 ]\n[ 74 ]\n[ 21 ]\n");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 
