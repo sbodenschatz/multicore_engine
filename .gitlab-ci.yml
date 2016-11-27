@@ -39,7 +39,7 @@ scan-build:
     - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen${BUILD_EXE_SUFFIX} ${BUILD_COMPILER_NAME}/load_unit_gen${BUILD_EXE_SUFFIX}
     - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen${BUILD_EXE_SUFFIX} ${BUILD_COMPILER_NAME}/pack_file_gen${BUILD_EXE_SUFFIX}
     #- cmake -E rename build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
-    - cmake -E . ${BUILD_COMPILER_NAME}/core_tests${BUILD_EXE_SUFFIX} --report_level=short
+    - cmake -E chdir . ${BUILD_COMPILER_NAME}/core_tests${BUILD_EXE_SUFFIX} --report_level=short
   artifacts:
     name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
     expire_in: 1 week
