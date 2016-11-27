@@ -38,7 +38,7 @@ scan-build:
     - cmake -E rename build/multicore_engine_demo/multicore_engine_demo${BUILD_EXE_SUFFIX} ${BUILD_COMPILER_NAME}/demo${BUILD_EXE_SUFFIX}
     - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen${BUILD_EXE_SUFFIX} ${BUILD_COMPILER_NAME}/load_unit_gen${BUILD_EXE_SUFFIX}
     - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen${BUILD_EXE_SUFFIX} ${BUILD_COMPILER_NAME}/pack_file_gen${BUILD_EXE_SUFFIX}
-    - cmake -E rename build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
+    #- cmake -E rename build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
     - cd ${BUILD_COMPILER_NAME}
     - core_tests${BUILD_EXE_SUFFIX} --report_level=short
   artifacts:
