@@ -49,7 +49,7 @@ cache:
     - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe %BUILD_COMPILER_NAME%/core_tests.exe
     - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
     - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
-    - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME$/pack_file_gen.exe
+    - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
     #- cmake -E rename build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
     - cmake -E chdir . %BUILD_COMPILER_NAME%/core_tests.exe --report_level=short
 
