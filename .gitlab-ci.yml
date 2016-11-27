@@ -213,18 +213,20 @@ api-doc:
     - refman.pdf
     - cloc_report.txt
     
-license-pack-win:
+license-pack-windows:
     stage: build
     script:
     - mkdir licenses\windows
     - cd licenses\windows
-    - mkdir Boost glfw gli glm TBB vulkan-hpp zlib mingw-w64\mingw-w64
+    - mkdir Boost glfw gli glm TBB vulkan-hpp vulkan-sdk zlib mingw-w64\mingw-w64
     - copy C:\Libs\Boost\LICENSE_1_0.txt Boost
     - copy C:\Libs\glfw\COPYING.txt glfw
     - copy C:\Libs\gli\copying.txt gli
     - copy C:\Libs\glm\copying.txt glm
     - copy C:\Libs\TBB\LICENSE TBB
     - copy C:\Libs\vulkan-hpp\LICENSE.txt vulkan-hpp
+    - copy %VULKAN_SDK%\LICENSE.txt vulkan-sdk
+    - copy %VULKAN_SDK%\SDK_LICENSE.rtf vulkan-sdk
     - copy C:\Libs\zlib\README zlib
     - cmake -E copy_directory C:/mingw-w64/mingw64/licenses/winpthreads mingw-w64/winpthreads
     - cmake -E copy_directory C:/mingw-w64/mingw64/licenses/gcc mingw-w64/gcc
