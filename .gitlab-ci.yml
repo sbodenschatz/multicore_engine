@@ -212,7 +212,26 @@ api-doc:
     paths:
     - refman.pdf
     - cloc_report.txt
-
+    
+license-pack-win:
+    stage: build
+    script:
+    - mkdir licenses\windows
+    - cd licenses\windows
+    - mkdir Boost glfw gli glm TBB vulkan-hpp zlib
+    - copy C:\Libs\Boost\LICENSE_1_0.txt Boost
+    - copy C:\Libs\glfw\COPYING.txt glfw
+    - copy C:\Libs\gli\copying.txt gli
+    - copy C:\Libs\glm\copying.txt glm
+    - copy C:\Libs\TBB\LICENSE TBB
+    - copy C:\Libs\vulkan-hpp\LICENSE.txt vulkan-hpp
+    - copy C:\Libs\zlib\README zlib
+    artifacts:
+        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        expire_in: 1 week
+        paths:
+        - licenses
+        
 package-base:
   stage: package
   except: 
@@ -266,6 +285,7 @@ package-base:
     - mingw/pack_file_gen.exe
 #    - mingw/assets.pack
     - checksums.txt
+    - licenses
 
 package-tags:
   stage: package
@@ -318,3 +338,4 @@ package-tags:
     - mingw/pack_file_gen.exe
 #    - mingw/assets.pack
     - checksums.txt
+    - licenses
