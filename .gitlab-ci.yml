@@ -26,8 +26,7 @@ cache:
         name: "mce_%CI_BUILD_REF_NAME%_%CI_BUILD_ID%_%CI_BUILD_REF%_%CI_BUILD_NAME%"
         expire_in: 1 week
         paths:
-        - %BUILD_COMPILER_NAME%
-
+        - "%BUILD_COMPILER_NAME%"
 
 .linux-build-template: &linux-build-task
     stage: build
@@ -178,8 +177,8 @@ mingw-release-build:
     tags:
     - win-cpp
     <<: *mingw-build-task
-    <<: *artifact-spec-build
-    <<: *windows-cache-spec-windows
+    <<: *artifact-spec-build-windows
+    <<: *windows-cache-spec
 
 cpp-check:
   stage: build
