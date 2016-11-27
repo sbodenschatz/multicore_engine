@@ -9,27 +9,11 @@ cache:
     paths: &cache-paths
     - build
 
-cpp-check:
-  stage: build
-  script:
-  - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
-  tags:
-  - cpp
-  
-scan-build:
-  stage: build
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
-  - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
-  tags:
-  - cpp
-
 .windows-cache-spec-template: &windows-cache-spec
     cache:
         paths: *cache-paths
         key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
-  
+
 .artifacts-spec-build-template: &artifact-spec-build
     artifacts:
         name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
@@ -188,7 +172,23 @@ mingw-release-build:
     <<: *gmake-build-task
     <<: *artifact-spec-build
     <<: *windows-cache-spec
-    
+
+cpp-check:
+  stage: build
+  script:
+  - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
+  tags:
+  - cpp
+  
+scan-build:
+  stage: build
+  script:
+  - mkdir -p build && cd build
+  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
+  - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
+  tags:
+  - cpp
+
 api-doc:
   stage: build
   script:
