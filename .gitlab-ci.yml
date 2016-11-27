@@ -14,12 +14,20 @@ cache:
         paths: *cache-paths
         key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
-.artifacts-spec-build-template: &artifact-spec-build
+.artifacts-spec-build-linux-template: &artifact-spec-build-linux
     artifacts:
         name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
         expire_in: 1 week
         paths:
         - ${BUILD_COMPILER_NAME}
+
+.artifacts-spec-build-windows-template: &artifact-spec-build-windows
+    artifacts:
+        name: "mce_%CI_BUILD_REF_NAME%_%CI_BUILD_ID%_%CI_BUILD_REF%_%CI_BUILD_NAME%"
+        expire_in: 1 week
+        paths:
+        - %BUILD_COMPILER_NAME%
+
 
 .linux-build-template: &linux-build-task
     stage: build
@@ -108,7 +116,7 @@ gcc-release-build:
     tags:
     - cpp
     <<: *linux-build-task
-    <<: *artifact-spec-build
+    <<: *artifact-spec-build-linux
 
 clang-debug-build:
     variables:
@@ -129,7 +137,7 @@ clang-release-build:
     tags:
     - cpp
     <<: *linux-build-task
-    <<: *artifact-spec-build
+    <<: *artifact-spec-build-linux
 
 msvc-debug-build:
     variables:
@@ -148,7 +156,7 @@ msvc-release-build:
     - win-cpp
     <<: *msbuild-build-task
     <<: *windows-cache-spec    
-    <<: *artifact-spec-build
+    <<: *artifact-spec-build-windows
 
 mingw-debug-build:
     variables:
@@ -171,7 +179,7 @@ mingw-release-build:
     - win-cpp
     <<: *mingw-build-task
     <<: *artifact-spec-build
-    <<: *windows-cache-spec
+    <<: *windows-cache-spec-windows
 
 cpp-check:
   stage: build
