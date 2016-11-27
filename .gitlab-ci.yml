@@ -242,7 +242,7 @@ license-pack-windows:
 license-pack-linux:
     stage: build
     script:
-    - mkdir licenses/linux
+    - mkdir -p licenses/linux
     - cd licenses/linux
     - mkdir Boost glfw gli glm TBB vulkan-hpp vulkan-sdk zlib libc++ libstdc++ libgcc llvm-runtime g++ gcc-base
     - cp /usr/local/share/doc/local-boost/LICENSE_1_0.txt Boost
