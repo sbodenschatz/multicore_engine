@@ -226,6 +226,8 @@ license-pack-win:
     - copy C:\Libs\TBB\LICENSE TBB
     - copy C:\Libs\vulkan-hpp\LICENSE.txt vulkan-hpp
     - copy C:\Libs\zlib\README zlib
+    tags:
+    - win-cpp
     artifacts:
         name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
         expire_in: 1 week
