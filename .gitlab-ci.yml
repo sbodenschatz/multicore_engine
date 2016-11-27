@@ -117,6 +117,8 @@ msvc-debug-build:
   tags:
   - win-cpp
   cache:
+    paths:
+        - build
     key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 msvc-release-build:
@@ -144,6 +146,8 @@ msvc-release-build:
     - pack_file_gen-msvc-release.exe
 #    - assets-msvc-release.pack
   cache:
+    paths:
+        - build
     key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
     
 mingw-debug-build:
@@ -162,6 +166,8 @@ mingw-debug-build:
   tags:
   - win-cpp
   cache:
+    paths:
+        - build
     key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 mingw-release-build:
@@ -189,6 +195,8 @@ mingw-release-build:
     - pack_file_gen-mingw-release.exe
 #    - assets-mingw-release.pack
   cache:
+    paths:
+        - build
     key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 api-doc:
