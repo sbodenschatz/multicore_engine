@@ -6,8 +6,8 @@ stages:
   - package
 
 cache:
-    paths:
-        - build
+    paths: &cache-paths
+    - build
 
 cpp-check:
   stage: build
@@ -25,13 +25,25 @@ scan-build:
   tags:
   - cpp
 
+.windows-cache-spec-template: &windows-cache-spec
+    cache:
+        paths: *cache-paths
+        key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
+  
+.artifacts-spec-build-template: &artifact-spec-build
+    artifacts:
+        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        expire_in: 1 week
+        paths:
+        - ${BUILD_COMPILER_NAME}
+
 .gmake-build-template: &gmake-build-task
-  stage: build
-  script:
+    stage: build
+    script:
     - cmake -E make_directory build
     - cd build
     - cmake -G "${BUILD_GENERATOR}" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
-    - make -j ${BUILD_CONCURRENCY}
+    - cmake --build . -- -j ${BUILD_CONCURRENCY}
     - cd ..
     - cmake -E make_directory ${BUILD_COMPILER_NAME}
     - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests${BUILD_EXE_SUFFIX} ${BUILD_COMPILER_NAME}/core_tests${BUILD_EXE_SUFFIX}
@@ -40,27 +52,18 @@ scan-build:
     - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen${BUILD_EXE_SUFFIX} ${BUILD_COMPILER_NAME}/pack_file_gen${BUILD_EXE_SUFFIX}
     #- cmake -E rename build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
     - cmake -E chdir . ${BUILD_COMPILER_NAME}/core_tests${BUILD_EXE_SUFFIX} --report_level=short
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    expire_in: 1 week
-    paths:
-    - ${BUILD_COMPILER_NAME}
-
-  
+    
 gcc-debug-build:
-  stage: build
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
-  - cd ..
-  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-gcc-debug
-  - mv build/multicore_engine_demo/multicore_engine_demo demo-gcc-debug
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-gcc-debug
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-gcc-debug
-  - ./core_tests-gcc-debug --report_level=short
-  tags:
-  - cpp
+    variables:
+        BUILD_CXX_COMPILER: "g++"
+        BUILD_C_COMPILER: "gcc"
+        BUILD_TYPE: "Debug"
+        BUILD_COMPILER_NAME: "gcc"
+        BUILD_GENERATOR: "Unix Makefiles"
+        BUILD_EXE_SUFFIX: ""
+    tags:
+    - cpp
+    <<: *gmake-build-task
 
 gcc-release-build:
     variables:
@@ -73,45 +76,32 @@ gcc-release-build:
     tags:
     - cpp
     <<: *gmake-build-task
+    <<: *artifact-spec-build
 
 clang-debug-build:
-  stage: build
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug ..
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
-  - cd ..
-  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-clang-debug
-  - mv build/multicore_engine_demo/multicore_engine_demo demo-clang-debug
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-clang-debug
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-clang-debug
-  - ./core_tests-clang-debug --report_level=short
-  tags:
-  - cpp
+    variables:
+        BUILD_CXX_COMPILER: "clang++"
+        BUILD_C_COMPILER: "clang"
+        BUILD_TYPE: "Debug"
+        BUILD_COMPILER_NAME: "clang"
+        BUILD_GENERATOR: "Unix Makefiles"
+        BUILD_EXE_SUFFIX: ""
+    tags:
+    - cpp
+    <<: *gmake-build-task
 
 clang-release-build:
-  stage: build
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release ..
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
-  - cd ..
-  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-clang-release
-  - mv build/multicore_engine_demo/multicore_engine_demo demo-clang-release
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-clang-release
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-clang-release
-#  - mv build/multicore_engine_assets/assets.pack assets-clang-release.pack
-  - ./core_tests-clang-release --report_level=short
-  tags:
-  - cpp
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    expire_in: 1 week
-    paths:
-    - demo-clang-release
-    - load_unit_gen-clang-release
-    - pack_file_gen-clang-release
-#    - assets-clang-release.pack
+    variables:
+        BUILD_CXX_COMPILER: "clang++"
+        BUILD_C_COMPILER: "clang"
+        BUILD_TYPE: "Release"
+        BUILD_COMPILER_NAME: "clang"
+        BUILD_GENERATOR: "Unix Makefiles"
+        BUILD_EXE_SUFFIX: ""
+    tags:
+    - cpp
+    <<: *gmake-build-task
+    <<: *artifact-spec-build
 
 msvc-debug-build:
   stage: build
@@ -162,56 +152,34 @@ msvc-release-build:
     paths:
         - build
     key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
-    
+
 mingw-debug-build:
-  stage: build
-  script:
-  - if not exist build mkdir build
-  - cd build
-  - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
-  - cmake --build . -- -j 16
-  - cd ..
-  - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe core_tests-mingw-debug.exe
-  - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-debug.exe
-  - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-debug.exe
-  - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-debug.exe
-  - core_tests-mingw-debug.exe --report_level=short
-  tags:
-  - win-cpp
-  cache:
-    paths:
-        - build
-    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
+    variables:
+        BUILD_CXX_COMPILER: "g++"
+        BUILD_C_COMPILER: "gcc"
+        BUILD_TYPE: "Debug"
+        BUILD_COMPILER_NAME: "mingw"
+        BUILD_GENERATOR: "MinGW Makefiles"
+        BUILD_EXE_SUFFIX: ".exe"
+    tags:
+    - win-cpp
+    <<: *gmake-build-task
+    <<: *windows-cache-spec
 
 mingw-release-build:
-  stage: build
-  script:
-  - if not exist build mkdir build
-  - cd build
-  - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
-  - cmake --build . -- -j 16
-  - cd ..
-  - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe core_tests-mingw-release.exe
-  - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-release.exe
-  - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-release.exe
-  - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-release.exe
-#  - cmake -E rename build/multicore_engine_assets/assets.pack assets-mingw-release.pack
-  - core_tests-mingw-release.exe --report_level=short
-  tags:
-  - win-cpp
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    expire_in: 1 week
-    paths:
-    - demo-mingw-release.exe
-    - load_unit_gen-mingw-release.exe
-    - pack_file_gen-mingw-release.exe
-#    - assets-mingw-release.pack
-  cache:
-    paths:
-        - build
-    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
-
+    variables:
+        BUILD_CXX_COMPILER: "g++"
+        BUILD_C_COMPILER: "gcc"
+        BUILD_TYPE: "Release"
+        BUILD_COMPILER_NAME: "mingw"
+        BUILD_GENERATOR: "MinGW Makefiles"
+        BUILD_EXE_SUFFIX: ".exe"
+    tags:
+    - win-cpp
+    <<: *gmake-build-task
+    <<: *artifact-spec-build
+    <<: *windows-cache-spec
+    
 api-doc:
   stage: build
   script:
