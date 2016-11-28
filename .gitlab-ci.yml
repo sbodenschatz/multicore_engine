@@ -6,9 +6,12 @@ stages:
   - auxiliary
   - package
 
-cache:
-    paths: &cache-paths
+.cache-paths-spec: &cache-paths
     - build
+
+.linux-cache-spec-template: &linux-cache-spec
+    cache:
+        paths: *cache-paths
 
 .windows-cache-spec-template: &windows-cache-spec
     cache:
@@ -31,6 +34,7 @@ cache:
 
 .linux-build-template: &linux-build-task
     stage: build
+    <<: *linux-cache-spec    
     script:
     - cmake -E make_directory build
     - cd build
@@ -47,6 +51,7 @@ cache:
 
 .mingw-build-template: &mingw-build-task
     stage: build
+    <<: *windows-cache-spec    
     script:
     - cmake -E make_directory build
     - cd build
@@ -63,6 +68,7 @@ cache:
 
 .msbuild-build-template: &msbuild-build-task
     stage: build
+    <<: *windows-cache-spec    
     script:
     - cmake -E make_directory build
     - cd build
@@ -86,8 +92,6 @@ cache:
     - cat checksums.txt
     tags:
     - package
-    cache:
-        paths: []
     artifacts: &package-artifact-spec
         name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
         paths:
@@ -149,7 +153,6 @@ msvc-debug-build:
     tags:
     - win-cpp
     <<: *msbuild-build-task
-    <<: *windows-cache-spec    
 
 msvc-release-build:
     variables:
@@ -158,7 +161,6 @@ msvc-release-build:
     tags:
     - win-cpp
     <<: *msbuild-build-task
-    <<: *windows-cache-spec    
     <<: *artifact-spec-build-windows
 
 mingw-debug-build:
@@ -170,7 +172,6 @@ mingw-debug-build:
     tags:
     - win-cpp
     <<: *mingw-build-task
-    <<: *windows-cache-spec
 
 mingw-release-build:
     variables:
@@ -182,7 +183,6 @@ mingw-release-build:
     - win-cpp
     <<: *mingw-build-task
     <<: *artifact-spec-build-windows
-    <<: *windows-cache-spec
 
 cpp-check:
   stage: auxiliary
@@ -190,9 +190,7 @@ cpp-check:
   - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
   tags:
   - cpp
-  cache:
-    paths: []
-  
+
 scan-build:
   stage: auxiliary
   script:
@@ -201,6 +199,7 @@ scan-build:
   - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
   tags:
   - cpp
+  <<: *linux-cache-spec    
 
 api-doc:
   stage: auxiliary
@@ -223,13 +222,9 @@ api-doc:
     paths:
     - refman.pdf
     - cloc_report.txt
-  cache:
-    paths: []
-    
+
 license-pack-windows:
     stage: auxiliary
-    cache:
-        paths: []
     script:
     - mkdir licenses\windows
     - cd licenses\windows
@@ -256,8 +251,6 @@ license-pack-windows:
         
 license-pack-linux:
     stage: auxiliary
-    cache:
-        paths: []
     script:
     - mkdir -p licenses/linux
     - cd licenses/linux
