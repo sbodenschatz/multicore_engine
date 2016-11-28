@@ -85,7 +85,7 @@ cache:
     - cat checksums.txt
     tags:
     - package
-    artifacts:
+    artifacts: &package-artifact-spec
         name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
         paths:
         - refman.pdf
@@ -223,6 +223,7 @@ package-base:
     except: 
     - tags
     artifacts:
+        <<: *package-artifact-spec
         expire_in: 6 months
 
 package-tags:
