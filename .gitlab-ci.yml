@@ -3,6 +3,7 @@ variables:
 
 stages:
   - build
+  - auxiliary
   - package
 
 cache:
@@ -182,14 +183,14 @@ mingw-release-build:
     <<: *windows-cache-spec
 
 cpp-check:
-  stage: build
+  stage: auxiliary
   script:
   - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
   tags:
   - cpp
   
 scan-build:
-  stage: build
+  stage: auxiliary
   script:
   - mkdir -p build && cd build
   - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
@@ -198,7 +199,7 @@ scan-build:
   - cpp
 
 api-doc:
-  stage: build
+  stage: auxiliary
   script:
   - chmod +x generate_cloc_report.sh
   - ./generate_cloc_report.sh
