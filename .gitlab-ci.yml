@@ -221,7 +221,7 @@ api-doc:
     - cloc_report.txt
     
 license-pack-windows:
-    stage: build
+    stage: auxiliary
     script:
     - mkdir licenses\windows
     - cd licenses\windows
@@ -247,7 +247,7 @@ license-pack-windows:
         - licenses
         
 license-pack-linux:
-    stage: build
+    stage: auxiliary
     script:
     - mkdir -p licenses/linux
     - cd licenses/linux
