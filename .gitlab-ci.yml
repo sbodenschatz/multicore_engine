@@ -6,9 +6,12 @@ stages:
   - auxiliary
   - package
 
-cache:
-    paths: &cache-paths
+.cache-paths-spec: &cache-paths
     - build
+
+.linux-cache-spec-template: &linux-cache-spec
+    cache:
+        paths: *cache-paths
 
 .windows-cache-spec-template: &windows-cache-spec
     cache:
@@ -17,20 +20,21 @@ cache:
 
 .artifacts-spec-build-linux-template: &artifact-spec-build-linux
     artifacts:
-        name: "${CI_PROJECT_NAME}_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
         expire_in: 1 week
         paths:
         - ${BUILD_COMPILER_NAME}
 
 .artifacts-spec-build-windows-template: &artifact-spec-build-windows
     artifacts:
-        name: "%CI_PROJECT_NAME%_%CI_BUILD_REF_NAME%_%CI_BUILD_ID%_%CI_BUILD_REF%_%CI_BUILD_NAME%"
+        name: "mce_%CI_BUILD_REF_NAME%_%CI_BUILD_ID%_%CI_BUILD_REF%_%CI_BUILD_NAME%"
         expire_in: 1 week
         paths:
         - "%BUILD_COMPILER_NAME%"
 
 .linux-build-template: &linux-build-task
     stage: build
+    <<: *linux-cache-spec    
     script:
     - cmake -E make_directory build
     - cd build
@@ -47,6 +51,7 @@ cache:
 
 .mingw-build-template: &mingw-build-task
     stage: build
+    <<: *windows-cache-spec    
     script:
     - cmake -E make_directory build
     - cd build
@@ -63,6 +68,7 @@ cache:
 
 .msbuild-build-template: &msbuild-build-task
     stage: build
+    <<: *windows-cache-spec    
     script:
     - cmake -E make_directory build
     - cd build
@@ -87,7 +93,7 @@ cache:
     tags:
     - package
     artifacts: &package-artifact-spec
-        name: "${CI_PROJECT_NAME}_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
+        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
         paths:
         - refman.pdf
         - cloc_report.txt
@@ -147,7 +153,6 @@ msvc-debug-build:
     tags:
     - win-cpp
     <<: *msbuild-build-task
-    <<: *windows-cache-spec    
 
 msvc-release-build:
     variables:
@@ -156,7 +161,6 @@ msvc-release-build:
     tags:
     - win-cpp
     <<: *msbuild-build-task
-    <<: *windows-cache-spec    
     <<: *artifact-spec-build-windows
 
 mingw-debug-build:
@@ -168,7 +172,6 @@ mingw-debug-build:
     tags:
     - win-cpp
     <<: *mingw-build-task
-    <<: *windows-cache-spec
 
 mingw-release-build:
     variables:
@@ -180,7 +183,6 @@ mingw-release-build:
     - win-cpp
     <<: *mingw-build-task
     <<: *artifact-spec-build-windows
-    <<: *windows-cache-spec
 
 cpp-check:
   stage: auxiliary
@@ -188,7 +190,7 @@ cpp-check:
   - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
   tags:
   - cpp
-  
+
 scan-build:
   stage: auxiliary
   script:
@@ -197,6 +199,7 @@ scan-build:
   - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
   tags:
   - cpp
+  <<: *linux-cache-spec    
 
 api-doc:
   stage: auxiliary
@@ -219,7 +222,7 @@ api-doc:
     paths:
     - refman.pdf
     - cloc_report.txt
-    
+
 license-pack-windows:
     stage: auxiliary
     script:
@@ -241,7 +244,7 @@ license-pack-windows:
     tags:
     - win-cpp
     artifacts:
-        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        name: "mce_%CI_BUILD_REF_NAME%_%CI_BUILD_ID%_%CI_BUILD_REF%_%CI_BUILD_NAME%"
         expire_in: 1 week
         paths:
         - licenses
