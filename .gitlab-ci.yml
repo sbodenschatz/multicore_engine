@@ -12,7 +12,7 @@ cache:
 .windows-cache-spec-template: &windows-cache-spec
     cache:
         paths: *cache-paths
-        key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
+        key: "%CI_RUNNER_ID%/%CI_BUILD_REF_NAME%/%CI_BUILD_NAME%"
 
 .artifacts-spec-build-linux-template: &artifact-spec-build-linux
     artifacts:
