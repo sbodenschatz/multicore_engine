@@ -1,10 +1,185 @@
+variables:
+    BUILD_CONCURRENCY: "10"
+
 stages:
   - build
   - package
 
 cache:
-    paths:
-        - build
+    paths: &cache-paths
+    - build
+
+.windows-cache-spec-template: &windows-cache-spec
+    cache:
+        paths: *cache-paths
+        key: "%CI_RUNNER_ID%/%CI_BUILD_REF_NAME%/%CI_BUILD_NAME%"
+
+.artifacts-spec-build-linux-template: &artifact-spec-build-linux
+    artifacts:
+        name: "${CI_PROJECT_NAME}_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        expire_in: 1 week
+        paths:
+        - ${BUILD_COMPILER_NAME}
+
+.artifacts-spec-build-windows-template: &artifact-spec-build-windows
+    artifacts:
+        name: "%CI_PROJECT_NAME%_%CI_BUILD_REF_NAME%_%CI_BUILD_ID%_%CI_BUILD_REF%_%CI_BUILD_NAME%"
+        expire_in: 1 week
+        paths:
+        - "%BUILD_COMPILER_NAME%"
+
+.linux-build-template: &linux-build-task
+    stage: build
+    script:
+    - cmake -E make_directory build
+    - cd build
+    - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+    - cmake --build . -- -j ${BUILD_CONCURRENCY}
+    - cd ..
+    - cmake -E make_directory ${BUILD_COMPILER_NAME}
+    - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests ${BUILD_COMPILER_NAME}/core_tests
+    - cmake -E rename build/multicore_engine_demo/multicore_engine_demo ${BUILD_COMPILER_NAME}/demo
+    - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
+    - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
+    #- cmake -E rename build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
+    - cmake -E chdir . ${BUILD_COMPILER_NAME}/core_tests --report_level=short
+
+.mingw-build-template: &mingw-build-task
+    stage: build
+    script:
+    - cmake -E make_directory build
+    - cd build
+    - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+    - cmake --build . -- -j %BUILD_CONCURRENCY%
+    - cd ..
+    - cmake -E make_directory %BUILD_COMPILER_NAME%
+    - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe %BUILD_COMPILER_NAME%/core_tests.exe
+    - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
+    - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
+    #- cmake -E rename build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - cmake -E chdir . %BUILD_COMPILER_NAME%/core_tests.exe --report_level=short
+
+.msbuild-build-template: &msbuild-build-task
+    stage: build
+    script:
+    - cmake -E make_directory build
+    - cd build
+    - cmake -G "Visual Studio 14 2015 Win64" ..
+    - cmake --build . --config %BUILD_TYPE%
+    - cd ..
+    - cmake -E make_directory %BUILD_COMPILER_NAME%
+    - cmake -E rename build/multicore_engine_core_tests/%BUILD_TYPE%/multicore_engine_core_tests.exe %BUILD_COMPILER_NAME%/core_tests.exe
+    - cmake -E rename build/multicore_engine_demo/%BUILD_TYPE%/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E rename build/multicore_engine_load_unit_gen/%BUILD_TYPE%/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
+    - cmake -E rename build/multicore_engine_pack_file_gen/%BUILD_TYPE%/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
+    #- cmake -E rename build/multicore_engine_assets/%BUILD_TYPE%/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - cmake -E chdir . %BUILD_COMPILER_NAME%/core_tests.exe --report_level=short
+
+.package-task-template: &package-task
+    stage: package
+    variables:
+        GIT_STRATEGY: none
+    script:
+    - sha1sum -b cloc_report.txt refman.pdf gcc/* clang/* msvc/* mingw/* > checksums.txt
+    - cat checksums.txt
+    tags:
+    - package
+    artifacts: &package-artifact-spec
+        name: "${CI_PROJECT_NAME}_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
+        paths:
+        - refman.pdf
+        - cloc_report.txt
+        - gcc
+        - clang
+        - msvc
+        - mingw
+        - checksums.txt
+        - licenses
+
+gcc-debug-build:
+    variables:
+        BUILD_CXX_COMPILER: "g++"
+        BUILD_C_COMPILER: "gcc"
+        BUILD_TYPE: "Debug"
+        BUILD_COMPILER_NAME: "gcc"
+    tags:
+    - cpp
+    <<: *linux-build-task
+
+gcc-release-build:
+    variables:
+        BUILD_CXX_COMPILER: "g++"
+        BUILD_C_COMPILER: "gcc"
+        BUILD_TYPE: "Release"
+        BUILD_COMPILER_NAME: "gcc"
+    tags:
+    - cpp
+    <<: *linux-build-task
+    <<: *artifact-spec-build-linux
+
+clang-debug-build:
+    variables:
+        BUILD_CXX_COMPILER: "clang++"
+        BUILD_C_COMPILER: "clang"
+        BUILD_TYPE: "Debug"
+        BUILD_COMPILER_NAME: "clang"
+    tags:
+    - cpp
+    <<: *linux-build-task
+
+clang-release-build:
+    variables:
+        BUILD_CXX_COMPILER: "clang++"
+        BUILD_C_COMPILER: "clang"
+        BUILD_TYPE: "Release"
+        BUILD_COMPILER_NAME: "clang"
+    tags:
+    - cpp
+    <<: *linux-build-task
+    <<: *artifact-spec-build-linux
+
+msvc-debug-build:
+    variables:
+        BUILD_COMPILER_NAME: "msvc"
+        BUILD_TYPE: "Debug"
+    tags:
+    - win-cpp
+    <<: *msbuild-build-task
+    <<: *windows-cache-spec    
+
+msvc-release-build:
+    variables:
+        BUILD_COMPILER_NAME: "msvc"
+        BUILD_TYPE: "Release"
+    tags:
+    - win-cpp
+    <<: *msbuild-build-task
+    <<: *windows-cache-spec    
+    <<: *artifact-spec-build-windows
+
+mingw-debug-build:
+    variables:
+        BUILD_CXX_COMPILER: "g++"
+        BUILD_C_COMPILER: "gcc"
+        BUILD_TYPE: "Debug"
+        BUILD_COMPILER_NAME: "mingw"
+    tags:
+    - win-cpp
+    <<: *mingw-build-task
+    <<: *windows-cache-spec
+
+mingw-release-build:
+    variables:
+        BUILD_CXX_COMPILER: "g++"
+        BUILD_C_COMPILER: "gcc"
+        BUILD_TYPE: "Release"
+        BUILD_COMPILER_NAME: "mingw"
+    tags:
+    - win-cpp
+    <<: *mingw-build-task
+    <<: *artifact-spec-build-windows
+    <<: *windows-cache-spec
 
 cpp-check:
   stage: build
@@ -21,175 +196,6 @@ scan-build:
   - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
   tags:
   - cpp
-
-gcc-debug-build:
-  stage: build
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
-  - cd ..
-  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-gcc-debug
-  - mv build/multicore_engine_demo/multicore_engine_demo demo-gcc-debug
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-gcc-debug
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-gcc-debug
-  - ./core_tests-gcc-debug --report_level=short
-  tags:
-  - cpp
-
-gcc-release-build:
-  stage: build
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
-  - cd ..
-  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-gcc-release
-  - mv build/multicore_engine_demo/multicore_engine_demo demo-gcc-release
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-gcc-release
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-gcc-release
-#  - mv build/multicore_engine_assets/assets.pack assets-gcc-release.pack
-  - ./core_tests-gcc-release --report_level=short
-  tags:
-  - cpp
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    expire_in: 1 week
-    paths:
-    - demo-gcc-release
-    - load_unit_gen-gcc-release
-    - pack_file_gen-gcc-release
-#    - assets-gcc-release.pack
-
-clang-debug-build:
-  stage: build
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug ..
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
-  - cd ..
-  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-clang-debug
-  - mv build/multicore_engine_demo/multicore_engine_demo demo-clang-debug
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-clang-debug
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-clang-debug
-  - ./core_tests-clang-debug --report_level=short
-  tags:
-  - cpp
-
-clang-release-build:
-  stage: build
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release ..
-  - make -j $[$(grep -c ^processor /proc/cpuinfo)+2]
-  - cd ..
-  - mv build/multicore_engine_core_tests/multicore_engine_core_tests core_tests-clang-release
-  - mv build/multicore_engine_demo/multicore_engine_demo demo-clang-release
-  - mv build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen load_unit_gen-clang-release
-  - mv build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen pack_file_gen-clang-release
-#  - mv build/multicore_engine_assets/assets.pack assets-clang-release.pack
-  - ./core_tests-clang-release --report_level=short
-  tags:
-  - cpp
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    expire_in: 1 week
-    paths:
-    - demo-clang-release
-    - load_unit_gen-clang-release
-    - pack_file_gen-clang-release
-#    - assets-clang-release.pack
-
-msvc-debug-build:
-  stage: build
-  script:
-  - if not exist build mkdir build
-  - cd build
-  - cmake -G "Visual Studio 14 2015 Win64" ..
-  - cmake --build . --config Debug
-  - cd ..
-  - move build\multicore_engine_core_tests\Debug\multicore_engine_core_tests.exe core_tests-msvc-debug.exe
-  - move build\multicore_engine_demo\Debug\multicore_engine_demo.exe demo-msvc-debug.exe
-  - move build\multicore_engine_load_unit_gen\Debug\multicore_engine_load_unit_gen.exe load_unit_gen-msvc-debug.exe
-  - move build\multicore_engine_pack_file_gen\Debug\multicore_engine_pack_file_gen.exe pack_file_gen-msvc-debug.exe
-#  - move build\multicore_engine_assets\Debug\assets.pack assets-msvc-debug.pack
-  - core_tests-msvc-debug.exe --report_level=short
-  tags:
-  - win-cpp
-  cache:
-    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
-
-msvc-release-build:
-  stage: build
-  script:
-  - if not exist build mkdir build
-  - cd build
-  - cmake -G "Visual Studio 14 2015 Win64" ..
-  - cmake --build . --config Release
-  - cd ..
-  - move build\multicore_engine_core_tests\Release\multicore_engine_core_tests.exe core_tests-msvc-release.exe
-  - move build\multicore_engine_demo\Release\multicore_engine_demo.exe demo-msvc-release.exe
-  - move build\multicore_engine_load_unit_gen\Release\multicore_engine_load_unit_gen.exe load_unit_gen-msvc-release.exe
-  - move build\multicore_engine_pack_file_gen\Release\multicore_engine_pack_file_gen.exe pack_file_gen-msvc-release.exe
-#  - move build\multicore_engine_assets\Release\assets.pack assets-msvc-release.pack
-  - core_tests-msvc-release.exe --report_level=short
-  tags:
-  - win-cpp
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    expire_in: 1 week
-    paths:
-    - demo-msvc-release.exe
-    - load_unit_gen-msvc-release.exe
-    - pack_file_gen-msvc-release.exe
-#    - assets-msvc-release.pack
-  cache:
-    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
-    
-mingw-debug-build:
-  stage: build
-  script:
-  - if not exist build mkdir build
-  - cd build
-  - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug ..
-  - cmake --build . -- -j 16
-  - cd ..
-  - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe core_tests-mingw-debug.exe
-  - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-debug.exe
-  - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-debug.exe
-  - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-debug.exe
-  - core_tests-mingw-debug.exe --report_level=short
-  tags:
-  - win-cpp
-  cache:
-    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
-
-mingw-release-build:
-  stage: build
-  script:
-  - if not exist build mkdir build
-  - cd build
-  - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
-  - cmake --build . -- -j 16
-  - cd ..
-  - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe core_tests-mingw-release.exe
-  - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe demo-mingw-release.exe
-  - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe load_unit_gen-mingw-release.exe
-  - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe pack_file_gen-mingw-release.exe
-#  - cmake -E rename build/multicore_engine_assets/assets.pack assets-mingw-release.pack
-  - core_tests-mingw-release.exe --report_level=short
-  tags:
-  - win-cpp
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    expire_in: 1 week
-    paths:
-    - demo-mingw-release.exe
-    - load_unit_gen-mingw-release.exe
-    - pack_file_gen-mingw-release.exe
-#    - assets-mingw-release.pack
-  cache:
-    key: "%CI_BUILD_NAME%/%CI_BUILD_REF_NAME%/%CI_RUNNER_ID%"
 
 api-doc:
   stage: build
@@ -269,109 +275,15 @@ license-pack-linux:
         - licenses
 
 package-base:
-  stage: package
-  except: 
+    <<: *package-task
+    except: 
     - tags
-  script:
-  - mkdir gcc
-  - mkdir clang
-  - mkdir msvc
-  - mkdir mingw
-  - mv demo-gcc-release gcc/demo
-  - mv load_unit_gen-gcc-release gcc/load_unit_gen
-  - mv pack_file_gen-gcc-release gcc/pack_file_gen
-#  - mv assets-gcc-release.pack gcc/assets.pack
-  - mv demo-clang-release clang/demo
-  - mv load_unit_gen-clang-release clang/load_unit_gen
-  - mv pack_file_gen-clang-release clang/pack_file_gen
-#  - mv assets-clang-release.pack clang/assets.pack
-  - mv demo-msvc-release.exe msvc/demo.exe
-  - mv load_unit_gen-msvc-release.exe msvc/load_unit_gen.exe
-  - mv pack_file_gen-msvc-release.exe msvc/pack_file_gen.exe
-#  - mv assets-msvc-release.pack msvc/assets.pack
-  - mv demo-mingw-release.exe mingw/demo.exe
-  - mv load_unit_gen-mingw-release.exe mingw/load_unit_gen.exe
-  - mv pack_file_gen-mingw-release.exe mingw/pack_file_gen.exe
-#  - mv assets-mingw-release.pack mingw/assets.pack
-#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack mingw/assets.pack > checksums.txt
-  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe > checksums.txt
-  - cat checksums.txt
-  tags:
-  - package
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
-    expire_in: 6 months
-    paths:
-    - refman.pdf
-    - cloc_report.txt
-    - gcc/demo
-    - gcc/load_unit_gen
-    - gcc/pack_file_gen
-#    - gcc/assets.pack
-    - clang/demo
-    - clang/load_unit_gen
-    - clang/pack_file_gen
-#    - clang/assets.pack
-    - msvc/demo.exe
-    - msvc/load_unit_gen.exe
-    - msvc/pack_file_gen.exe
-#    - msvc/assets.pack
-    - mingw/demo.exe
-    - mingw/load_unit_gen.exe
-    - mingw/pack_file_gen.exe
-#    - mingw/assets.pack
-    - checksums.txt
-    - licenses
+    artifacts:
+        <<: *package-artifact-spec
+        expire_in: 6 months
 
 package-tags:
-  stage: package
-  only: 
+    <<: *package-task
+    only: 
     - tags
-  script:
-  - mkdir gcc
-  - mkdir clang
-  - mkdir msvc
-  - mv demo-gcc-release gcc/demo
-  - mv load_unit_gen-gcc-release gcc/load_unit_gen
-  - mv pack_file_gen-gcc-release gcc/pack_file_gen
-#  - mv assets-gcc-release.pack gcc/assets.pack
-  - mv demo-clang-release clang/demo
-  - mv load_unit_gen-clang-release clang/load_unit_gen
-  - mv pack_file_gen-clang-release clang/pack_file_gen
-#  - mv assets-clang-release.pack clang/assets.pack
-  - mv demo-msvc-release.exe msvc/demo.exe
-  - mv load_unit_gen-msvc-release.exe msvc/load_unit_gen.exe
-  - mv pack_file_gen-msvc-release.exe msvc/pack_file_gen.exe
-#  - mv assets-msvc-release.pack msvc/assets.pack
-  - mv demo-mingw-release.exe mingw/demo.exe
-  - mv load_unit_gen-mingw-release.exe mingw/load_unit_gen.exe
-  - mv pack_file_gen-mingw-release.exe mingw/pack_file_gen.exe
-#  - mv assets-mingw-release.pack mingw/assets.pack
-#  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe gcc/assets.pack clang/assets.pack msvc/assets.pack mingw/assets.pack > checksums.txt
-  - sha1sum -b cloc_report.txt refman.pdf gcc/demo gcc/load_unit_gen gcc/pack_file_gen clang/demo clang/load_unit_gen clang/pack_file_gen msvc/demo.exe msvc/load_unit_gen.exe msvc/pack_file_gen.exe mingw/demo.exe mingw/load_unit_gen.exe mingw/pack_file_gen.exe > checksums.txt
-  - cat checksums.txt
-  tags:
-  - package
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
-    paths:
-    - refman.pdf
-    - cloc_report.txt
-    - gcc/demo
-    - gcc/load_unit_gen
-    - gcc/pack_file_gen
-#    - gcc/assets.pack
-    - clang/demo
-    - clang/load_unit_gen
-    - clang/pack_file_gen
-#    - clang/assets.pack
-    - msvc/demo.exe
-    - msvc/load_unit_gen.exe
-    - msvc/pack_file_gen.exe
-#    - msvc/assets.pack
-    - mingw/demo.exe
-    - mingw/load_unit_gen.exe
-    - mingw/pack_file_gen.exe
-#    - mingw/assets.pack
-    - checksums.txt
-    - licenses
+
