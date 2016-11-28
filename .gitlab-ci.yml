@@ -86,6 +86,7 @@ cache:
     - cat checksums.txt
     tags:
     - package
+    cache: []
     artifacts: &package-artifact-spec
         name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
         paths:
@@ -188,6 +189,7 @@ cpp-check:
   - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
   tags:
   - cpp
+  cache: []
   
 scan-build:
   stage: auxiliary
@@ -219,9 +221,11 @@ api-doc:
     paths:
     - refman.pdf
     - cloc_report.txt
+  cache: []
     
 license-pack-windows:
     stage: auxiliary
+    cache: []
     script:
     - mkdir licenses\windows
     - cd licenses\windows
@@ -248,6 +252,7 @@ license-pack-windows:
         
 license-pack-linux:
     stage: auxiliary
+    cache: []
     script:
     - mkdir -p licenses/linux
     - cd licenses/linux
