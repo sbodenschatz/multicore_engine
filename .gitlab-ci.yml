@@ -42,6 +42,9 @@ stages:
     - cmake --build . -- -j ${BUILD_CONCURRENCY}
     - cd ..
     - cmake -E make_directory ${BUILD_COMPILER_NAME}
+    - cmake -E rename build/multicore_engine_parsers/libmulticore_engine_parsers.a ${BUILD_COMPILER_NAME}/libmulticore_engine_parsers.a
+    - cmake -E rename build/multicore_engine_base/libmulticore_engine_base.a ${BUILD_COMPILER_NAME}/libmulticore_engine_base.a
+    - cmake -E rename build/multicore_engine_core/libmulticore_engine_core.a ${BUILD_COMPILER_NAME}/libmulticore_engine_core.a
     - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests ${BUILD_COMPILER_NAME}/core_tests
     - cmake -E rename build/multicore_engine_demo/multicore_engine_demo ${BUILD_COMPILER_NAME}/demo
     - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
@@ -59,6 +62,9 @@ stages:
     - cmake --build . -- -j %BUILD_CONCURRENCY%
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
+    - cmake -E rename build/multicore_engine_parsers/libmulticore_engine_parsers.a %BUILD_COMPILER_NAME%/libmulticore_engine_parsers.a
+    - cmake -E rename build/multicore_engine_base/libmulticore_engine_base.a %BUILD_COMPILER_NAME%/libmulticore_engine_base.a
+    - cmake -E rename build/multicore_engine_core/libmulticore_engine_core.a %BUILD_COMPILER_NAME%/libmulticore_engine_core.a
     - cmake -E rename build/multicore_engine_core_tests/multicore_engine_core_tests.exe %BUILD_COMPILER_NAME%/core_tests.exe
     - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
     - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
@@ -76,6 +82,10 @@ stages:
     - cmake --build . --config %BUILD_TYPE%
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
+    # FIXME: These libraries are huge on release build due to LTCG and are therefore excluded for now.
+    #- cmake -E rename build/multicore_engine_parsers/%BUILD_TYPE%/multicore_engine_parsers.lib %BUILD_COMPILER_NAME%/multicore_engine_parsers.lib
+    #- cmake -E rename build/multicore_engine_base/%BUILD_TYPE%/multicore_engine_base.lib %BUILD_COMPILER_NAME%/multicore_engine_base.lib
+    #- cmake -E rename build/multicore_engine_core/%BUILD_TYPE%/multicore_engine_core.lib %BUILD_COMPILER_NAME%/multicore_engine_core.lib
     - cmake -E rename build/multicore_engine_core_tests/%BUILD_TYPE%/multicore_engine_core_tests.exe %BUILD_COMPILER_NAME%/core_tests.exe
     - cmake -E rename build/multicore_engine_demo/%BUILD_TYPE%/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
     - cmake -E rename build/multicore_engine_load_unit_gen/%BUILD_TYPE%/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
