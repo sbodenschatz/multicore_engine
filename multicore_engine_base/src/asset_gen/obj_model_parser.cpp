@@ -14,9 +14,9 @@ void obj_model_parser::parse_file(const std::string& filename) {
 	// TODO: Implement
 	UNUSED(filename);
 }
-std::tuple<static_model, static_model_collision_data> obj_model_parser::finalize_model() {
+std::tuple<static_model, model::static_model_collision_data> obj_model_parser::finalize_model() {
 	// TODO: Implement
-	return std::make_tuple(static_model(), static_model_collision_data());
+	return std::make_tuple(static_model(), model::static_model_collision_data());
 }
 
 } /* namespace asset_gen */

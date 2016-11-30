@@ -16,7 +16,7 @@ void static_model_exporter::export_model(const static_model& model_data,
 	UNUSED(model_data);
 	UNUSED(output_file);
 }
-void static_model_exporter::export_model(const static_model_collision_data& collision_data,
+void static_model_exporter::export_model(const model::static_model_collision_data& collision_data,
 										 const std::string& output_file) const {
 	// TODO: Implement
 	UNUSED(collision_data);

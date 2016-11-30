@@ -35,7 +35,7 @@ private:
 public:
 	obj_model_parser(bool indexed = true) : indexed(indexed){};
 	void parse_file(const std::string& filename);
-	std::tuple<static_model, static_model_collision_data> finalize_model();
+	std::tuple<static_model, model::static_model_collision_data> finalize_model();
 };
 
 } /* namespace asset_gen */

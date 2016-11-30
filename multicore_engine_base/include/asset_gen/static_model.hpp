@@ -15,9 +15,15 @@
 namespace mce {
 namespace asset_gen {
 
-struct static_model {};
+struct static_model_mesh {
+	std::string name;
+	std::vector<model::model_index> indices;
+};
 
-struct static_model_collision_data {};
+struct static_model {
+	std::vector<model::model_vertex> vertices;
+	std::vector<static_model_mesh> meshes;
+};
 
 } // namespace asset_gen
 } // namespace mce

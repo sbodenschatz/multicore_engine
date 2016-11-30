@@ -17,6 +17,7 @@
 #include <cctype>
 #include <fstream>
 #include <iostream>
+#include <model/model_format.hpp>
 #include <string>
 #include <util/program_name.hpp>
 #include <util/string_tools.hpp>
@@ -97,7 +98,7 @@ int main(int argc, char* argv[]) {
 	}
 	bool static_format = true;
 	mce::asset_gen::static_model model_data;
-	mce::asset_gen::static_model_collision_data collision_data;
+	mce::model::static_model_collision_data collision_data;
 	if(format == mce::model_converter::file_format::obj) {
 		mce::asset_gen::obj_model_parser parser;
 		parser.parse_file(input_file);
