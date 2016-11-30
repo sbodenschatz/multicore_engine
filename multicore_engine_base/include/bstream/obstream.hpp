@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
 
@@ -79,6 +80,33 @@ public:
 		for(size_t i = 0; i < N && *this; ++i) {
 			*this << value[i];
 		}
+		return *this;
+	}
+
+	template <typename T, glm::precision P>
+	obstream& operator<<(const glm::tvec1<T, P>& value) {
+		*this << value.x;
+		return *this;
+	}
+	template <typename T, glm::precision P>
+	obstream& operator<<(const glm::tvec2<T, P>& value) {
+		*this << value.x;
+		*this << value.y;
+		return *this;
+	}
+	template <typename T, glm::precision P>
+	obstream& operator<<(const glm::tvec3<T, P>& value) {
+		*this << value.x;
+		*this << value.y;
+		*this << value.z;
+		return *this;
+	}
+	template <typename T, glm::precision P>
+	obstream& operator<<(const glm::tvec4<T, P>& value) {
+		*this << value.x;
+		*this << value.y;
+		*this << value.z;
+		*this << value.w;
 		return *this;
 	}
 };
