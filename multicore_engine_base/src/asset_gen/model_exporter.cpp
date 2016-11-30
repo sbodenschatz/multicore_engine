@@ -53,7 +53,7 @@ void static_model_exporter::export_model(const static_model& model_data,
 	for(size_t i = 0; i < model_data.meshes.size(); ++i) {
 		auto& mesh = model_data.meshes[i];
 		auto& mesh_meta = model_meta_data.meshes[i];
-
+		UNUSED(mesh_meta);
 		assert(stream.tell_write() == mesh_meta.index_data.begin());
 		stream.write_bytes(reinterpret_cast<const char*>(mesh.indices.data()),
 						   sizeof(decltype(mesh.indices)::value_type) * mesh.indices.size());
