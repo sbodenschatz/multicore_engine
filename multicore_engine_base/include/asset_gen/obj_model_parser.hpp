@@ -10,6 +10,7 @@
 #include "static_model.hpp"
 #include <boost/container/flat_map.hpp>
 #include <glm/glm.hpp>
+#include <model/model_format.hpp>
 #include <tuple>
 #include <vector>
 
@@ -21,14 +22,14 @@ private:
 	class mesh_data {
 	public:
 		std::string name;
-		std::vector<model_index> indices;
+		std::vector<model::model_index> indices;
 	};
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> tex_coords;
-	std::vector<model_vertex> vertices;
+	std::vector<model::model_vertex> vertices;
 	std::vector<mesh_data> meshes;
-	boost::container::flat_map<glm::ivec3, model_index> vertex_indices;
+	boost::container::flat_map<glm::ivec3, model::model_index> vertex_indices;
 	bool indexed = true;
 
 public:

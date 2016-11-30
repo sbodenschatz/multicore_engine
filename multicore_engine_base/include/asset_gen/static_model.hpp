@@ -9,21 +9,15 @@
 
 #include <cstdint>
 #include <glm/glm.hpp>
+#include <model/model_format.hpp>
+#include <util/offset_range.hpp>
 
 namespace mce {
 namespace asset_gen {
 
-struct model_vertex {
-	glm::vec3 position;
-	glm::vec3 normal;
-	glm::vec2 tex_coords;
-};
+struct static_model {};
 
-using model_index = uint32_t;
-
-class static_model {};
-
-class static_model_collision_data {};
+struct static_model_collision_data {};
 
 } // namespace asset_gen
 } // namespace mce
