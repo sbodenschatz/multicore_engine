@@ -109,6 +109,14 @@ public:
 		*this << value.w;
 		return *this;
 	}
+	template <typename T, glm::precision P>
+	obstream& operator<<(const glm::tquat<T, P>& value) {
+		*this << value.x;
+		*this << value.y;
+		*this << value.z;
+		*this << value.w;
+		return *this;
+	}
 };
 
 } // namespace bstream

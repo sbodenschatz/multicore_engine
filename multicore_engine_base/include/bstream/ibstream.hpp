@@ -116,6 +116,14 @@ public:
 		*this >> value.w;
 		return *this;
 	}
+	template <typename T, glm::precision P>
+	ibstream& operator>>(glm::tquat<T, P>& value) {
+		*this >> value.x;
+		*this >> value.y;
+		*this >> value.z;
+		*this >> value.w;
+		return *this;
+	}
 };
 
 } // namespace bstream
