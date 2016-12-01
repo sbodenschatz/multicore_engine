@@ -86,6 +86,9 @@ struct collision_sphere {
 struct axis_aligned_collision_box {
 	glm::vec3 min;
 	glm::vec3 max;
+	axis_aligned_collision_box(glm::vec3 min = glm::vec3(.0f, .0f, .0f),
+							   glm::vec3 max = glm::vec3(.0f, .0f, .0f))
+			: min{min}, max{max} {}
 	glm::vec3 center() const {
 		return (max + min) * 0.5f;
 	}

@@ -9,6 +9,7 @@
 
 #include "static_model.hpp"
 #include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
 #include <glm/glm.hpp>
 #include <model/model_format.hpp>
 #include <tuple>
@@ -23,6 +24,10 @@ private:
 	public:
 		std::string name;
 		std::vector<model::model_index> indices;
+		boost::container::flat_set<model::model_index> collision_vertices; // Contains each vertex used in the
+																		   // mesh exactly once. Is used to
+																		   // calculate collision_data.
+		model::static_model_mesh_collision_data collision_data;
 	};
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
