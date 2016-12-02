@@ -14,6 +14,8 @@ namespace util {
 
 bool ends_with(const std::string& str, const std::string& ending);
 bool ends_with_ignore_case(const std::string& str, const std::string& ending);
+bool starts_with(const std::string& str, const std::string& prefix);
+bool starts_with_ignore_case(const std::string& str, const std::string& prefix);
 
 } /* namespace util */
 } /* namespace mce */

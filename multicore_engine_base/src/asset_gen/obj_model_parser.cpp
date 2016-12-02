@@ -6,18 +6,74 @@
 
 #include <algorithm>
 #include <asset_gen/obj_model_parser.hpp>
+#include <fstream>
 #include <iterator>
 #include <limits>
 #include <numeric>
+#include <stdexcept>
+#include <util/string_tools.hpp>
 #include <util/unused.hpp>
 
 namespace mce {
 namespace asset_gen {
 
-void obj_model_parser::parse_file(const std::string& filename) {
-	// TODO: Implement
-	UNUSED(filename);
+bool check_prefix(const std::string& str, const std::string& prefix, std::string& rest) const {
+	if(util::starts_with(str, prefix)) {
+		rest = str.substr(prefix.size());
+		return true;
+	} else {
+		return false;
+	}
 }
+
+void obj_model_parser::parse_file(const std::string& filename) {
+	std::ifstream obj_file(filename);
+	if(!obj_file) throw std::runtime_error("Couldn't open input file.");
+
+	for(std::string line; std::getline(obj_file, line);) {
+		std::string param;
+		if(check_prefix(line, "v ", param)) {
+			parse_vertex_position(param);
+		} else if(check_prefix(line, "vt ", param)) {
+			parse_vertex_texcoords(param);
+		} else if(check_prefix(line, "vn ", param)) {
+			parse_vertex_normal(param);
+		} else if(check_prefix(line, "vp ", param)) {
+			parse_vertex_parameter(param);
+		} else if(check_prefix(line, "usemtl ", param)) {
+			parse_usemtl(param);
+		} else if(check_prefix(line, "mtllib ", param)) {
+			parse_mtllib(param);
+		} else if(check_prefix(line, "o ", param)) {
+			parse_object(param);
+		} else if(check_prefix(line, "g ", param)) {
+			parse_group(param);
+		} else if(check_prefix(line, "s ", param)) {
+			parse_smoothing(param);
+		} else if(check_prefix(line, "f ", param)) {
+			parse_face(param);
+		} else if(check_prefix(line, "#", param)) {
+		} else {
+			line.erase(
+					std::remove_if(line.begin(), line.end(), [](char c) { return c == " " || c == "\t"; }));
+			if(line.size()) {
+				throw std::runtime_error("Unknown command: " + line);
+			}
+		}
+	}
+}
+
+void obj_model_parser::parse_vertex_position(const std::string& line) {}
+void obj_model_parser::parse_vertex_normal(const std::string& line) {}
+void obj_model_parser::parse_vertex_texcoords(const std::string& line) {}
+void obj_model_parser::parse_vertex_parameter(const std::string& line) {}
+void obj_model_parser::parse_usemtl(const std::string& line) {}
+void obj_model_parser::parse_object(const std::string& line) {}
+void obj_model_parser::parse_mtllib(const std::string& line) {}
+void obj_model_parser::parse_group(const std::string& line) {}
+void obj_model_parser::parse_smoothing(const std::string& line) {}
+void obj_model_parser::parse_face(const std::string& line) {}
+
 std::tuple<static_model, model::static_model_collision_data> obj_model_parser::finalize_model() {
 	for(auto& mesh : meshes) {
 		mesh.collision_data.sphere.center =
