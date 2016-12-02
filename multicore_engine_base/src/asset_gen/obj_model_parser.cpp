@@ -17,7 +17,8 @@
 namespace mce {
 namespace asset_gen {
 
-bool check_prefix(const std::string& str, const std::string& prefix, std::string& rest) const {
+bool obj_model_parser::check_prefix(const std::string& str, const std::string& prefix,
+									std::string& rest) const {
 	if(util::starts_with(str, prefix)) {
 		rest = str.substr(prefix.size());
 		return true;
@@ -55,7 +56,7 @@ void obj_model_parser::parse_file(const std::string& filename) {
 		} else if(check_prefix(line, "#", param)) {
 		} else {
 			line.erase(
-					std::remove_if(line.begin(), line.end(), [](char c) { return c == " " || c == "\t"; }));
+					std::remove_if(line.begin(), line.end(), [](char c) { return c == ' ' || c == '\t'; }));
 			if(line.size()) {
 				throw std::runtime_error("Unknown command: " + line);
 			}
@@ -63,16 +64,36 @@ void obj_model_parser::parse_file(const std::string& filename) {
 	}
 }
 
-void obj_model_parser::parse_vertex_position(const std::string& line) {}
-void obj_model_parser::parse_vertex_normal(const std::string& line) {}
-void obj_model_parser::parse_vertex_texcoords(const std::string& line) {}
-void obj_model_parser::parse_vertex_parameter(const std::string& line) {}
-void obj_model_parser::parse_usemtl(const std::string& line) {}
-void obj_model_parser::parse_object(const std::string& line) {}
-void obj_model_parser::parse_mtllib(const std::string& line) {}
-void obj_model_parser::parse_group(const std::string& line) {}
-void obj_model_parser::parse_smoothing(const std::string& line) {}
-void obj_model_parser::parse_face(const std::string& line) {}
+void obj_model_parser::parse_vertex_position(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_vertex_normal(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_vertex_texcoords(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_vertex_parameter(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_usemtl(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_object(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_mtllib(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_group(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_smoothing(const std::string& line) {
+	UNUSED(line);
+}
+void obj_model_parser::parse_face(const std::string& line) {
+	UNUSED(line);
+}
 
 std::tuple<static_model, model::static_model_collision_data> obj_model_parser::finalize_model() {
 	for(auto& mesh : meshes) {
