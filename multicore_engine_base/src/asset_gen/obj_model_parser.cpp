@@ -28,6 +28,18 @@ bool obj_model_parser::check_prefix(boost::string_view str, boost::string_view p
 	}
 }
 
+// TODO: Try to implement these functions without copying to a temporary buffer
+float obj_model_parser::stof(boost::string_view str, std::size_t* pos) {
+	sto_buffer.clear();
+	sto_buffer.append(str.data(), str.size());
+	return std::stof(sto_buffer, pos);
+}
+long long obj_model_parser::stoll(boost::string_view str, std::size_t* pos) {
+	sto_buffer.clear();
+	sto_buffer.append(str.data(), str.size());
+	return std::stoll(sto_buffer, pos);
+}
+
 void obj_model_parser::parse_file(const std::string& filename) {
 	std::ifstream obj_file(filename);
 	if(!obj_file) throw std::runtime_error("Couldn't open input file.");

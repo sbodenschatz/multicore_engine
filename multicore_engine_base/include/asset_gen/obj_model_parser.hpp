@@ -39,6 +39,8 @@ private:
 	boost::container::flat_map<glm::ivec3, model::model_index> vertex_indices;
 	bool indexed = true;
 
+	std::string sto_buffer;
+
 	void parse_vertex_position(boost::string_view line);
 	void parse_vertex_normal(boost::string_view line);
 	void parse_vertex_texcoords(boost::string_view line);
@@ -51,6 +53,10 @@ private:
 	void parse_face(boost::string_view line);
 
 	bool check_prefix(boost::string_view str, boost::string_view prefix, boost::string_view& rest) const;
+
+	// TODO: Try to implement these functions without copying to a temporary buffer
+	float stof(boost::string_view str, std::size_t* pos = nullptr);
+	long long stoll(boost::string_view str, std::size_t* pos = nullptr);
 
 public:
 	obj_model_parser(bool indexed = true) : indexed(indexed){};
