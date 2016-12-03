@@ -17,6 +17,16 @@ bool ends_with_ignore_case(boost::string_view str, boost::string_view ending);
 bool starts_with(boost::string_view str, boost::string_view prefix);
 bool starts_with_ignore_case(boost::string_view str, boost::string_view prefix);
 
+template <typename F>
+void split_iterate(boost::string_view str, boost::string_view delim, F f) {
+	boost::string_view::size_type pos = 0;
+	for(boost::string_view::size_type next = str.find(delim, pos); next != str.npos; pos = next + 1) {
+		f(str.substr(pos, next - pos));
+		next = str.find(delim, pos);
+	}
+	f(str.substr(pos));
+}
+
 } /* namespace util */
 } /* namespace mce */
 
