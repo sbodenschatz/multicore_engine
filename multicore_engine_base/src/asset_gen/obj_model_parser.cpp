@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <asset_gen/obj_model_parser.hpp>
+#include <boost/utility/string_view.hpp>
 #include <fstream>
 #include <iterator>
 #include <limits>
@@ -17,8 +18,8 @@
 namespace mce {
 namespace asset_gen {
 
-bool obj_model_parser::check_prefix(const std::string& str, const std::string& prefix,
-									std::string& rest) const {
+bool obj_model_parser::check_prefix(boost::string_view str, boost::string_view prefix,
+									boost::string_view& rest) const {
 	if(util::starts_with(str, prefix)) {
 		rest = str.substr(prefix.size());
 		return true;
@@ -31,8 +32,10 @@ void obj_model_parser::parse_file(const std::string& filename) {
 	std::ifstream obj_file(filename);
 	if(!obj_file) throw std::runtime_error("Couldn't open input file.");
 
-	for(std::string line; std::getline(obj_file, line);) {
-		std::string param;
+	for(std::string line_str; std::getline(obj_file, line_str);) {
+		boost::string_view line = line_str;
+
+		boost::string_view param;
 		if(check_prefix(line, "v ", param)) {
 			parse_vertex_position(param);
 		} else if(check_prefix(line, "vt ", param)) {
@@ -54,44 +57,40 @@ void obj_model_parser::parse_file(const std::string& filename) {
 		} else if(check_prefix(line, "f ", param)) {
 			parse_face(param);
 		} else if(check_prefix(line, "#", param)) {
-		} else {
-			line.erase(
-					std::remove_if(line.begin(), line.end(), [](char c) { return c == ' ' || c == '\t'; }));
-			if(line.size()) {
-				throw std::runtime_error("Unknown command: " + line);
-			}
+		} else if(!std::all_of(line.begin(), line.end(), [](char c) { return c == ' ' || c == '\t'; })) {
+			throw std::runtime_error("Unknown command: " + line_str);
 		}
 	}
 }
 
-void obj_model_parser::parse_vertex_position(const std::string& line) {
+void obj_model_parser::parse_vertex_position(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_vertex_normal(const std::string& line) {
+void obj_model_parser::parse_vertex_normal(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_vertex_texcoords(const std::string& line) {
+void obj_model_parser::parse_vertex_texcoords(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_vertex_parameter(const std::string& line) {
+void obj_model_parser::parse_vertex_parameter(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_usemtl(const std::string& line) {
+void obj_model_parser::parse_usemtl(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_object(const std::string& line) {
+void obj_model_parser::parse_object(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_mtllib(const std::string& line) {
+void obj_model_parser::parse_mtllib(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_group(const std::string& line) {
+void obj_model_parser::parse_group(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_smoothing(const std::string& line) {
+void obj_model_parser::parse_smoothing(boost::string_view line) {
 	UNUSED(line);
 }
-void obj_model_parser::parse_face(const std::string& line) {
+void obj_model_parser::parse_face(boost::string_view line) {
 	UNUSED(line);
 }
 

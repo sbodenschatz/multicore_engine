@@ -10,6 +10,7 @@
 #include "static_model.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
+#include <boost/utility/string_view.hpp>
 #include <glm/glm.hpp>
 #include <model/model_format.hpp>
 #include <tuple>
@@ -38,18 +39,18 @@ private:
 	boost::container::flat_map<glm::ivec3, model::model_index> vertex_indices;
 	bool indexed = true;
 
-	void parse_vertex_position(const std::string& line);
-	void parse_vertex_normal(const std::string& line);
-	void parse_vertex_texcoords(const std::string& line);
-	void parse_vertex_parameter(const std::string& line);
-	void parse_mtllib(const std::string& line);
-	void parse_usemtl(const std::string& line);
-	void parse_object(const std::string& line);
-	void parse_group(const std::string& line);
-	void parse_smoothing(const std::string& line);
-	void parse_face(const std::string& line);
+	void parse_vertex_position(boost::string_view line);
+	void parse_vertex_normal(boost::string_view line);
+	void parse_vertex_texcoords(boost::string_view line);
+	void parse_vertex_parameter(boost::string_view line);
+	void parse_mtllib(boost::string_view line);
+	void parse_usemtl(boost::string_view line);
+	void parse_object(boost::string_view line);
+	void parse_group(boost::string_view line);
+	void parse_smoothing(boost::string_view line);
+	void parse_face(boost::string_view line);
 
-	bool check_prefix(const std::string& str, const std::string& prefix, std::string& rest) const;
+	bool check_prefix(boost::string_view str, boost::string_view prefix, boost::string_view& rest) const;
 
 public:
 	obj_model_parser(bool indexed = true) : indexed(indexed){};
