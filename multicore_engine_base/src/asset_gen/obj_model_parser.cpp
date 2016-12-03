@@ -76,16 +76,37 @@ void obj_model_parser::parse_file(const std::string& filename) {
 }
 
 void obj_model_parser::parse_vertex_position(boost::string_view line) {
-	UNUSED(line);
+	size_t i = 0;
+	glm::vec3 pos;
+	util::split_iterate(line, " ", [this, &pos, &i](boost::string_view e) {
+		if(i >= 3) throw std::runtime_error("Too many components.");
+		pos[i] = stof(e);
+		++i;
+	});
+	positions.push_back(pos);
 }
 void obj_model_parser::parse_vertex_normal(boost::string_view line) {
-	UNUSED(line);
+	size_t i = 0;
+	glm::vec3 normal;
+	util::split_iterate(line, " ", [this, &normal, &i](boost::string_view e) {
+		if(i >= 3) throw std::runtime_error("Too many components.");
+		normal[i] = stof(e);
+		++i;
+	});
+	normals.push_back(normal);
 }
 void obj_model_parser::parse_vertex_texcoords(boost::string_view line) {
-	UNUSED(line);
+	size_t i = 0;
+	glm::vec2 uv;
+	util::split_iterate(line, " ", [this, &uv, &i](boost::string_view e) {
+		if(i >= 2) throw std::runtime_error("Too many components.");
+		uv[i] = stof(e);
+		++i;
+	});
+	tex_coords.push_back(uv);
 }
-void obj_model_parser::parse_vertex_parameter(boost::string_view line) {
-	UNUSED(line);
+void obj_model_parser::parse_vertex_parameter(boost::string_view) {
+	throw std::runtime_error("Vertex Parameters not supported yet");
 }
 void obj_model_parser::parse_usemtl(boost::string_view line) {
 	UNUSED(line);
