@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <util/string_tools.hpp>
 #include <util/unused.hpp>
+#include <array>
 
 namespace mce {
 namespace asset_gen {
@@ -133,7 +134,64 @@ void obj_model_parser::parse_smoothing(boost::string_view line) {
 	}
 }
 void obj_model_parser::parse_face(boost::string_view line) {
-	UNUSED(line);
+	if(meshes.empty() || meshes.back().object_name != current_object_name ||
+	   meshes.back().group_name != current_group_name) {
+		meshes.emplace_back(current_object_name, current_group_name);
+	}
+	size_t face_vertex = 0;
+	std::array<glm::ivec3, 3> vert_tripples;
+	util::split_iterate(line, " ", [this, &face_vertex, &vert_tripples](boost::string_view vert_ref) {
+		glm::ivec3 current_tripple;
+		size_t elem_index = 0;
+		util::split_iterate(
+				vert_ref, "/", [this, &current_tripple, &elem_index](boost::string_view ref_elem) {
+					if(elem_index > 2) {
+						throw std::runtime_error("Too many elements in vertex reference.");
+					}
+					auto elem = stoll(ref_elem);
+					if(elem > std::numeric_limits<glm::ivec3::value_type>::max()) {
+						throw std::runtime_error("Numeric overflow in elements of vertex reference.");
+					}
+					current_tripple[elem_index] = glm::ivec3::value_type(elem);
+					++elem_index;
+				});
+		if(face_vertex > 1) {
+			vert_tripples[2] = current_tripple;
+			create_face(vert_tripples);
+			vert_tripples[1] = vert_tripples[2];
+		} else {
+			vert_tripples[face_vertex] = current_tripple;
+		}
+
+	});
+}
+
+model::model_index obj_model_parser::get_or_create_vertex(const glm::ivec3& tripple) {
+	auto it = vertex_indices.find(tripple);
+	if(it != vertex_indices.end()) {
+		return it->second;
+	} else {
+		model::model_vertex new_vert;
+		new_vert.position = positions.at(tripple[0]);
+		new_vert.tex_coords = tex_coords.at(tripple[1]);
+		new_vert.normal = normals.at(tripple[2]);
+		if(vertices.size() > std::numeric_limits<model::model_index>::max()) {
+			throw std::runtime_error("Numeric overflow in index data.");
+		}
+		model::model_index index = model::model_index(vertices.size());
+		vertices.push_back(new_vert);
+		vertex_indices[tripple] = index;
+		return index;
+	}
+}
+
+void obj_model_parser::create_face(const std::array<glm::ivec3, 3>& vertex_tripples) {
+	std::transform(vertex_tripples.begin(), vertex_tripples.end(), std::back_inserter(meshes.back().indices),
+				   [this](const glm::ivec3& tripple) {
+					   auto index = get_or_create_vertex(tripple);
+					   meshes.back().collision_vertices.insert(index);
+					   return index;
+				   });
 }
 
 std::tuple<static_model, model::static_model_collision_data> obj_model_parser::finalize_model() {

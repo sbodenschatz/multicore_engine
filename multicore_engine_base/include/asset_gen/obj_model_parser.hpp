@@ -22,6 +22,11 @@ namespace asset_gen {
 
 class obj_model_parser {
 private:
+	struct tripple_comparator {
+		bool operator()(const glm::ivec3& a, const glm::ivec3& b) const {
+			return std::tie(a.x, a.y, a.z) < std::tie(b.x, b.y, b.z);
+		}
+	};
 	class mesh_data {
 	public:
 		std::string object_name;
@@ -40,7 +45,7 @@ private:
 	std::vector<glm::vec2> tex_coords;
 	std::vector<model::model_vertex> vertices;
 	std::vector<mesh_data> meshes;
-	boost::container::flat_map<glm::ivec3, model::model_index> vertex_indices;
+	boost::container::flat_map<glm::ivec3, model::model_index, tripple_comparator> vertex_indices;
 	bool indexed = true;
 	std::string current_object_name;
 	std::string current_group_name = "default";
@@ -57,6 +62,9 @@ private:
 	void parse_group(boost::string_view line);
 	void parse_smoothing(boost::string_view line);
 	void parse_face(boost::string_view line);
+
+	model::model_index get_or_create_vertex(const glm::ivec3& tripple);
+	void create_face(const std::array<glm::ivec3, 3>& vertex_tripples);
 
 	bool check_prefix(boost::string_view str, boost::string_view prefix, boost::string_view& rest) const;
 
