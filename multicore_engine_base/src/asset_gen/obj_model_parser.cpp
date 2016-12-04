@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <asset_gen/obj_model_parser.hpp>
 #include <boost/utility/string_view.hpp>
 #include <fstream>
@@ -14,7 +15,6 @@
 #include <stdexcept>
 #include <util/string_tools.hpp>
 #include <util/unused.hpp>
-#include <array>
 
 namespace mce {
 namespace asset_gen {
@@ -148,7 +148,7 @@ void obj_model_parser::parse_face(boost::string_view line) {
 					if(elem_index > 2) {
 						throw std::runtime_error("Too many elements in vertex reference.");
 					}
-					auto elem = stoll(ref_elem);
+					auto elem = stoll(ref_elem) + 1;
 					if(elem > std::numeric_limits<glm::ivec3::value_type>::max()) {
 						throw std::runtime_error("Numeric overflow in elements of vertex reference.");
 					}
