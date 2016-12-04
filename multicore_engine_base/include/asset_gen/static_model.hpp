@@ -16,7 +16,8 @@ namespace mce {
 namespace asset_gen {
 
 struct static_model_mesh {
-	std::string name;
+	std::string object_name;
+	std::string group_name;
 	std::vector<model::model_index> indices;
 };
 

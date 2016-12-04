@@ -26,7 +26,8 @@ void static_model_exporter::export_model(const static_model& model_data,
 	std::transform(model_data.meshes.begin(), model_data.meshes.end(),
 				   std::back_inserter(model_meta_data.meshes), [&next_offset](const static_model_mesh& mesh) {
 					   model::static_model_mesh_meta_data meta_data;
-					   meta_data.name = mesh.name;
+					   meta_data.object_name = mesh.object_name;
+					   meta_data.group_name = mesh.group_name;
 					   meta_data.index_data.begin(next_offset);
 					   meta_data.index_data.length(mesh.indices.size() *
 												   sizeof(decltype(mesh.indices)::value_type));

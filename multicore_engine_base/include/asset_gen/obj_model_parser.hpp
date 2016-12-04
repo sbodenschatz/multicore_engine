@@ -24,12 +24,16 @@ class obj_model_parser {
 private:
 	class mesh_data {
 	public:
-		std::string name;
+		std::string object_name;
+		std::string group_name;
 		std::vector<model::model_index> indices;
 		boost::container::flat_set<model::model_index> collision_vertices; // Contains each vertex used in the
 																		   // mesh exactly once. Is used to
 																		   // calculate collision_data.
 		model::static_model_mesh_collision_data collision_data;
+
+		mesh_data(const std::string& object_name, const std::string& group_name)
+				: object_name{object_name}, group_name{group_name} {}
 	};
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
@@ -38,6 +42,8 @@ private:
 	std::vector<mesh_data> meshes;
 	boost::container::flat_map<glm::ivec3, model::model_index> vertex_indices;
 	bool indexed = true;
+	std::string current_object_name;
+	std::string current_group_name = "default";
 
 	std::string sto_buffer;
 

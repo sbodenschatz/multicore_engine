@@ -47,6 +47,11 @@ void obj_model_parser::parse_file(const std::string& filename) {
 	for(std::string line_str; std::getline(obj_file, line_str);) {
 		boost::string_view line = line_str;
 
+		auto trimmed_end = line.find_last_not_of(" \t");
+		if(trimmed_end != line.npos) {
+			line.remove_suffix(line.size() - trimmed_end);
+		}
+
 		boost::string_view param;
 		if(check_prefix(line, "v ", param)) {
 			parse_vertex_position(param);
@@ -69,7 +74,7 @@ void obj_model_parser::parse_file(const std::string& filename) {
 		} else if(check_prefix(line, "f ", param)) {
 			parse_face(param);
 		} else if(check_prefix(line, "#", param)) {
-		} else if(!std::all_of(line.begin(), line.end(), [](char c) { return c == ' ' || c == '\t'; })) {
+		} else {
 			throw std::runtime_error("Unknown command: " + line_str);
 		}
 	}
@@ -112,16 +117,20 @@ void obj_model_parser::parse_usemtl(boost::string_view line) {
 	UNUSED(line);
 }
 void obj_model_parser::parse_object(boost::string_view line) {
-	UNUSED(line);
+	current_object_name.clear();
+	current_object_name.append(line.data(), line.size());
 }
 void obj_model_parser::parse_mtllib(boost::string_view line) {
 	UNUSED(line);
 }
 void obj_model_parser::parse_group(boost::string_view line) {
-	UNUSED(line);
+	current_group_name.clear();
+	current_group_name.append(line.data(), line.size());
 }
 void obj_model_parser::parse_smoothing(boost::string_view line) {
-	UNUSED(line);
+	if(line != "off") {
+		throw std::runtime_error("Smoothing groups are currently not supported.");
+	}
 }
 void obj_model_parser::parse_face(boost::string_view line) {
 	UNUSED(line);
@@ -150,7 +159,8 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 					const auto& p = vertices.at(b).position;
 					return model::axis_aligned_collision_box(glm::min(a.min, p), glm::max(a.max, p));
 				});
-		mesh.collision_data.name = mesh.name;
+		mesh.collision_data.object_name = mesh.object_name;
+		mesh.collision_data.group_name = mesh.group_name;
 	}
 	model::static_model_collision_data model_colision_data;
 	std::transform(meshes.begin(), meshes.end(), std::back_inserter(model_colision_data.meshes),
@@ -160,7 +170,8 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 	model.vertices = vertices;
 	std::transform(meshes.begin(), meshes.end(), std::back_inserter(model.meshes), [](const auto& m) {
 		static_model_mesh mesh;
-		mesh.name = m.name;
+		mesh.object_name = m.object_name;
+		mesh.group_name = m.group_name;
 		mesh.indices = m.indices;
 		return mesh;
 	});

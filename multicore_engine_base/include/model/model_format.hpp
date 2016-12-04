@@ -26,16 +26,19 @@ struct model_vertex {
 using model_index = uint32_t;
 
 struct static_model_mesh_meta_data {
-	std::string name;
+	std::string object_name;
+	std::string group_name;
 	util::offset_range<uint64_t> index_data;
 	friend bstream::obstream& operator<<(bstream::obstream& stream,
 										 const static_model_mesh_meta_data& value) {
-		stream << value.name;
+		stream << value.object_name;
+		stream << value.group_name;
 		stream << value.index_data;
 		return stream;
 	}
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_mesh_meta_data& value) {
-		stream >> value.name;
+		stream >> value.object_name;
+		stream >> value.group_name;
 		stream >> value.index_data;
 		return stream;
 	}
@@ -105,17 +108,20 @@ struct axis_aligned_collision_box {
 };
 
 struct static_model_mesh_collision_data {
-	std::string name;
+	std::string object_name;
+	std::string group_name;
 	collision_sphere sphere;
 	axis_aligned_collision_box axis_aligned_box;
 	friend bstream::obstream& operator<<(bstream::obstream& stream,
 										 const static_model_mesh_collision_data& value) {
-		stream << value.name;
+		stream << value.object_name;
+		stream << value.group_name;
 		stream << value.sphere;
 		return stream;
 	}
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_mesh_collision_data& value) {
-		stream >> value.name;
+		stream >> value.object_name;
+		stream >> value.group_name;
 		stream >> value.sphere;
 		stream >> value.axis_aligned_box;
 		return stream;
