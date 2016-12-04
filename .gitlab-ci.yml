@@ -103,6 +103,7 @@ stages:
     script:
     - sha1sum -b cloc_report.txt refman.pdf gcc/* clang/* msvc/* mingw/* > checksums.txt
     - cat checksums.txt
+    - cat cloc_report.txt
     tags:
     - package
     artifacts: &package-artifact-spec
