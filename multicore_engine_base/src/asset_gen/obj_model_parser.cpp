@@ -149,7 +149,7 @@ void obj_model_parser::parse_face(boost::string_view line) {
 					if(elem_index > 2) {
 						throw std::runtime_error("Too many elements in vertex reference.");
 					}
-					auto elem = stoll(ref_elem) + 1;
+					auto elem = stoll(ref_elem) - 1;
 					if(elem > std::numeric_limits<glm::ivec3::value_type>::max()) {
 						throw std::runtime_error("Numeric overflow in elements of vertex reference.");
 					}
