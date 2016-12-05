@@ -156,12 +156,14 @@ function(convert_models OUTPUT_MODEL_LIST OUTPUT_COL_LIST)
 	foreach(SRC_FILE ${ARGN})
 		get_filename_component(BASE_NAME ${SRC_FILE} NAME_WE)
 		get_filename_component(DIR ${SRC_FILE} DIRECTORY)
-		set(MODEL_FILE ${DIR}${BASE_NAME}.model)
-		set(COL_FILE ${DIR}${BASE_NAME}.col)
+		set(MODEL_FILE ${DIR}/${BASE_NAME}.model)
+		set(COL_FILE ${DIR}/${BASE_NAME}.col)
+		execute_process(COMMAND ${BOOTSTRAP_PACK_MODEL_CONV} -r -i ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} OUTPUT_VARIABLE DEPS_LIST RESULT_VARIABLE DEPS_RES)
 		add_custom_command(
 			OUTPUT ${MODEL_FILE} ${COL_FILE}
 			COMMAND multicore_engine_model_converter -m ${MODEL_FILE} -c ${COL_FILE} -i ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
 			MAIN_DEPENDENCY ${SRC_FILE}
+			DEPENDS ${DEPS_LIST}
 			COMMENT "Converting model input file \"${SRC_FILE}\" to model file \"${MODEL_FILE}\" and collision file \"${COL_FILE}\""
 		)
 		list(APPEND MODEL_LIST ${MODEL_FILE})
