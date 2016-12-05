@@ -57,6 +57,7 @@ int main(int argc, char* argv[]) {
 	std::string model_output_file;
 	std::string collision_output_file;
 	std::string input_file;
+	bool refs = false;
 	mce::model_converter::file_format format;
 	po::options_description desc;
 	desc.add_options()																					   //
@@ -64,6 +65,7 @@ int main(int argc, char* argv[]) {
 			("model,m", po::value(&model_output_file), "The output model file name.")					   //
 			("collision,c", po::value(&collision_output_file), "The output collision geometry file name.") //
 			("input,i", po::value(&input_file), "The input file name.")									   //
+			("refs,r", po::bool_switch(&refs), "Only generate list of referenced files.")				   //
 			("format,f", po::value(&format)->default_value(mce::model_converter::file_format::automatic),  //
 			 "Override input format. \nSupported formats:\n"											   //
 			 " obj - Wavefront OBJ")																	   //
@@ -96,17 +98,29 @@ int main(int argc, char* argv[]) {
 	if(collision_output_file.empty()) {
 		collision_output_file = fs::path(input_file).replace_extension("col").string();
 	}
+	fs::path input_file_dir = fs::path(input_file).parent_path();
 	bool static_format = true;
 	mce::asset_gen::static_model model_data;
 	mce::model::static_model_collision_data collision_data;
+	std::vector<fs::path> refs_list;
 	if(format == mce::model_converter::file_format::obj) {
-		mce::asset_gen::obj_model_parser parser;
-		parser.parse_file(input_file);
-		std::tie(model_data, collision_data) = parser.finalize_model();
+		mce::asset_gen::obj_model_parser parser(input_file_dir);
+		if(!refs) {
+			parser.parse_file(input_file);
+			std::tie(model_data, collision_data) = parser.finalize_model();
+		} else {
+			refs_list = parser.list_refs(input_file);
+		}
 	}
-	if(static_format) {
-		mce::asset_gen::static_model_exporter exporter;
-		exporter.export_model(model_data, model_output_file);
-		exporter.export_model(collision_data, collision_output_file);
+	if(!refs) {
+		if(static_format) {
+			mce::asset_gen::static_model_exporter exporter;
+			exporter.export_model(model_data, model_output_file);
+			exporter.export_model(collision_data, collision_output_file);
+		}
+	} else {
+		for(auto& r : refs_list) {
+			std::cout << r.generic_string() << ";";
+		}
 	}
 }

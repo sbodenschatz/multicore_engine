@@ -10,6 +10,7 @@
 #include "static_model.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/utility/string_view.hpp>
 #include <glm/glm.hpp>
 #include <model/model_format.hpp>
@@ -40,13 +41,13 @@ private:
 		mesh_data(const std::string& object_name, const std::string& group_name)
 				: object_name{object_name}, group_name{group_name} {}
 	};
+	boost::filesystem::path refs_dir;
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> tex_coords;
 	std::vector<model::model_vertex> vertices;
 	std::vector<mesh_data> meshes;
 	boost::container::flat_map<glm::ivec3, model::model_index, tripple_comparator> vertex_indices;
-	bool indexed = true;
 	std::string current_object_name;
 	std::string current_group_name = "default";
 
@@ -73,9 +74,10 @@ private:
 	long long stoll(boost::string_view str, std::size_t* pos = nullptr);
 
 public:
-	obj_model_parser(bool indexed = true) : indexed(indexed){};
+	obj_model_parser(boost::filesystem::path refs_dir) : refs_dir(refs_dir){};
 	void parse_file(const std::string& filename);
 	std::tuple<static_model, model::static_model_collision_data> finalize_model();
+	std::vector<boost::filesystem::path> list_refs(const std::string& filename) const;
 };
 
 } /* namespace asset_gen */

@@ -50,7 +50,7 @@ void obj_model_parser::parse_file(const std::string& filename) {
 
 		auto trimmed_end = line.find_last_not_of(" \t");
 		if(trimmed_end != line.npos) {
-			++trimmed_end; //point to first whitespace char
+			++trimmed_end; // point to first whitespace char
 			line.remove_suffix(line.size() - trimmed_end);
 		}
 
@@ -235,6 +235,29 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 		return mesh;
 	});
 	return std::make_tuple(std::move(model), std::move(model_colision_data));
+}
+
+std::vector<boost::filesystem::path> obj_model_parser::list_refs(const std::string& filename) const {
+	std::vector<boost::filesystem::path> refs_list;
+	std::ifstream obj_file(filename);
+	if(!obj_file) throw std::runtime_error("Couldn't open input file.");
+
+	for(std::string line_str; std::getline(obj_file, line_str);) {
+		boost::string_view line = line_str;
+
+		auto trimmed_end = line.find_last_not_of(" \t");
+		if(trimmed_end != line.npos) {
+			++trimmed_end; // point to first whitespace char
+			line.remove_suffix(line.size() - trimmed_end);
+		}
+
+		boost::string_view param;
+		if(check_prefix(line, "mtllib ", param)) {
+			boost::filesystem::path mtllib_path(std::string(param.data(), param.size()));
+			refs_list.push_back(boost::filesystem::absolute(mtllib_path, refs_dir));
+		}
+	}
+	return refs_list;
 }
 
 } /* namespace asset_gen */
