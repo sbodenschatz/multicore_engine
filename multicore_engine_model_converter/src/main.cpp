@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 	std::string collision_output_file;
 	std::string input_file;
 	bool refs = false;
-	mce::model_converter::file_format format;
+	mce::model_converter::file_format format = mce::model_converter::file_format;
 	po::options_description desc;
 	desc.add_options()																					   //
 			("help,h", "Display help message.")															   //
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
 			("collision,c", po::value(&collision_output_file), "The output collision geometry file name.") //
 			("input,i", po::value(&input_file), "The input file name.")									   //
 			("refs,r", po::bool_switch(&refs), "Only generate list of referenced files.")				   //
-			("format,f", po::value(&format)->default_value(mce::model_converter::file_format::automatic),  //
+			("format,f", po::value(&format),															   //
 			 "Override input format. \nSupported formats:\n"											   //
 			 " obj - Wavefront OBJ")																	   //
 			;																							   //
