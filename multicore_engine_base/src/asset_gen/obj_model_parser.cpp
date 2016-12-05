@@ -50,6 +50,7 @@ void obj_model_parser::parse_file(const std::string& filename) {
 
 		auto trimmed_end = line.find_last_not_of(" \t");
 		if(trimmed_end != line.npos) {
+			++trimmed_end; //point to first whitespace char
 			line.remove_suffix(line.size() - trimmed_end);
 		}
 
