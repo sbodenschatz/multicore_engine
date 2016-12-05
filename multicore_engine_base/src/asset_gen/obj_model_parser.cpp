@@ -163,7 +163,7 @@ void obj_model_parser::parse_face(boost::string_view line) {
 		} else {
 			vert_tripples[face_vertex] = current_tripple;
 		}
-
+		++face_vertex;
 	});
 }
 
