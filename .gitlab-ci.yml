@@ -50,7 +50,7 @@ stages:
     - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
     - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
     - cmake -E rename build/multicore_engine_model_converter/multicore_engine_model_converter ${BUILD_COMPILER_NAME}/model_converter
-    #- cmake -E rename build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
+    - cmake -E rename build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
     - cmake -E chdir . ${BUILD_COMPILER_NAME}/core_tests --report_level=short
 
 .mingw-build-template: &mingw-build-task
@@ -71,7 +71,7 @@ stages:
     - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
     - cmake -E rename build/multicore_engine_model_converter/multicore_engine_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
-    #- cmake -E rename build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - cmake -E rename build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
     - cmake -E chdir . %BUILD_COMPILER_NAME%/core_tests.exe --report_level=short
 
 .msbuild-build-template: &msbuild-build-task
@@ -93,7 +93,7 @@ stages:
     - cmake -E rename build/multicore_engine_load_unit_gen/%BUILD_TYPE%/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E rename build/multicore_engine_pack_file_gen/%BUILD_TYPE%/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
     - cmake -E rename build/multicore_engine_model_converter/%BUILD_TYPE%/multicore_engine_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
-    #- cmake -E rename build/multicore_engine_assets/%BUILD_TYPE%/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - cmake -E rename build/multicore_engine_assets/%BUILD_TYPE%/assets.pack %BUILD_COMPILER_NAME%/assets.pack
     - cmake -E chdir . %BUILD_COMPILER_NAME%/core_tests.exe --report_level=short
 
 .package-task-template: &package-task
