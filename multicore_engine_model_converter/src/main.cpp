@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 	std::string collision_output_file;
 	std::string input_file;
 	bool refs = false;
-	mce::model_converter::file_format format = mce::model_converter::file_format;
+	mce::model_converter::file_format format = mce::model_converter::file_format::automatic;
 	po::options_description desc;
 	desc.add_options()																					   //
 			("help,h", "Display help message.")															   //
