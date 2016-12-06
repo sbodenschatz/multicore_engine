@@ -101,7 +101,7 @@ function(build_load_units OUTPUT_META_LIST OUTPUT_PAYLOAD_LIST)
 			OUTPUT ${META_FILE} ${PL_FILE}
 			COMMAND multicore_engine_load_unit_gen -m ${META_FILE} -p ${PL_FILE} -d ${CMAKE_CURRENT_SOURCE_DIR}/${DESC_FILE}
 			MAIN_DEPENDENCY ${DESC_FILE}
-			DEPENDS ${DEPS_LIST}
+			DEPENDS ${DEPS_LIST} multicore_engine_load_unit_gen
 			COMMENT "Building load unit from \"${DESC_FILE}\" to meta file \"${META_FILE}\" and payload file \"${PL_FILE}\""
 		)
 		list(APPEND LUM_LIST ${META_FILE})
@@ -142,7 +142,7 @@ function(build_pack_files OUTPUT_LIST)
 			OUTPUT ${PACK_FILE}
 			COMMAND multicore_engine_pack_file_gen -o ${PACK_FILE} -d ${CMAKE_CURRENT_SOURCE_DIR}/${DESC_FILE}
 			MAIN_DEPENDENCY ${DESC_FILE}
-			DEPENDS ${DEPS_LIST}
+			DEPENDS ${DEPS_LIST} multicore_engine_pack_file_gen
 			COMMENT "Building pack file \"${PACK_FILE}\" from \"${DESC_FILE}\""
 		)
 		list(APPEND PACK_LIST ${PACK_FILE})
@@ -163,7 +163,7 @@ function(convert_models OUTPUT_MODEL_LIST OUTPUT_COL_LIST)
 			OUTPUT ${MODEL_FILE} ${COL_FILE}
 			COMMAND multicore_engine_model_converter -m ${MODEL_FILE} -c ${COL_FILE} -i ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
 			MAIN_DEPENDENCY ${SRC_FILE}
-			DEPENDS ${DEPS_LIST}
+			DEPENDS ${DEPS_LIST} multicore_engine_model_converter
 			COMMENT "Converting model input file \"${SRC_FILE}\" to model file \"${MODEL_FILE}\" and collision file \"${COL_FILE}\""
 		)
 		list(APPEND MODEL_LIST ${MODEL_FILE})
