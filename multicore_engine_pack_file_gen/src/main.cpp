@@ -38,7 +38,12 @@ int main(int argc, char* argv[]) {
 			 * ("deps", po::value(&deps_file),														 //
 			 "Generate makefile-style dependency rules into given file")*/; //
 	po::variables_map vars;
-	po::store(po::parse_command_line(argc, argv, desc), vars);
+	try {
+		po::store(po::parse_command_line(argc, argv, desc), vars);
+	} catch(...) {
+		std::cout << "Invalid arguments." << std::endl;
+		argc = 1;
+	}
 	po::notify(vars);
 	if(vars.count("help") || argc == 1) {
 		std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
@@ -46,10 +51,10 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	if(vars.count("version")) {
-		std::cerr << "Multi-Core Engine project\n";
-		std::cerr << "pack file generator - Version " << mce::core::get_build_version_string() << "\n";
-		std::cerr << "Copyright 2015-2016 by Stefan Bodenschatz\n";
-		std::cerr << std::endl;
+		std::cout << "Multi-Core Engine project\n";
+		std::cout << "pack file generator - Version " << mce::core::get_build_version_string() << "\n";
+		std::cout << "Copyright 2015-2016 by Stefan Bodenschatz\n";
+		std::cout << std::endl;
 		return -1;
 	}
 	if(!fs::exists(fs::path(description_file))) {
