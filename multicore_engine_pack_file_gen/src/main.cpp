@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /mutlicore_engine_pack_file_gen/src/main.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifdef _MSC_VER
@@ -13,6 +13,7 @@
 #include <asset_gen/pack_file_gen.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include <core/version.hpp>
 #include <iostream>
 #include <string>
 #include <util/program_name.hpp>
@@ -29,6 +30,7 @@ int main(int argc, char* argv[]) {
 
 	desc.add_options()																			 //
 			("help,h", "Display help message.")													 //
+			("version,v", "Display version info.")												 //
 			("description-file,d", po::value(&description_file), "The description file to use.") //
 			("output,o", po::value(&output_file), "The output file name.")						 //
 			("deps", po::bool_switch(&deps), "Only generate list of dependencies.")
@@ -36,11 +38,23 @@ int main(int argc, char* argv[]) {
 			 * ("deps", po::value(&deps_file),														 //
 			 "Generate makefile-style dependency rules into given file")*/; //
 	po::variables_map vars;
-	po::store(po::parse_command_line(argc, argv, desc), vars);
+	try {
+		po::store(po::parse_command_line(argc, argv, desc), vars);
+	} catch(...) {
+		std::cout << "Invalid arguments." << std::endl;
+		argc = 1;
+	}
 	po::notify(vars);
 	if(vars.count("help") || argc == 1) {
 		std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
 		std::cout << desc;
+		return -1;
+	}
+	if(vars.count("version")) {
+		std::cout << "Multi-Core Engine project\n";
+		std::cout << "pack file generator - Version " << mce::core::get_build_version_string() << "\n";
+		std::cout << "Copyright 2015-2016 by Stefan Bodenschatz\n";
+		std::cout << std::endl;
 		return -1;
 	}
 	if(!fs::exists(fs::path(description_file))) {
