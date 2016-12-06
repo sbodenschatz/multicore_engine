@@ -6,3 +6,8 @@ build
 Makefile
 /doc
 *.VC.opendb
+*.lum
+*.lup
+*.pack
+*.db
+cloc_report.txt

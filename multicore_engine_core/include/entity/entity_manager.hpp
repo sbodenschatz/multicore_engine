@@ -1,0 +1,99 @@
+/*
+ * Multi-Core Engine project
+ * File /multicore_engine_core/include/entity/entity_manager.hpp
+ * Copyright 2015 by Stefan Bodenschatz
+ */
+
+#ifndef ENTITY_ENTITY_MANAGER_HPP_
+#define ENTITY_ENTITY_MANAGER_HPP_
+
+#include "component_type.hpp"
+#include "ecs_types.hpp"
+#include "entity.hpp"
+#include "parser/entity_text_file_ast.hpp"
+#include <asset/asset_defs.hpp>
+#include <atomic>
+#include <boost/container/flat_map.hpp>
+#include <containers/unordered_object_pool.hpp>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <util/unused.hpp>
+
+namespace mce {
+namespace core {
+class engine;
+} // namespace core
+namespace entity {
+namespace parser {
+class entity_text_file_parser_backend;
+} // namespace parser
+class entity_configuration;
+class abstract_component_type;
+
+class entity_manager {
+	core::engine& engine;
+	std::atomic<entity_id_t> next_id{1};
+	containers::unordered_object_pool<entity> entities;
+	// TODO: Check if this can be non-atomic:
+	std::atomic<bool> read_only_mode{false};
+	mutable std::mutex id_map_mutex;
+	boost::container::flat_map<entity_id_t, containers::unordered_object_pool<entity>::iterator>
+			entity_id_map;
+	mutable std::mutex name_map_mutex;
+	boost::container::flat_map<std::string, entity_id_t> entity_name_map;
+	// The following members may only be written to in strictly single-threaded access:
+	boost::container::flat_map<std::string, std::unique_ptr<entity_configuration>> entity_configurations;
+	boost::container::flat_map<std::string, std::unique_ptr<abstract_component_type>> component_types;
+
+	void register_builtin_components();
+
+public:
+	friend class mce::entity::parser::entity_text_file_parser_backend;
+	explicit entity_manager(core::engine& engine);
+	entity_manager(const entity_manager&) = delete;
+	entity_manager(entity_manager&&) = delete;
+	entity_manager& operator=(const entity_manager&) = delete;
+	entity_manager& operator=(entity_manager&&) = delete;
+	~entity_manager();
+
+	void clear_entities();
+	void clear_entities_and_entity_configurations();
+	void load_entities_from_text_file(const asset::asset_ptr& text_file_asset);
+	void add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config);
+	entity* create_entity(const entity_configuration& config);
+	void destroy_entity(entity_id_t id);
+	void destroy_entity(entity* entity);
+
+	entity* find_entity(long long id) const;
+	entity* find_entity(const std::string& name) const;
+	void assign_entity_name(const std::string& name, long long id);
+	const entity_configuration* find_entity_configuration(const std::string& name) const;
+	const abstract_component_type* find_component_type(const std::string& name) const;
+
+	template <typename T, typename F>
+	void register_component_type(const std::string& name, const F& factory_function) {
+		bool success = false;
+		std::tie(std::ignore, success) =
+				component_types.emplace(name, make_component_type<T>(name, factory_function));
+		if(!success) throw std::logic_error("Duplicate component type name.");
+	}
+};
+
+} // namespace entity
+} // namespace mce
+
+#define REGISTER_COMPONENT_TYPE(ENTITYMANAGER, TYPE, NAME, FACTORYEXPR)                                      \
+	ENTITYMANAGER.register_component_type<TYPE>(NAME, [](auto&& owner, auto&& config, auto&& engine) {       \
+		UNUSED(owner), UNUSED(config), UNUSED(engine);                                                       \
+		return FACTORYEXPR;                                                                                  \
+	})
+
+#define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR)                                     \
+	ENTITYMANAGER.register_component_type<NAME##_component>(                                                 \
+			#NAME, [](auto&& owner, auto&& config, auto&& engine) {                                          \
+				UNUSED(owner), UNUSED(config), UNUSED(engine);                                               \
+				return FACTORYEXPR;                                                                          \
+			})
+
+#endif /* ENTITY_ENTITY_MANAGER_HPP_ */

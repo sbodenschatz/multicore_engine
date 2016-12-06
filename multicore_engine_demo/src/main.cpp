@@ -4,6 +4,4 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-int main() {
-
-}
+int main() {}

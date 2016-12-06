@@ -3,11 +3,13 @@
 	<name>multicore_engine_core</name>
 	<comment></comment>
 	<projects>
+		<project>multicore_engine_base</project>
+		<project>multicore_engine_parsers</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
-			<triggers>clean,full,incremental,</triggers>
+			<triggers>clean,</triggers>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -17,11 +19,17 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.codan.core.codanBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+		<nature>org.eclipse.cdt.codan.core.codanNature</nature>
 	</natures>
 </projectDescription>
