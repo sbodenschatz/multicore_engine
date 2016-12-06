@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /mutlicore_engine_load_unit_gen/src/main.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifdef _MSC_VER
@@ -14,6 +14,7 @@
 #include <asset_gen/load_unit_gen.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include <core/version.hpp>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -32,6 +33,7 @@ int main(int argc, char* argv[]) {
 	po::options_description desc;
 	desc.add_options()																			 //
 			("help,h", "Display help message.")													 //
+			("version,v", "Display version info.")												 //
 			("description-file,d", po::value(&description_file), "The description file to use.") //
 			("payload-output,p", po::value(&payload_output_file),								 //
 			 "The output file name for the payload data.")										 //
@@ -46,6 +48,13 @@ int main(int argc, char* argv[]) {
 	if(vars.count("help") || argc == 1) {
 		std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
 		std::cout << desc;
+		return -1;
+	}
+	if(vars.count("version")) {
+		std::cerr << "Multi-Core Engine project\n";
+		std::cerr << "load unit generator - Version " << mce::core::get_build_version_string() << "\n";
+		std::cerr << "Copyright 2015-2016 by Stefan Bodenschatz\n";
+		std::cerr << std::endl;
 		return -1;
 	}
 	if(!fs::exists(fs::path(description_file))) {
