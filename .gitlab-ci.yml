@@ -200,45 +200,49 @@ mingw-release-build:
     <<: *artifact-spec-build-windows
 
 cpp-check:
-  stage: auxiliary
-  script:
-  - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
-  tags:
-  - cpp
+    dependencies: []
+    stage: auxiliary
+    script:
+    - cppcheck -j 8 -v --inline-suppr --enable=all -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
+    tags:
+    - cpp
 
 scan-build:
-  stage: auxiliary
-  script:
-  - mkdir -p build && cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
-  - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
-  tags:
-  - cpp
-  <<: *linux-cache-spec    
+    dependencies: []
+    stage: auxiliary
+    script:
+    - mkdir -p build && cd build
+    - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
+    - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
+    tags:
+    - cpp
+    <<: *linux-cache-spec    
 
 api-doc:
-  stage: auxiliary
-  script:
-  - chmod +x generate_cloc_report.sh
-  - ./generate_cloc_report.sh
-  - doxygen Doxyfile
-  - cd doc/latex
-  - pdflatex refman.tex
-  - makeindex refman
-  - pdflatex refman.tex
-  - pdflatex refman.tex
-  - mv refman.pdf ../..
-  tags:
-  - latex
-  - doxygen
-  artifacts:
-    name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
-    expire_in: 1 week
-    paths:
-    - refman.pdf
-    - cloc_report.txt
+    dependencies: []
+    stage: auxiliary
+    script:
+    - chmod +x generate_cloc_report.sh
+    - ./generate_cloc_report.sh
+    - doxygen Doxyfile
+    - cd doc/latex
+    - pdflatex refman.tex
+    - makeindex refman
+    - pdflatex refman.tex
+    - pdflatex refman.tex
+    - mv refman.pdf ../..
+    tags:
+    - latex
+    - doxygen
+    artifacts:
+        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        expire_in: 1 week
+        paths:
+        - refman.pdf
+        - cloc_report.txt
 
 license-pack-windows:
+    dependencies: []
     stage: auxiliary
     script:
     - mkdir licenses\windows
@@ -265,6 +269,7 @@ license-pack-windows:
         - licenses
         
 license-pack-linux:
+    dependencies: []
     stage: auxiliary
     script:
     - mkdir -p licenses/linux
