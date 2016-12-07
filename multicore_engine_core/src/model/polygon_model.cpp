@@ -4,4 +4,4 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <model/model.hpp>
+#include <model/polygon_model.hpp>

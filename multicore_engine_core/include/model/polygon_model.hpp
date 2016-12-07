@@ -4,13 +4,13 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#ifndef MODEL_MODEL_HPP_
-#define MODEL_MODEL_HPP_
+#ifndef MODEL_POLYGON_MODEL_HPP_
+#define MODEL_POLYGON_MODEL_HPP_
 
 namespace mce {
 namespace model {
 
-class model {
+class polygon_model {
 public:
 private:
 };
@@ -18,4 +18,4 @@ private:
 } // namespace model
 } // namespace mce
 
-#endif /* MODEL_MODEL_HPP_ */
+#endif /* MODEL_POLYGON_MODEL_HPP_ */
