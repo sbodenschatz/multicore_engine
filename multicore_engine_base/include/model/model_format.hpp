@@ -117,6 +117,7 @@ struct static_model_mesh_collision_data {
 		stream << value.object_name;
 		stream << value.group_name;
 		stream << value.sphere;
+		stream << value.axis_aligned_box;
 		return stream;
 	}
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_mesh_collision_data& value) {
