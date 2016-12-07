@@ -156,6 +156,7 @@ void obj_model_parser::parse_face(boost::string_view line) {
 					current_tripple[elem_index] = glm::ivec3::value_type(elem);
 					++elem_index;
 				});
+		meshes.back().collision_vertices.insert(current_tripple.x);
 		if(face_vertex > 1) {
 			vert_tripples[2] = current_tripple;
 			create_face(vert_tripples);
@@ -190,7 +191,6 @@ void obj_model_parser::create_face(const std::array<glm::ivec3, 3>& vertex_tripp
 	std::transform(vertex_tripples.begin(), vertex_tripples.end(), std::back_inserter(meshes.back().indices),
 				   [this](const glm::ivec3& tripple) {
 					   auto index = get_or_create_vertex(tripple);
-					   meshes.back().collision_vertices.insert(index);
 					   return index;
 				   });
 }
@@ -198,10 +198,9 @@ void obj_model_parser::create_face(const std::array<glm::ivec3, 3>& vertex_tripp
 std::tuple<static_model, model::static_model_collision_data> obj_model_parser::finalize_model() {
 	for(auto& mesh : meshes) {
 		mesh.collision_data.sphere.center =
-				std::accumulate(
-						mesh.collision_vertices.begin(), mesh.collision_vertices.end(),
-						glm::vec3(.0f, .0f, .0f),
-						[this](const auto& a, const auto& b) { return a + vertices.at(b).position; }) *
+				std::accumulate(mesh.collision_vertices.begin(), mesh.collision_vertices.end(),
+								glm::vec3(.0f, .0f, .0f),
+								[this](const auto& a, const auto& b) { return a + positions.at(b); }) *
 				(1.0f / mesh.collision_vertices.size());
 		mesh.collision_data.sphere.radius =
 				sqrt(std::accumulate(mesh.collision_vertices.begin(), mesh.collision_vertices.end(), 0.0f,
