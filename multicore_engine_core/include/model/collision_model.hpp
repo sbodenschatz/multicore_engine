@@ -7,12 +7,78 @@
 #ifndef MODEL_COLLISION_MODEL_HPP_
 #define MODEL_COLLISION_MODEL_HPP_
 
+#include <asset/asset_defs.hpp>
+#include <atomic>
+#include <memory>
+#include <model/model_defs.hpp>
+#include <model/model_format.hpp>
+#include <mutex>
+#include <vector>
+
 namespace mce {
 namespace model {
 
-class collision_model {
+class collision_model : public std::enable_shared_from_this<collision_model> {
 public:
+	enum class state { loading, ready, error };
+
 private:
+	std::atomic<state> current_state_;
+	mutable std::mutex modification_mutex;
+	std::string name_;
+	std::vector<collision_model_completion_handler> completion_handlers;
+	static_model_collision_data data_;
+
+	void complete_loading(const asset::asset_ptr& collision_asset);
+
+	void raise_error_flag() {
+		current_state_ = state::error;
+	}
+
+public:
+	explicit collision_model(const std::string& name);
+	explicit collision_model(std::string&& name);
+	collision_model(const collision_model&) = delete;
+	collision_model& operator=(const collision_model&) = delete;
+
+	template <typename F>
+	void run_when_loaded(F handler) {
+		if(current_state_ == state::ready) {
+			handler(this->shared_from_this());
+			return;
+		}
+		std::unique_lock<std::mutex> lock(modification_mutex);
+		if(current_state_ == state::ready) {
+			lock.unlock();
+			handler(this->shared_from_this());
+		} else {
+			completion_handlers.emplace_back(std::move(handler));
+		}
+	}
+
+	bool ready() const {
+		return current_state_ == state::ready;
+	}
+
+	bool has_error() const {
+		return current_state_ == state::error;
+	}
+
+	void check_error_flag() const {
+		if(current_state_ == state::error) throw std::runtime_error("Error loading model '" + name_ + "'.");
+	}
+
+	state current_state() const {
+		return current_state_;
+	}
+
+	const static_model_collision_data& data() const {
+		return data_;
+	}
+
+	const std::string& name() const {
+		return name_;
+	}
 };
 
 } // namespace model
