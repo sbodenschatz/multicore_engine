@@ -12,6 +12,8 @@ namespace model {
 
 class polygon_model {
 public:
+	enum class state { loading, ready, error };
+
 private:
 };
 

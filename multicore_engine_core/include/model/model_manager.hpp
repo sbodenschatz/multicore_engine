@@ -8,6 +8,7 @@
 #define MODEL_MODEL_MANAGER_HPP_
 
 #include <boost/container/flat_map.hpp>
+#include <model/collision_model.hpp>
 #include <model/model_defs.hpp>
 #include <shared_mutex>
 
@@ -45,12 +46,13 @@ template <typename F>
 polygon_model_ptr model_manager::load_polygon_model(const std::string& name, F completion_handler) {
 	auto model = internal_load_polygon_model(name);
 	// TODO Register completion handler
+	UNUSED(completion_handler);
 	return model;
 }
 template <typename F>
 collision_model_ptr model_manager::load_collision_model(const std::string& name, F completion_handler) {
 	auto model = internal_load_collision_model(name);
-	// TODO Register completion handler
+	model->run_when_loaded(std::move(completion_handler));
 	return model;
 }
 
