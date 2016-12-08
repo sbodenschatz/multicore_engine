@@ -77,7 +77,7 @@ stages:
     - cmake -E make_directory build
     - cd build
     - cmake -G "Visual Studio 14 2015 Win64" ..
-    - cmake --build . --config %BUILD_TYPE% -- /m:16
+    - cmake --build . --config %BUILD_TYPE% -- /m:%BUILD_CONCURRENCY%
     - ctest -C %BUILD_TYPE% --output-on-failure
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
