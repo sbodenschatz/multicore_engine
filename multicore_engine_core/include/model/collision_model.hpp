@@ -35,6 +35,8 @@ private:
 		current_state_ = state::error;
 	}
 
+	friend class model_manager;
+
 public:
 	explicit collision_model(const std::string& name);
 	explicit collision_model(std::string&& name);

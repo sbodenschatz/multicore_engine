@@ -19,7 +19,7 @@ void collision_model::complete_loading(const asset::asset_ptr& collision_asset) 
 	bstream::asset_ibstream stream{collision_asset};
 	stream >> data_;
 	current_state_ = state::ready;
-	auto this_shared = this->shared_from_this();
+	auto this_shared = std::static_pointer_cast<const collision_model>(this->shared_from_this());
 	lock.unlock();
 	// From here on the collision model object is immutable and can therefore be read without holding a lock
 	for(auto& handler : completion_handlers) {
