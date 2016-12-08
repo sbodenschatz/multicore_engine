@@ -43,14 +43,14 @@ stages:
     - ctest --output-on-failure
     - cd ..
     - cmake -E make_directory ${BUILD_COMPILER_NAME}
-    - cmake -E rename build/multicore_engine_parsers/libmulticore_engine_parsers.a ${BUILD_COMPILER_NAME}/libmulticore_engine_parsers.a
-    - cmake -E rename build/multicore_engine_base/libmulticore_engine_base.a ${BUILD_COMPILER_NAME}/libmulticore_engine_base.a
-    - cmake -E rename build/multicore_engine_core/libmulticore_engine_core.a ${BUILD_COMPILER_NAME}/libmulticore_engine_core.a
-    - cmake -E rename build/multicore_engine_demo/multicore_engine_demo ${BUILD_COMPILER_NAME}/demo
-    - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
-    - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
-    - cmake -E rename build/multicore_engine_model_converter/multicore_engine_model_converter ${BUILD_COMPILER_NAME}/model_converter
-    - cmake -E rename build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
+    - cmake -E copy build/multicore_engine_parsers/libmulticore_engine_parsers.a ${BUILD_COMPILER_NAME}/libmulticore_engine_parsers.a
+    - cmake -E copy build/multicore_engine_base/libmulticore_engine_base.a ${BUILD_COMPILER_NAME}/libmulticore_engine_base.a
+    - cmake -E copy build/multicore_engine_core/libmulticore_engine_core.a ${BUILD_COMPILER_NAME}/libmulticore_engine_core.a
+    - cmake -E copy build/multicore_engine_demo/multicore_engine_demo ${BUILD_COMPILER_NAME}/demo
+    - cmake -E copy build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
+    - cmake -E copy build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
+    - cmake -E copy build/multicore_engine_model_converter/multicore_engine_model_converter ${BUILD_COMPILER_NAME}/model_converter
+    - cmake -E copy build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
 
 .mingw-build-template: &mingw-build-task
     stage: build
@@ -63,14 +63,14 @@ stages:
     - ctest --output-on-failure
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
-    - cmake -E rename build/multicore_engine_parsers/libmulticore_engine_parsers.a %BUILD_COMPILER_NAME%/libmulticore_engine_parsers.a
-    - cmake -E rename build/multicore_engine_base/libmulticore_engine_base.a %BUILD_COMPILER_NAME%/libmulticore_engine_base.a
-    - cmake -E rename build/multicore_engine_core/libmulticore_engine_core.a %BUILD_COMPILER_NAME%/libmulticore_engine_core.a
-    - cmake -E rename build/multicore_engine_demo/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
-    - cmake -E rename build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
-    - cmake -E rename build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
-    - cmake -E rename build/multicore_engine_model_converter/multicore_engine_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
-    - cmake -E rename build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - cmake -E copy build/multicore_engine_parsers/libmulticore_engine_parsers.a %BUILD_COMPILER_NAME%/libmulticore_engine_parsers.a
+    - cmake -E copy build/multicore_engine_base/libmulticore_engine_base.a %BUILD_COMPILER_NAME%/libmulticore_engine_base.a
+    - cmake -E copy build/multicore_engine_core/libmulticore_engine_core.a %BUILD_COMPILER_NAME%/libmulticore_engine_core.a
+    - cmake -E copy build/multicore_engine_demo/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E copy build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
+    - cmake -E copy build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
+    - cmake -E copy build/multicore_engine_model_converter/multicore_engine_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
+    - cmake -E copy build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
 
 .msbuild-build-template: &msbuild-build-task
     stage: build
@@ -79,19 +79,19 @@ stages:
     - cmake -E make_directory build
     - cd build
     - cmake -G "Visual Studio 14 2015 Win64" ..
-    - cmake --build . --config %BUILD_TYPE%
+    - cmake --build . --config %BUILD_TYPE% -- /m:%BUILD_CONCURRENCY%
     - ctest -C %BUILD_TYPE% --output-on-failure
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
     # FIXME: These libraries are huge on release build due to LTCG and are therefore excluded for now.
-    #- cmake -E rename build/multicore_engine_parsers/%BUILD_TYPE%/multicore_engine_parsers.lib %BUILD_COMPILER_NAME%/multicore_engine_parsers.lib
-    #- cmake -E rename build/multicore_engine_base/%BUILD_TYPE%/multicore_engine_base.lib %BUILD_COMPILER_NAME%/multicore_engine_base.lib
-    #- cmake -E rename build/multicore_engine_core/%BUILD_TYPE%/multicore_engine_core.lib %BUILD_COMPILER_NAME%/multicore_engine_core.lib
-    - cmake -E rename build/multicore_engine_demo/%BUILD_TYPE%/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
-    - cmake -E rename build/multicore_engine_load_unit_gen/%BUILD_TYPE%/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
-    - cmake -E rename build/multicore_engine_pack_file_gen/%BUILD_TYPE%/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
-    - cmake -E rename build/multicore_engine_model_converter/%BUILD_TYPE%/multicore_engine_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
-    - cmake -E rename build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    #- cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/multicore_engine_parsers.lib %BUILD_COMPILER_NAME%/multicore_engine_parsers.lib
+    #- cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/multicore_engine_base.lib %BUILD_COMPILER_NAME%/multicore_engine_base.lib
+    #- cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/multicore_engine_core.lib %BUILD_COMPILER_NAME%/multicore_engine_core.lib
+    - cmake -E copy build/multicore_engine_demo/%BUILD_TYPE%/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
+    - cmake -E copy build/multicore_engine_pack_file_gen/%BUILD_TYPE%/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
+    - cmake -E copy build/multicore_engine_model_converter/%BUILD_TYPE%/multicore_engine_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
+    - cmake -E copy build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
     - cmake -E remove_directory build/multicore_engine_assets
 
 .package-task-template: &package-task
