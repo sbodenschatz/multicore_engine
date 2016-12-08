@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project(multicore_engine_parsers)
 file(GLOB_RECURSE PARSERS_SRC "src/*.cpp")
-file(GLOB_RECURSE PARSERS_HEADERS "src/*.cpp")
+file(GLOB_RECURSE PARSERS_HEADERS "src/*.hpp")
 add_library(multicore_engine_parsers STATIC ${PARSERS_SRC} ${PARSERS_HEADERS})
 make_src_groups()
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")

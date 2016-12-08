@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project(multicore_engine_model_converter)
 file(GLOB_RECURSE MODEL_CONV_SRC "src/*.cpp")
-file(GLOB_RECURSE MODEL_CONV_HEADERS "include/*.cpp")
+file(GLOB_RECURSE MODEL_CONV_HEADERS "include/*.hpp")
 add_executable(multicore_engine_model_converter ${MODEL_CONV_SRC} ${MODEL_CONV_HEADERS})
 make_src_groups()
 target_link_libraries(multicore_engine_model_converter multicore_engine_base)

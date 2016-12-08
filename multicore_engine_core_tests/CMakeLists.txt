@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project(multicore_engine_core_tests)
 file(GLOB_RECURSE CORE_TESTS_SRC "src/*.cpp")
-file(GLOB_RECURSE CORE_TESTS_HEADERS "include/*.cpp")
+file(GLOB_RECURSE CORE_TESTS_HEADERS "include/*.hpp")
 add_executable(multicore_engine_core_tests ${CORE_TESTS_SRC} ${CORE_TESTS_HEADERS})
 make_src_groups()
 target_link_libraries(multicore_engine_core_tests multicore_engine_core)
