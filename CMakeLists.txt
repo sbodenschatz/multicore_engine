@@ -3,6 +3,8 @@ project (multicore_engine)
 
 include(CMakeUtils.txt)
 
+enable_testing()
+
 if(NOT MSVC)
 	set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 endif()
