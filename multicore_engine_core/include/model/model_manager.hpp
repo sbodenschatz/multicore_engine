@@ -10,6 +10,7 @@
 #include <boost/container/flat_map.hpp>
 #include <model/collision_model.hpp>
 #include <model/model_defs.hpp>
+#include <model/polygon_model.hpp>
 #include <shared_mutex>
 
 namespace mce {
@@ -40,13 +41,14 @@ private:
 
 	std::shared_ptr<polygon_model> internal_load_polygon_model(const std::string& name);
 	std::shared_ptr<collision_model> internal_load_collision_model(const std::string& name);
+
+	void start_stage_polygon_model(std::shared_ptr<polygon_model> model);
 };
 
 template <typename F>
 polygon_model_ptr model_manager::load_polygon_model(const std::string& name, F completion_handler) {
 	auto model = internal_load_polygon_model(name);
-	// TODO Register completion handler
-	UNUSED(completion_handler);
+	model->run_when_ready(std::move(completion_handler));
 	return model;
 }
 template <typename F>

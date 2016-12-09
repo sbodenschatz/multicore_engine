@@ -18,9 +18,30 @@ collision_model_ptr model_manager::load_collision_model(const std::string& name)
 	return internal_load_collision_model(name);
 }
 std::shared_ptr<polygon_model> model_manager::internal_load_polygon_model(const std::string& name) {
-	// TODO: Implement
-	UNUSED(name);
-	return nullptr;
+	{
+		// Acquire read lock
+		std::shared_lock<std::shared_timed_mutex> lock(loaded_polygon_models_rw_lock);
+		auto it = loaded_polygon_models.find(name);
+		if(it != loaded_polygon_models.end()) {
+			return it->second;
+		}
+	}
+	{
+		// Acquire write lock
+		std::unique_lock<std::shared_timed_mutex> lock(loaded_polygon_models_rw_lock);
+		// Double check if the polygon model is still not in the map.
+		auto it = loaded_polygon_models.find(name);
+		if(it != loaded_polygon_models.end()) {
+			return it->second;
+		} else {
+			auto tmp = std::make_shared<polygon_model>(name);
+			loaded_polygon_models[name] = tmp;
+			asset_manager.load_asset_async(name, [tmp](const asset::asset_ptr& polygon_asset) {
+				tmp->complete_loading(polygon_asset);
+			});
+			return tmp;
+		}
+	}
 }
 std::shared_ptr<collision_model> model_manager::internal_load_collision_model(const std::string& name) {
 	{
@@ -47,6 +68,10 @@ std::shared_ptr<collision_model> model_manager::internal_load_collision_model(co
 			return tmp;
 		}
 	}
+}
+void model_manager::start_stage_polygon_model(std::shared_ptr<polygon_model> model) {
+	// TODO: Initiate upload to GPU memory through renderer and do the call below when upload is finished.
+	model->complete_staging();
 }
 
 } // namespace model
