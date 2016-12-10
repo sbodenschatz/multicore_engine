@@ -40,6 +40,7 @@ stages:
     - cd build
     - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
     - cmake --build . -- -j ${BUILD_CONCURRENCY}
+    - export LD_LIBRARY_PATH=/usr/local/lib/local-boost/lib-${BUILD_COMPILER_NAME}-${BUILD_TYPE,,}/
     - ctest --output-on-failure
     - cd ..
     - cmake -E make_directory ${BUILD_COMPILER_NAME}
