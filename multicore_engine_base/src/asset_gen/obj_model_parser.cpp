@@ -44,8 +44,10 @@ long long obj_model_parser::stoll(boost::string_view str, std::size_t* pos) {
 void obj_model_parser::parse_file(const std::string& filename) {
 	std::ifstream obj_file(filename);
 	if(!obj_file) throw std::runtime_error("Couldn't open input file.");
-
-	for(std::string line_str; std::getline(obj_file, line_str);) {
+	parse(obj_file);
+}
+void obj_model_parser::parse(std::istream& input) {
+	for(std::string line_str; std::getline(input, line_str);) {
 		boost::string_view line = line_str;
 
 		auto trimmed_end = line.find_last_not_of(" \t");

@@ -13,6 +13,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/utility/string_view.hpp>
 #include <glm/glm.hpp>
+#include <istream>
 #include <model/model_format.hpp>
 #include <tuple>
 #include <utility>
@@ -76,6 +77,7 @@ private:
 public:
 	obj_model_parser(boost::filesystem::path refs_dir) : refs_dir(refs_dir){};
 	void parse_file(const std::string& filename);
+	void parse(std::istream& input);
 	std::tuple<static_model, model::static_model_collision_data> finalize_model();
 	std::vector<boost::filesystem::path> list_refs(const std::string& filename) const;
 };
