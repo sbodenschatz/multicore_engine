@@ -43,13 +43,13 @@ public:
 	void run_when_loaded(F handler) {
 		if(current_state_ == state::ready) {
 			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
-			handler(this->shared_from_this());
+			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
 			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		if(current_state_ == state::ready) {
 			lock.unlock();
-			handler(this->shared_from_this());
+			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
 		} else {
 			completion_handlers.emplace_back(std::move(handler));
 		}
