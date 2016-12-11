@@ -36,8 +36,8 @@ std::shared_ptr<polygon_model> model_manager::internal_load_polygon_model(const 
 		} else {
 			auto tmp = std::make_shared<polygon_model>(name);
 			loaded_polygon_models[name] = tmp;
-			asset_manager.load_asset_async(name, [tmp](const asset::asset_ptr& polygon_asset) {
-				tmp->complete_loading(polygon_asset);
+			asset_manager.load_asset_async(name, [tmp, this](const asset::asset_ptr& polygon_asset) {
+				tmp->complete_loading(polygon_asset, *this);
 			});
 			return tmp;
 		}
@@ -71,7 +71,7 @@ std::shared_ptr<collision_model> model_manager::internal_load_collision_model(co
 }
 void model_manager::start_stage_polygon_model(std::shared_ptr<polygon_model> model) {
 	// TODO: Initiate upload to GPU memory through renderer and do the call below when upload is finished.
-	model->complete_staging();
+	model->complete_staging(*this);
 }
 
 } // namespace model

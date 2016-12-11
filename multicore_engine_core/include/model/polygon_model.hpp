@@ -18,6 +18,8 @@
 namespace mce {
 namespace model {
 
+class model_manager;
+
 class polygon_model : public std::enable_shared_from_this<polygon_model> {
 public:
 	enum class state { loading, staging, ready, error };
@@ -29,8 +31,8 @@ private:
 	std::vector<polygon_model_completion_handler> completion_handlers;
 	static_model_meta_data meta_data_;
 
-	void complete_loading(const asset::asset_ptr& polygon_asset);
-	void complete_staging();
+	void complete_loading(const asset::asset_ptr& polygon_asset, model_manager& mm);
+	void complete_staging(model_manager& mm);
 
 	void raise_error_flag() {
 		current_state_ = state::error;

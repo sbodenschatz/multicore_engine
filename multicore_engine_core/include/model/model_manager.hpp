@@ -43,6 +43,8 @@ private:
 	std::shared_ptr<collision_model> internal_load_collision_model(const std::string& name);
 
 	void start_stage_polygon_model(std::shared_ptr<polygon_model> model);
+
+	friend class polygon_model;
 };
 
 template <typename F>
