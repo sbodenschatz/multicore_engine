@@ -1,0 +1,6 @@
+models zip(9) {
+	"models_col.lum";
+	"models_geo.lum";
+	"models_col.lup";
+	"models_geo.lup";
+}

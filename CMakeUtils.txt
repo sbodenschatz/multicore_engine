@@ -105,7 +105,7 @@ function(build_load_units OUTPUT_META_LIST OUTPUT_PAYLOAD_LIST)
 			OUTPUT ${META_FILE} ${PL_FILE}
 			COMMAND multicore_engine_load_unit_gen -m ${META_FILE} -p ${PL_FILE} -d ${CMAKE_CURRENT_SOURCE_DIR}/${DESC_FILE}
 			MAIN_DEPENDENCY ${DESC_FILE}
-			DEPENDS ${DEPS_LIST}
+			DEPENDS ${DEPS_LIST} multicore_engine_load_unit_gen
 			COMMENT "Building load unit from \"${DESC_FILE}\" to meta file \"${META_FILE}\" and payload file \"${PL_FILE}\""
 		)
 		list(APPEND LUM_LIST ${META_FILE})
@@ -146,7 +146,7 @@ function(build_pack_files OUTPUT_LIST)
 			OUTPUT ${PACK_FILE}
 			COMMAND multicore_engine_pack_file_gen -o ${PACK_FILE} -d ${CMAKE_CURRENT_SOURCE_DIR}/${DESC_FILE}
 			MAIN_DEPENDENCY ${DESC_FILE}
-			DEPENDS ${DEPS_LIST}
+			DEPENDS ${DEPS_LIST} multicore_engine_pack_file_gen
 			COMMENT "Building pack file \"${PACK_FILE}\" from \"${DESC_FILE}\""
 		)
 		list(APPEND PACK_LIST ${PACK_FILE})
@@ -154,20 +154,26 @@ function(build_pack_files OUTPUT_LIST)
 	set(${OUTPUT_LIST} ${PACK_LIST} PARENT_SCOPE)
 endfunction()
 
-function(convert_models OUTPUT_LIST)
+function(convert_models OUTPUT_MODEL_LIST OUTPUT_COL_LIST)
 	set(MODEL_LIST)
+	set(COL_LIST)
 	foreach(SRC_FILE ${ARGN})
 		get_filename_component(BASE_NAME ${SRC_FILE} NAME_WE)
 		get_filename_component(DIR ${SRC_FILE} DIRECTORY)
-		set(MODEL_FILE ${DIR}${BASE_NAME}.model)
+		set(MODEL_FILE ${DIR}/${BASE_NAME}.model)
+		set(COL_FILE ${DIR}/${BASE_NAME}.col)
+		execute_process(COMMAND ${BOOTSTRAP_PACK_MODEL_CONV} -r -i ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} OUTPUT_VARIABLE DEPS_LIST RESULT_VARIABLE DEPS_RES)
 		add_custom_command(
-			OUTPUT ${MODEL_FILE}
-			COMMAND multicore_engine_model_converter -o ${MODEL_FILE} -m ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
+			OUTPUT ${MODEL_FILE} ${COL_FILE}
+			COMMAND multicore_engine_model_converter -m ${MODEL_FILE} -c ${COL_FILE} -i ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
 			MAIN_DEPENDENCY ${SRC_FILE}
-			COMMENT "Converting model file \"${SRC_FILE}\" to \"${MODEL_FILE}\""
+			DEPENDS ${DEPS_LIST} multicore_engine_model_converter
+			COMMENT "Converting model input file \"${SRC_FILE}\" to model file \"${MODEL_FILE}\" and collision file \"${COL_FILE}\""
 		)
 		list(APPEND MODEL_LIST ${MODEL_FILE})
+		list(APPEND COL_LIST ${COL_FILE})
 	endforeach()
-	set(${OUTPUT_LIST} ${MODEL_LIST} PARENT_SCOPE)
+	set(${OUTPUT_MODEL_LIST} ${MODEL_LIST} PARENT_SCOPE)
+	set(${OUTPUT_COL_LIST} ${COL_LIST} PARENT_SCOPE)
 endfunction()
 

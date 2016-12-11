@@ -18,8 +18,12 @@ build_load_units(LOAD_UNIT_METAS LOAD_UNIT_PAYLOADS ${LOAD_UNIT_DESCS})
 file(GLOB_RECURSE PACK_DESCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.packdesc")
 build_pack_files(PACK_FILES ${PACK_DESCS})
 
+file(GLOB_RECURSE MODEL_OBJS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.obj")
+convert_models(MODEL_FILES MODEL_COLS ${MODEL_OBJS})
+
 add_custom_target(multicore_engine_assets_compile ALL SOURCES ${SHADERS_SRC} DEPENDS ${SPV_OBJ})
+add_custom_target(multicore_engine_assets_models ALL SOURCES ${MODEL_OBJS} DEPENDS ${MODEL_FILES} ${MODEL_COLS})
 add_custom_target(multicore_engine_assets_units ALL SOURCES ${LOAD_UNIT_DESCS} DEPENDS ${LOAD_UNIT_METAS} ${LOAD_UNIT_PAYLOADS})
 add_custom_target(multicore_engine_assets_packs ALL SOURCES ${PACK_DESCS} DEPENDS ${PACK_FILES})
-add_dependencies(multicore_engine_assets_units multicore_engine_assets_compile)
+add_dependencies(multicore_engine_assets_units multicore_engine_assets_compile multicore_engine_assets_models)
 add_dependencies(multicore_engine_assets_packs multicore_engine_assets_units)
