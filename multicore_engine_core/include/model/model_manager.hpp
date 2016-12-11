@@ -22,7 +22,7 @@ namespace model {
 
 class model_manager {
 public:
-	model_manager(asset::asset_manager& asset_manager) noexcept : asset_manager(asset_manager) {}
+	explicit model_manager(asset::asset_manager& asset_manager) noexcept : asset_manager(asset_manager) {}
 
 	template <typename F>
 	polygon_model_ptr load_polygon_model(const std::string& name, F completion_handler);
