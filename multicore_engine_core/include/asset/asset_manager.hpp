@@ -1,19 +1,22 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/asset_manager.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_MANAGER_HPP_
 #define ASSET_ASSET_MANAGER_HPP_
 
 #include "asset_defs.hpp"
+#include <exception>
 #include <memory>
 #include <shared_mutex>
 #include <string>
 #include <thread>
 #include <util/copy_on_write.hpp>
+#include <util/unused.hpp>
 #include <vector>
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
@@ -59,7 +62,12 @@ public:
 	asset_manager(const asset_manager&) = delete;
 	asset_manager& operator=(const asset_manager&) = delete;
 	template <typename F>
-	std::shared_ptr<const asset> load_asset_async(const std::string& name, F completion_handler);
+	std::shared_ptr<const asset> load_asset_async(const std::string& name, F&& completion_handler) {
+		return load_asset_async(name, std::forward<F>(completion_handler), [](std::exception_ptr) {});
+	}
+	template <typename F, typename E>
+	std::shared_ptr<const asset> load_asset_async(const std::string& name, F completion_handler,
+												  E error_handler);
 	std::shared_ptr<const asset> load_asset_sync(const std::string& name);
 	boost::unique_future<std::shared_ptr<const asset>> load_asset_future(const std::string& name);
 	void start_clean();
@@ -80,8 +88,10 @@ public:
 namespace mce {
 namespace asset {
 
-template <typename F>
-std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& name, F completion_handler) {
+template <typename F, typename E>
+std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& name, F completion_handler,
+															 E error_handler) {
+	UNUSED(error_handler); // TODO Implement error handling.
 	std::shared_ptr<asset> result;
 	{
 		// Acquire read lock
