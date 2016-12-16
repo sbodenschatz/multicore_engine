@@ -1,12 +1,13 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/asset_defs.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_DEFS_HPP_
 #define ASSET_ASSET_DEFS_HPP_
 
+#include <exception>
 #include <util/local_function.hpp>
 
 namespace mce {
@@ -29,6 +30,8 @@ struct offset_range {
 	file_size begin;
 	file_size end;
 };
+
+typedef util::local_function<128, void(std::exception_ptr)> error_handler;
 
 } // namespace asset
 } // namespace mce

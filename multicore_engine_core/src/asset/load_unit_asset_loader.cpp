@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/asset/load_unit_asset_loader.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <asset/file_reader.hpp>
@@ -91,7 +91,9 @@ bool load_unit_asset_loader::start_load_asset(const std::shared_ptr<asset>& asse
 					if(content) {
 						finish_loading(asset, content, size);
 					} else {
-						raise_error_flag(asset);
+						raise_error_flag(asset, std::make_exception_ptr(std::runtime_error(
+														"Couldn't load asset '" + asset->name() +
+														"' from load unit '" + load_unit->name() + "'.")));
 					}
 				});
 				if(sync_hint) {

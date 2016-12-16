@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/asset.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_HPP_
@@ -31,6 +31,7 @@ private:
 	std::shared_ptr<const char> data_;
 	size_t size_;
 	std::vector<asset_completion_handler> completion_handlers;
+	std::vector<error_handler> error_handlers;
 	mutable std::condition_variable completed_cv;
 
 public:
@@ -93,9 +94,17 @@ public:
 private:
 	void complete_loading(const std::shared_ptr<const char>& data, size_t size);
 
-	void raise_error_flag() {
+	void raise_error_flag(std::exception_ptr e) {
 		current_state_ = state::error;
 		completed_cv.notify_all();
+		std::unique_lock<std::mutex> lock(modification_mutex);
+		for(auto& handler : error_handlers) {
+			handler(e);
+		}
+		error_handlers.clear();
+		completion_handlers.clear();
+		error_handlers.shrink_to_fit();
+		completion_handlers.shrink_to_fit();
 	}
 
 	// TODO Prevent a dead-lock where all workers are waiting (sync) for completions of assets whose load

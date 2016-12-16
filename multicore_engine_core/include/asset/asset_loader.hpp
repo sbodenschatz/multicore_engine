@@ -1,13 +1,14 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/asset_loader.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_LOADER_HPP_
 #define ASSET_ASSET_LOADER_HPP_
 
 #include "asset_defs.hpp"
+#include <exception>
 #include <memory>
 #include <string>
 
@@ -28,7 +29,7 @@ protected:
 	static void launch_async_task(asset_manager& asset_manager, F&& f);
 	static void finish_loading(const std::shared_ptr<mce::asset::asset>& asset, const file_content_ptr& data,
 							   file_size size);
-	static void raise_error_flag(const std::shared_ptr<mce::asset::asset>& asset);
+	static void raise_error_flag(const std::shared_ptr<mce::asset::asset>& asset, std::exception_ptr e);
 
 public:
 	virtual ~asset_loader() = default;

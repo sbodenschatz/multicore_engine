@@ -120,10 +120,12 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 							if(loader->start_load_asset(tmp, *this, false)) return;
 						}
 					} catch(...) {
-						tmp->raise_error_flag();
+						tmp->raise_error_flag(std::current_exception());
 						throw;
 					}
-					tmp->raise_error_flag();
+					tmp->raise_error_flag(std::make_exception_ptr(
+							std::runtime_error("Couldn't find asset '" + tmp->name() +
+											   "' through any of the registered loaders.")));
 				}
 			});
 			return tmp;

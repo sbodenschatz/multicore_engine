@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/asset/asset_manager.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_MANAGER_CPP_
@@ -49,10 +49,12 @@ std::shared_ptr<const asset> asset_manager::call_loaders_sync(const std::shared_
 				}
 			}
 		} catch(...) {
-			asset_to_load->raise_error_flag();
+			asset_to_load->raise_error_flag(std::current_exception());
 			throw;
 		}
-		asset_to_load->raise_error_flag();
+		asset_to_load->raise_error_flag(
+				std::make_exception_ptr(std::runtime_error("Couldn't find asset '" + asset_to_load->name() +
+														   "' through any of the registered loaders.")));
 		asset_to_load->check_error_flag();
 		return std::shared_ptr<const asset>();
 	} else {
