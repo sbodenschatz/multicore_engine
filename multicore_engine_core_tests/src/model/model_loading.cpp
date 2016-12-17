@@ -37,12 +37,15 @@ BOOST_AUTO_TEST_CASE(load_example_collision_model) {
 	if(load_unit_failed) return;
 	model_manager mm(am);
 	std::atomic<bool> model_loaded{false};
+	std::atomic<bool> model_failed{false};
 	mm.load_collision_model("models/cube",
-							[&model_loaded](const collision_model_ptr&) { model_loaded = true; });
-	while(!model_loaded) {
+							[&model_loaded](const collision_model_ptr&) { model_loaded = true; },
+							[&model_failed](std::exception_ptr) { model_failed = true; });
+	while(!model_loaded && !model_failed) {
 		std::this_thread::sleep_for(1ms);
 	}
 	BOOST_CHECK(model_loaded);
+	BOOST_CHECK(!model_failed);
 }
 
 BOOST_AUTO_TEST_CASE(load_example_polygon_model) {
@@ -62,11 +65,14 @@ BOOST_AUTO_TEST_CASE(load_example_polygon_model) {
 	BOOST_CHECK(!load_unit_failed);
 	model_manager mm(am);
 	std::atomic<bool> model_loaded{false};
-	mm.load_polygon_model("models/cube", [&model_loaded](const polygon_model_ptr&) { model_loaded = true; });
-	while(!model_loaded) {
+	std::atomic<bool> model_failed{false};
+	mm.load_polygon_model("models/cube", [&model_loaded](const polygon_model_ptr&) { model_loaded = true; },
+						  [&model_failed](std::exception_ptr) { model_failed = true; });
+	while(!model_loaded && !model_failed) {
 		std::this_thread::sleep_for(1ms);
 	}
 	BOOST_CHECK(model_loaded);
+	BOOST_CHECK(!model_failed);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

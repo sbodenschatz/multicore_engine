@@ -26,7 +26,9 @@ void collision_model::complete_loading(const asset::asset_ptr& collision_asset) 
 		handler(this_shared);
 	}
 	completion_handlers.clear();
+	error_handlers.clear();
 	completion_handlers.shrink_to_fit();
+	error_handlers.shrink_to_fit();
 }
 
 } // namespace model

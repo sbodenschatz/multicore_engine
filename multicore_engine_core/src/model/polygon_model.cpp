@@ -34,7 +34,9 @@ void polygon_model::complete_staging(model_manager&) {
 		handler(this_shared);
 	}
 	completion_handlers.clear();
+	error_handlers.clear();
 	completion_handlers.shrink_to_fit();
+	error_handlers.shrink_to_fit();
 }
 
 } // namespace model
