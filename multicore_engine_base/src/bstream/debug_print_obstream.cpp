@@ -84,8 +84,7 @@ static bool try_print_floating_point_impl(std::ostream& debug_stream, const char
 }
 
 void debug_print_obstream::print_integer_signed_impl(const char* buffer, size_t count) noexcept {
-	bool ok = false;
-	ok = try_print_integer_signed_impl<int64_t>(debug_stream, buffer, count, "_s64");
+	bool ok = try_print_integer_signed_impl<int64_t>(debug_stream, buffer, count, "_s64");
 	ok = try_print_integer_signed_impl<int32_t>(debug_stream, buffer, count, "_s32") || ok;
 	ok = try_print_integer_signed_impl<int16_t>(debug_stream, buffer, count, "_s16") || ok;
 	ok = try_print_integer_signed_impl<int8_t>(debug_stream, buffer, count, "_s8") || ok;
@@ -94,8 +93,7 @@ void debug_print_obstream::print_integer_signed_impl(const char* buffer, size_t 
 	}
 }
 void debug_print_obstream::print_integer_unsigned_impl(const char* buffer, size_t count) noexcept {
-	bool ok = false;
-	ok = try_print_integer_unsigned_impl<uint64_t>(debug_stream, buffer, count, "_u64");
+	bool ok = try_print_integer_unsigned_impl<uint64_t>(debug_stream, buffer, count, "_u64");
 	ok = try_print_integer_unsigned_impl<uint32_t>(debug_stream, buffer, count, "_u32") || ok;
 	ok = try_print_integer_unsigned_impl<uint16_t>(debug_stream, buffer, count, "_u16") || ok;
 	ok = try_print_integer_unsigned_impl<uint8_t>(debug_stream, buffer, count, "_u8") || ok;

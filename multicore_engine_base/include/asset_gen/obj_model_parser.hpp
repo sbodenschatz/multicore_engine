@@ -40,7 +40,7 @@ private:
 		model::static_model_mesh_collision_data collision_data;
 
 		mesh_data(const std::string& object_name, const std::string& group_name)
-				: object_name{object_name}, group_name{group_name} {}
+				: object_name{object_name}, group_name{group_name}, collision_data{} {}
 	};
 	boost::filesystem::path refs_dir;
 	std::vector<glm::vec3> positions;
@@ -75,7 +75,7 @@ private:
 	long long stoll(boost::string_view str, std::size_t* pos = nullptr);
 
 public:
-	obj_model_parser(boost::filesystem::path refs_dir) : refs_dir(refs_dir){};
+	explicit obj_model_parser(boost::filesystem::path refs_dir) : refs_dir(refs_dir){};
 	void parse_file(const std::string& filename);
 	void parse(std::istream& input);
 	std::tuple<static_model, model::static_model_collision_data> finalize_model();

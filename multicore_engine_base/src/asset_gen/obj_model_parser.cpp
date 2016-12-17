@@ -88,6 +88,7 @@ void obj_model_parser::parse_vertex_position(boost::string_view line) {
 	size_t i = 0;
 	glm::vec3 pos;
 	util::split_iterate(line, " ", [this, &pos, &i](boost::string_view e) {
+		// cppcheck-suppress knownConditionTrueFalse
 		if(i >= 3) throw std::runtime_error("Too many components.");
 		pos[i] = stof(e);
 		++i;
@@ -98,6 +99,7 @@ void obj_model_parser::parse_vertex_normal(boost::string_view line) {
 	size_t i = 0;
 	glm::vec3 normal;
 	util::split_iterate(line, " ", [this, &normal, &i](boost::string_view e) {
+		// cppcheck-suppress knownConditionTrueFalse
 		if(i >= 3) throw std::runtime_error("Too many components.");
 		normal[i] = stof(e);
 		++i;
@@ -108,6 +110,7 @@ void obj_model_parser::parse_vertex_texcoords(boost::string_view line) {
 	size_t i = 0;
 	glm::vec2 uv;
 	util::split_iterate(line, " ", [this, &uv, &i](boost::string_view e) {
+		// cppcheck-suppress knownConditionTrueFalse
 		if(i >= 2) throw std::runtime_error("Too many components.");
 		uv[i] = stof(e);
 		++i;
@@ -148,6 +151,7 @@ void obj_model_parser::parse_face(boost::string_view line) {
 		size_t elem_index = 0;
 		util::split_iterate(
 				vert_ref, "/", [this, &current_tripple, &elem_index](boost::string_view ref_elem) {
+					// cppcheck-suppress knownConditionTrueFalse
 					if(elem_index > 2) {
 						throw std::runtime_error("Too many elements in vertex reference.");
 					}

@@ -113,7 +113,6 @@ int main(int argc, char* argv[]) {
 		collision_output_file = fs::path(input_file).replace_extension("col").string();
 	}
 	fs::path input_file_dir = fs::path(input_file).parent_path();
-	bool static_format = true;
 	mce::asset_gen::static_model model_data;
 	mce::model::static_model_collision_data collision_data;
 	std::vector<fs::path> refs_list;
@@ -127,6 +126,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	if(!refs) {
+		bool static_format = true;
 		if(static_format) {
 			mce::asset_gen::static_model_exporter exporter;
 			exporter.export_model(model_data, model_output_file);

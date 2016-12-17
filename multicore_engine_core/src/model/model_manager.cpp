@@ -73,7 +73,7 @@ std::shared_ptr<collision_model> model_manager::internal_load_collision_model(co
 		}
 	}
 }
-void model_manager::start_stage_polygon_model(std::shared_ptr<polygon_model> model) {
+void model_manager::start_stage_polygon_model(const std::shared_ptr<polygon_model>& model) {
 	// TODO: Initiate upload to GPU memory through renderer and do the call below when upload is finished.
 	model->complete_staging(*this);
 }
