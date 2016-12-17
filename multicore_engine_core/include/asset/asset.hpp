@@ -40,19 +40,26 @@ public:
 	asset(const asset&) = delete;
 	asset& operator=(const asset&) = delete;
 
-	template <typename F>
-	void run_when_loaded(F handler) {
+	template <typename F, typename E>
+	void run_when_loaded(F handler, E error_handler) {
 		if(current_state_ == state::ready) {
 			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
 			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
 			return;
+		} else if(current_state_ == state::error) {
+			error_handler(std::make_exception_ptr(
+					std::runtime_error("Requested asset '" + name_ + "' is cached as failed.")));
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		if(current_state_ == state::ready) {
 			lock.unlock();
 			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
+		} else if(current_state_ == state::error) {
+			error_handler(std::make_exception_ptr(
+					std::runtime_error("Requested asset '" + name_ + "' is cached as failed.")));
 		} else {
 			completion_handlers.emplace_back(std::move(handler));
+			error_handlers.emplace_back(std::move(error_handler));
 		}
 	}
 

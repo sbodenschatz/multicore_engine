@@ -91,7 +91,6 @@ namespace asset {
 template <typename F, typename E>
 std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& name, F completion_handler,
 															 E error_handler) {
-	UNUSED(error_handler); // TODO Implement error handling.
 	std::shared_ptr<asset> result;
 	{
 		// Acquire read lock
@@ -111,7 +110,7 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		} else {
 			auto tmp = std::make_shared<asset>(name);
 			loaded_assets[name] = tmp;
-			tmp->run_when_loaded(std::move(completion_handler));
+			tmp->run_when_loaded(std::move(completion_handler), std::move(error_handler));
 			task_pool.post([tmp, this]() {
 				if(tmp->try_obtain_load_ownership()) {
 					try {
@@ -132,7 +131,7 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		}
 	}
 
-	if(result) result->run_when_loaded(std::move(completion_handler));
+	if(result) result->run_when_loaded(std::move(completion_handler), std::move(error_handler));
 	return result;
 }
 
