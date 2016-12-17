@@ -18,6 +18,11 @@ void collision_model::complete_loading(const asset::asset_ptr& collision_asset) 
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	bstream::asset_ibstream stream{collision_asset};
 	stream >> data_;
+	if(!stream) {
+		raise_error_flag(std::make_exception_ptr(
+				std::runtime_error("Error on loading collision data for collision model '" + name_ + "'.")));
+		return;
+	}
 	current_state_ = state::ready;
 	auto this_shared = std::static_pointer_cast<const collision_model>(this->shared_from_this());
 	lock.unlock();
