@@ -19,6 +19,11 @@ void polygon_model::complete_loading(const asset::asset_ptr& polygon_asset, mode
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	bstream::asset_ibstream stream{polygon_asset};
 	stream >> meta_data_;
+	if(!stream) {
+		raise_error_flag(std::make_exception_ptr(
+				std::runtime_error("Error on loading meta data for polygon model '" + name_ + "'.")));
+		return;
+	}
 	current_state_ = state::staging;
 	lock.unlock();
 	mm.start_stage_polygon_model(this->shared_from_this());
@@ -34,7 +39,9 @@ void polygon_model::complete_staging(model_manager&) {
 		handler(this_shared);
 	}
 	completion_handlers.clear();
+	error_handlers.clear();
 	completion_handlers.shrink_to_fit();
+	error_handlers.shrink_to_fit();
 }
 
 } // namespace model

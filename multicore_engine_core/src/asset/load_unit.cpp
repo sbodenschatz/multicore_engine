@@ -20,7 +20,8 @@ void load_unit::load_meta_data(const std::shared_ptr<const char>& data, size_t s
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	stream >> meta_data_;
 	if(!stream) {
-		raise_error_flag();
+		raise_error_flag(std::make_exception_ptr(
+				std::runtime_error("Couldn't read meta data for load unit '" + name_ + "'.")));
 		check_error_flag();
 	} else {
 		current_state_ = state::meta_ready;
@@ -45,8 +46,10 @@ void load_unit::complete_loading(const std::shared_ptr<const char>& data, size_t
 	}
 	completion_handlers.clear();
 	simple_completion_handlers.clear();
+	error_handlers.clear();
 	completion_handlers.shrink_to_fit();
 	simple_completion_handlers.shrink_to_fit();
+	error_handlers.shrink_to_fit();
 }
 
 load_unit::asset_resolution_cookie load_unit::resolve_asset(const std::string& name) const {

@@ -40,7 +40,8 @@ public:
 								  bool sync_hint) override;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager) override;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager,
-									 const simple_completion_handler& completion_handler) override;
+									 const simple_completion_handler& completion_handler,
+									 const error_handler& error_handler) override;
 	virtual void start_unpin_load_unit(const std::string& name, asset_manager& asset_manager) override;
 };
 

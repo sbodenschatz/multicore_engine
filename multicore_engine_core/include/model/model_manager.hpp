@@ -24,12 +24,12 @@ class model_manager {
 public:
 	explicit model_manager(asset::asset_manager& asset_manager) noexcept : asset_manager(asset_manager) {}
 
-	template <typename F>
-	polygon_model_ptr load_polygon_model(const std::string& name, F completion_handler);
+	template <typename F, typename E>
+	polygon_model_ptr load_polygon_model(const std::string& name, F completion_handler, E error_handler);
 	polygon_model_ptr load_polygon_model(const std::string& name);
 
-	template <typename F>
-	collision_model_ptr load_collision_model(const std::string& name, F completion_handler);
+	template <typename F, typename E>
+	collision_model_ptr load_collision_model(const std::string& name, F completion_handler, E error_handler);
 	collision_model_ptr load_collision_model(const std::string& name);
 
 private:
@@ -47,16 +47,18 @@ private:
 	friend class polygon_model;
 };
 
-template <typename F>
-polygon_model_ptr model_manager::load_polygon_model(const std::string& name, F completion_handler) {
+template <typename F, typename E>
+polygon_model_ptr model_manager::load_polygon_model(const std::string& name, F completion_handler,
+													E error_handler) {
 	auto model = internal_load_polygon_model(name);
-	model->run_when_ready(std::move(completion_handler));
+	model->run_when_ready(std::move(completion_handler), std::move(error_handler));
 	return model;
 }
-template <typename F>
-collision_model_ptr model_manager::load_collision_model(const std::string& name, F completion_handler) {
+template <typename F, typename E>
+collision_model_ptr model_manager::load_collision_model(const std::string& name, F completion_handler,
+														E error_handler) {
 	auto model = internal_load_collision_model(name);
-	model->run_when_loaded(std::move(completion_handler));
+	model->run_when_loaded(std::move(completion_handler), std::move(error_handler));
 	return model;
 }
 
