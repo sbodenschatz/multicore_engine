@@ -37,7 +37,8 @@ public:
 								  bool sync_hint) = 0;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 	virtual void start_pin_load_unit(const std::string& name, asset_manager& asset_manager,
-									 const simple_completion_handler& completion_handler) = 0;
+									 const simple_completion_handler& completion_handler,
+									 const error_handler& error_handler) = 0;
 	virtual void start_unpin_load_unit(const std::string& name, asset_manager& asset_manager) = 0;
 };
 

@@ -124,10 +124,11 @@ void asset_manager::start_pin_load_unit(const std::string& name) {
 	}
 }
 void asset_manager::start_pin_load_unit(const std::string& name,
-										const simple_completion_handler& completion_handler) {
+										const simple_completion_handler& completion_handler,
+										const error_handler& error_handler) {
 	auto local_asset_loaders = asset_loaders.get();
 	for(auto& loader : *local_asset_loaders) {
-		loader->start_pin_load_unit(name, *this, completion_handler);
+		loader->start_pin_load_unit(name, *this, completion_handler, error_handler);
 	}
 }
 void asset_manager::start_unpin_load_unit(const std::string& name) {

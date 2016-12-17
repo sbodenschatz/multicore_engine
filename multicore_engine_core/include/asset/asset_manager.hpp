@@ -72,7 +72,8 @@ public:
 	boost::unique_future<std::shared_ptr<const asset>> load_asset_future(const std::string& name);
 	void start_clean();
 	void start_pin_load_unit(const std::string& name);
-	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler);
+	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler,
+							 const error_handler& error_handler);
 	void start_unpin_load_unit(const std::string& name);
 
 	void add_asset_loader(std::shared_ptr<asset_loader>&& loader);

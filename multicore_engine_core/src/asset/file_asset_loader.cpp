@@ -48,7 +48,8 @@ void file_asset_loader::start_pin_load_unit(const std::string& name, asset_manag
 	load_units.push_back(name);
 }
 void file_asset_loader::start_pin_load_unit(const std::string& name, asset_manager& manager,
-											const simple_completion_handler& completion_handler) {
+											const simple_completion_handler& completion_handler,
+											const error_handler&) {
 	// In this class the start_pin_load_unit method is blocking (only adds an entry to load_units list),
 	// therefore delegate to non-completion-handler implementation and run completion handler after this.
 	start_pin_load_unit(name, manager);
