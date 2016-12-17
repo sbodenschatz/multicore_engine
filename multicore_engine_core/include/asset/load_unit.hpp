@@ -79,6 +79,7 @@ public:
 		} else if(current_state_ == state::error) {
 			error_handler(std::make_exception_ptr(
 					std::runtime_error("Requested load unit '" + name_ + "' is cached as failed.")));
+			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		if(current_state_ == state::data_ready) {
@@ -102,6 +103,7 @@ public:
 		} else if(current_state_ == state::error) {
 			error_handler(std::make_exception_ptr(
 					std::runtime_error("Requested load unit '" + name_ + "' is cached as failed.")));
+			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		if(current_state_ == state::data_ready) {
