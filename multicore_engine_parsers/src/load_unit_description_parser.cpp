@@ -122,7 +122,7 @@ ast::load_unit_ast_root load_unit_description_parser::load_file(const std::strin
 	const char* end = buffer.data() + size;
 	bool r = parse(start, end, ast_root);
 	if(!r || start != end) {
-		std::runtime_error("Parse error in file '" + filename + "'.");
+		throw std::runtime_error("Parse error in file '" + filename + "'.");
 	}
 	return ast_root;
 }
