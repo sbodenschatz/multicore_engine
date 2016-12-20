@@ -149,8 +149,9 @@ entity_text_file_parser_frontend::entity_text_file_parser_frontend()
 		  skipper(std::make_unique<entity_text_file_skipper>()) {}
 entity_text_file_parser_frontend::~entity_text_file_parser_frontend() {}
 
-bool entity_text_file_parser_frontend::parse(const std::string& filename, const char*& first,
-											 const char* last, ast::ast_root& ast_root) {
+ast::ast_root entity_text_file_parser_frontend::parse(const std::string& filename, const char*& first,
+													  const char* last) {
+	ast::ast_root ast_root;
 	const char* buffer_start = first;
 	try {
 		bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
@@ -159,11 +160,10 @@ bool entity_text_file_parser_frontend::parse(const std::string& filename, const 
 		   })) {
 			util::throw_syntax_error(filename, buffer_start, first, "General syntax error");
 		}
-		return result;
 	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
 		util::throw_syntax_error(filename, buffer_start, ef.first, "Syntax error", ef.what_);
 	}
-	return false;
+	return ast_root;
 }
 
 } // namespace parser
