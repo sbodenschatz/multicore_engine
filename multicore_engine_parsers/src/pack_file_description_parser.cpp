@@ -10,6 +10,7 @@
 #include <istream>
 #include <string>
 #include <vector>
+#include <iterator>
 #ifdef _MSC_VER
 #pragma warning(disable : 4459)
 #pragma warning(disable : 4503)
@@ -122,18 +123,11 @@ ast::pack_file_ast_root pack_file_description_parser::load_file(const std::strin
 		throw std::runtime_error("Couldn't open file '" + filename + "'.");
 	}
 
-	stream.seekg(0, std::ios::end);
-	auto size_tmp = stream.tellg();
-	size_t size = size_tmp;
-	decltype(size_tmp) size_check = size;
-	if(size_check != size_tmp) throw std::runtime_error("File too big to fit in address space.");
-	stream.seekg(0, std::ios::beg);
-
-	buffer.resize(size);
-	stream.read(buffer.data(), size);
+	std::copy(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>(),
+			  std::back_inserter(buffer));
 
 	const char* start = buffer.data();
-	const char* end = buffer.data() + size;
+	const char* end = buffer.data() + buffer.size();
 	try {
 		bool r = parse(start, end, ast_root);
 		if(!r ||
