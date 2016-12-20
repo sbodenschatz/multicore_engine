@@ -28,6 +28,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <util/error_helper.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;
@@ -75,10 +76,10 @@ struct load_unit_description_grammar
 		using spirit::float_;
 
 		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
-		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
+		string_literal %= lexeme[lit('\"') > *((char_ - '\"')) > lit('\"')];
 		lookup_spec = no_case[lit("w")[_val = ast::lookup_type::w] | lit("d")[_val = ast::lookup_type::d]];
-		entry %= string_literal >> -(lookup_spec) >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
-		section %= identifier >> lit('{') >> *(entry) >> lit('}');
+		entry %= string_literal > -(lookup_spec) > -(lit('-') > lit('>') > string_literal) > lit(';');
+		section %= identifier > lit('{') > *(entry) > lit('}');
 		start %= *(section);
 
 		BOOST_SPIRIT_DEBUG_NODE(start);
@@ -86,6 +87,9 @@ struct load_unit_description_grammar
 		BOOST_SPIRIT_DEBUG_NODE(entry);
 		BOOST_SPIRIT_DEBUG_NODE(identifier);
 		BOOST_SPIRIT_DEBUG_NODE(string_literal);
+
+		on_error<qi::rethrow>(entry, [](auto...) {});
+		on_error<qi::rethrow>(section, [](auto...) {});
 	}
 };
 
@@ -120,10 +124,16 @@ ast::load_unit_ast_root load_unit_description_parser::load_file(const std::strin
 
 	const char* start = buffer.data();
 	const char* end = buffer.data() + size;
-	bool r = parse(start, end, ast_root);
-	if(!r ||
-	   !std::all_of(start, end, [](char c) { return c == ' ' || c == '\t' || c == '\0' || c == '\n'; })) {
-		throw std::runtime_error("Parse error in file '" + filename + "'.");
+	try {
+		bool r = parse(start, end, ast_root);
+		if(!r ||
+		   !std::all_of(start, end, [](char c) { return c == ' ' || c == '\t' || c == '\0' || c == '\n'; })) {
+			const char* buffer_start = buffer.data();
+			util::throw_syntax_error(filename, buffer_start, start, "General syntax error");
+		}
+	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
+		const char* buffer_start = buffer.data();
+		util::throw_syntax_error(filename, buffer_start, ef.first, "Syntax error", ef.what_);
 	}
 	return ast_root;
 }
