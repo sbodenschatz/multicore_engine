@@ -160,7 +160,7 @@ ast::ast_root entity_text_file_parser_backend::load_file(const asset::asset_ptr&
 	const char* start = text_file_asset->data();
 	const char* end = text_file_asset->data() + text_file_asset->size();
 	parser::entity_text_file_parser_frontend fe;
-	bool r = fe.parse(start, end, root);
+	bool r = fe.parse(text_file_asset->name(), start, end, root);
 	if(!r) throw std::runtime_error("Syntax error in '" + text_file_asset->name() + "'.");
 	if(start != end) throw std::runtime_error("Partial parse of '" + text_file_asset->name() + "'.");
 	return root;

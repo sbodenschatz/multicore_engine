@@ -27,6 +27,7 @@
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_fusion.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
+#include <util/error_helper.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;
@@ -148,9 +149,21 @@ entity_text_file_parser_frontend::entity_text_file_parser_frontend()
 		  skipper(std::make_unique<entity_text_file_skipper>()) {}
 entity_text_file_parser_frontend::~entity_text_file_parser_frontend() {}
 
-bool entity_text_file_parser_frontend::parse(const char*& first, const char* last, ast::ast_root& ast_root) {
-	bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
-	return result;
+bool entity_text_file_parser_frontend::parse(const std::string& filename, const char*& first,
+											 const char* last, ast::ast_root& ast_root) {
+	const char* buffer_start = first;
+	try {
+		bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
+		if(!result || !std::all_of(first, last, [](char c) {
+			   return c == ' ' || c == '\t' || c == '\0' || c == '\n';
+		   })) {
+			util::throw_syntax_error(filename, buffer_start, first, "General syntax error");
+		}
+		return result;
+	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
+		util::throw_syntax_error(filename, buffer_start, ef.first, "Syntax error", ef.what_);
+	}
+	return false;
 }
 
 } // namespace parser

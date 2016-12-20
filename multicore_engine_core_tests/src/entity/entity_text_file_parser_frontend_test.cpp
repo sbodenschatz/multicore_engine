@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(empty_file_valid) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	BOOST_CHECK(root.size() == 0);
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(only_comment_valid) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	BOOST_CHECK(root.size() == 0);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(single_instance_unnamed_intlist_rotlist) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(single_instance_named_floatlist_floatlist) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(single_include) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_empty) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_empty) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_intvar) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_floatvar) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_stringvar) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_intlist) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_floatlist) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_stringlist) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_entityref) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_marker) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(single_definition_super_compreplace_comp) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(combined) {
 	ast::ast_root root;
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
-	bool result = parser.parse(first, last, root);
+	bool result = parser.parse("[unittest]", first, last, root);
 	BOOST_CHECK(result);
 	BOOST_CHECK(first == last);
 	ast::ast_root root_expected;
