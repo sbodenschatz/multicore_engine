@@ -232,6 +232,9 @@ api-doc:
     tags:
     - latex
     - doxygen
+    cache:
+        paths:
+        - doc
     artifacts:
         name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
         expire_in: 1 week
