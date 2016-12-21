@@ -1,13 +1,14 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/util/compression.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef UTIL_COMPRESSION_HPP_
 #define UTIL_COMPRESSION_HPP_
 
 #include <cerrno>
+#include <exceptions.hpp>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -48,11 +49,11 @@ enum class return_code {
 
 inline void zlib_check_error(return_code rc) {
 	if(rc == return_code::error_no)
-		throw std::runtime_error("ZLIB error number " + std::to_string(errno) + ".");
-	if(rc == return_code::error_data) throw std::runtime_error("ZLIB data error.");
-	if(rc == return_code::error_mem) throw std::runtime_error("ZLIB memory error.");
-	if(rc == return_code::error_stream) throw std::runtime_error("ZLIB stream error.");
-	if(rc == return_code::error_version) throw std::runtime_error("ZLIB version error.");
+		throw compression_exception("ZLIB error number " + std::to_string(errno) + ".");
+	if(rc == return_code::error_data) throw compression_exception("ZLIB data error.");
+	if(rc == return_code::error_mem) throw compression_exception("ZLIB memory error.");
+	if(rc == return_code::error_stream) throw compression_exception("ZLIB stream error.");
+	if(rc == return_code::error_version) throw compression_exception("ZLIB version error.");
 }
 
 class zlib_deflate_stream {
@@ -76,14 +77,14 @@ public:
 	}
 	void provide_input(const unsigned char* buffer, size_t size) {
 		if(size > std::numeric_limits<unsigned int>::max()) {
-			throw std::runtime_error("Buffer too big for ZLIB.");
+			throw buffer_size_exception("Buffer too big for ZLIB.");
 		}
 		stream.next_in = buffer;
 		stream.avail_in = uInt(size);
 	}
 	void provide_output(unsigned char* buffer, size_t size) {
 		if(size > std::numeric_limits<unsigned int>::max()) {
-			throw std::runtime_error("Buffer too big for ZLIB.");
+			throw buffer_size_exception("Buffer too big for ZLIB.");
 		}
 		stream.next_out = buffer;
 		stream.avail_out = uInt(size);
@@ -119,14 +120,14 @@ public:
 	}
 	void provide_input(const unsigned char* buffer, size_t size) {
 		if(size > std::numeric_limits<unsigned int>::max()) {
-			throw std::runtime_error("Buffer too big for ZLIB.");
+			throw buffer_size_exception("Buffer too big for ZLIB.");
 		}
 		stream.next_in = buffer;
 		stream.avail_in = uInt(size);
 	}
 	void provide_output(unsigned char* buffer, size_t size) {
 		if(size > std::numeric_limits<unsigned int>::max()) {
-			throw std::runtime_error("Buffer too big for ZLIB.");
+			throw buffer_size_exception("Buffer too big for ZLIB.");
 		}
 		stream.next_out = buffer;
 		stream.avail_out = uInt(size);
