@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/entity/component_property_assignment.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ENTITY_COMPONENT_PROPERTY_ASSIGNMENT_HPP_
@@ -72,8 +72,8 @@ class component_property_assignment : public abstract_component_property_assignm
 				: entity_context(entity_context), component_context(component_context), pa(pa) {}
 		template <typename U, typename V = T, typename W = typename ast::ast_value_mapper<U, V>::error>
 		void operator()(const U&, W* = nullptr) {
-			throw std::runtime_error("Invalid value for " + pa.property_.name() + " of " + component_context +
-									 " in " + entity_context + ".");
+			throw value_type_exception("Invalid value for " + pa.property_.name() + " of " +
+									   component_context + " in " + entity_context + ".");
 		}
 		template <typename U, typename V = T,
 				  void (*convert)(const U&, V&) = ast::ast_value_mapper<U, V>::convert>

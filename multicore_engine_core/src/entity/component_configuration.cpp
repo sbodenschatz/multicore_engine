@@ -1,13 +1,14 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/entity/component_configuration.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <algorithm>
 #include <entity/component_configuration.hpp>
 #include <entity/component_property_assignment.hpp>
 #include <entity/component_type.hpp>
+#include <exceptions.hpp>
 #include <iterator>
 
 namespace mce {
@@ -42,8 +43,8 @@ void component_configuration::make_assignment(const std::string& property_name,
 		auto it2 = std::find_if(type_.properties().begin(), type_.properties().end(),
 								[&](const auto& elem) { return elem->name() == property_name; });
 		if(it2 == type_.properties().end())
-			throw std::runtime_error("Unknown property '" + property_name + "' of component type '" +
-									 type_.name() + "'.");
+			throw invalid_property_exception("Unknown property '" + property_name + "' of component type '" +
+											 type_.name() + "'.");
 		it = assignments.emplace(assignments.end(), it2->get()->make_assignment(engine));
 	}
 	it->get()->parse(ast_value, entity_context, type_.name());
