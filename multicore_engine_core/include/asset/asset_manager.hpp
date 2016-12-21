@@ -9,6 +9,7 @@
 
 #include "asset_defs.hpp"
 #include <exception>
+#include <exceptions.hpp>
 #include <memory>
 #include <shared_mutex>
 #include <string>
@@ -124,8 +125,8 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 						throw;
 					}
 					tmp->raise_error_flag(std::make_exception_ptr(
-							std::runtime_error("Couldn't find asset '" + tmp->name() +
-											   "' through any of the registered loaders.")));
+							path_not_found_exception("Couldn't find asset '" + tmp->name() +
+													 "' through any of the registered loaders.")));
 				}
 			});
 			return tmp;
