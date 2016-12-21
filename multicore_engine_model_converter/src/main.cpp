@@ -16,13 +16,13 @@
 #include <boost/program_options.hpp>
 #include <cctype>
 #include <core/version.hpp>
+#include <exceptions.hpp>
 #include <fstream>
 #include <iostream>
 #include <model/model_format.hpp>
 #include <string>
 #include <util/program_name.hpp>
 #include <util/string_tools.hpp>
-#include <exceptions.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

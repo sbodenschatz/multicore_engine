@@ -7,10 +7,10 @@
 #include <algorithm>
 #include <asset/pack_file_reader.hpp>
 #include <cassert>
+#include <exceptions.hpp>
 #include <fstream>
 #include <util/compression.hpp>
 #include <util/unused.hpp>
-#include <exceptions.hpp>
 
 namespace mce {
 namespace asset {

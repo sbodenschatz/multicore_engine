@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <asset/load_unit.hpp>
 #include <bstream/buffer_ibstream.hpp>
-#include <stdexcept>
 #include <exceptions.hpp>
+#include <stdexcept>
 
 namespace mce {
 namespace asset {

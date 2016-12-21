@@ -20,7 +20,7 @@ bool starts_with_ignore_case(boost::string_view str, boost::string_view prefix);
 template <typename F>
 void split_iterate(boost::string_view str, boost::string_view delim, F f) {
 	boost::string_view::size_type pos = 0;
-	for(boost::string_view::size_type next = str.find(delim, pos); next != str.npos; ) {
+	for(boost::string_view::size_type next = str.find(delim, pos); next != str.npos;) {
 		f(str.substr(pos, next - pos));
 		pos = next + 1;
 		next = str.find(delim, pos);

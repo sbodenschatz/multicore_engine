@@ -15,11 +15,11 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <core/version.hpp>
+#include <exceptions.hpp>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <util/program_name.hpp>
-#include <exceptions.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

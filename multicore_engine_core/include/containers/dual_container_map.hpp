@@ -111,8 +111,8 @@ public:
 		typedef typename iterator_::value_type reference;
 		iterator_() = delete;
 		iterator_(const iterator_<std::remove_const_t<It_Map>, It_Key, std::remove_const_t<It_Value>>&
-						  it) noexcept : index(it.index),
-										 map(it.map) {}
+						  it) noexcept
+				: index(it.index), map(it.map) {}
 		iterator_& operator=(const iterator_<std::remove_const_t<It_Map>, It_Key,
 											 std::remove_const_t<It_Value>>& it) noexcept {
 			index = it.index;

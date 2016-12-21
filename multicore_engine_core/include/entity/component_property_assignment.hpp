@@ -9,10 +9,10 @@
 
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_value_mapper.hpp>
+#include <exceptions.hpp>
 #include <memory>
 #include <reflection/property.hpp>
 #include <string>
-#include <exceptions.hpp>
 
 namespace mce {
 namespace core {
@@ -36,8 +36,8 @@ protected:
 	bool valid_;
 
 public:
-	explicit abstract_component_property_assignment(core::engine& engine) noexcept : engine_(engine),
-																					 valid_(false) {}
+	explicit abstract_component_property_assignment(core::engine& engine) noexcept
+			: engine_(engine), valid_(false) {}
 	abstract_component_property_assignment(const abstract_component_property_assignment&) = default;
 	abstract_component_property_assignment(abstract_component_property_assignment&&) = default;
 	abstract_component_property_assignment&

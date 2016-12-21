@@ -6,9 +6,9 @@
 
 #include <asset/asset_manager.hpp>
 #include <bstream/asset_ibstream.hpp>
+#include <exceptions.hpp>
 #include <model/model_manager.hpp>
 #include <model/polygon_model.hpp>
-#include <exceptions.hpp>
 
 namespace mce {
 namespace model {

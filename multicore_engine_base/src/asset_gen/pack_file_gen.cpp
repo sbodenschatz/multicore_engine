@@ -9,11 +9,11 @@
 #include <asset_gen/pack_file_gen.hpp>
 #include <bstream/iostream_bstream.hpp>
 #include <bstream/vector_iobstream.hpp>
+#include <exceptions.hpp>
 #include <fstream>
 #include <iterator>
 #include <util/compression.hpp>
 #include <util/path_util.hpp>
-#include <exceptions.hpp>
 
 namespace mce {
 namespace asset_gen {

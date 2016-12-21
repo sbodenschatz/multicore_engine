@@ -10,12 +10,12 @@
 #include <asset/asset_defs.hpp>
 #include <atomic>
 #include <exception>
+#include <exceptions.hpp>
 #include <memory>
 #include <model/model_defs.hpp>
 #include <model/model_format.hpp>
 #include <mutex>
 #include <vector>
-#include <exceptions.hpp>
 
 namespace mce {
 namespace model {

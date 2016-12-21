@@ -9,11 +9,11 @@
 #include <bstream/iostream_bstream.hpp>
 #include <bstream/vector_iobstream.hpp>
 #include <cassert>
+#include <exceptions.hpp>
 #include <fstream>
 #include <iterator>
 #include <model/model_format.hpp>
 #include <util/unused.hpp>
-#include <exceptions.hpp>
 
 namespace mce {
 namespace asset_gen {

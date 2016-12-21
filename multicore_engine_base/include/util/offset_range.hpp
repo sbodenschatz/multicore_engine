@@ -9,9 +9,9 @@
 
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
+#include <exceptions.hpp>
 #include <limits>
 #include <stdexcept>
-#include <exceptions.hpp>
 
 namespace mce {
 namespace util {
