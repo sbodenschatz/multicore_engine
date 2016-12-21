@@ -289,8 +289,8 @@ public:
 		}
 		(void)free_entries;
 	}
-	unordered_object_pool(unordered_object_pool&& other) noexcept : first_free_entry{nullptr, nullptr},
-																	active_objects{0} {
+	unordered_object_pool(unordered_object_pool&& other) noexcept
+			: first_free_entry{nullptr, nullptr}, active_objects{0} {
 		lock_guard_delayed ul0(management_data_lock);
 		lock_guard_delayed ul1(other.management_data_lock);
 		if(Lock_Policy::safe) std::lock(ul0, ul1);

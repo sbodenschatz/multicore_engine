@@ -1,13 +1,14 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/entity/entity_manager.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <entity/component_type.hpp>
 #include <entity/entity_configuration.hpp>
 #include <entity/entity_manager.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace entity {
@@ -50,7 +51,7 @@ void entity_manager::destroy_entity(entity_id_t id) {
 		std::lock_guard<std::mutex> lock(id_map_mutex);
 		auto it = entity_id_map.find(id);
 		if(it == entity_id_map.end())
-			throw std::runtime_error("non-existent entity requested for destruction.");
+			throw missing_entity_exception("non-existent entity requested for destruction.");
 		ent_it = it->second;
 		entity_id_map.erase(it);
 	}
@@ -61,7 +62,7 @@ void entity_manager::destroy_entity(entity* entity) {
 	{
 		std::lock_guard<std::mutex> lock(id_map_mutex);
 		auto count = entity_id_map.erase(entity->id());
-		if(count == 0) throw std::runtime_error("non-existent entity requested for destruction.");
+		if(count == 0) throw missing_entity_exception("non-existent entity requested for destruction.");
 	}
 	entities.find_and_erase(*entity);
 }

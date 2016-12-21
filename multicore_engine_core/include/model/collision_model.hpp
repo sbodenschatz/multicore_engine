@@ -10,6 +10,7 @@
 #include <asset/asset_defs.hpp>
 #include <atomic>
 #include <exception>
+#include <exceptions.hpp>
 #include <memory>
 #include <model/model_defs.hpp>
 #include <model/model_format.hpp>
@@ -60,7 +61,7 @@ public:
 			return;
 		} else if(current_state_ == state::error) {
 			error_handler(std::make_exception_ptr(
-					std::runtime_error("Collision model '" + name() + "' was cached as failed.")));
+					path_not_found_exception("Collision model '" + name() + "' was cached as failed.")));
 			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
@@ -69,7 +70,7 @@ public:
 			handler(this->shared_from_this());
 		} else if(current_state_ == state::error) {
 			error_handler(std::make_exception_ptr(
-					std::runtime_error("Collision model '" + name() + "' was cached as failed.")));
+					path_not_found_exception("Collision model '" + name() + "' was cached as failed.")));
 		} else {
 			completion_handlers.emplace_back(std::move(handler));
 			error_handlers.emplace_back(std::move(error_handler));
@@ -85,7 +86,8 @@ public:
 	}
 
 	void check_error_flag() const {
-		if(current_state_ == state::error) throw std::runtime_error("Error loading model '" + name_ + "'.");
+		if(current_state_ == state::error)
+			throw path_not_found_exception("Error loading model '" + name_ + "'.");
 	}
 
 	state current_state() const {

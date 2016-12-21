@@ -1,16 +1,16 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_parsers/src/load_unit_description_parser.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 //#define BOOST_SPIRIT_DEBUG
 
 #include <fstream>
 #include <istream>
+#include <iterator>
 #include <string>
 #include <vector>
-#include <iterator>
 #ifdef _MSC_VER
 #pragma warning(disable : 4459)
 #pragma warning(disable : 4503)
@@ -29,6 +29,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <exceptions.hpp>
 #include <util/error_helper.hpp>
 
 namespace spirit = boost::spirit;
@@ -110,7 +111,7 @@ ast::load_unit_ast_root load_unit_description_parser::load_file(const std::strin
 	std::ifstream stream(filename);
 	std::vector<char> buffer;
 	if(!stream.is_open()) {
-		throw std::runtime_error("Couldn't open file '" + filename + "'.");
+		throw path_not_found_exception("Couldn't open file '" + filename + "'.");
 	}
 
 	std::copy(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>(),

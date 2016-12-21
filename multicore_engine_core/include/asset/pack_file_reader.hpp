@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/pack_file_reader.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_PACK_FILE_READER_HPP_
@@ -12,6 +12,7 @@
 #include <atomic>
 #include <boost/container/flat_map.hpp>
 #include <bstream/istream_bstream.hpp>
+#include <exceptions.hpp>
 #include <fstream>
 #include <memory>
 #include <shared_mutex>
@@ -31,11 +32,10 @@ class pack_file_reader : public file_reader {
 		std::vector<char> decompressed_buffer;
 		explicit pack_file_source(const std::string& pack_file_name)
 				: stream{pack_file_name, std::ios::binary} {
-			if(!stream) throw std::runtime_error("Unable to open file '" + pack_file_name + "'.");
+			if(!stream) throw path_not_found_exception("Unable to open file '" + pack_file_name + "'.");
 			bstream::istream_bstream bstr(stream);
 			bstr >> metadata;
-			if(!bstr)
-				throw std::runtime_error("Unable to read meta data from file '" + pack_file_name + "'.");
+			if(!bstr) throw io_exception("Unable to read meta data from file '" + pack_file_name + "'.");
 		}
 		bool try_lock() {
 			return !lock_flag.test_and_set();

@@ -52,33 +52,26 @@ class smart_pool_ptr {
 	friend class smart_pool_ptr;
 
 	smart_pool_ptr(T* object, detail::smart_object_pool_block_interface* block) noexcept
-			: object{object},
-			  managed_object{object},
-			  block{block} {}
+			: object{object}, managed_object{object}, block{block} {}
 	smart_pool_ptr(T* object, void* managed_object, detail::smart_object_pool_block_interface* block) noexcept
-			: object{object},
-			  managed_object{managed_object},
-			  block{block} {}
+			: object{object}, managed_object{managed_object}, block{block} {}
 
 public:
 	typedef detail::smart_object_pool_block_interface::ref_count_t ref_count_t;
 	smart_pool_ptr() noexcept : object{nullptr}, managed_object{nullptr}, block{nullptr} {}
-	smart_pool_ptr(const smart_pool_ptr& other) noexcept : object{other.object},
-														   managed_object{other.managed_object},
-														   block{other.block} {
+	smart_pool_ptr(const smart_pool_ptr& other) noexcept
+			: object{other.object}, managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_strong_ref(managed_object);
 	}
-	smart_pool_ptr(smart_pool_ptr&& other) noexcept : object{other.object},
-													  managed_object{other.managed_object},
-													  block{other.block} {
+	smart_pool_ptr(smart_pool_ptr&& other) noexcept
+			: object{other.object}, managed_object{other.managed_object}, block{other.block} {
 		other.object = nullptr;
 		other.managed_object = nullptr;
 		other.block = nullptr;
 	}
 	template <typename U>
-	smart_pool_ptr(const smart_pool_ptr<U>& other, T* ptr) noexcept : object{ptr},
-																	  managed_object{other.managed_object},
-																	  block{other.block} {
+	smart_pool_ptr(const smart_pool_ptr<U>& other, T* ptr) noexcept
+			: object{ptr}, managed_object{other.managed_object}, block{other.block} {
 		if(!block || !object || !managed_object) {
 			block = nullptr;
 			object = nullptr;
@@ -87,15 +80,13 @@ public:
 		if(block) block->increment_strong_ref(managed_object);
 	}
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-	smart_pool_ptr(const smart_pool_ptr<U>& other) noexcept : object(other.object),
-															  managed_object{other.managed_object},
-															  block{other.block} {
+	smart_pool_ptr(const smart_pool_ptr<U>& other) noexcept
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_strong_ref(managed_object);
 	}
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-	smart_pool_ptr(smart_pool_ptr<U>&& other) noexcept : object(other.object),
-														 managed_object{other.managed_object},
-														 block{other.block} {
+	smart_pool_ptr(smart_pool_ptr<U>&& other) noexcept
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		other.object = nullptr;
 		other.managed_object = nullptr;
 		other.block = nullptr;
@@ -227,28 +218,24 @@ public:
 
 	typedef detail::smart_object_pool_block_interface::ref_count_t ref_count_t;
 	weak_pool_ptr() noexcept : object{nullptr}, managed_object{nullptr}, block{nullptr} {}
-	weak_pool_ptr(const weak_pool_ptr& other) noexcept : object{other.object},
-														 managed_object{other.managed_object},
-														 block{other.block} {
+	weak_pool_ptr(const weak_pool_ptr& other) noexcept
+			: object{other.object}, managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_weak_ref(managed_object);
 	}
-	weak_pool_ptr(weak_pool_ptr&& other) noexcept : object{other.object},
-													managed_object{other.managed_object},
-													block{other.block} {
+	weak_pool_ptr(weak_pool_ptr&& other) noexcept
+			: object{other.object}, managed_object{other.managed_object}, block{other.block} {
 		other.object = nullptr;
 		other.managed_object = nullptr;
 		other.block = nullptr;
 	}
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-	weak_pool_ptr(const weak_pool_ptr<U>& other) noexcept : object(other.object),
-															managed_object{other.managed_object},
-															block{other.block} {
+	weak_pool_ptr(const weak_pool_ptr<U>& other) noexcept
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_weak_ref(managed_object);
 	}
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-	weak_pool_ptr(weak_pool_ptr<U>&& other) noexcept : object(other.object),
-													   managed_object{other.managed_object},
-													   block{other.block} {
+	weak_pool_ptr(weak_pool_ptr<U>&& other) noexcept
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		other.object = nullptr;
 		other.managed_object = nullptr;
 		other.block = nullptr;

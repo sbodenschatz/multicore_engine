@@ -10,6 +10,7 @@
 #include <asset/asset_loader.hpp>
 #include <asset/asset_manager.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace asset {
@@ -52,9 +53,9 @@ std::shared_ptr<const asset> asset_manager::call_loaders_sync(const std::shared_
 			asset_to_load->raise_error_flag(std::current_exception());
 			throw;
 		}
-		asset_to_load->raise_error_flag(
-				std::make_exception_ptr(std::runtime_error("Couldn't find asset '" + asset_to_load->name() +
-														   "' through any of the registered loaders.")));
+		asset_to_load->raise_error_flag(std::make_exception_ptr(
+				path_not_found_exception("Couldn't find asset '" + asset_to_load->name() +
+										 "' through any of the registered loaders.")));
 		asset_to_load->check_error_flag();
 		return std::shared_ptr<const asset>();
 	} else {

@@ -6,6 +6,7 @@
 
 #include <asset/asset_manager.hpp>
 #include <bstream/asset_ibstream.hpp>
+#include <exceptions.hpp>
 #include <model/model_manager.hpp>
 #include <model/polygon_model.hpp>
 
@@ -21,7 +22,7 @@ void polygon_model::complete_loading(const asset::asset_ptr& polygon_asset, mode
 	stream >> meta_data_;
 	if(!stream) {
 		raise_error_flag(std::make_exception_ptr(
-				std::runtime_error("Error on loading meta data for polygon model '" + name_ + "'.")));
+				io_exception("Error on loading meta data for polygon model '" + name_ + "'.")));
 		return;
 	}
 	current_state_ = state::staging;

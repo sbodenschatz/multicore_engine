@@ -7,6 +7,7 @@
 #include <asset/file_reader.hpp>
 #include <asset/load_unit.hpp>
 #include <asset/load_unit_asset_loader.hpp>
+#include <exceptions.hpp>
 #include <util/unused.hpp>
 
 namespace mce {
@@ -38,7 +39,7 @@ void load_unit_asset_loader::start_payload_loading(const std::shared_ptr<load_un
 				if(content) {
 					load_unit->complete_loading(content, size);
 				} else {
-					load_unit->raise_error_flag(std::make_exception_ptr(std::runtime_error(
+					load_unit->raise_error_flag(std::make_exception_ptr(path_not_found_exception(
 							"Couldn't load payload data for load unit '" + load_unit->name() + "'.")));
 				}
 			} catch(...) {
@@ -60,7 +61,7 @@ void load_unit_asset_loader::prepare_load_unit_meta_data(const std::shared_ptr<l
 					load_unit->load_meta_data(content, size);
 					start_payload_loading(load_unit, asset_manager);
 				} else {
-					load_unit->raise_error_flag(std::make_exception_ptr(std::runtime_error(
+					load_unit->raise_error_flag(std::make_exception_ptr(path_not_found_exception(
 							"Couldn't load meta data for load unit '" + load_unit->name() + "'.")));
 				}
 			} catch(...) {
@@ -95,7 +96,7 @@ bool load_unit_asset_loader::start_load_asset(const std::shared_ptr<asset>& asse
 								finish_loading(asset, content, size);
 							} else {
 								raise_error_flag(asset,
-												 std::make_exception_ptr(std::runtime_error(
+												 std::make_exception_ptr(path_not_found_exception(
 														 "Couldn't load asset '" + asset->name() +
 														 "' from load unit '" + load_unit->name() + "'.")));
 							}
@@ -111,9 +112,10 @@ bool load_unit_asset_loader::start_load_asset(const std::shared_ptr<asset>& asse
 								if(content) {
 									load_unit->complete_loading(content, size);
 								} else {
-									load_unit->raise_error_flag(std::make_exception_ptr(
-											std::runtime_error("Couldn't load payload data for load unit '" +
-															   load_unit->name() + "'.")));
+									load_unit->raise_error_flag(
+											std::make_exception_ptr(path_not_found_exception(
+													"Couldn't load payload data for load unit '" +
+													load_unit->name() + "'.")));
 								}
 							} catch(...) {
 								load_unit->raise_error_flag(std::current_exception());
@@ -153,7 +155,7 @@ std::shared_ptr<load_unit> load_unit_asset_loader::start_pin_load_unit_helper(co
 					load_unit_ptr->load_meta_data(content, size);
 					start_payload_loading(load_unit_ptr, manager);
 				} else {
-					load_unit_ptr->raise_error_flag(std::make_exception_ptr(std::runtime_error(
+					load_unit_ptr->raise_error_flag(std::make_exception_ptr(path_not_found_exception(
 							"Couldn't load meta data for load unit '" + load_unit_ptr->name() + "'.")));
 				}
 			} catch(...) {
