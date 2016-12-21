@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_parsers/src/pack_file_description_parser.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 //#define BOOST_SPIRIT_DEBUG
@@ -28,6 +28,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <exceptions.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;
@@ -111,14 +112,14 @@ ast::pack_file_ast_root pack_file_description_parser::load_file(const std::strin
 	std::ifstream stream(filename);
 	std::vector<char> buffer;
 	if(!stream.is_open()) {
-		throw std::runtime_error("Couldn't open file '" + filename + "'.");
+		throw path_not_found_exception("Couldn't open file '" + filename + "'.");
 	}
 
 	stream.seekg(0, std::ios::end);
 	auto size_tmp = stream.tellg();
 	size_t size = size_tmp;
 	decltype(size_tmp) size_check = size;
-	if(size_check != size_tmp) throw std::runtime_error("File too big to fit in address space.");
+	if(size_check != size_tmp) throw buffer_size_exception("File too big to fit in address space.");
 	stream.seekg(0, std::ios::beg);
 
 	buffer.resize(size);
@@ -129,7 +130,7 @@ ast::pack_file_ast_root pack_file_description_parser::load_file(const std::strin
 	bool r = parse(start, end, ast_root);
 	if(!r ||
 	   !std::all_of(start, end, [](char c) { return c == ' ' || c == '\t' || c == '\0' || c == '\n'; })) {
-		throw std::runtime_error("Parse error in file '" + filename + "'.");
+		throw syntax_exception("Parse error in file '" + filename + "'.");
 	}
 	return ast_root;
 }

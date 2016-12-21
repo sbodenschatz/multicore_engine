@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/asset/pack_file_reader.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <algorithm>
@@ -67,7 +67,7 @@ std::pair<file_content_ptr, file_size> pack_file_reader::read_file(const std::st
 			source->decompressed_buffer.clear();
 			util::decompress(source->compressed_buffer, source->decompressed_buffer);
 			if(source->decompressed_buffer.size() != pos->size)
-				throw std::runtime_error(
+				throw io_exception(
 						"Pack file appears corrupt: asset size and decompressed data size differ.");
 			std::shared_ptr<char> content =
 					std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });

@@ -9,6 +9,7 @@
 
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
+#include <exceptions.hpp>
 #include <string>
 #include <util/composite_magic_number.hpp>
 #include <util/offset_range.hpp>
@@ -65,8 +66,8 @@ struct static_model_meta_data {
 		stream >> value.version;
 		stream >> value.meshes;
 		stream >> value.vertex_data;
-		if(value.magic_number != magic_number_) throw std::runtime_error("Invalid magic number.");
-		if(value.version != version_) throw std::runtime_error("Can't load different model version.");
+		if(value.magic_number != magic_number_) throw invalid_magic_number_exception("Invalid magic number.");
+		if(value.version != version_) throw invalid_version_exception("Can't load different model version.");
 		return stream;
 	}
 };
@@ -149,8 +150,8 @@ struct static_model_collision_data {
 		stream >> value.magic_number;
 		stream >> value.version;
 		stream >> value.meshes;
-		if(value.magic_number != magic_number_) throw std::runtime_error("Invalid magic number.");
-		if(value.version != version_) throw std::runtime_error("Can't load different model version.");
+		if(value.magic_number != magic_number_) throw invalid_magic_number_exception("Invalid magic number.");
+		if(value.version != version_) throw invalid_version_exception("Can't load different model version.");
 		return stream;
 	}
 };

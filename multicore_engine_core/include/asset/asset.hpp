@@ -10,6 +10,7 @@
 #include "asset_defs.hpp"
 #include <atomic>
 #include <condition_variable>
+#include <exceptions.hpp>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -48,7 +49,7 @@ public:
 			return;
 		} else if(current_state_ == state::error) {
 			error_handler(std::make_exception_ptr(
-					std::runtime_error("Requested asset '" + name_ + "' is cached as failed.")));
+					path_not_found_exception("Requested asset '" + name_ + "' is cached as failed.")));
 			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
@@ -57,7 +58,7 @@ public:
 			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
 		} else if(current_state_ == state::error) {
 			error_handler(std::make_exception_ptr(
-					std::runtime_error("Requested asset '" + name_ + "' is cached as failed.")));
+					path_not_found_exception("Requested asset '" + name_ + "' is cached as failed.")));
 		} else {
 			completion_handlers.emplace_back(std::move(handler));
 			error_handlers.emplace_back(std::move(error_handler));
@@ -73,7 +74,8 @@ public:
 	}
 
 	void check_error_flag() const {
-		if(current_state_ == state::error) throw std::runtime_error("Error loading asset '" + name_ + "'.");
+		if(current_state_ == state::error)
+			throw path_not_found_exception("Error loading asset '" + name_ + "'.");
 	}
 
 	state current_state() const {

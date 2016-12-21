@@ -1,12 +1,13 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/bstream/buffer_ibstream.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <algorithm>
 #include <bstream/buffer_ibstream.hpp>
 #include <cstring>
+#include <exceptions.hpp>
 #include <stdexcept>
 
 namespace mce {
@@ -30,7 +31,7 @@ void buffer_ibstream::seek_read(size_t position) {
 	if(position <= size_) {
 		read_position = position;
 	} else {
-		throw std::runtime_error("Position outside of the buffer.");
+		throw out_of_range_exception("Position outside of the buffer.");
 	}
 }
 
