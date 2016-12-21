@@ -8,6 +8,7 @@
 #include <exceptions.hpp>
 #include <fstream>
 #include <util/path_util.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace asset {

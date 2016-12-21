@@ -10,6 +10,7 @@
 #include <fstream>
 #include <util/compression.hpp>
 #include <util/unused.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace asset {

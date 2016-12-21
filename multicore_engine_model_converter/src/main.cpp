@@ -22,6 +22,7 @@
 #include <string>
 #include <util/program_name.hpp>
 #include <util/string_tools.hpp>
+#include <exceptions.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

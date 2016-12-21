@@ -6,6 +6,7 @@
 
 #include <bstream/asset_ibstream.hpp>
 #include <model/collision_model.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace model {

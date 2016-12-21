@@ -11,6 +11,7 @@
 #include <bstream/obstream.hpp>
 #include <limits>
 #include <stdexcept>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace util {

@@ -10,6 +10,7 @@
 #include <entity/entity_configuration.hpp>
 #include <entity/entity_manager.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace entity {

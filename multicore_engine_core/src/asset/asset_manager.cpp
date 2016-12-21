@@ -10,6 +10,7 @@
 #include <asset/asset_loader.hpp>
 #include <asset/asset_manager.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace asset {

@@ -13,6 +13,7 @@
 #include <iterator>
 #include <model/model_format.hpp>
 #include <util/unused.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace asset_gen {

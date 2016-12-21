@@ -12,6 +12,7 @@
 #include <memory>
 #include <reflection/property.hpp>
 #include <string>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace core {

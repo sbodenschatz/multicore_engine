@@ -8,6 +8,7 @@
 #include <asset/load_unit.hpp>
 #include <asset/load_unit_asset_loader.hpp>
 #include <util/unused.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace asset {

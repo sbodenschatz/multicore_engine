@@ -8,6 +8,7 @@
 #include <bstream/asset_ibstream.hpp>
 #include <model/model_manager.hpp>
 #include <model/polygon_model.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace model {

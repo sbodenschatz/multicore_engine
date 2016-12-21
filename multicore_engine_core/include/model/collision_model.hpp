@@ -15,6 +15,7 @@
 #include <model/model_format.hpp>
 #include <mutex>
 #include <vector>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace model {
