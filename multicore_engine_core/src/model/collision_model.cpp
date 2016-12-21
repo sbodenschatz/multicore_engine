@@ -20,7 +20,7 @@ void collision_model::complete_loading(const asset::asset_ptr& collision_asset) 
 	stream >> data_;
 	if(!stream) {
 		raise_error_flag(std::make_exception_ptr(
-				std::runtime_error("Error on loading collision data for collision model '" + name_ + "'.")));
+				io_exception("Error on loading collision data for collision model '" + name_ + "'.")));
 		return;
 	}
 	current_state_ = state::ready;
