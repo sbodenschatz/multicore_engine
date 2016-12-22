@@ -7,6 +7,7 @@
 #ifndef UTIL_ERROR_HELPER_HPP_
 #define UTIL_ERROR_HELPER_HPP_
 
+#include <exceptions.hpp>
 #include <numeric>
 #include <sstream>
 #include <stdexcept>
@@ -47,7 +48,7 @@ void throw_syntax_error(const std::string& filename, It buffer_start, It pos, co
 	detail::print_error_position(msgstream, filename, p.first, p.second);
 	msgstream << ": error: ";
 	msgstream << message;
-	throw std::runtime_error(msgstream.str());
+	throw syntax_exception(msgstream.str());
 }
 
 template <typename It, typename Expected>
@@ -63,7 +64,7 @@ void throw_syntax_error(const std::string& filename, It buffer_start, It pos, co
 	msgstream << ": error: ";
 	msgstream << message;
 	msgstream << " - Expected " << expected;
-	throw std::runtime_error(msgstream.str());
+	throw syntax_exception(msgstream.str());
 }
 
 } // namespace util
