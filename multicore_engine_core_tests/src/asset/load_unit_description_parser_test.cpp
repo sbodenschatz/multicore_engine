@@ -162,6 +162,78 @@ BOOST_AUTO_TEST_CASE(whitespace_skipping) {
 	BOOST_CHECK(root == root_expected);
 }
 
+BOOST_AUTO_TEST_CASE(syntax_error_missing_brace) {
+	load_unit_description_parser parser;
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB \"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::load_unit_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ast::load_unit_ast_root root_expected;
+	root_expected.emplace_back(ast::load_unit_section{"testA",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testB",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_quote) {
+	load_unit_description_parser parser;
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::load_unit_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ast::load_unit_ast_root root_expected;
+	root_expected.emplace_back(ast::load_unit_section{"testA",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testB",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_semicolon) {
+	load_unit_description_parser parser;
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{\"test1\"->\"test2\"\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::load_unit_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ast::load_unit_ast_root root_expected;
+	root_expected.emplace_back(ast::load_unit_section{"testA",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testB",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_arrow) {
+	load_unit_description_parser parser;
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{\"test1\"\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::load_unit_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ast::load_unit_ast_root root_expected;
+	root_expected.emplace_back(ast::load_unit_section{"testA",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+	root_expected.emplace_back(ast::load_unit_section{"testB",
+													  {{"test1", ast::lookup_type::w, "test2"},
+													   {"test3", ast::lookup_type::w, "test4"},
+													   {"test5", ast::lookup_type::w, "test6"}}});
+}
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 
