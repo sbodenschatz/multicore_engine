@@ -223,6 +223,51 @@ BOOST_AUTO_TEST_CASE(whitespace_skipping) {
 	BOOST_CHECK(root == root_expected);
 }
 
+BOOST_AUTO_TEST_CASE(syntax_error_missing_brace) {
+	pack_file_description_parser parser;
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB \"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::pack_file_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_quote) {
+	pack_file_description_parser parser;
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::pack_file_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_semicolon) {
+	pack_file_description_parser parser;
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{\"test1\"->\"test2\"\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::pack_file_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_arrow) {
+	pack_file_description_parser parser;
+	std::string testdata = "testA{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{\"test1\"\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::pack_file_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_zip_level) {
+	pack_file_description_parser parser;
+	std::string testdata = "testA zip() {\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}"
+						   "testB{\"test1\"->\"test2\";\"test3\"->\"test4\";\"test5\"->\"test6\";}";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::pack_file_ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 
