@@ -111,13 +111,23 @@ pack_file_description_parser::pack_file_description_parser()
 		  skipper(std::make_unique<pack_file_description_skipper>()) {}
 pack_file_description_parser::~pack_file_description_parser() {}
 
-bool pack_file_description_parser::parse(const char*& first, const char* last,
-										 ast::pack_file_ast_root& ast_root) {
-	bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
-	return result;
+ast::pack_file_ast_root pack_file_description_parser::parse(const std::string& filename, const char*& first,
+															const char* last) {
+	ast::pack_file_ast_root ast_root;
+	const char* buffer_start = first;
+	try {
+		bool r = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
+		if(!r || !std::all_of(first, last, [](char c) {
+			   return c == ' ' || c == '\t' || c == '\0' || c == '\n';
+		   })) {
+			util::throw_syntax_error(filename, buffer_start, first, "General syntax error");
+		}
+	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
+		util::throw_syntax_error(filename, buffer_start, ef.first, "Syntax error", ef.what_);
+	}
+	return ast_root;
 }
 ast::pack_file_ast_root pack_file_description_parser::load_file(const std::string& filename) {
-	ast::pack_file_ast_root ast_root;
 	std::ifstream stream(filename);
 	std::vector<char> buffer;
 	if(!stream.is_open()) {
@@ -129,18 +139,7 @@ ast::pack_file_ast_root pack_file_description_parser::load_file(const std::strin
 
 	const char* start = buffer.data();
 	const char* end = buffer.data() + buffer.size();
-	try {
-		bool r = parse(start, end, ast_root);
-		if(!r ||
-		   !std::all_of(start, end, [](char c) { return c == ' ' || c == '\t' || c == '\0' || c == '\n'; })) {
-			const char* buffer_start = buffer.data();
-			util::throw_syntax_error(filename, buffer_start, start, "General syntax error");
-		}
-	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
-		const char* buffer_start = buffer.data();
-		util::throw_syntax_error(filename, buffer_start, ef.first, "Syntax error", ef.what_);
-	}
-	return ast_root;
+	return parse(filename, start, end);
 }
 
 } // namespace parser
