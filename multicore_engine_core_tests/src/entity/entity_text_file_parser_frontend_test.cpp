@@ -9,6 +9,7 @@
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_compare.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
+#include <exceptions.hpp>
 #include <string>
 
 namespace mce {
@@ -391,6 +392,234 @@ BOOST_AUTO_TEST_CASE(combined) {
 		root_expected.emplace_back(ei);
 	}
 	BOOST_CHECK(root == root_expected);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_include_non_string) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include testfile.etf;\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_super) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_template_name) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   ":SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_invalid_modifier) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	repl TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_comp_name) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_var_name) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_delimiter) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\"\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_value) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_missing_semicolon) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_delimiter) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3)(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_internal_delimiter) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30);\n"
+						   "Test test(1,2,3.0),(1.02.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+}
+BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_semicolon) {
+	entity_text_file_parser_frontend parser;
+	std::string testdata = "include \"testfile.etf\";\n"
+						   "//Comment\n"
+						   "TestEnt:SuperEnt{\n"
+						   "	replace TestComp{\n"
+						   "		test=(\"Hello\",\"World\");\n"
+						   "	}\n"
+						   "	TestComp2{\n"
+						   "		test=42;\n"
+						   "	}\n"
+						   "}\n"
+						   "Test (1,2,3),(x:45,y:30)\n"
+						   "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);\n";
+	const char* first = testdata.data();
+	const char* last = testdata.data() + testdata.size();
+	ast::ast_root root;
+	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
