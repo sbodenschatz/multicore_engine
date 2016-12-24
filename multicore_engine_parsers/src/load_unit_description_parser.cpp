@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include <istream>
+#include <iterator>
 #include <string>
 #include <vector>
 #ifdef _MSC_VER
@@ -29,6 +30,7 @@
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <exceptions.hpp>
+#include <util/error_helper.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;
@@ -76,10 +78,10 @@ struct load_unit_description_grammar
 		using spirit::float_;
 
 		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
-		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
+		string_literal %= lexeme[lit('\"') > *((char_ - '\"')) > lit('\"')];
 		lookup_spec = no_case[lit("w")[_val = ast::lookup_type::w] | lit("d")[_val = ast::lookup_type::d]];
-		entry %= string_literal >> -(lookup_spec) >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
-		section %= identifier >> lit('{') >> *(entry) >> lit('}');
+		entry %= string_literal > -(lookup_spec) > -(lit('-') > lit('>') > string_literal) > lit(';');
+		section %= identifier > lit('{') > *(entry) > lit('}');
 		start %= *(section);
 
 		BOOST_SPIRIT_DEBUG_NODE(start);
@@ -87,6 +89,9 @@ struct load_unit_description_grammar
 		BOOST_SPIRIT_DEBUG_NODE(entry);
 		BOOST_SPIRIT_DEBUG_NODE(identifier);
 		BOOST_SPIRIT_DEBUG_NODE(string_literal);
+
+		on_error<qi::rethrow>(entry, [](auto...) {});
+		on_error<qi::rethrow>(section, [](auto...) {});
 	}
 };
 
@@ -95,38 +100,36 @@ load_unit_description_parser::load_unit_description_parser()
 		  skipper(std::make_unique<load_unit_description_skipper>()) {}
 load_unit_description_parser::~load_unit_description_parser() {}
 
-bool load_unit_description_parser::parse(const char*& first, const char* last,
-										 ast::load_unit_ast_root& ast_root) {
-	bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
-	return result;
+ast::load_unit_ast_root load_unit_description_parser::parse(const std::string& filename, const char*& first,
+															const char* last) {
+	ast::load_unit_ast_root ast_root;
+	const char* buffer_start = first;
+	try {
+		bool r = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
+		if(!r || !std::all_of(first, last, [](char c) {
+			   return c == ' ' || c == '\t' || c == '\0' || c == '\n';
+		   })) {
+			util::throw_syntax_error(filename, buffer_start, first, "General syntax error");
+		}
+	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
+		util::throw_syntax_error(filename, buffer_start, ef.first, "Syntax error", ef.what_);
+	}
+	return ast_root;
 }
 
 ast::load_unit_ast_root load_unit_description_parser::load_file(const std::string& filename) {
-	ast::load_unit_ast_root ast_root;
 	std::ifstream stream(filename);
 	std::vector<char> buffer;
 	if(!stream.is_open()) {
 		throw path_not_found_exception("Couldn't open file '" + filename + "'.");
 	}
 
-	stream.seekg(0, std::ios::end);
-	auto size_tmp = stream.tellg();
-	size_t size = size_tmp;
-	decltype(size_tmp) size_check = size;
-	if(size_check != size_tmp) throw buffer_size_exception("File too big to fit in address space.");
-	stream.seekg(0, std::ios::beg);
-
-	buffer.resize(size);
-	stream.read(buffer.data(), size);
+	std::copy(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>(),
+			  std::back_inserter(buffer));
 
 	const char* start = buffer.data();
-	const char* end = buffer.data() + size;
-	bool r = parse(start, end, ast_root);
-	if(!r ||
-	   !std::all_of(start, end, [](char c) { return c == ' ' || c == '\t' || c == '\0' || c == '\n'; })) {
-		throw syntax_exception("Unknown parse error in file '" + filename + "'.");
-	}
-	return ast_root;
+	const char* end = buffer.data() + buffer.size();
+	return parse(filename, start, end);
 }
 
 } // namespace parser

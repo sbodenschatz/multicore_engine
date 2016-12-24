@@ -161,12 +161,10 @@ void entity_text_file_parser_backend::process_entity_instances(ast::ast_root& ro
 	for(auto&& element : root_node) element.apply_visitor(visitor);
 }
 ast::ast_root entity_text_file_parser_backend::load_file(const asset::asset_ptr& text_file_asset) {
-	ast::ast_root root;
 	const char* start = text_file_asset->data();
 	const char* end = text_file_asset->data() + text_file_asset->size();
 	parser::entity_text_file_parser_frontend fe;
-	bool r = fe.parse(start, end, root);
-	if(!r) throw syntax_exception("Syntax error in '" + text_file_asset->name() + "'.");
+	auto root = fe.parse(text_file_asset->name(), start, end);
 	if(start != end) throw syntax_exception("Partial parse of '" + text_file_asset->name() + "'.");
 	return root;
 }
