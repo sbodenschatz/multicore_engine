@@ -24,7 +24,7 @@ class pack_file_description_parser {
 public:
 	pack_file_description_parser();
 	~pack_file_description_parser();
-	bool parse(const char*& first, const char* last, ast::pack_file_ast_root& ast_root);
+	ast::pack_file_ast_root parse(const std::string& filename, const char*& first, const char* last);
 	ast::pack_file_ast_root load_file(const std::string& filename);
 };
 

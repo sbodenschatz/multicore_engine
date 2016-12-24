@@ -1,13 +1,14 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/bstream/asset_ibstream.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <algorithm>
 #include <asset/asset.hpp>
 #include <bstream/asset_ibstream.hpp>
 #include <cstring>
+#include <exceptions.hpp>
 #include <stdexcept>
 
 namespace mce {
@@ -30,11 +31,11 @@ size_t asset_ibstream::tell_read() const noexcept {
 	return read_position;
 }
 void asset_ibstream::seek_read(size_t position) {
-	if(!asset->ready()) throw std::runtime_error("Asset not ready.");
+	if(!asset->ready()) throw async_state_exception("Asset not ready.");
 	if(position <= asset->size()) {
 		read_position = position;
 	} else {
-		throw std::runtime_error("Position outside of the referenced asset.");
+		throw out_of_range_exception("Position outside of the referenced asset.");
 	}
 }
 

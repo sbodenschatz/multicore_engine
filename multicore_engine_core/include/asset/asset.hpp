@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/asset.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_HPP_
@@ -10,6 +10,7 @@
 #include "asset_defs.hpp"
 #include <atomic>
 #include <condition_variable>
+#include <exceptions.hpp>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -31,6 +32,7 @@ private:
 	std::shared_ptr<const char> data_;
 	size_t size_;
 	std::vector<asset_completion_handler> completion_handlers;
+	std::vector<error_handler> error_handlers;
 	mutable std::condition_variable completed_cv;
 
 public:
@@ -39,19 +41,27 @@ public:
 	asset(const asset&) = delete;
 	asset& operator=(const asset&) = delete;
 
-	template <typename F>
-	void run_when_loaded(F handler) {
+	template <typename F, typename E>
+	void run_when_loaded(F handler, E error_handler) {
 		if(current_state_ == state::ready) {
 			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
 			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
+			return;
+		} else if(current_state_ == state::error) {
+			error_handler(std::make_exception_ptr(
+					path_not_found_exception("Requested asset '" + name_ + "' is cached as failed.")));
 			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		if(current_state_ == state::ready) {
 			lock.unlock();
 			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
+		} else if(current_state_ == state::error) {
+			error_handler(std::make_exception_ptr(
+					path_not_found_exception("Requested asset '" + name_ + "' is cached as failed.")));
 		} else {
 			completion_handlers.emplace_back(std::move(handler));
+			error_handlers.emplace_back(std::move(error_handler));
 		}
 	}
 
@@ -64,7 +74,8 @@ public:
 	}
 
 	void check_error_flag() const {
-		if(current_state_ == state::error) throw std::runtime_error("Error loading asset '" + name_ + "'.");
+		if(current_state_ == state::error)
+			throw path_not_found_exception("Error loading asset '" + name_ + "'.");
 	}
 
 	state current_state() const {
@@ -93,9 +104,17 @@ public:
 private:
 	void complete_loading(const std::shared_ptr<const char>& data, size_t size);
 
-	void raise_error_flag() {
+	void raise_error_flag(std::exception_ptr e) {
 		current_state_ = state::error;
 		completed_cv.notify_all();
+		std::unique_lock<std::mutex> lock(modification_mutex);
+		for(auto& handler : error_handlers) {
+			handler(e);
+		}
+		error_handlers.clear();
+		completion_handlers.clear();
+		error_handlers.shrink_to_fit();
+		completion_handlers.shrink_to_fit();
 	}
 
 	// TODO Prevent a dead-lock where all workers are waiting (sync) for completions of assets whose load

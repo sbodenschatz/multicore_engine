@@ -8,6 +8,7 @@
 #include <array>
 #include <asset_gen/obj_model_parser.hpp>
 #include <boost/utility/string_view.hpp>
+#include <exceptions.hpp>
 #include <fstream>
 #include <iterator>
 #include <limits>
@@ -43,7 +44,7 @@ long long obj_model_parser::stoll(boost::string_view str, std::size_t* pos) {
 
 void obj_model_parser::parse_file(const std::string& filename) {
 	std::ifstream obj_file(filename);
-	if(!obj_file) throw std::runtime_error("Couldn't open input file.");
+	if(!obj_file) throw path_not_found_exception("Couldn't open input file.");
 	parse(obj_file);
 }
 void obj_model_parser::parse(std::istream& input) {
@@ -79,7 +80,7 @@ void obj_model_parser::parse(std::istream& input) {
 			parse_face(param);
 		} else if(check_prefix(line, "#", param)) {
 		} else {
-			throw std::runtime_error("Unknown command: " + line_str);
+			throw syntax_exception("Unknown command: " + line_str);
 		}
 	}
 }
@@ -88,7 +89,8 @@ void obj_model_parser::parse_vertex_position(boost::string_view line) {
 	size_t i = 0;
 	glm::vec3 pos;
 	util::split_iterate(line, " ", [this, &pos, &i](boost::string_view e) {
-		if(i >= 3) throw std::runtime_error("Too many components.");
+		// cppcheck-suppress knownConditionTrueFalse
+		if(i >= 3) throw syntax_exception("Too many components.");
 		pos[i] = stof(e);
 		++i;
 	});
@@ -98,7 +100,8 @@ void obj_model_parser::parse_vertex_normal(boost::string_view line) {
 	size_t i = 0;
 	glm::vec3 normal;
 	util::split_iterate(line, " ", [this, &normal, &i](boost::string_view e) {
-		if(i >= 3) throw std::runtime_error("Too many components.");
+		// cppcheck-suppress knownConditionTrueFalse
+		if(i >= 3) throw syntax_exception("Too many components.");
 		normal[i] = stof(e);
 		++i;
 	});
@@ -108,16 +111,18 @@ void obj_model_parser::parse_vertex_texcoords(boost::string_view line) {
 	size_t i = 0;
 	glm::vec2 uv;
 	util::split_iterate(line, " ", [this, &uv, &i](boost::string_view e) {
-		if(i >= 2) throw std::runtime_error("Too many components.");
+		// cppcheck-suppress knownConditionTrueFalse
+		if(i >= 2) throw syntax_exception("Too many components.");
 		uv[i] = stof(e);
 		++i;
 	});
 	tex_coords.push_back(uv);
 }
 void obj_model_parser::parse_vertex_parameter(boost::string_view) {
-	throw std::runtime_error("Vertex Parameters not supported yet");
+	throw unimplemented_exception("Vertex parameters not supported yet");
 }
 void obj_model_parser::parse_usemtl(boost::string_view line) {
+	// throw unimplemented_exception("Materials not supported yet");
 	UNUSED(line);
 }
 void obj_model_parser::parse_object(boost::string_view line) {
@@ -125,6 +130,7 @@ void obj_model_parser::parse_object(boost::string_view line) {
 	current_object_name.append(line.data(), line.size());
 }
 void obj_model_parser::parse_mtllib(boost::string_view line) {
+	// throw unimplemented_exception("Material libraries not supported yet");
 	UNUSED(line);
 }
 void obj_model_parser::parse_group(boost::string_view line) {
@@ -133,7 +139,7 @@ void obj_model_parser::parse_group(boost::string_view line) {
 }
 void obj_model_parser::parse_smoothing(boost::string_view line) {
 	if(line != "off") {
-		throw std::runtime_error("Smoothing groups are currently not supported.");
+		throw unimplemented_exception("Smoothing groups are currently not supported.");
 	}
 }
 void obj_model_parser::parse_face(boost::string_view line) {
@@ -148,12 +154,13 @@ void obj_model_parser::parse_face(boost::string_view line) {
 		size_t elem_index = 0;
 		util::split_iterate(
 				vert_ref, "/", [this, &current_tripple, &elem_index](boost::string_view ref_elem) {
+					// cppcheck-suppress knownConditionTrueFalse
 					if(elem_index > 2) {
-						throw std::runtime_error("Too many elements in vertex reference.");
+						throw syntax_exception("Too many elements in vertex reference.");
 					}
 					auto elem = stoll(ref_elem) - 1;
 					if(elem > std::numeric_limits<glm::ivec3::value_type>::max()) {
-						throw std::runtime_error("Numeric overflow in elements of vertex reference.");
+						throw out_of_range_exception("Numeric overflow in elements of vertex reference.");
 					}
 					current_tripple[elem_index] = glm::ivec3::value_type(elem);
 					++elem_index;
@@ -180,7 +187,7 @@ model::model_index obj_model_parser::get_or_create_vertex(const glm::ivec3& trip
 		new_vert.tex_coords = tex_coords.at(tripple[1]);
 		new_vert.normal = normals.at(tripple[2]);
 		if(vertices.size() > std::numeric_limits<model::model_index>::max()) {
-			throw std::runtime_error("Numeric overflow in index data.");
+			throw out_of_range_exception("Numeric overflow in index data.");
 		}
 		model::model_index index = model::model_index(vertices.size());
 		vertices.push_back(new_vert);
@@ -241,7 +248,7 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 std::vector<boost::filesystem::path> obj_model_parser::list_refs(const std::string& filename) const {
 	std::vector<boost::filesystem::path> refs_list;
 	std::ifstream obj_file(filename);
-	if(!obj_file) throw std::runtime_error("Couldn't open input file.");
+	if(!obj_file) throw path_not_found_exception("Couldn't open input file.");
 
 	for(std::string line_str; std::getline(obj_file, line_str);) {
 		boost::string_view line = line_str;

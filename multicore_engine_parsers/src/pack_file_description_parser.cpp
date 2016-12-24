@@ -1,13 +1,14 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_parsers/src/pack_file_description_parser.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 //#define BOOST_SPIRIT_DEBUG
 
 #include <fstream>
 #include <istream>
+#include <iterator>
 #include <string>
 #include <vector>
 #ifdef _MSC_VER
@@ -28,6 +29,8 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <exceptions.hpp>
+#include <util/error_helper.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;
@@ -59,6 +62,7 @@ struct pack_file_description_grammar
 	rule<std::string()> string_literal;
 	rule<std::string()> identifier;
 	rule<int> zip_level;
+	rule<int> integer_zip_level;
 	rule<ast::lookup_type> lookup_spec;
 
 	pack_file_description_grammar() : pack_file_description_grammar::base_type(start) {
@@ -78,13 +82,14 @@ struct pack_file_description_grammar
 		using qi::eps;
 
 		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
-		string_literal %= lexeme[lit('\"') >> *((char_ - '\"')) >> lit('\"')];
+		string_literal %= lexeme[lit('\"') > *((char_ - '\"')) > lit('\"')];
 		lookup_spec = no_case[lit("w")[_val = ast::lookup_type::w] | lit("d")[_val = ast::lookup_type::d]];
-		entry %= string_literal >> -(lookup_spec) >> -(lit('-') >> lit('>') >> string_literal) >> lit(';');
-		zip_level = ((lit("zip(") >> int_ >> lit(')'))[_val = _1]) // Explicit level
-					| (lit("zip")[_val = -1])					   // Default level
-					| (eps[_val = -2]);							   // Uncompressed
-		section %= identifier >> zip_level >> lit('{') >> *(entry) >> lit('}');
+		entry %= string_literal > -(lookup_spec) > -(lit('-') > lit('>') > string_literal) > lit(';');
+		integer_zip_level %= int_;
+		zip_level = ((lit("zip(") > integer_zip_level > lit(')'))[_val = _1]) // Explicit level
+					| (lit("zip")[_val = -1])								  // Default level
+					| (eps[_val = -2]);										  // Uncompressed
+		section %= identifier > zip_level > lit('{') > *(entry) > lit('}');
 		start %= *(section);
 
 		BOOST_SPIRIT_DEBUG_NODE(start);
@@ -93,6 +98,11 @@ struct pack_file_description_grammar
 		BOOST_SPIRIT_DEBUG_NODE(identifier);
 		BOOST_SPIRIT_DEBUG_NODE(string_literal);
 		BOOST_SPIRIT_DEBUG_NODE(zip_level);
+		BOOST_SPIRIT_DEBUG_NODE(integer_zip_level);
+
+		on_error<qi::rethrow>(entry, [](auto...) {});
+		on_error<qi::rethrow>(section, [](auto...) {});
+		on_error<qi::rethrow>(zip_level, [](auto...) {});
 	}
 };
 
@@ -101,36 +111,35 @@ pack_file_description_parser::pack_file_description_parser()
 		  skipper(std::make_unique<pack_file_description_skipper>()) {}
 pack_file_description_parser::~pack_file_description_parser() {}
 
-bool pack_file_description_parser::parse(const char*& first, const char* last,
-										 ast::pack_file_ast_root& ast_root) {
-	bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
-	return result;
+ast::pack_file_ast_root pack_file_description_parser::parse(const std::string& filename, const char*& first,
+															const char* last) {
+	ast::pack_file_ast_root ast_root;
+	const char* buffer_start = first;
+	try {
+		bool r = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
+		if(!r || !std::all_of(first, last, [](char c) {
+			   return c == ' ' || c == '\t' || c == '\0' || c == '\n';
+		   })) {
+			util::throw_syntax_error(filename, buffer_start, first, "General syntax error");
+		}
+	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
+		util::throw_syntax_error(filename, buffer_start, ef.first, "Syntax error", ef.what_);
+	}
+	return ast_root;
 }
 ast::pack_file_ast_root pack_file_description_parser::load_file(const std::string& filename) {
-	ast::pack_file_ast_root ast_root;
 	std::ifstream stream(filename);
 	std::vector<char> buffer;
 	if(!stream.is_open()) {
-		throw std::runtime_error("Couldn't open file '" + filename + "'.");
+		throw path_not_found_exception("Couldn't open file '" + filename + "'.");
 	}
 
-	stream.seekg(0, std::ios::end);
-	auto size_tmp = stream.tellg();
-	size_t size = size_tmp;
-	decltype(size_tmp) size_check = size;
-	if(size_check != size_tmp) throw std::runtime_error("File too big to fit in address space.");
-	stream.seekg(0, std::ios::beg);
-
-	buffer.resize(size);
-	stream.read(buffer.data(), size);
+	std::copy(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>(),
+			  std::back_inserter(buffer));
 
 	const char* start = buffer.data();
-	const char* end = buffer.data() + size;
-	bool r = parse(start, end, ast_root);
-	if(!r || start != end) {
-		std::runtime_error("Parse error in file '" + filename + "'.");
-	}
-	return ast_root;
+	const char* end = buffer.data() + buffer.size();
+	return parse(filename, start, end);
 }
 
 } // namespace parser

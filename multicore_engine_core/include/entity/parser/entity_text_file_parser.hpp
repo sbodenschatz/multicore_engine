@@ -28,7 +28,7 @@ public:
 	entity_text_file_parser_frontend();
 	~entity_text_file_parser_frontend();
 
-	bool parse(const char*& first, const char* last, ast::ast_root& ast_root);
+	ast::ast_root parse(const std::string& filename, const char*& first, const char* last);
 };
 
 class entity_text_file_parser_backend {

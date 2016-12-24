@@ -28,8 +28,7 @@ private:
 
 protected:
 	component(entity& owner, component_configuration& configuration) noexcept
-			: owner_(owner),
-			  configuration_(configuration) {}
+			: owner_(owner), configuration_(configuration) {}
 
 public:
 	typedef std::vector<std::unique_ptr<

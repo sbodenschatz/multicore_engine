@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/asset_gen/pack_file_gen.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <algorithm>
@@ -9,6 +9,7 @@
 #include <asset_gen/pack_file_gen.hpp>
 #include <bstream/iostream_bstream.hpp>
 #include <bstream/vector_iobstream.hpp>
+#include <exceptions.hpp>
 #include <fstream>
 #include <iterator>
 #include <util/compression.hpp>
@@ -25,10 +26,10 @@ uint64_t pack_file_gen::read_file_size(const std::string& path) {
 		auto size_tmp = stream.tellg();
 		uint64_t size = size_tmp;
 		decltype(size_tmp) size_check = size;
-		if(size_check != size_tmp) throw std::runtime_error("Asset too big to fit in address space.");
+		if(size_check != size_tmp) throw buffer_size_exception("Asset too big to fit in address space.");
 		return size;
 	} else
-		throw std::runtime_error("Couldn't open asset file '" + path + "'.");
+		throw path_not_found_exception("Couldn't open asset file '" + path + "'.");
 }
 std::pair<uint64_t, uint64_t> pack_file_gen::read_file_size_compressed(const std::string& path, int level) {
 	std::string sanitized_path = path;
@@ -39,7 +40,7 @@ std::pair<uint64_t, uint64_t> pack_file_gen::read_file_size_compressed(const std
 		auto size_tmp = stream.tellg();
 		uint64_t size = size_tmp;
 		decltype(size_tmp) size_check = size;
-		if(size_check != size_tmp) throw std::runtime_error("Asset too big to fit in address space.");
+		if(size_check != size_tmp) throw buffer_size_exception("Asset too big to fit in address space.");
 		stream.seekg(0, std::ios::beg);
 		input_buffer.clear();
 		input_buffer.resize(size, '\0');
@@ -47,7 +48,7 @@ std::pair<uint64_t, uint64_t> pack_file_gen::read_file_size_compressed(const std
 		util::compress(input_buffer, level, compressed_buffer);
 		return std::make_pair(size, compressed_buffer.size());
 	} else
-		throw std::runtime_error("Couldn't open asset file '" + path + "'.");
+		throw path_not_found_exception("Couldn't open asset file '" + path + "'.");
 }
 void pack_file_gen::update_content_offset(uint64_t new_content_offset) {
 	for(auto& entry : entries) {
@@ -74,9 +75,9 @@ void pack_file_gen::copy_file_content(std::fstream& into, const pack_file_entry&
 	std::ifstream stream(sanitized_path, std::ios::binary);
 	if(stream) {
 		auto pos = into.tellp();
-		if(pos < 0) throw std::runtime_error("Error getting write position for file '" + entry.path + "'.");
+		if(pos < 0) throw io_exception("Error getting write position for file '" + entry.path + "'.");
 		if(uint64_t(pos) != entry.meta_data.offset)
-			throw std::runtime_error("Offset mismatch for file '" + entry.path + "'.");
+			throw io_exception("Offset mismatch for file '" + entry.path + "'.");
 		constexpr size_t buffer_size = 1024;
 		char buffer[buffer_size];
 		uint64_t copied_bytes = 0;
@@ -86,9 +87,9 @@ void pack_file_gen::copy_file_content(std::fstream& into, const pack_file_entry&
 			copied_bytes += stream.gcount();
 		} while(stream.gcount());
 		if(copied_bytes != entry.meta_data.size)
-			throw std::runtime_error("Size mismatch for file '" + entry.path + "'.");
+			throw io_exception("Size mismatch for file '" + entry.path + "'.");
 	} else
-		throw std::runtime_error("Couldn't open asset file '" + entry.path + "'.");
+		throw path_not_found_exception("Couldn't open asset file '" + entry.path + "'.");
 }
 void pack_file_gen::copy_file_content_compressed(std::fstream& into, const pack_file_entry& entry) {
 	std::string sanitized_path = entry.path;
@@ -96,14 +97,14 @@ void pack_file_gen::copy_file_content_compressed(std::fstream& into, const pack_
 	std::ifstream stream(sanitized_path, std::ios::binary);
 	if(stream) {
 		auto pos = into.tellp();
-		if(pos < 0) throw std::runtime_error("Error getting write position for file '" + entry.path + "'.");
+		if(pos < 0) throw io_exception("Error getting write position for file '" + entry.path + "'.");
 		if(uint64_t(pos) != entry.meta_data.offset)
-			throw std::runtime_error("Offset mismatch for file '" + entry.path + "'.");
+			throw io_exception("Offset mismatch for file '" + entry.path + "'.");
 		stream.seekg(0, std::ios::end);
 		auto size_tmp = stream.tellg();
 		uint64_t size = size_tmp;
 		decltype(size_tmp) size_check = size;
-		if(size_check != size_tmp) throw std::runtime_error("Asset too big to fit in address space.");
+		if(size_check != size_tmp) throw buffer_size_exception("Asset too big to fit in address space.");
 		stream.seekg(0, std::ios::beg);
 		input_buffer.clear();
 		input_buffer.resize(size, '\0');
@@ -111,15 +112,15 @@ void pack_file_gen::copy_file_content_compressed(std::fstream& into, const pack_
 		util::compress(input_buffer, entry.compression_level, compressed_buffer);
 		into.write(compressed_buffer.data(), compressed_buffer.size());
 		if(std::max(uint64_t(stream.gcount()), uint64_t(0)) != entry.meta_data.size)
-			throw std::runtime_error("Size mismatch for file '" + entry.path + "'.");
+			throw io_exception("Size mismatch for file '" + entry.path + "'.");
 		if(compressed_buffer.size() != entry.meta_data.compressed_size)
-			throw std::runtime_error("Compressed size mismatch for file '" + entry.path + "'.");
+			throw io_exception("Compressed size mismatch for file '" + entry.path + "'.");
 	} else
-		throw std::runtime_error("Couldn't open asset file '" + entry.path + "'.");
+		throw path_not_found_exception("Couldn't open asset file '" + entry.path + "'.");
 }
 void pack_file_gen::write_pack_file(const std::string& output_file) {
 	std::fstream file_stream(output_file, std::ios::out | std::ios::trunc | std::ios::binary);
-	if(!file_stream) throw std::runtime_error("Can't open '" + output_file + "' for writing.");
+	if(!file_stream) throw path_not_found_exception("Can't open '" + output_file + "' for writing.");
 	bstream::iostream_bstream stream(file_stream);
 	stream << meta_data;
 	auto test = file_stream.tellp();
@@ -152,7 +153,7 @@ void pack_file_gen::compile_pack_file(const std::string& output_file) {
 	compile_meta_data();
 	auto start_offset2 = calculate_meta_data_size();
 	if(start_offset != start_offset2)
-		throw std::logic_error("Meta data size mismatch after applying start_offset.");
+		throw logic_exception("Meta data size mismatch after applying start_offset.");
 	write_pack_file(output_file);
 }
 

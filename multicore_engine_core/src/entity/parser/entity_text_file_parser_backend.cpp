@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/entity/parser/entity_text_file_parser_frontend.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <asset/asset.hpp>
@@ -10,6 +10,7 @@
 #include <entity/entity_configuration.hpp>
 #include <entity/entity_manager.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace entity {
@@ -20,7 +21,8 @@ void entity_text_file_parser_backend::ast_definition_visitor::operator()(const a
 	if(node.super_name.empty()) {
 		auto super_config = backend.em.find_entity_configuration(node.super_name);
 		if(!super_config)
-			throw std::runtime_error("Super entity configuration '" + node.super_name + "' not found.");
+			throw missing_entity_config_exception("Super entity configuration '" + node.super_name +
+												  "' not found.");
 		config = std::make_unique<entity_configuration>(*super_config);
 		config->name(node.name);
 	} else {
@@ -33,12 +35,14 @@ void entity_text_file_parser_backend::ast_definition_visitor::operator()(const a
 		});
 		if(comp_conf_it == comp_configs.end()) {
 			auto comp_type = backend.em.find_component_type(comp_def.name);
-			if(!comp_type) throw std::runtime_error("Unknown component type '" + comp_def.name + "'.");
+			if(!comp_type)
+				throw invalid_component_type_exception("Unknown component type '" + comp_def.name + "'.");
 			comp_conf_it = comp_configs.emplace(comp_configs.end(), std::make_unique<component_configuration>(
 																			backend.em.engine, *comp_type));
 		} else if(comp_def.replace) {
 			auto comp_type = backend.em.find_component_type(comp_def.name);
-			if(!comp_type) throw std::runtime_error("Unknown component type '" + comp_def.name + "'.");
+			if(!comp_type)
+				throw invalid_component_type_exception("Unknown component type '" + comp_def.name + "'.");
 			*comp_conf_it = std::make_unique<component_configuration>(backend.em.engine, *comp_type);
 		}
 		auto& comp_conf = **comp_conf_it;
@@ -63,7 +67,8 @@ void entity_text_file_parser_backend::ast_instance_visitor::operator()(ast::incl
 void entity_text_file_parser_backend::ast_instance_visitor::operator()(const ast::entity_instance& node) {
 	// Create entity and give it the specified position and orientation
 	auto entity_conf = backend.em.find_entity_configuration(node.type_name);
-	if(!entity_conf) throw std::runtime_error("Unknown entity configuration '" + node.type_name + "'.");
+	if(!entity_conf)
+		throw missing_entity_config_exception("Unknown entity configuration '" + node.type_name + "'.");
 	auto entity = backend.em.create_entity(*entity_conf);
 	ast_position_visitor pos_visitor(backend);
 	entity->position(node.position_parameter.apply_visitor(pos_visitor));
@@ -89,12 +94,12 @@ operator()(const ast::float_list& node) {
 }
 entity_position_t entity_text_file_parser_backend::ast_position_visitor::
 operator()(const ast::rotation_list&) {
-	throw std::runtime_error("Rotation list given as position.");
+	throw value_type_exception("Rotation list given as position.");
 }
 entity_position_t entity_text_file_parser_backend::ast_position_visitor::
 operator()(const ast::marker_evaluation& node) {
 	(void)node; // TODO Resolve marker and set position, when marker system is implemented.
-	throw "not implemented";
+	throw unimplemented_exception("not implemented");
 }
 entity_position_t entity_text_file_parser_backend::ast_position_visitor::
 operator()(const ast::entity_reference& node) {
@@ -102,19 +107,19 @@ operator()(const ast::entity_reference& node) {
 	if(ent) {
 		return ent->position();
 	} else {
-		throw std::runtime_error("Named entity not found.");
+		throw missing_entity_exception("Named entity not found.");
 	}
 }
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::int_list& node) {
 	if(node.empty()) return entity_orientation_t();
-	if(node.size() < 4) throw std::runtime_error("Invalid angle-axis quaternion literal.");
+	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
 	return glm::angleAxis(float(node[0]), glm::vec3(float(node[1]), float(node[2]), float(node[3])));
 }
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::float_list& node) {
 	if(node.empty()) return entity_orientation_t();
-	if(node.size() < 4) throw std::runtime_error("Invalid angle-axis quaternion literal.");
+	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
 	return glm::angleAxis(float(node[0]), glm::vec3(node[1], node[2], node[3]));
 }
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
@@ -135,7 +140,7 @@ operator()(const ast::rotation_list& node) {
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::marker_evaluation& node) {
 	(void)node; // TODO Resolve marker and set position, when marker system is implemented.
-	throw "not implemented";
+	throw unimplemented_exception("not implemented");
 }
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::entity_reference& node) {
@@ -143,7 +148,7 @@ operator()(const ast::entity_reference& node) {
 	if(ent) {
 		return ent->orientation();
 	} else {
-		throw std::runtime_error("Named entity not found.");
+		throw missing_entity_exception("Named entity not found.");
 	}
 }
 
@@ -156,13 +161,11 @@ void entity_text_file_parser_backend::process_entity_instances(ast::ast_root& ro
 	for(auto&& element : root_node) element.apply_visitor(visitor);
 }
 ast::ast_root entity_text_file_parser_backend::load_file(const asset::asset_ptr& text_file_asset) {
-	ast::ast_root root;
 	const char* start = text_file_asset->data();
 	const char* end = text_file_asset->data() + text_file_asset->size();
 	parser::entity_text_file_parser_frontend fe;
-	bool r = fe.parse(start, end, root);
-	if(!r) throw std::runtime_error("Syntax error in '" + text_file_asset->name() + "'.");
-	if(start != end) throw std::runtime_error("Partial parse of '" + text_file_asset->name() + "'.");
+	auto root = fe.parse(text_file_asset->name(), start, end);
+	if(start != end) throw syntax_exception("Partial parse of '" + text_file_asset->name() + "'.");
 	return root;
 }
 void entity_text_file_parser_backend::load_and_process_file(const asset::asset_ptr& text_file_asset) {

@@ -9,6 +9,7 @@
 #include <bstream/iostream_bstream.hpp>
 #include <bstream/vector_iobstream.hpp>
 #include <cassert>
+#include <exceptions.hpp>
 #include <fstream>
 #include <iterator>
 #include <model/model_format.hpp>
@@ -44,7 +45,7 @@ void static_model_exporter::export_model(const static_model& model_data,
 	}
 
 	std::fstream file_stream(output_file, std::ios::out | std::ios::trunc | std::ios::binary);
-	if(!file_stream) throw std::runtime_error("Can't open '" + output_file + "' for writing.");
+	if(!file_stream) throw path_not_found_exception("Can't open '" + output_file + "' for writing.");
 	bstream::iostream_bstream stream(file_stream);
 	stream << model_meta_data;
 	assert(stream.tell_write() == model_meta_data.vertex_data.begin());
@@ -65,7 +66,7 @@ void static_model_exporter::export_model(const static_model& model_data,
 void static_model_exporter::export_model(const model::static_model_collision_data& collision_data,
 										 const std::string& output_file) const {
 	std::fstream file_stream(output_file, std::ios::out | std::ios::trunc | std::ios::binary);
-	if(!file_stream) throw std::runtime_error("Can't open '" + output_file + "' for writing.");
+	if(!file_stream) throw path_not_found_exception("Can't open '" + output_file + "' for writing.");
 	bstream::iostream_bstream stream(file_stream);
 	stream << collision_data;
 }

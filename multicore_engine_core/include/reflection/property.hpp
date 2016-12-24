@@ -95,7 +95,7 @@ public:
 	virtual accessor_value get_value(const Root_Type& object) const = 0;
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
-			make_assignment(Assignment_Param...) const override;
+	make_assignment(Assignment_Param...) const override;
 };
 
 } // namespace reflection
@@ -107,8 +107,8 @@ namespace reflection {
 template <typename Root_Type, typename T, template <typename> class Abstract_Assignment,
 		  template <typename, typename> class Assignment, typename... Assignment_Param>
 std::unique_ptr<Abstract_Assignment<Root_Type>>
-		property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>::make_assignment(
-				Assignment_Param... param) const {
+property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>::make_assignment(
+		Assignment_Param... param) const {
 	return std::make_unique<Assignment<Root_Type, T>>(*this, param...);
 }
 

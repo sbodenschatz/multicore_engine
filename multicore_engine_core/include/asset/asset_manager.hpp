@@ -1,19 +1,23 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/asset_manager.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_MANAGER_HPP_
 #define ASSET_ASSET_MANAGER_HPP_
 
 #include "asset_defs.hpp"
+#include <exception>
+#include <exceptions.hpp>
 #include <memory>
 #include <shared_mutex>
 #include <string>
 #include <thread>
 #include <util/copy_on_write.hpp>
+#include <util/unused.hpp>
 #include <vector>
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
@@ -59,12 +63,18 @@ public:
 	asset_manager(const asset_manager&) = delete;
 	asset_manager& operator=(const asset_manager&) = delete;
 	template <typename F>
-	std::shared_ptr<const asset> load_asset_async(const std::string& name, F completion_handler);
+	std::shared_ptr<const asset> load_asset_async(const std::string& name, F&& completion_handler) {
+		return load_asset_async(name, std::forward<F>(completion_handler), [](std::exception_ptr) {});
+	}
+	template <typename F, typename E>
+	std::shared_ptr<const asset> load_asset_async(const std::string& name, F completion_handler,
+												  E error_handler);
 	std::shared_ptr<const asset> load_asset_sync(const std::string& name);
 	boost::unique_future<std::shared_ptr<const asset>> load_asset_future(const std::string& name);
 	void start_clean();
 	void start_pin_load_unit(const std::string& name);
-	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler);
+	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler,
+							 const error_handler& error_handler);
 	void start_unpin_load_unit(const std::string& name);
 
 	void add_asset_loader(std::shared_ptr<asset_loader>&& loader);
@@ -80,8 +90,9 @@ public:
 namespace mce {
 namespace asset {
 
-template <typename F>
-std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& name, F completion_handler) {
+template <typename F, typename E>
+std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& name, F completion_handler,
+															 E error_handler) {
 	std::shared_ptr<asset> result;
 	{
 		// Acquire read lock
@@ -101,7 +112,7 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 		} else {
 			auto tmp = std::make_shared<asset>(name);
 			loaded_assets[name] = tmp;
-			tmp->run_when_loaded(std::move(completion_handler));
+			tmp->run_when_loaded(std::move(completion_handler), std::move(error_handler));
 			task_pool.post([tmp, this]() {
 				if(tmp->try_obtain_load_ownership()) {
 					try {
@@ -110,17 +121,19 @@ std::shared_ptr<const asset> asset_manager::load_asset_async(const std::string& 
 							if(loader->start_load_asset(tmp, *this, false)) return;
 						}
 					} catch(...) {
-						tmp->raise_error_flag();
+						tmp->raise_error_flag(std::current_exception());
 						throw;
 					}
-					tmp->raise_error_flag();
+					tmp->raise_error_flag(std::make_exception_ptr(
+							path_not_found_exception("Couldn't find asset '" + tmp->name() +
+													 "' through any of the registered loaders.")));
 				}
 			});
 			return tmp;
 		}
 	}
 
-	if(result) result->run_when_loaded(std::move(completion_handler));
+	if(result) result->run_when_loaded(std::move(completion_handler), std::move(error_handler));
 	return result;
 }
 

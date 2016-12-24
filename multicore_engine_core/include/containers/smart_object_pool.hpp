@@ -192,9 +192,8 @@ private:
 
 		// May only be called inside of a lock on free list
 		block(smart_object_pool<T, block_size>* owning_pool, block_entry_link& prev,
-			  block* prev_block = nullptr) noexcept : owning_pool{owning_pool},
-													  prev_block{prev_block},
-													  block_index{owning_pool->block_count} {
+			  block* prev_block = nullptr) noexcept
+				: owning_pool{owning_pool}, prev_block{prev_block}, block_index{owning_pool->block_count} {
 			ref_counts[block_size - 1].strong = {-1, 0u};
 			ref_counts[block_size - 1].weak = 0;
 			entries[block_size - 1].next_free = prev;
@@ -424,8 +423,7 @@ public:
 		}
 
 		iterator_(const iterator_<T, block_entry_link>& it) noexcept
-				: target{it.target.entry, it.target.containing_block},
-				  pool{it.pool},
+				: target{it.target.entry, it.target.containing_block}, pool{it.pool},
 				  is_limiter{it.is_limiter} {
 			if(pool) ++(pool->active_iterators);
 		}
@@ -442,8 +440,7 @@ public:
 		}
 
 		iterator_(iterator_<T, block_entry_link>&& it) noexcept
-				: target{it.target.entry, it.target.containing_block},
-				  pool{it.pool},
+				: target{it.target.entry, it.target.containing_block}, pool{it.pool},
 				  is_limiter{it.is_limiter} {
 			it.target.entry = nullptr;
 			it.target.containing_block = nullptr;

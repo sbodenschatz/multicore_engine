@@ -7,12 +7,12 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
 
+#include "entity_text_file_ast.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include "entity_text_file_ast.hpp"
 
 namespace mce {
 namespace entity {

@@ -1,12 +1,13 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/asset/load_unit_asset_loader.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <asset/file_reader.hpp>
 #include <asset/load_unit.hpp>
 #include <asset/load_unit_asset_loader.hpp>
+#include <exceptions.hpp>
 #include <util/unused.hpp>
 
 namespace mce {
@@ -38,10 +39,11 @@ void load_unit_asset_loader::start_payload_loading(const std::shared_ptr<load_un
 				if(content) {
 					load_unit->complete_loading(content, size);
 				} else {
-					load_unit->raise_error_flag();
+					load_unit->raise_error_flag(std::make_exception_ptr(path_not_found_exception(
+							"Couldn't load payload data for load unit '" + load_unit->name() + "'.")));
 				}
 			} catch(...) {
-				load_unit->raise_error_flag();
+				load_unit->raise_error_flag(std::current_exception());
 			}
 		}
 	});
@@ -59,10 +61,11 @@ void load_unit_asset_loader::prepare_load_unit_meta_data(const std::shared_ptr<l
 					load_unit->load_meta_data(content, size);
 					start_payload_loading(load_unit, asset_manager);
 				} else {
-					load_unit->raise_error_flag();
+					load_unit->raise_error_flag(std::make_exception_ptr(path_not_found_exception(
+							"Couldn't load meta data for load unit '" + load_unit->name() + "'.")));
 				}
 			} catch(...) {
-				load_unit->raise_error_flag();
+				load_unit->raise_error_flag(std::current_exception());
 				throw;
 			}
 			load_unit->check_error_flag();
@@ -84,16 +87,21 @@ bool load_unit_asset_loader::start_load_asset(const std::shared_ptr<asset>& asse
 			prepare_load_unit_meta_data(load_unit, asset_manager);
 			auto resolution_cookie = load_unit->resolve_asset(asset->name());
 			if(resolution_cookie) {
-				load_unit->run_when_loaded([asset, resolution_cookie](const load_unit_ptr& load_unit) {
-					file_content_ptr content;
-					file_size size;
-					std::tie(content, size) = load_unit->get_asset_content(resolution_cookie);
-					if(content) {
-						finish_loading(asset, content, size);
-					} else {
-						raise_error_flag(asset);
-					}
-				});
+				load_unit->run_when_loaded(
+						[asset, resolution_cookie](const load_unit_ptr& load_unit) {
+							file_content_ptr content;
+							file_size size;
+							std::tie(content, size) = load_unit->get_asset_content(resolution_cookie);
+							if(content) {
+								finish_loading(asset, content, size);
+							} else {
+								raise_error_flag(asset,
+												 std::make_exception_ptr(path_not_found_exception(
+														 "Couldn't load asset '" + asset->name() +
+														 "' from load unit '" + load_unit->name() + "'.")));
+							}
+						},
+						[asset](std::exception_ptr e) { raise_error_flag(asset, e); });
 				if(sync_hint) {
 					if(!load_unit->ready()) {
 						if(load_unit->try_obtain_data_load_ownership()) {
@@ -104,10 +112,13 @@ bool load_unit_asset_loader::start_load_asset(const std::shared_ptr<asset>& asse
 								if(content) {
 									load_unit->complete_loading(content, size);
 								} else {
-									load_unit->raise_error_flag();
+									load_unit->raise_error_flag(
+											std::make_exception_ptr(path_not_found_exception(
+													"Couldn't load payload data for load unit '" +
+													load_unit->name() + "'.")));
 								}
 							} catch(...) {
-								load_unit->raise_error_flag();
+								load_unit->raise_error_flag(std::current_exception());
 							}
 						}
 					}
@@ -144,10 +155,11 @@ std::shared_ptr<load_unit> load_unit_asset_loader::start_pin_load_unit_helper(co
 					load_unit_ptr->load_meta_data(content, size);
 					start_payload_loading(load_unit_ptr, manager);
 				} else {
-					load_unit_ptr->raise_error_flag();
+					load_unit_ptr->raise_error_flag(std::make_exception_ptr(path_not_found_exception(
+							"Couldn't load meta data for load unit '" + load_unit_ptr->name() + "'.")));
 				}
 			} catch(...) {
-				load_unit_ptr->raise_error_flag();
+				load_unit_ptr->raise_error_flag(std::current_exception());
 			}
 		}
 	});
@@ -158,9 +170,10 @@ void load_unit_asset_loader::start_pin_load_unit(const std::string& name, asset_
 	start_pin_load_unit_helper(name, manager);
 }
 void load_unit_asset_loader::start_pin_load_unit(const std::string& name, asset_manager& manager,
-												 const simple_completion_handler& completion_handler) {
+												 const simple_completion_handler& completion_handler,
+												 const error_handler& error_handler) {
 	auto load_unit = start_pin_load_unit_helper(name, manager);
-	load_unit->run_when_loaded_simple(completion_handler);
+	load_unit->run_when_loaded_simple(completion_handler, error_handler);
 }
 void load_unit_asset_loader::start_unpin_load_unit(const std::string& name, asset_manager&) {
 	std::unique_lock<std::shared_timed_mutex> lock(load_units_rw_lock);

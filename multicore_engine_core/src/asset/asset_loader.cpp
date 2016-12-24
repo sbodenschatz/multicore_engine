@@ -1,11 +1,12 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/asset/asset_loader.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <asset/asset.hpp>
 #include <asset/asset_loader.hpp>
+#include <exception>
 
 namespace mce {
 namespace asset {
@@ -14,8 +15,8 @@ void asset_loader::finish_loading(const std::shared_ptr<asset>& asset, const fil
 								  file_size size) {
 	asset->complete_loading(data, size);
 }
-void asset_loader::raise_error_flag(const std::shared_ptr<asset>& asset) {
-	asset->raise_error_flag();
+void asset_loader::raise_error_flag(const std::shared_ptr<asset>& asset, std::exception_ptr e) {
+	asset->raise_error_flag(e);
 }
 
 } // namespace asset

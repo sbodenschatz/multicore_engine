@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/asset/asset.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #include <asset/asset.hpp>
@@ -24,7 +24,9 @@ void asset::complete_loading(const std::shared_ptr<const char>& loaded_data, siz
 	for(auto& handler : completion_handlers) {
 		handler(this_shared);
 	}
+	error_handlers.clear();
 	completion_handlers.clear();
+	error_handlers.shrink_to_fit();
 	completion_handlers.shrink_to_fit();
 }
 

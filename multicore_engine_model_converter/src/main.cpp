@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /mutlicore_engine_load_unit_gen/src/main.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifdef _MSC_VER
@@ -16,6 +16,7 @@
 #include <boost/program_options.hpp>
 #include <cctype>
 #include <core/version.hpp>
+#include <exceptions.hpp>
 #include <fstream>
 #include <iostream>
 #include <model/model_format.hpp>
@@ -80,61 +81,66 @@ int main(int argc, char* argv[]) {
 		std::cout << "Invalid arguments." << std::endl;
 		argc = 1;
 	}
-	po::notify(vars);
-	if(vars.count("help") || argc == 1) {
-		std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
-		std::cout << desc;
-		return -1;
-	}
-	if(vars.count("version")) {
-		std::cout << "Multi-Core Engine project\n";
-		std::cout << "model converter - Version " << mce::core::get_build_version_string() << "\n";
-		std::cout << "Copyright 2015-2016 by Stefan Bodenschatz\n";
-		std::cout << std::endl;
-		return -1;
-	}
-	if(format == mce::model_converter::file_format::automatic) {
-		if(mce::util::ends_with_ignore_case(input_file, "obj")) {
-			format = mce::model_converter::file_format::obj;
-		} else {
-			std::cerr << "Could not determine input format for file name '" << input_file
-					  << "' and no format given." << std::endl;
-			return -2;
+	try {
+		po::notify(vars);
+		if(vars.count("help") || argc == 1) {
+			std::cout << "Usage: " << mce::util::calculate_program_name(argv[0]) << " [options]" << std::endl;
+			std::cout << desc;
+			return -1;
 		}
-	}
-	if(!fs::exists(fs::path(input_file))) {
-		std::cerr << "Input file '" << input_file << "' does not exist." << std::endl;
-		return -3;
-	}
-	if(model_output_file.empty()) {
-		model_output_file = fs::path(input_file).replace_extension("model").string();
-	}
-	if(collision_output_file.empty()) {
-		collision_output_file = fs::path(input_file).replace_extension("col").string();
-	}
-	fs::path input_file_dir = fs::path(input_file).parent_path();
-	bool static_format = true;
-	mce::asset_gen::static_model model_data;
-	mce::model::static_model_collision_data collision_data;
-	std::vector<fs::path> refs_list;
-	if(format == mce::model_converter::file_format::obj) {
-		mce::asset_gen::obj_model_parser parser(input_file_dir);
+		if(vars.count("version")) {
+			std::cout << "Multi-Core Engine project\n";
+			std::cout << "model converter - Version " << mce::core::get_build_version_string() << "\n";
+			std::cout << "Copyright 2015-2016 by Stefan Bodenschatz\n";
+			std::cout << std::endl;
+			return -1;
+		}
+		if(format == mce::model_converter::file_format::automatic) {
+			if(mce::util::ends_with_ignore_case(input_file, "obj")) {
+				format = mce::model_converter::file_format::obj;
+			} else {
+				std::cerr << "Could not determine input format for file name '" << input_file
+						  << "' and no format given." << std::endl;
+				return -2;
+			}
+		}
+		if(!fs::exists(fs::path(input_file))) {
+			std::cerr << "Input file '" << input_file << "' does not exist." << std::endl;
+			return -3;
+		}
+		if(model_output_file.empty()) {
+			model_output_file = fs::path(input_file).replace_extension("model").string();
+		}
+		if(collision_output_file.empty()) {
+			collision_output_file = fs::path(input_file).replace_extension("col").string();
+		}
+		fs::path input_file_dir = fs::path(input_file).parent_path();
+		mce::asset_gen::static_model model_data;
+		mce::model::static_model_collision_data collision_data;
+		std::vector<fs::path> refs_list;
+		if(format == mce::model_converter::file_format::obj) {
+			mce::asset_gen::obj_model_parser parser(input_file_dir);
+			if(!refs) {
+				parser.parse_file(input_file);
+				std::tie(model_data, collision_data) = parser.finalize_model();
+			} else {
+				refs_list = parser.list_refs(input_file);
+			}
+		}
 		if(!refs) {
-			parser.parse_file(input_file);
-			std::tie(model_data, collision_data) = parser.finalize_model();
+			bool static_format = true;
+			if(static_format) {
+				mce::asset_gen::static_model_exporter exporter;
+				exporter.export_model(model_data, model_output_file);
+				exporter.export_model(collision_data, collision_output_file);
+			}
 		} else {
-			refs_list = parser.list_refs(input_file);
+			for(auto& r : refs_list) {
+				std::cout << r.generic_string() << ";";
+			}
 		}
-	}
-	if(!refs) {
-		if(static_format) {
-			mce::asset_gen::static_model_exporter exporter;
-			exporter.export_model(model_data, model_output_file);
-			exporter.export_model(collision_data, collision_output_file);
-		}
-	} else {
-		for(auto& r : refs_list) {
-			std::cout << r.generic_string() << ";";
-		}
+	} catch(std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+		return -4;
 	}
 }
