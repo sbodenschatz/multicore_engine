@@ -62,12 +62,12 @@ public:
 		cv.notify_one();
 	}
 
-	bool empty() const {
+	bool empty() const noexcept {
 		std::lock_guard<Lock> guard(lock);
 		return queue.empty();
 	}
 
-	size_t size() const {
+	size_t size() const noexcept {
 		std::lock_guard<Lock> guard(lock);
 		return queue.size();
 	}
