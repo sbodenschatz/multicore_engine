@@ -10,6 +10,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <type_traits>
 #include <util/spin_lock.hpp>
 
 namespace mce {
@@ -37,7 +38,7 @@ private:
 	typename detail::cond_var_mapper<Lock>::condition_variable cv;
 
 public:
-	T pop() {
+	T pop() noexcept(std::is_nothrow_move_assignable<T>::value) {
 		std::unique_lock<Lock> guard(lock);
 		cv.wait(guard, [this] { return !queue.empty(); });
 		T value = std::move(queue.front());
@@ -45,7 +46,7 @@ public:
 		return std::move(value);
 	}
 
-	bool try_pop(T& target) {
+	bool try_pop(T& target) noexcept(std::is_nothrow_move_assignable<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		if(queue.empty()) return false;
 		target = std::move(queue.front());
