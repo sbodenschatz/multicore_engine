@@ -29,7 +29,6 @@ struct cond_var_mapper<std::mutex> {
 
 } // namespace detail
 
-// TODO Add (conditional) noexcepts
 template <typename T, typename Lock = spin_lock>
 class message_queue {
 private:
@@ -55,7 +54,8 @@ public:
 	}
 
 	template <typename U>
-	void push(U&& value) { // Forwarding reference to move value into the queue if possible
+	void push(U&& value) { // Forwarding reference to move value into the queue if possible, not noexcept
+						   // because push might throw bad_alloc
 		{
 			std::lock_guard<Lock> guard(lock);
 			queue.push(std::forward<U>(value));
