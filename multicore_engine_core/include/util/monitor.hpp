@@ -215,12 +215,12 @@ public:
 		}
 	}
 	template <typename F>
-	void do_atomically(F&& f) {
+	void do_atomically(F&& f) noexcept(noexcept(f(std::declval<T&>()))) {
 		std::lock_guard<Lock> guard(lock);
 		f(value);
 	}
 	template <typename F>
-	void do_atomically(F&& f) volatile {
+	void do_atomically(F&& f) volatile noexcept(noexcept(f(std::declval<T&>()))) {
 		std::lock_guard<Lock> guard(lock);
 		f(value);
 	}
