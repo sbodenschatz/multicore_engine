@@ -160,7 +160,9 @@ public:
 	}
 
 	/// desired is moved from in both cases.
-	bool compare_exchange_strong(T& expected, const T& desired) {
+	bool compare_exchange_strong(T& expected, const T& desired) noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_copy_constructible<T>::value&&
+					std::is_nothrow_copy_assignable<T>::value) {
 		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
@@ -175,7 +177,9 @@ public:
 		}
 	}
 	/// desired is moved from in both cases.
-	bool compare_exchange_strong(T& expected, const T& desired) volatile {
+	bool compare_exchange_strong(T& expected, const T& desired) volatile noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_copy_constructible<T>::value&&
+					std::is_nothrow_copy_assignable<T>::value) {
 		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
@@ -190,7 +194,9 @@ public:
 		}
 	}
 	/// desired is moved from in both cases.
-	bool compare_exchange_strong(T& expected, T&& desired) {
+	bool compare_exchange_strong(T& expected, T&& desired) noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_move_constructible<T>::value&&
+					std::is_nothrow_copy_assignable<T>::value) {
 		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
@@ -205,7 +211,9 @@ public:
 		}
 	}
 	/// desired is moved from in both cases.
-	bool compare_exchange_strong(T& expected, T&& desired) volatile {
+	bool compare_exchange_strong(T& expected, T&& desired) volatile noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_move_constructible<T>::value&&
+					std::is_nothrow_copy_assignable<T>::value) {
 		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
