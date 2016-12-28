@@ -125,25 +125,29 @@ public:
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
-	T exchange(const T& desired) {
+	T exchange(const T& desired) noexcept(
+			std::is_nothrow_copy_constructible<T>::value&& std::is_nothrow_move_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		T temp = value;
 		value = desired;
 		return temp;
 	}
-	T exchange(const T& desired) volatile {
+	T exchange(const T& desired) volatile noexcept(
+			std::is_nothrow_copy_constructible<T>::value&& std::is_nothrow_move_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		T temp = value;
 		value = desired;
 		return temp;
 	}
-	T exchange(T&& desired) {
+	T exchange(T&& desired) noexcept(std::is_nothrow_copy_constructible<T>::value ||
+									 std::is_nothrow_move_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		T temp = std::move_if_noexcept(value);
 		value = std::move_if_noexcept(desired);
 		return std::move_if_noexcept(temp);
 	}
-	T exchange(T&& desired) volatile {
+	T exchange(T&& desired) volatile noexcept(std::is_nothrow_copy_constructible<T>::value ||
+											  std::is_nothrow_move_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		T temp = std::move_if_noexcept(value);
 		value = std::move_if_noexcept(desired);
