@@ -79,10 +79,10 @@ public:
 		swap(value, new_value);
 		return value;
 	}
-	bool is_lock_free() const {
+	bool is_lock_free() const noexcept {
 		return false;
 	}
-	bool is_lock_free() const volatile {
+	bool is_lock_free() const volatile noexcept {
 		return false;
 	}
 	void store(const T& desired) {
