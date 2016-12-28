@@ -10,6 +10,7 @@
 #include <mutex>
 #include <type_traits>
 #include <util/spin_lock.hpp>
+#include <util/traits.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -85,25 +86,29 @@ public:
 	bool is_lock_free() const volatile noexcept {
 		return false;
 	}
-	void store(const T& desired) {
+	void store(const T& desired) noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_copy_constructible<T>::value) {
 		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		using std::swap;
 		swap(value, new_value);
 	}
-	void store(const T& desired) volatile {
+	void store(const T& desired) volatile noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_copy_constructible<T>::value) {
 		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		using std::swap;
 		swap(value, new_value);
 	}
-	void store(T&& desired) {
+	void store(T&& desired) noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_move_constructible<T>::value) {
 		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		using std::swap;
 		swap(value, new_value);
 	}
-	void store(T&& desired) volatile {
+	void store(T&& desired) volatile noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_move_constructible<T>::value) {
 		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		using std::swap;
