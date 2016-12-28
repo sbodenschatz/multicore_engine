@@ -109,19 +109,19 @@ public:
 		using std::swap;
 		swap(value, new_value);
 	}
-	T load() const {
+	T load() const noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
-	T load() const volatile {
+	T load() const volatile noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
-	operator T() const {
+	operator T() const noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
-	operator T() const volatile {
+	operator T() const volatile noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
