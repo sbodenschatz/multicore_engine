@@ -8,6 +8,7 @@
 #define UTIL_MONITOR_HPP_
 
 #include <mutex>
+#include <type_traits>
 #include <util/spin_lock.hpp>
 
 #ifdef _MSC_VER
@@ -42,9 +43,11 @@ class monitor {
 public:
 	monitor() noexcept = default;
 	// cppcheck-suppress noExplicitConstructor
-	constexpr monitor(const T& desired) : value{desired} {}
+	constexpr monitor(const T& desired) noexcept(std::is_nothrow_copy_constructible<T>::value)
+			: value{desired} {}
 	// cppcheck-suppress noExplicitConstructor
-	constexpr monitor(T&& desired) : value{std::move(desired)} {}
+	constexpr monitor(T&& desired) noexcept(std::is_nothrow_move_constructible<T>::value)
+			: value{std::move(desired)} {}
 	monitor(const monitor&) = delete;
 	monitor& operator=(const monitor&) = delete;
 	monitor& operator=(const monitor&) volatile = delete;
