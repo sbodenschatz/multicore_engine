@@ -8,7 +8,9 @@
 #define UTIL_MONITOR_HPP_
 
 #include <mutex>
+#include <type_traits>
 #include <util/spin_lock.hpp>
+#include <util/traits.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -42,9 +44,11 @@ class monitor {
 public:
 	monitor() noexcept = default;
 	// cppcheck-suppress noExplicitConstructor
-	constexpr monitor(const T& desired) : value{desired} {}
+	constexpr monitor(const T& desired) noexcept(std::is_nothrow_copy_constructible<T>::value)
+			: value{desired} {}
 	// cppcheck-suppress noExplicitConstructor
-	constexpr monitor(T&& desired) : value{std::move(desired)} {}
+	constexpr monitor(T&& desired) noexcept(std::is_nothrow_move_constructible<T>::value)
+			: value{std::move(desired)} {}
 	monitor(const monitor&) = delete;
 	monitor& operator=(const monitor&) = delete;
 	monitor& operator=(const monitor&) volatile = delete;
@@ -76,71 +80,79 @@ public:
 		swap(value, new_value);
 		return value;
 	}
-	bool is_lock_free() const {
+	bool is_lock_free() const noexcept {
 		return false;
 	}
-	bool is_lock_free() const volatile {
+	bool is_lock_free() const volatile noexcept {
 		return false;
 	}
-	void store(const T& desired) {
+	void store(const T& desired) noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_copy_constructible<T>::value) {
 		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		using std::swap;
 		swap(value, new_value);
 	}
-	void store(const T& desired) volatile {
+	void store(const T& desired) volatile noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_copy_constructible<T>::value) {
 		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		using std::swap;
 		swap(value, new_value);
 	}
-	void store(T&& desired) {
+	void store(T&& desired) noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_move_constructible<T>::value) {
 		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		using std::swap;
 		swap(value, new_value);
 	}
-	void store(T&& desired) volatile {
+	void store(T&& desired) volatile noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_move_constructible<T>::value) {
 		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		using std::swap;
 		swap(value, new_value);
 	}
-	T load() const {
+	T load() const noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
-	T load() const volatile {
+	T load() const volatile noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
-	operator T() const {
+	operator T() const noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
-	operator T() const volatile {
+	operator T() const volatile noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		return value;
 	}
-	T exchange(const T& desired) {
+	T exchange(const T& desired) noexcept(
+			std::is_nothrow_copy_constructible<T>::value&& std::is_nothrow_move_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		T temp = value;
 		value = desired;
 		return temp;
 	}
-	T exchange(const T& desired) volatile {
+	T exchange(const T& desired) volatile noexcept(
+			std::is_nothrow_copy_constructible<T>::value&& std::is_nothrow_move_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		T temp = value;
 		value = desired;
 		return temp;
 	}
-	T exchange(T&& desired) {
+	T exchange(T&& desired) noexcept(std::is_nothrow_copy_constructible<T>::value ||
+									 std::is_nothrow_move_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		T temp = std::move_if_noexcept(value);
 		value = std::move_if_noexcept(desired);
 		return std::move_if_noexcept(temp);
 	}
-	T exchange(T&& desired) volatile {
+	T exchange(T&& desired) volatile noexcept(std::is_nothrow_copy_constructible<T>::value ||
+											  std::is_nothrow_move_constructible<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		T temp = std::move_if_noexcept(value);
 		value = std::move_if_noexcept(desired);
@@ -148,7 +160,9 @@ public:
 	}
 
 	/// desired is moved from in both cases.
-	bool compare_exchange_strong(T& expected, const T& desired) {
+	bool compare_exchange_strong(T& expected, const T& desired) noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_copy_constructible<T>::value&&
+					std::is_nothrow_copy_assignable<T>::value) {
 		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
@@ -163,7 +177,9 @@ public:
 		}
 	}
 	/// desired is moved from in both cases.
-	bool compare_exchange_strong(T& expected, const T& desired) volatile {
+	bool compare_exchange_strong(T& expected, const T& desired) volatile noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_copy_constructible<T>::value&&
+					std::is_nothrow_copy_assignable<T>::value) {
 		T new_value = desired;
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
@@ -178,7 +194,9 @@ public:
 		}
 	}
 	/// desired is moved from in both cases.
-	bool compare_exchange_strong(T& expected, T&& desired) {
+	bool compare_exchange_strong(T& expected, T&& desired) noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_move_constructible<T>::value&&
+					std::is_nothrow_copy_assignable<T>::value) {
 		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
@@ -193,7 +211,9 @@ public:
 		}
 	}
 	/// desired is moved from in both cases.
-	bool compare_exchange_strong(T& expected, T&& desired) volatile {
+	bool compare_exchange_strong(T& expected, T&& desired) volatile noexcept(
+			is_nothrow_swappable<T>::value&& std::is_nothrow_move_constructible<T>::value&&
+					std::is_nothrow_copy_assignable<T>::value) {
 		T new_value = std::move(desired);
 		std::lock_guard<Lock> guard(lock);
 		if(expected == value) {
@@ -208,12 +228,12 @@ public:
 		}
 	}
 	template <typename F>
-	void do_atomically(F&& f) {
+	void do_atomically(F&& f) noexcept(noexcept(f(std::declval<T&>()))) {
 		std::lock_guard<Lock> guard(lock);
 		f(value);
 	}
 	template <typename F>
-	void do_atomically(F&& f) volatile {
+	void do_atomically(F&& f) volatile noexcept(noexcept(f(std::declval<T&>()))) {
 		std::lock_guard<Lock> guard(lock);
 		f(value);
 	}
