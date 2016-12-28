@@ -7,6 +7,8 @@
 #ifndef UTIL_TRAITS_HPP_
 #define UTIL_TRAITS_HPP_
 
+#include <utility>
+
 namespace mce {
 namespace util {
 namespace detail {
@@ -16,14 +18,14 @@ template <typename T>
 struct swappable_trait_impl {
 	struct not_swappable_t;
 
-	template <typename U = T>
-	static auto test_func(U& a, U& b) -> decltype(swap(a, b));
+	template <typename U = T, typename V = decltype(swap(std::declval<U&>(), std::declval<U&>()))>
+	static V test_func(U&, U&);
 	template <typename... Args>
 	static not_swappable_t test_func(Args&...);
 
-	using result = decltype(test_func(std::declval<T&>(), std::declval<T&>()));
-
-	static constexpr bool value = !std::is_same<result, not_swappable_t>::value;
+	static constexpr bool value =
+			!std::is_same<not_swappable_t,
+						  decltype(test_func(std::declval<T&>(), std::declval<T&>()))>::value;
 };
 
 template <typename T, bool>
