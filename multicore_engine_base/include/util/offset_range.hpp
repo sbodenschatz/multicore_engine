@@ -12,6 +12,7 @@
 #include <exceptions.hpp>
 #include <limits>
 #include <stdexcept>
+#include <type_traits>
 
 namespace mce {
 namespace util {
@@ -23,25 +24,26 @@ private:
 	T length_ = 0;
 
 public:
-	offset_range(T begin = 0, T length = 0) : begin_{begin}, length_{length} {}
+	offset_range(T begin = 0, T length = 0) noexcept(std::is_nothrow_copy_constructible<T>::value)
+			: begin_{begin}, length_{length} {}
 
-	T length() const {
+	T length() const noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		return length_;
 	}
 
-	void length(T length) {
+	void length(T length) noexcept(std::is_nothrow_copy_assignable<T>::value) {
 		length_ = length;
 	}
 
-	T begin() const {
+	T begin() const noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		return begin_;
 	}
 
-	void begin(T begin) {
+	void begin(T begin) noexcept(std::is_nothrow_copy_assignable<T>::value) {
 		begin_ = begin;
 	}
 
-	T end() const {
+	T end() const noexcept(std::is_nothrow_copy_constructible<T>::value) {
 		return begin_ + length_;
 	}
 
