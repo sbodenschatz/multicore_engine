@@ -8,6 +8,7 @@
 #define UTIL_LOCKED_HPP_
 
 #include <mutex>
+#include <type_traits>
 
 namespace mce {
 namespace util {
@@ -22,8 +23,8 @@ public:
 		std::unique_lock<S> lock;
 
 	public:
-		locked_transaction(U* value_ptr, S& sync_object) : value_ptr(value_ptr), lock(sync_object) {}
-		U* operator->() const {
+		locked_transaction(U* value_ptr, S& sync_object) noexcept : value_ptr(value_ptr), lock(sync_object) {}
+		U* operator->() const noexcept {
 			return value_ptr;
 		}
 	};
@@ -34,21 +35,22 @@ private:
 
 public:
 	template <typename... Args>
-	explicit locked(Args&&... args) : value(std::forward<Args>(args)...) {}
+	explicit locked(Args&&... args) noexcept(std::is_nothrow_constructible<T, Args...>::value)
+			: value(std::forward<Args>(args)...) {}
 	locked(const locked&) = delete;
 	locked& operator=(const locked&) = delete;
 	locked(const locked&&) = delete;
 	locked& operator=(const locked&&) = delete;
-	locked_transaction<const T, Sync_Object> operator->() const {
+	locked_transaction<const T, Sync_Object> operator->() const noexcept {
 		return locked_transaction<const T, Sync_Object>(&value, sync_object);
 	}
-	locked_transaction<T, Sync_Object> operator->() {
+	locked_transaction<T, Sync_Object> operator->() noexcept {
 		return locked_transaction<T, Sync_Object>(&value, sync_object);
 	}
-	locked_transaction<const T, Sync_Object> start_transaction() const {
+	locked_transaction<const T, Sync_Object> start_transaction() const noexcept {
 		return locked_transaction<const T, Sync_Object>(&value, sync_object);
 	}
-	locked_transaction<T, Sync_Object> start_transaction() {
+	locked_transaction<T, Sync_Object> start_transaction() noexcept {
 		return locked_transaction<T, Sync_Object>(&value, sync_object);
 	}
 };
