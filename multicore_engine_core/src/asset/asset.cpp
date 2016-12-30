@@ -12,7 +12,7 @@ namespace asset {
 asset::asset(const std::string& name) : current_state_{state::initial}, name_{name}, size_{0} {}
 asset::asset(std::string&& name) : current_state_{state::initial}, name_{std::move(name)}, size_{0} {}
 
-void asset::complete_loading(const std::shared_ptr<const char>& loaded_data, size_t size) {
+void asset::complete_loading(const std::shared_ptr<const char>& loaded_data, size_t size) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	this->data_ = loaded_data;
 	size_ = size;
@@ -22,7 +22,11 @@ void asset::complete_loading(const std::shared_ptr<const char>& loaded_data, siz
 	// From here on the asset object is immutable and can therefore be read without holding a lock
 	completed_cv.notify_all();
 	for(auto& handler : completion_handlers) {
-		handler(this_shared);
+		try {
+			handler(this_shared);
+		} catch(...) {
+			// Drop exceptions escaped from completion handlers
+		}
 	}
 	error_handlers.clear();
 	completion_handlers.clear();

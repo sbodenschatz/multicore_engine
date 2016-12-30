@@ -65,11 +65,11 @@ public:
 		}
 	}
 
-	bool ready() const {
+	bool ready() const noexcept {
 		return current_state_ == state::ready;
 	}
 
-	bool has_error() const {
+	bool has_error() const noexcept {
 		return current_state_ == state::error;
 	}
 
@@ -78,23 +78,23 @@ public:
 			throw path_not_found_exception("Error loading asset '" + name_ + "'.");
 	}
 
-	state current_state() const {
+	state current_state() const noexcept {
 		return current_state_;
 	}
 
-	const char* data() const {
+	const char* data() const noexcept {
 		return data_.get();
 	}
 
-	const std::shared_ptr<const char>& data_shared() const {
+	const std::shared_ptr<const char>& data_shared() const noexcept {
 		return data_;
 	}
 
-	const std::string& name() const {
+	const std::string& name() const noexcept {
 		return name_;
 	}
 
-	size_t size() const {
+	size_t size() const noexcept {
 		return size_;
 	}
 
@@ -102,14 +102,18 @@ public:
 	friend class asset_manager;
 
 private:
-	void complete_loading(const std::shared_ptr<const char>& data, size_t size);
+	void complete_loading(const std::shared_ptr<const char>& data, size_t size) noexcept;
 
-	void raise_error_flag(std::exception_ptr e) {
+	void raise_error_flag(std::exception_ptr e) noexcept {
 		current_state_ = state::error;
 		completed_cv.notify_all();
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		for(auto& handler : error_handlers) {
-			handler(e);
+			try {
+				handler(e);
+			} catch(...) {
+				// Drop exceptions escaped from completion handlers
+			}
 		}
 		error_handlers.clear();
 		completion_handlers.clear();
@@ -130,7 +134,7 @@ private:
 		check_error_flag();
 	}
 
-	bool try_obtain_load_ownership() {
+	bool try_obtain_load_ownership() noexcept {
 		state expected = state::initial;
 		return current_state_.compare_exchange_strong(expected, state::loading);
 	}
