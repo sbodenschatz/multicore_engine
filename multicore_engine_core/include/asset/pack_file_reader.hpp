@@ -37,10 +37,10 @@ class pack_file_reader : public file_reader {
 			bstr >> metadata;
 			if(!bstr) throw io_exception("Unable to read meta data from file '" + pack_file_name + "'.");
 		}
-		bool try_lock() {
+		bool try_lock() noexcept {
 			return !lock_flag.test_and_set();
 		}
-		void unlock() {
+		void unlock() noexcept {
 			lock_flag.clear();
 		}
 	};
