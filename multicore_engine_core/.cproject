@@ -33,6 +33,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1459155580" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -47,6 +48,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.902118531" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
@@ -64,6 +66,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.2098860767" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
@@ -116,6 +119,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2072545442" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -129,6 +133,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.102887474" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
@@ -145,6 +150,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.457364909" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
@@ -202,6 +208,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.106728205" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -216,6 +223,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1289350945" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
@@ -233,6 +241,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.661152041" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MULTICORE_ENGINE_WINDOWS"/>
@@ -278,7 +287,13 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1830712584;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1921901379;cdt.managedbuild.tool.gnu.c.compiler.input.906289021">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.896978377;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.896978377.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1784527695;cdt.managedbuild.tool.gnu.c.compiler.input.2125252252">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1068879121;cdt.managedbuild.tool.gnu.c.compiler.input.851904731">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.896978377;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.896978377.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.34040870;cdt.managedbuild.tool.gnu.cpp.compiler.input.1826814160">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1830712584;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1292740438;cdt.managedbuild.tool.gnu.cpp.compiler.input.1005330771">
