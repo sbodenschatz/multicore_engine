@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <exceptions.hpp>
 #include <iostream>
 #include <iterator>
 #include <memory>
@@ -73,6 +74,19 @@ private:
 		bool operator!=(const block_entry_link& other) const {
 			return !(*this == other);
 		}
+		bool operator<(const block_entry_link& other) const {
+			return std::tie(containing_block->block_index, entry) <
+				   std::tie(containing_block->block_index, entry);
+		}
+		bool operator>(const block_entry_link& other) const {
+			return other < *this;
+		}
+		bool operator<=(const block_entry_link& other) const {
+			return (*this < other) || (*this == other);
+		}
+		bool operator>=(const block_entry_link& other) const {
+			return (*this > other) || (*this == other);
+		}
 	};
 
 	struct const_block_entry_link {
@@ -109,6 +123,21 @@ private:
 		}
 		bool operator!=(const const_block_entry_link& other) const {
 			return !(*this == other);
+		}
+		bool operator<(const const_block_entry_link& other) const {
+			if(!containing_block) return false;
+			if(!other.containing_block) return true;
+			return std::tie(containing_block->block_index, entry) <
+				   std::tie(other.containing_block->block_index, other.entry);
+		}
+		bool operator>(const const_block_entry_link& other) const {
+			return other < *this;
+		}
+		bool operator<=(const const_block_entry_link& other) const {
+			return (*this < other) || (*this == other);
+		}
+		bool operator>=(const const_block_entry_link& other) const {
+			return (*this > other) || (*this == other);
 		}
 	};
 
@@ -192,8 +221,9 @@ private:
 
 		// May only be called inside of a lock on free list
 		block(smart_object_pool<T, block_size>* owning_pool, block_entry_link& prev,
-			  block* prev_block = nullptr) noexcept
-				: owning_pool{owning_pool}, prev_block{prev_block}, block_index{owning_pool->block_count} {
+			  block* prev_block = nullptr) noexcept : owning_pool{owning_pool},
+													  prev_block{prev_block},
+													  block_index{owning_pool->block_count} {
 			ref_counts[block_size - 1].strong = {-1, 0u};
 			ref_counts[block_size - 1].weak = 0;
 			entries[block_size - 1].next_free = prev;
@@ -423,7 +453,8 @@ public:
 		}
 
 		iterator_(const iterator_<T, block_entry_link>& it) noexcept
-				: target{it.target.entry, it.target.containing_block}, pool{it.pool},
+				: target{it.target.entry, it.target.containing_block},
+				  pool{it.pool},
 				  is_limiter{it.is_limiter} {
 			if(pool) ++(pool->active_iterators);
 		}
@@ -440,7 +471,8 @@ public:
 		}
 
 		iterator_(iterator_<T, block_entry_link>&& it) noexcept
-				: target{it.target.entry, it.target.containing_block}, pool{it.pool},
+				: target{it.target.entry, it.target.containing_block},
+				  pool{it.pool},
 				  is_limiter{it.is_limiter} {
 			it.target.entry = nullptr;
 			it.target.containing_block = nullptr;
@@ -536,6 +568,31 @@ public:
 			iterator_ ret = *this;
 			ret.make_nonlimiter_inplace();
 			return ret;
+		}
+
+		bool operator<(const iterator_<const T, const_block_entry_link>& it) const {
+			return (!is_limiter) && target < it.target;
+		}
+		bool operator>(const iterator_<const T, const_block_entry_link>& it) const {
+			return it < *this;
+		}
+		bool operator<=(const iterator_<const T, const_block_entry_link>& it) const {
+			return (*this < it) || (*this == it);
+		}
+		bool operator>=(const iterator_<const T, const_block_entry_link>& it) const {
+			return (*this > it) || (*this == it);
+		}
+		bool operator<(const iterator_<T, block_entry_link>& it) const {
+			return (!is_limiter) && target < it.target;
+		}
+		bool operator>(const iterator_<T, block_entry_link>& it) const {
+			return it < *this;
+		}
+		bool operator<=(const iterator_<T, block_entry_link>& it) const {
+			return (*this < it) || (*this == it);
+		}
+		bool operator>=(const iterator_<T, block_entry_link>& it) const {
+			return (*this > it) || (*this == it);
 		}
 
 	private:
