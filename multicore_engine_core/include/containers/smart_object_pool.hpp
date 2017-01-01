@@ -473,10 +473,10 @@ public:
 		bool operator==(const iterator_<const T, const_block_entry_link>& it) const {
 			return (it.target.entry == target.entry &&
 					it.target.containing_block == target.containing_block) ||
-				   (is_limiter &&
+				   (is_limiter && target.containing_block && it.target.containing_block &&
 					target.containing_block->block_index <= it.target.containing_block->block_index &&
 					target.entry <= it.target.entry) ||
-				   (it.is_limiter &&
+				   (it.is_limiter && target.containing_block && it.target.containing_block &&
 					it.target.containing_block->block_index <= target.containing_block->block_index &&
 					it.target.entry <= target.entry);
 		}
@@ -486,10 +486,10 @@ public:
 		bool operator==(const iterator_<T, block_entry_link>& it) const {
 			return (it.target.entry == target.entry &&
 					it.target.containing_block == target.containing_block) ||
-				   (is_limiter &&
+				   (is_limiter && target.containing_block && it.target.containing_block &&
 					target.containing_block->block_index <= it.target.containing_block->block_index &&
 					target.entry <= it.target.entry) ||
-				   (it.is_limiter &&
+				   (it.is_limiter && target.containing_block && it.target.containing_block &&
 					it.target.containing_block->block_index <= target.containing_block->block_index &&
 					it.target.entry <= target.entry);
 		}
