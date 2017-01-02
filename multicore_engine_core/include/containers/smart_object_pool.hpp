@@ -18,7 +18,6 @@
 #include <iterator>
 #include <memory>
 #include <mutex>
-#include <tbb/tbb_stddef.h>
 #include <type_traits>
 #include <vector>
 
@@ -31,6 +30,9 @@
 
 namespace mce {
 namespace containers {
+
+template <typename It>
+struct smart_object_pool_range;
 
 template <typename T, size_t block_size = 0x10000u>
 class smart_object_pool {
@@ -427,9 +429,6 @@ public:
 	smart_object_pool(smart_object_pool&&) noexcept = delete;
 	smart_object_pool& operator=(smart_object_pool&&) noexcept = delete;
 
-	template <typename It>
-	struct range_;
-
 	template <typename It_T, typename Target_T>
 	class iterator_ : public std::iterator<std::forward_iterator_tag, It_T> {
 		Target_T target;
@@ -437,7 +436,7 @@ public:
 		bool is_limiter = false;
 		friend class smart_object_pool<T, block_size>;
 		template <typename It>
-		friend class smart_object_pool<T, block_size>::range_;
+		friend struct smart_object_pool_range;
 
 		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
 			++(pool->active_iterators);
@@ -711,46 +710,6 @@ public:
 	const_iterator cend() const {
 		return const_iterator();
 	}
-
-	template <typename It>
-	struct range_ {
-		It lower;
-		It upper;
-		range_(It lower, It upper) noexcept : lower{lower}, upper{upper.make_limiter()} {
-			if(!lower.target.containing_block) throw logic_exception("Start of block can't be end iterator.");
-		}
-		bool empty() const noexcept {
-			return lower == upper;
-		}
-		bool is_divisible() const noexcept {
-			auto x = lower;
-			x++;
-			if(x == upper) return false;
-			x++;
-			return x != upper;
-		}
-		range_(range_& other, tbb::split) : lower{other.lower}, upper{other.upper} {
-			if(!lower.target.containing_block) throw logic_exception("Start of block can't be end iterator.");
-			size_t i0 = lower.target.containing_block->block_index * block_size +
-						(lower.target.entry - lower.target.containing_block->entries);
-			size_t i1 = (lower.target.containing_block->owning_pool->block_count.load() + 1) * block_size;
-			if(upper.target.containing_block) {
-				i1 = upper.target.containing_block->block_index * block_size +
-					 (upper.target.entry - upper.target.containing_block->entries);
-			}
-			size_t ih = i0 + (i1 - i0) / 2;
-			size_t ib = ih / block_size;
-			size_t ie = ih % block_size;
-			auto cur_block = upper.target.containing_block;
-			for(; cur_block && cur_block->block_index < ib; cur_block = cur_block->next_block) {
-			}
-			assert(cur_block);
-			typename It::target_type tar{cur_block->entries + ie, cur_block};
-			It it(tar, lower.target.containing_block->owning_pool);
-			lower = it;
-			other.upper = it.make_limiter();
-		}
-	};
 };
 
 template <typename T, size_t block_size>
