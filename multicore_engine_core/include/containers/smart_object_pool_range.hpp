@@ -25,6 +25,7 @@ struct smart_object_pool_range {
 	}
 	bool is_divisible() const noexcept {
 		auto x = lower;
+		if(x == upper) return false;
 		x++;
 		if(x == upper) return false;
 		x++;
@@ -51,6 +52,8 @@ struct smart_object_pool_range {
 		It it(tar, lower.target.containing_block->owning_pool);
 		lower = it;
 		other.upper = it.make_limiter();
+		lower.skip_until_valid(lower.target);
+		if(lower >= upper) lower = upper;
 	}
 };
 
