@@ -451,6 +451,10 @@ public:
 			}
 		}
 
+		static size_t pool_block_size() {
+			return block_size;
+		}
+
 	public:
 		typedef Target_T target_type;
 		iterator_() : target{nullptr, nullptr}, pool{nullptr} {}
