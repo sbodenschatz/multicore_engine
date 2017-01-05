@@ -34,16 +34,17 @@ struct smart_object_pool_range {
 	smart_object_pool_range(smart_object_pool_range& other, tbb::split)
 			: lower{other.lower}, upper{other.upper} {
 		if(!lower.target.containing_block) throw logic_exception("Start of block can't be end iterator.");
-		size_t i0 = lower.target.containing_block->block_index * block_size +
+		size_t i0 = lower.target.containing_block->block_index * lower.pool_block_size() +
 					(lower.target.entry - lower.target.containing_block->entries);
-		size_t i1 = (lower.target.containing_block->owning_pool->block_count.load() + 1) * block_size;
+		size_t i1 = (lower.target.containing_block->owning_pool->block_count.load() + 1) *
+					lower.pool_block_size();
 		if(upper.target.containing_block) {
-			i1 = upper.target.containing_block->block_index * block_size +
+			i1 = upper.target.containing_block->block_index * upper.pool_block_size() +
 				 (upper.target.entry - upper.target.containing_block->entries);
 		}
 		size_t ih = i0 + (i1 - i0) / 2;
-		size_t ib = ih / block_size;
-		size_t ie = ih % block_size;
+		size_t ib = ih / lower.pool_block_size();
+		size_t ie = ih % lower.pool_block_size();
 		auto cur_block = upper.target.containing_block;
 		for(; cur_block && cur_block->block_index < ib; cur_block = cur_block->next_block) {
 		}
@@ -58,22 +59,22 @@ struct smart_object_pool_range {
 };
 
 template <typename T, size_t block_size = 0x10000u>
-smart_object_pool_range<smart_object_pool<T, block_size>::iterator>
+smart_object_pool_range<typename smart_object_pool<T, block_size>::iterator>
 make_pool_range(smart_object_pool<T, block_size>& pool) {
-	return smart_object_pool_range<smart_object_pool<T, block_size>::iterator>(pool.begin(), pool.end());
+	return smart_object_pool_range<typename smart_object_pool<T, block_size>::iterator>(pool.begin(), pool.end());
 }
 
 template <typename T, size_t block_size = 0x10000u>
-smart_object_pool_range<smart_object_pool<T, block_size>::const_iterator>
+smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>
 make_pool_range(const smart_object_pool<T, block_size>& pool) {
-	return smart_object_pool_range<smart_object_pool<T, block_size>::const_iterator>(pool.begin(),
+	return smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>(pool.begin(),
 																					 pool.end());
 }
 
 template <typename T, size_t block_size = 0x10000u>
-smart_object_pool_range<smart_object_pool<T, block_size>::const_iterator>
+smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>
 make_pool_const_range(smart_object_pool<T, block_size>& pool) {
-	return smart_object_pool_range<smart_object_pool<T, block_size>::const_iterator>(pool.cbegin(),
+	return smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>(pool.cbegin(),
 																					 pool.cend());
 }
 
