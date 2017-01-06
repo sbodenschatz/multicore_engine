@@ -17,7 +17,7 @@ template <typename It>
 struct smart_object_pool_range {
 	It lower;
 	It upper;
-	smart_object_pool_range(It lower, It upper) noexcept : lower{lower}, upper{upper.make_limiter()} {
+	smart_object_pool_range(It lower, It upper) : lower{lower}, upper{upper.make_limiter()} {
 		if(!lower.target.containing_block) throw logic_exception("Start of block can't be end iterator.");
 	}
 	bool empty() const noexcept {
@@ -61,21 +61,22 @@ struct smart_object_pool_range {
 template <typename T, size_t block_size = 0x10000u>
 smart_object_pool_range<typename smart_object_pool<T, block_size>::iterator>
 make_pool_range(smart_object_pool<T, block_size>& pool) {
-	return smart_object_pool_range<typename smart_object_pool<T, block_size>::iterator>(pool.begin(), pool.end());
+	return smart_object_pool_range<typename smart_object_pool<T, block_size>::iterator>(pool.begin(),
+																						pool.end());
 }
 
 template <typename T, size_t block_size = 0x10000u>
 smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>
 make_pool_range(const smart_object_pool<T, block_size>& pool) {
 	return smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>(pool.begin(),
-																					 pool.end());
+																							  pool.end());
 }
 
 template <typename T, size_t block_size = 0x10000u>
 smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>
 make_pool_const_range(smart_object_pool<T, block_size>& pool) {
 	return smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>(pool.cbegin(),
-																					 pool.cend());
+																							  pool.cend());
 }
 
 } // namespace containers
