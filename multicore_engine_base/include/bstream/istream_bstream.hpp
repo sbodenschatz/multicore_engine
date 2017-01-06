@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/bstream/istream_bstream.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef BSTREAM_ISTREAM_BSTREAM_HPP_
@@ -25,7 +25,7 @@ public:
 	virtual size_t size() const noexcept override;
 	virtual size_t tell_read() const noexcept override;
 	virtual void seek_read(size_t position) override;
-	void reset() {
+	void reset() noexcept {
 		clear_read_errors();
 	}
 };
