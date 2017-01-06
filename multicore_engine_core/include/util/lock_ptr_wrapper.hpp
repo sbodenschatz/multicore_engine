@@ -60,7 +60,7 @@ public:
 	const Ptr<T>& ptr() const noexcept {
 		return ptr_;
 	}
-	explicit operator bool() const {
+	explicit operator bool() const noexcept {
 		return ptr_.operator bool();
 	}
 };
