@@ -15,10 +15,14 @@ collision_model::collision_model(const std::string& name) : current_state_{state
 collision_model::collision_model(std::string&& name)
 		: current_state_{state::loading}, name_{std::move(name)} {}
 
-void collision_model::complete_loading(const asset::asset_ptr& collision_asset) {
+void collision_model::complete_loading(const asset::asset_ptr& collision_asset) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	bstream::asset_ibstream stream{collision_asset};
-	stream >> data_;
+	try {
+		stream >> data_;
+	} catch(...) {
+		raise_error_flag(std::current_exception());
+	}
 	if(!stream) {
 		raise_error_flag(std::make_exception_ptr(
 				io_exception("Error on loading collision data for collision model '" + name_ + "'.")));
@@ -29,7 +33,11 @@ void collision_model::complete_loading(const asset::asset_ptr& collision_asset) 
 	lock.unlock();
 	// From here on the collision model object is immutable and can therefore be read without holding a lock
 	for(auto& handler : completion_handlers) {
-		handler(this_shared);
+		try {
+			handler(this_shared);
+		} catch(...) {
+			// Drop exceptions escaped from completion handlers
+		}
 	}
 	completion_handlers.clear();
 	error_handlers.clear();

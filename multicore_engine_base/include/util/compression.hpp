@@ -89,10 +89,10 @@ public:
 		stream.next_out = buffer;
 		stream.avail_out = uInt(size);
 	}
-	size_t input_available() const {
+	size_t input_available() const noexcept {
 		return stream.avail_in;
 	}
-	size_t output_available() const {
+	size_t output_available() const noexcept {
 		return stream.avail_out;
 	}
 };

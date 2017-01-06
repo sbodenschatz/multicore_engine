@@ -42,7 +42,7 @@ private:
 	std::shared_ptr<polygon_model> internal_load_polygon_model(const std::string& name);
 	std::shared_ptr<collision_model> internal_load_collision_model(const std::string& name);
 
-	void start_stage_polygon_model(const std::shared_ptr<polygon_model>& model);
+	void start_stage_polygon_model(const std::shared_ptr<polygon_model>& model) noexcept;
 
 	friend class polygon_model;
 };

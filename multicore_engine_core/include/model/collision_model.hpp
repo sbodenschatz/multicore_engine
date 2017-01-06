@@ -32,13 +32,17 @@ private:
 	std::vector<asset::error_handler> error_handlers;
 	static_model_collision_data data_;
 
-	void complete_loading(const asset::asset_ptr& collision_asset);
+	void complete_loading(const asset::asset_ptr& collision_asset) noexcept;
 
-	void raise_error_flag(std::exception_ptr e) {
+	void raise_error_flag(std::exception_ptr e) noexcept {
 		current_state_ = state::error;
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		for(auto& handler : error_handlers) {
-			handler(e);
+			try {
+				handler(e);
+			} catch(...) {
+				// Drop exceptions escaped from completion handlers
+			}
 		}
 		error_handlers.clear();
 		completion_handlers.clear();
@@ -77,11 +81,11 @@ public:
 		}
 	}
 
-	bool ready() const {
+	bool ready() const noexcept {
 		return current_state_ == state::ready;
 	}
 
-	bool has_error() const {
+	bool has_error() const noexcept {
 		return current_state_ == state::error;
 	}
 
@@ -90,15 +94,15 @@ public:
 			throw path_not_found_exception("Error loading model '" + name_ + "'.");
 	}
 
-	state current_state() const {
+	state current_state() const noexcept {
 		return current_state_;
 	}
 
-	const static_model_collision_data& data() const {
+	const static_model_collision_data& data() const noexcept {
 		return data_;
 	}
 
-	const std::string& name() const {
+	const std::string& name() const noexcept {
 		return name_;
 	}
 };

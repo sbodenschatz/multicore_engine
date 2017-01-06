@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/bstream/native_file_bstream.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
 #ifndef BSTREAM_IOSTREAM_BSTREAM_HPP_
@@ -27,7 +27,7 @@ public:
 	virtual bool write_bytes(const char* buffer, size_t count) noexcept override;
 	virtual size_t tell_write() const noexcept override;
 	virtual void seek_write(size_t position) override;
-	void reset() {
+	void reset() noexcept {
 		clear_write_errors();
 		clear_read_errors();
 	}

@@ -30,7 +30,7 @@ void load_unit::load_meta_data(const std::shared_ptr<const char>& data, size_t s
 		completed_cv.notify_all();
 	}
 }
-void load_unit::complete_loading(const std::shared_ptr<const char>& data, size_t size) {
+void load_unit::complete_loading(const std::shared_ptr<const char>& data, size_t size) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	this->payload_data_ = data;
 	size_ = size;
@@ -40,10 +40,18 @@ void load_unit::complete_loading(const std::shared_ptr<const char>& data, size_t
 	// From here on the load_unit object is immutable and can therefore be read without holding a lock
 	completed_cv.notify_all();
 	for(auto& handler : completion_handlers) {
-		handler(this_shared);
+		try {
+			handler(this_shared);
+		} catch(...) {
+			// Drop exceptions escaped from completion handlers
+		}
 	}
 	for(auto& handler : simple_completion_handlers) {
-		handler();
+		try {
+			handler();
+		} catch(...) {
+			// Drop exceptions escaped from completion handlers
+		}
 	}
 	completion_handlers.clear();
 	simple_completion_handlers.clear();
