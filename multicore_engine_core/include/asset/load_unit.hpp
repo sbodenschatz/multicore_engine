@@ -55,12 +55,14 @@ public:
 		uint64_t size;
 
 	public:
-		operator bool() const {
+		operator bool() const noexcept {
 			return load_unit != nullptr;
 		}
-		asset_resolution_cookie() : load_unit{nullptr}, offset{0}, size{0} {}
-		asset_resolution_cookie(const mce::asset::load_unit* load_unit, uint64_t offset, uint64_t size)
-				: load_unit{load_unit}, offset{offset}, size{size} {}
+		asset_resolution_cookie() noexcept : load_unit{nullptr}, offset{0}, size{0} {}
+		asset_resolution_cookie(const mce::asset::load_unit* load_unit, uint64_t offset,
+								uint64_t size) noexcept : load_unit{load_unit},
+														  offset{offset},
+														  size{size} {}
 	};
 	explicit load_unit(const std::string& name);
 	explicit load_unit(std::string&& name);
@@ -119,17 +121,17 @@ public:
 		}
 	}
 
-	bool meta_data_ready() const {
+	bool meta_data_ready() const noexcept {
 		auto cur_state = current_state_.load();
 		return cur_state == state::meta_ready || cur_state == state::data_loading ||
 			   cur_state == state::data_ready;
 	}
 
-	bool ready() const {
+	bool ready() const noexcept {
 		return current_state_ == state::data_ready;
 	}
 
-	bool has_error() const {
+	bool has_error() const noexcept {
 		return current_state_ == state::error;
 	}
 
@@ -138,11 +140,11 @@ public:
 			throw path_not_found_exception("Error loading asset '" + name_ + "'.");
 	}
 
-	state current_state() const {
+	state current_state() const noexcept {
 		return current_state_;
 	}
 
-	const std::string& name() const {
+	const std::string& name() const noexcept {
 		return name_;
 	}
 
@@ -150,14 +152,18 @@ public:
 
 private:
 	void load_meta_data(const std::shared_ptr<const char>& data, size_t size);
-	void complete_loading(const std::shared_ptr<const char>& data, size_t size);
+	void complete_loading(const std::shared_ptr<const char>& data, size_t size) noexcept;
 
 	void raise_error_flag(std::exception_ptr e) {
 		current_state_ = state::error;
 		completed_cv.notify_all();
 		std::unique_lock<std::mutex> lock(modification_mutex);
 		for(auto& handler : error_handlers) {
-			handler(e);
+			try {
+				handler(e);
+			} catch(...) {
+				// Drop exceptions escaped from completion handlers
+			}
 		}
 		error_handlers.clear();
 		completion_handlers.clear();
@@ -194,12 +200,12 @@ private:
 		check_error_flag();
 	}
 
-	bool try_obtain_meta_load_ownership() {
+	bool try_obtain_meta_load_ownership() noexcept {
 		state expected = state::initial;
 		return current_state_.compare_exchange_strong(expected, state::meta_loading);
 	}
 
-	bool try_obtain_data_load_ownership() {
+	bool try_obtain_data_load_ownership() noexcept {
 		state expected = state::meta_ready;
 		return current_state_.compare_exchange_strong(expected, state::data_loading);
 	}

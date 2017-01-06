@@ -70,6 +70,7 @@ if (WIN32)
 	include_directories(SYSTEM $ENV{VK_SDK_PATH}/Include)
 	include_directories(SYSTEM C:/Libs/vkcpp/include)
 	include_directories(SYSTEM C:/Libs/glfw/include)
+	include_directories(SYSTEM C:/Libs/TBB/include)
 	add_definitions(-DMULTICORE_ENGINE_WINDOWS) 
 	#Windos 7 and higher:
 	add_definitions(-D_WIN32_WINNT=0x0601)

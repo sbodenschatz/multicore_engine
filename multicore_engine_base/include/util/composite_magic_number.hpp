@@ -11,12 +11,12 @@ namespace mce {
 namespace util {
 
 template <typename T, typename A>
-constexpr T composite_magic_number(A arg) {
+constexpr T composite_magic_number(A arg) noexcept {
 	return T(arg);
 }
 
 template <typename T, typename A, typename... Args>
-constexpr T composite_magic_number(A arg, Args... args) {
+constexpr T composite_magic_number(A arg, Args... args) noexcept {
 	return composite_magic_number<T>(args...) << (sizeof(arg) * 8) | T(arg);
 }
 

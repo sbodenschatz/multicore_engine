@@ -10,6 +10,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <type_traits>
 #include <util/spin_lock.hpp>
 
 namespace mce {
@@ -28,7 +29,6 @@ struct cond_var_mapper<std::mutex> {
 
 } // namespace detail
 
-// TODO Add (conditional) noexcepts
 template <typename T, typename Lock = spin_lock>
 class message_queue {
 private:
@@ -37,7 +37,7 @@ private:
 	typename detail::cond_var_mapper<Lock>::condition_variable cv;
 
 public:
-	T pop() {
+	T pop() noexcept(std::is_nothrow_move_assignable<T>::value) {
 		std::unique_lock<Lock> guard(lock);
 		cv.wait(guard, [this] { return !queue.empty(); });
 		T value = std::move(queue.front());
@@ -45,7 +45,7 @@ public:
 		return std::move(value);
 	}
 
-	bool try_pop(T& target) {
+	bool try_pop(T& target) noexcept(std::is_nothrow_move_assignable<T>::value) {
 		std::lock_guard<Lock> guard(lock);
 		if(queue.empty()) return false;
 		target = std::move(queue.front());
@@ -54,7 +54,8 @@ public:
 	}
 
 	template <typename U>
-	void push(U&& value) { // Forwarding reference to move value into the queue if possible
+	void push(U&& value) { // Forwarding reference to move value into the queue if possible, not noexcept
+						   // because push might throw bad_alloc
 		{
 			std::lock_guard<Lock> guard(lock);
 			queue.push(std::forward<U>(value));
@@ -62,12 +63,12 @@ public:
 		cv.notify_one();
 	}
 
-	bool empty() const {
+	bool empty() const noexcept {
 		std::lock_guard<Lock> guard(lock);
 		return queue.empty();
 	}
 
-	size_t size() const {
+	size_t size() const noexcept {
 		std::lock_guard<Lock> guard(lock);
 		return queue.size();
 	}

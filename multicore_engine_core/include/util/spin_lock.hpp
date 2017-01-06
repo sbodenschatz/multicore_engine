@@ -16,14 +16,14 @@ class spin_lock {
 	std::atomic_flag flag = ATOMIC_FLAG_INIT;
 
 public:
-	void lock() {
+	void lock() noexcept {
 		while(flag.test_and_set(std::memory_order_acquire))
 			;
 	}
-	bool try_lock() {
+	bool try_lock() noexcept {
 		return !flag.test_and_set(std::memory_order_acquire);
 	}
-	void unlock() {
+	void unlock() noexcept {
 		flag.clear(std::memory_order_release);
 	}
 };
