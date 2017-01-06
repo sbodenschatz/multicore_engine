@@ -76,7 +76,7 @@ private:
 		}
 		bool operator<(const block_entry_link& other) const {
 			return std::tie(containing_block->block_index, entry) <
-				   std::tie(containing_block->block_index, entry);
+				   std::tie(other.containing_block->block_index, other.entry);
 		}
 		bool operator>(const block_entry_link& other) const {
 			return other < *this;
@@ -416,8 +416,7 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now."
-					  << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
 			std::terminate();
 		}
 	}
