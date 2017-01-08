@@ -11,64 +11,105 @@
 namespace mce {
 namespace containers {
 
+namespace test {
+
 template <typename T>
 struct dummy_iterator {
-	struct pool {
+	struct pool_t {
 		std::atomic<size_t> block_count;
 	};
-	struct block {
+	struct block_t {
 		T* entries;
 		size_t block_index;
-		pool* owning_pool;
-		block* next_block;
+		pool_t* owning_pool;
+		block_t* next_block;
 	} b;
 	struct target_type {
 		T* entry;
-		block* containing_block;
+		block_t* containing_block;
 	};
 	target_type target;
-	// typename dummy_iterator<T>::target_t target_type;
+	pool_t* pool;
 	bool limiter = false;
+	bool valid = false;
 	dummy_iterator make_limiter() const {
-		dummy_iterator i;
+		dummy_iterator i = *this;
 		i.limiter = true;
+		i.valid = false;
 		return i;
 	}
 	static size_t pool_block_size_;
 	static size_t pool_block_size() {
 		return pool_block_size_;
 	}
-	dummy_iterator() {
-		// TODO Implement
+	dummy_iterator() : target{nullptr, nullptr}, pool{nullptr} {}
+	dummy_iterator(const target_type& t, pool_t* p) : target{t}, pool{p} {
+		skip_until_valid();
 	}
-	dummy_iterator(const target_type&, pool*) {
-		// TODO Implement
+	struct no_skip_tag {};
+	dummy_iterator(const target_type& t, pool_t* p, no_skip_tag) : target{t}, pool{p} {}
+	void skip_until_valid() {
+		valid = true;
+		if(target.entry && target.containing_block && pool) {
+			if(target.entry >= target.containing_block->entries + pool_block_size()) {
+				target.containing_block = target.containing_block->next_block;
+				if(target.containing_block) {
+					target.entry = target.containing_block->entries;
+				} else {
+					valid = false;
+				}
+			}
+		} else {
+			valid = false;
+		}
 	}
-	static void skip_until_valid(target_type&) {
-		// TODO Implement
+	bool operator<(const dummy_iterator<T>& other) const {
+		if(limiter) return false;
+		if(!target.containing_block) return false;
+		if(!other.target.containing_block) return true;
+		return std::tie(target.containing_block->block_index, target.entry) <
+			   std::tie(other.target.containing_block->block_index, other.target.entry);
 	}
-	bool operator>=(const dummy_iterator<T>&) const {
-		// TODO Implement
-		return false;
+	bool operator>(const dummy_iterator<T>& other) const {
+		return other < *this;
 	}
-	bool operator==(const dummy_iterator<T>&) const {
-		// TODO Implement
-		return false;
+
+	bool operator<=(const dummy_iterator<T>& other) const {
+		return (*this < other) || (*this == other);
 	}
-	bool operator!=(const dummy_iterator<T>&) const {
-		// TODO Implement
-		return false;
+	bool operator>=(const dummy_iterator<T>& other) const {
+		return (*this > other) || (*this == other);
 	}
-	void operator++() const {
-		// TODO Implement
+	bool operator==(const dummy_iterator<T>& it) const {
+		return (it.target.entry == target.entry && it.target.containing_block == target.containing_block) ||
+			   (limiter && target.containing_block && it.target.containing_block &&
+				target.containing_block->block_index <= it.target.containing_block->block_index &&
+				target.entry <= it.target.entry) ||
+			   (it.limiter && target.containing_block && it.target.containing_block &&
+				it.target.containing_block->block_index <= target.containing_block->block_index &&
+				it.target.entry <= target.entry);
 	}
-	void operator++(int)const {
-		// TODO Implement
+	bool operator!=(const dummy_iterator<T>& it) const {
+		return !(*this == it);
+	}
+	dummy_iterator<T> operator++() {
+		target.entry++;
+		skip_until_valid();
+		return *this;
+	}
+	dummy_iterator<T> operator++(int) {
+		auto it = *this;
+		this->operator++();
+		return it;
 	}
 };
 
 template <typename T>
 size_t dummy_iterator<T>::pool_block_size_ = 128;
+
+} // namespace test
+
+using namespace test;
 
 BOOST_AUTO_TEST_SUITE(containers)
 BOOST_AUTO_TEST_SUITE(smart_object_pool_range_test)
