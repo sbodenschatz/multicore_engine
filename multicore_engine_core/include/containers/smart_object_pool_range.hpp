@@ -53,7 +53,7 @@ struct smart_object_pool_range {
 		It it(tar, lower.target.containing_block->owning_pool);
 		lower = it;
 		other.upper = it.make_limiter();
-		lower.skip_until_valid(lower.target);
+		lower.skip_until_valid();
 		if(lower >= upper) lower = upper;
 	}
 };

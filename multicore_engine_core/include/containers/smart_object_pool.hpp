@@ -419,7 +419,8 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now."
+					  << std::endl;
 			std::terminate();
 		}
 	}
@@ -439,7 +440,7 @@ public:
 
 		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
 			++(pool->active_iterators);
-			skip_until_valid(this->target);
+			skip_until_valid();
 		}
 
 		void drop_iterator() {
@@ -540,7 +541,7 @@ public:
 
 		iterator_& operator++() {
 			target.entry++;
-			skip_until_valid(this->target);
+			skip_until_valid();
 			return *this;
 		}
 		iterator_ operator++(int) {
@@ -615,7 +616,7 @@ public:
 			}
 			target.entry = target.containing_block ? target.containing_block->entries : nullptr;
 		}
-		static void skip_until_valid(Target_T& target) {
+		void skip_until_valid() {
 			if(!target.containing_block) {
 				target.entry = nullptr;
 				return;
