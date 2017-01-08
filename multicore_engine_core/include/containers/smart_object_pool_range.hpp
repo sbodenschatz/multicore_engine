@@ -37,7 +37,7 @@ struct smart_object_pool_range {
 			throw logic_exception("Start of block can't be end iterator.");
 		size_t i0 = lower.target.containing_block->block_index * lower.pool_block_size() +
 					(lower.target.entry - lower.target.containing_block->entries);
-		size_t i1 = (lower.pool->block_count.load() + 1) * lower.pool_block_size();
+		size_t i1 = lower.pool->block_count.load() * lower.pool_block_size();
 		if(upper.target.containing_block) {
 			i1 = upper.target.containing_block->block_index * upper.pool_block_size() +
 				 (upper.target.entry - upper.target.containing_block->entries);
@@ -45,7 +45,7 @@ struct smart_object_pool_range {
 		size_t ih = i0 + (i1 - i0) / 2;
 		size_t ib = ih / lower.pool_block_size();
 		size_t ie = ih % lower.pool_block_size();
-		auto cur_block = upper.target.containing_block;
+		auto cur_block = lower.target.containing_block;
 		for(; cur_block && cur_block->block_index < ib; cur_block = cur_block->next_block) {
 		}
 		assert(cur_block);
