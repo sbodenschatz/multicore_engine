@@ -438,6 +438,13 @@ public:
 		template <typename It>
 		friend struct smart_object_pool_range;
 
+		struct no_skip_tag {};
+
+		iterator_(Target_T target, smart_object_pool<T, block_size>* pool, no_skip_tag)
+				: target(target), pool{pool} {
+			++(pool->active_iterators);
+		}
+
 		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
 			++(pool->active_iterators);
 			skip_until_valid();

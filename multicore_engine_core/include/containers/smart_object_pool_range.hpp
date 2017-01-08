@@ -50,7 +50,7 @@ struct smart_object_pool_range {
 		}
 		assert(cur_block);
 		typename It::target_type tar{cur_block->entries + ie, cur_block};
-		It it(tar, lower.target.containing_block->owning_pool);
+		It it(tar, lower.target.containing_block->owning_pool, typename It::no_skip_tag{});
 		lower = it;
 		other.upper = it.make_limiter();
 		lower.skip_until_valid();
