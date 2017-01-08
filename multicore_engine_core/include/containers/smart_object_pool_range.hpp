@@ -33,7 +33,8 @@ struct smart_object_pool_range {
 	}
 	smart_object_pool_range(smart_object_pool_range& other, tbb::split)
 			: lower{other.lower}, upper{other.upper} {
-		if(!lower.target.containing_block) throw logic_exception("Start of block can't be end iterator.");
+		if(!lower.target.containing_block || !lower.pool)
+			throw logic_exception("Start of block can't be end iterator.");
 		size_t i0 = lower.target.containing_block->block_index * lower.pool_block_size() +
 					(lower.target.entry - lower.target.containing_block->entries);
 		size_t i1 = (lower.pool->block_count.load() + 1) * lower.pool_block_size();
