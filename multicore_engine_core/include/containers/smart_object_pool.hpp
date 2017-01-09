@@ -31,6 +31,9 @@
 namespace mce {
 namespace containers {
 
+template <typename It>
+struct smart_object_pool_range;
+
 template <typename T, size_t block_size = 0x10000u>
 class smart_object_pool {
 private:
@@ -416,7 +419,8 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now."
+					  << std::endl;
 			std::terminate();
 		}
 	}
@@ -431,10 +435,19 @@ public:
 		smart_object_pool<T, block_size>* pool;
 		bool is_limiter = false;
 		friend class smart_object_pool<T, block_size>;
+		template <typename It>
+		friend struct smart_object_pool_range;
+
+		struct no_skip_tag {};
+
+		iterator_(Target_T target, smart_object_pool<T, block_size>* pool, no_skip_tag)
+				: target(target), pool{pool} {
+			++(pool->active_iterators);
+		}
 
 		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
 			++(pool->active_iterators);
-			skip_until_valid(this->target);
+			skip_until_valid();
 		}
 
 		void drop_iterator() {
@@ -445,7 +458,12 @@ public:
 			}
 		}
 
+		static size_t pool_block_size() {
+			return block_size;
+		}
+
 	public:
+		typedef Target_T target_type;
 		iterator_() : target{nullptr, nullptr}, pool{nullptr} {}
 		~iterator_() {
 			drop_iterator();
@@ -530,7 +548,7 @@ public:
 
 		iterator_& operator++() {
 			target.entry++;
-			skip_until_valid(this->target);
+			skip_until_valid();
 			return *this;
 		}
 		iterator_ operator++(int) {
@@ -605,7 +623,7 @@ public:
 			}
 			target.entry = target.containing_block ? target.containing_block->entries : nullptr;
 		}
-		static void skip_until_valid(Target_T& target) {
+		void skip_until_valid() {
 			if(!target.containing_block) {
 				target.entry = nullptr;
 				return;
