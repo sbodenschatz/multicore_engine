@@ -27,8 +27,6 @@ struct smart_object_pool_range {
 		auto x = lower;
 		if(x == upper) return false;
 		x++;
-		if(x == upper) return false;
-		x++;
 		return x != upper;
 	}
 	smart_object_pool_range(smart_object_pool_range& other, tbb::split)

@@ -266,16 +266,79 @@ BOOST_AUTO_TEST_CASE(empty_negative) {
 
 	BOOST_CHECK(!r1.empty());
 }
-/*
+
 BOOST_AUTO_TEST_CASE(divisibility_positive) {
-	smart_object_pool_range<dummy_iterator<int>> r1(dummy_iterator<int>{}, dummy_iterator<int>{});
-	r1.is_divisible();
+	typedef dummy_iterator<int> dit_t;
+	int data[2 * 128];
+	dit_t::pool_t dpool;
+	dpool.block_count = 2;
+	dit_t::block_t dblocks[2];
+
+	dblocks[0].block_index = 0;
+	dblocks[0].entries = data;
+	dblocks[0].owning_pool = &dpool;
+	dblocks[0].next_block = dblocks + 1;
+
+	dblocks[1].block_index = 1;
+	dblocks[1].entries = data + 128;
+	dblocks[1].owning_pool = &dpool;
+	dblocks[1].next_block = nullptr;
+
+	dit_t it0(dit_t::target_type{dblocks[0].entries, dblocks}, &dpool);
+	dit_t it1(dit_t::target_type{dblocks[0].entries + 2, dblocks}, &dpool);
+
+	smart_object_pool_range<dummy_iterator<int>> r1(it0, it1);
+
+	BOOST_CHECK(!r1.lower.limiter);
+	BOOST_CHECK(r1.lower.valid);
+	BOOST_CHECK(r1.lower.pool == &dpool);
+	BOOST_CHECK(r1.lower.target.containing_block == dblocks);
+	BOOST_CHECK(r1.lower.target.entry == data);
+
+	BOOST_CHECK(r1.upper.limiter);
+	BOOST_CHECK(!r1.upper.valid);
+	BOOST_CHECK(r1.upper.pool == &dpool);
+	BOOST_CHECK(r1.upper.target.containing_block == dblocks);
+	BOOST_CHECK(r1.upper.target.entry == data + 2);
+
+	BOOST_CHECK(r1.is_divisible());
 }
 BOOST_AUTO_TEST_CASE(divisibility_negative) {
-	smart_object_pool_range<dummy_iterator<int>> r1(dummy_iterator<int>{}, dummy_iterator<int>{});
-	r1.is_divisible();
+	typedef dummy_iterator<int> dit_t;
+	int data[2 * 128];
+	dit_t::pool_t dpool;
+	dpool.block_count = 2;
+	dit_t::block_t dblocks[2];
+
+	dblocks[0].block_index = 0;
+	dblocks[0].entries = data;
+	dblocks[0].owning_pool = &dpool;
+	dblocks[0].next_block = dblocks + 1;
+
+	dblocks[1].block_index = 1;
+	dblocks[1].entries = data + 128;
+	dblocks[1].owning_pool = &dpool;
+	dblocks[1].next_block = nullptr;
+
+	dit_t it0(dit_t::target_type{dblocks[0].entries, dblocks}, &dpool);
+	dit_t it1(dit_t::target_type{dblocks[0].entries + 1, dblocks}, &dpool);
+
+	smart_object_pool_range<dummy_iterator<int>> r1(it0, it1);
+
+	BOOST_CHECK(!r1.lower.limiter);
+	BOOST_CHECK(r1.lower.valid);
+	BOOST_CHECK(r1.lower.pool == &dpool);
+	BOOST_CHECK(r1.lower.target.containing_block == dblocks);
+	BOOST_CHECK(r1.lower.target.entry == data);
+
+	BOOST_CHECK(r1.upper.limiter);
+	BOOST_CHECK(!r1.upper.valid);
+	BOOST_CHECK(r1.upper.pool == &dpool);
+	BOOST_CHECK(r1.upper.target.containing_block == dblocks);
+	BOOST_CHECK(r1.upper.target.entry == data + 1);
+
+	BOOST_CHECK(!r1.is_divisible());
 }
-*/
 
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
