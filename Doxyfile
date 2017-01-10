@@ -775,8 +775,13 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = multicore_engine_core \
-                         multicore_engine_demo
+INPUT                  = multicore_engine_base \
+                         multicore_engine_core \
+                         multicore_engine_demo \
+                         multicore_engine_load_unit_gen \
+                         multicore_engine_model_converter \
+                         multicore_engine_pack_file_gen \
+                         multicore_engine_parsers
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
