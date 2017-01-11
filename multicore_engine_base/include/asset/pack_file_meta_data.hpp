@@ -31,6 +31,7 @@ struct pack_file_element_meta_data {
 	friend bstream::obstream& operator<<(bstream::obstream& obs, const pack_file_element_meta_data& value);
 };
 
+/// Represents the meta data for a pack file.
 struct pack_file_meta_data {
 	/// The supported (current) version of the pack file meta data format.
 	static constexpr uint8_t current_version[3] = {0, 2, 0};

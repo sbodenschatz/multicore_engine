@@ -18,6 +18,7 @@ class obstream;
 } // namespace bstream
 namespace asset {
 
+/// Defines the structure of the meta data for an asset within a load unit.
 struct asset_meta_data {
 	uint64_t offset;  ///< The offset of the asset into the containing load unit payload in bytes.
 	uint64_t size;	///< The size of the assets in bytes.
@@ -29,6 +30,7 @@ struct asset_meta_data {
 	friend bstream::obstream& operator<<(bstream::obstream& obs, const asset_meta_data& value);
 };
 
+/// Defines the structure of the meta data for a load unit.
 struct load_unit_meta_data {
 	// std::string name;
 	std::vector<asset_meta_data> assets; ///< The meta data for the assets in the load unit.
