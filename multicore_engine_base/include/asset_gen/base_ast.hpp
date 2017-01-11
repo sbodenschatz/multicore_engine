@@ -11,9 +11,17 @@
 
 namespace mce {
 namespace asset_gen {
+/// Contains asset generator ASTs.
 namespace ast {
 
-enum class lookup_type { w, d };
+/// @brief Represents a lookup type modifier in description files and is used to specify which base is used
+/// for relative paths.
+enum class lookup_type {
+	w, ///< Resolve paths relative to the tools working directory.
+	d  ///< Resolve paths relative to the directory of the description file.
+};
+
+/// Debug output operator for #mce::asset_gen::ast::lookup_type
 inline std::ostream& operator<<(std::ostream& s, const lookup_type& r) {
 	if(r == lookup_type::w) {
 		s << "w";
