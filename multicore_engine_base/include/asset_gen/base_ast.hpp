@@ -11,7 +11,6 @@
 
 namespace mce {
 namespace asset_gen {
-/// Contains asset generator ASTs.
 namespace ast {
 
 /// @brief Represents a lookup type modifier in description files and is used to specify which base is used

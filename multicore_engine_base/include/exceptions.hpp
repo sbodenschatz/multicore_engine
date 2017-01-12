@@ -7,6 +7,11 @@
 #ifndef CORE_EXCEPTIONS_HPP_
 #define CORE_EXCEPTIONS_HPP_
 
+/**
+ * \file
+ * Provides the definitions for exception classes used in the mce code base.
+ */
+
 #include <stdexcept>
 
 namespace mce {
