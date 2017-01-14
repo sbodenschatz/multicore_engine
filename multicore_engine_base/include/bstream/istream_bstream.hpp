@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/bstream/istream_bstream.hpp
- * Copyright 2015-2016 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef BSTREAM_ISTREAM_BSTREAM_HPP_
