@@ -18,16 +18,16 @@ namespace ast {
 
 /// AST node for a parsed entry in a load unit description.
 struct load_unit_entry {
-	/// Construct load unit from values with lookup type.
+	/// Construct load unit entry node from values with lookup type.
 	// cppcheck-suppress passedByValue
 	load_unit_entry(std::string external_path, lookup_type lookup, std::string internal_path)
 			: external_path(std::move(external_path)), lookup(lookup),
 			  internal_path(std::move(internal_path)) {}
-	/// Construct load unit from values without lookup type.
+	/// Construct load unit entry node from values without lookup type.
 	// cppcheck-suppress passedByValue
 	load_unit_entry(std::string external_path, std::string internal_path)
 			: external_path(std::move(external_path)), internal_path(std::move(internal_path)) {}
-	/// Construct empty load unit.
+	/// Construct empty load unit entry node.
 	load_unit_entry() {}
 	std::string external_path;			 ///< The external path of the file to add into the load unit.
 	lookup_type lookup = lookup_type::w; ///< Specifies how the external path is resolved when relative.
