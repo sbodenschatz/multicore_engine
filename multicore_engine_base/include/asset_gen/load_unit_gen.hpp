@@ -17,7 +17,7 @@ namespace asset_gen {
 
 /// The central class for providing the load unit generator functionality.
 /**
- * An instance of this class holds the data needed for one load unit the is to be generated.
+ * An instance of this class holds the data needed for one load unit that is to be generated.
  * It saves the list of files to add to the unit and allows compiling the load unit after adding the files.
  * If another unit is to be generated a new instance of the class needs to be created.
  */
