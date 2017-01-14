@@ -15,6 +15,12 @@
 namespace mce {
 namespace asset_gen {
 
+/// The central class for providing the pack file generator functionality.
+/**
+ * An instance of this class holds the data needed for one pack file that is to be generated.
+ * It saves the list of files to add to the pack and allows compiling the pack file after adding the files.
+ * If another pack is to be generated a new instance of the class needs to be created.
+ */
 class pack_file_gen {
 	struct pack_file_entry {
 		std::string path;
@@ -48,8 +54,11 @@ class pack_file_gen {
 	void write_pack_file(const std::string& output_file);
 
 public:
+	/// Add a file to the prepared content of the pack file in uncompressed form.
 	void add_file(const std::string& path, const std::string& name);
+	/// Add a file to the prepared content of the pack file in compressed form with the given level.
 	void add_file_compressed(const std::string& path, const std::string& name, int level = -1);
+	/// Compile the prepared content into a pack file and write it to the given output file.
 	void compile_pack_file(const std::string& output_file);
 };
 
