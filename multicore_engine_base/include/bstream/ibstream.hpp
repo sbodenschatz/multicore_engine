@@ -34,15 +34,15 @@ public:
 	void raise_read_invalid() noexcept {
 		invalid_ = true;
 	}
-	/// Provides a virtual destructor for subclasses to hook in destruction.
+	/// Provides a virtual destructor for subclasses to hook for destruction.
 	virtual ~ibstream() = default;
 	/// The hook for reading bytes from the implemented data source.
 	virtual size_t read_bytes(char* buffer, size_t count) noexcept = 0;
 	/// The hook for determining the size of the implemented data source.
 	virtual size_t size() const noexcept = 0;
-	/// The hook for determining the current position in the implemented data source.
+	/// The hook for determining the current read position in the implemented data source.
 	virtual size_t tell_read() const noexcept = 0;
-	/// The hook for changing the current position in the implemented data source to the given value.
+	/// The hook for changing the current read position in the implemented data source to the given value.
 	virtual void seek_read(size_t position) = 0;
 
 	/// Disables the end of file and invalid flags to reset previous error states.
