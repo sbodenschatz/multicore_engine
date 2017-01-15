@@ -23,7 +23,7 @@ std::vector<char> compress(const std::vector<char>& input, int level) {
 }
 void compress(const std::vector<char>& input, int level, std::vector<char>& out_buffer) {
 	out_buffer.clear();
-	using namespace zlib_wrappers;
+	using namespace detail::zlib_wrappers;
 	{
 		zlib_deflate_stream strm(level);
 		size_t remaining_input = input.size();
@@ -58,7 +58,7 @@ std::vector<char> decompress(const std::vector<char>& input) {
 }
 void decompress(const std::vector<char>& input, std::vector<char>& out_buffer) {
 	out_buffer.clear();
-	using namespace zlib_wrappers;
+	using namespace detail::zlib_wrappers;
 	{
 		zlib_inflate_stream strm;
 		size_t remaining_input = input.size();
