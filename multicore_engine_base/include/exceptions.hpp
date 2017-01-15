@@ -16,66 +16,67 @@
 
 namespace mce {
 
+/// Exception used to signal an invalid magic number when loading binary data.
 struct invalid_magic_number_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal an incompatible file format version when loading data.
 struct invalid_version_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal errors from the (de-)compression library.
 struct compression_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal problems with the size of supplied buffers.
 struct buffer_size_exception : std::length_error {
 	using std::length_error::length_error;
 };
-
+/// Exception used to signal that values exceed the allowed range.
 struct out_of_range_exception : std::out_of_range {
 	using std::out_of_range::out_of_range;
 };
-
+/// Exception used to signal that a path or file was not found.
 struct path_not_found_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal general problems with I/O operations.
 struct io_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal syntax errors in parsed files.
 struct syntax_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal that a requested functionality is not implemented.
 struct unimplemented_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal errors in the program logic.
 struct logic_exception : std::logic_error {
 	using std::logic_error::logic_error;
 };
-
+/// Exception used to signal that an asynchronously used object was not in the required state for the request.
 struct async_state_exception : std::logic_error {
 	using std::logic_error::logic_error;
 };
-
+/// Exception used to signal that a value of an invalid type was supplied.
 struct value_type_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal that an invalid property was referenced.
 struct invalid_property_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal that the referenced entity does not exist.
 struct missing_entity_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal that the referenced entity configuration does not exist.
 struct missing_entity_config_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
-
+/// Exception used to signal that an invalid component type was referenced.
 struct invalid_component_type_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
