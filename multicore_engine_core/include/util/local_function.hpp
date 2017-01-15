@@ -19,7 +19,8 @@ namespace util {
 template <size_t Max_Size, typename Signature>
 class local_function;
 
-namespace detail_local_function {
+namespace detail {
+namespace local_function {
 
 template <typename R, typename... Args>
 class abstract_function_object;
@@ -27,7 +28,7 @@ class abstract_function_object;
 template <typename R, typename... Args>
 class deleter {
 public:
-	void operator()(detail_local_function::abstract_function_object<R, Args...>* ptr) {
+	void operator()(detail::local_function::abstract_function_object<R, Args...>* ptr) {
 		ptr->~abstract_function_object();
 	}
 };
@@ -44,15 +45,16 @@ public:
 																				   size_t storage_size) = 0;
 };
 
-} // namespace detail_local_function
+} // namespace local_function
+} // namespace detail
 
 template <size_t Max_Size, typename R, typename... Args>
 class local_function<Max_Size, R(Args...)> {
-	typedef std::unique_ptr<detail_local_function::abstract_function_object<R, Args...>,
-							detail_local_function::deleter<R, Args...>>
+	typedef std::unique_ptr<detail::local_function::abstract_function_object<R, Args...>,
+							detail::local_function::deleter<R, Args...>>
 			abstract_func_obj_ptr;
 	template <typename F>
-	class function_object : public detail_local_function::abstract_function_object<R, Args...> {
+	class function_object : public detail::local_function::abstract_function_object<R, Args...> {
 		F f;
 
 		template <typename = void, typename = void>
@@ -179,12 +181,12 @@ public:
 		return *this;
 	}
 	R operator()(Args... args) const {
-		const detail_local_function::abstract_function_object<R, Args...>* f = function_obj.get();
+		const detail::local_function::abstract_function_object<R, Args...>* f = function_obj.get();
 		if(!f) throw std::bad_function_call();
 		return (*f)(std::forward<Args>(args)...);
 	}
 	R operator()(Args... args) {
-		detail_local_function::abstract_function_object<R, Args...>* f = function_obj.get();
+		detail::local_function::abstract_function_object<R, Args...>* f = function_obj.get();
 		if(!f) throw std::bad_function_call();
 		return (*f)(std::forward<Args>(args)...);
 	}
