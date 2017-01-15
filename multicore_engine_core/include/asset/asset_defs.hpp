@@ -26,11 +26,6 @@ typedef util::local_function<128, void(const asset_ptr& asset)> asset_completion
 typedef std::shared_ptr<const char> file_content_ptr;
 typedef size_t file_size;
 
-struct offset_range {
-	file_size begin;
-	file_size end;
-};
-
 typedef util::local_function<128, void(std::exception_ptr)> error_handler;
 
 } // namespace asset
