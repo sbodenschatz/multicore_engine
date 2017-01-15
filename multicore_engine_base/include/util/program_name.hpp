@@ -12,6 +12,7 @@
 namespace mce {
 namespace util {
 
+/// Calculates the program name (without path or suffix) from the given first argument of main.
 std::string calculate_program_name(const std::string& arg0);
 
 } // namespace util

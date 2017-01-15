@@ -12,6 +12,7 @@
 namespace mce {
 namespace util {
 
+/// Sanitizes the given part in place for the right type of slashes.
 void sanitize_path_inplace(std::string& path) noexcept;
 
 } // namespace util
