@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/memory/align.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef MEMORY_ALIGN_HPP_
@@ -9,12 +9,18 @@
 
 #include <cstddef>
 
+/**
+ * \file
+ * Memory alignment functions.
+ */
+
 namespace mce {
 namespace memory {
 
-// Implements the same task as std::align to compensate for lacking compiler support
+/// Implements the same task as std::align to compensate for lacking compiler support
 void* align(std::size_t alignment, std::size_t size, void*& ptr, std::size_t& space);
 
+/// Aligns an offset instead of a pointer similarly to std::align.
 template <typename T>
 bool align_offset(T alignment, T size, T& ptr, T& space) {
 	T unalignment = ptr & (alignment - 1);
