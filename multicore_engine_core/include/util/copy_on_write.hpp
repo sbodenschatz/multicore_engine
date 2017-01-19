@@ -16,7 +16,11 @@ namespace util {
 /// Provides a generic implementation of copy-on-write semantics based transactions.
 /**
  * This class template uses #mce::util::monitor and std::shared_ptr to provide thread-save transactions using
- * copy-on-write on an object of type T.
+ * copy-on-write on an object of type T. It is especially suitable for cases with infrequent writes but
+ * many readers, that potentially work with the data for a long time. Cases with high writing frequencies are
+ * costly because each write transaction requires a heap allocation and at least one copy of the managed
+ * object. Very high read frequencies could lead to heavy lock contention of the monitor holding the current
+ * version (implemented using a spin lock, because it just protects a shared_ptr copy).
  *
  * The type T must satisfy the concept CopyConstructible from the standard library.
  * For the copy_on_write instantiation to be default-constructible, T must also satisfy the requirements of
