@@ -20,7 +20,8 @@ namespace util {
  * many readers, that potentially work with the data for a long time. Cases with high writing frequencies are
  * costly because each write transaction requires a heap allocation and at least one copy of the managed
  * object. Very high read frequencies could lead to heavy lock contention of the monitor holding the current
- * version (implemented using a spin lock, because it just protects a shared_ptr copy).
+ * version. By default, the monitor uses a spin lock, because it just protects a shared_ptr copy. If desired,
+ * this can be changed to other lock types by using the optional template parameter.
  *
  * The type T must satisfy the concept CopyConstructible from the standard library.
  * For the copy_on_write instantiation to be default-constructible, T must also satisfy the requirements of
