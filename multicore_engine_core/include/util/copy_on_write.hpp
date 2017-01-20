@@ -31,10 +31,10 @@ namespace util {
  * their view. Writing users can apply modifying transactions to T encapsulated in a idempotent function
  * object using #do_transaction.
  */
-template <typename T>
+template <typename T, typename Lock = spin_lock>
 class copy_on_write {
 	// TODO replace monitor<std::shared_ptr<T>> with std::atomic_shared_ptr<T> when available.
-	monitor<std::shared_ptr<T>> ptr;
+	monitor<std::shared_ptr<T>, Lock> ptr;
 
 public:
 	/// Deafult-constructs a copy_on_write object by default-constructing the managed object.
