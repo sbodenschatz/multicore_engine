@@ -40,11 +40,21 @@ struct nothrow_swappable_trait_impl<T, false> {
 
 } // namespace detail
 
+/// Replacement for std::is_swappable<T> from C++17 where it is not available.
+/**
+ * \bug This may give false positives where swap is not SFINAEd correctly (for C++17) yet. Unfortunately this
+ * can not prevented without also replacing std::swap and excluding the original from ADL.
+ */
 template <typename T>
 struct is_swappable {
 	static constexpr bool value = detail::swappable_trait_impl<T>::value;
 };
 
+/// Replacement for std::is_nothrow_swappable<T> from C++17 where it is not available.
+/**
+ * \bug This may give false positives where swap is not SFINAEd correctly (for C++17) yet. Unfortunately this
+ * can not prevented without also replacing std::swap and excluding the original from ADL.
+ */
 template <typename T>
 struct is_nothrow_swappable {
 	static constexpr bool value =
