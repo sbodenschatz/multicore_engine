@@ -74,10 +74,6 @@ public:
 		return ptr_.operator->();
 	}
 	/// Allows access to the smart pointer for the managed object.
-	Ptr<T>& ptr() noexcept {
-		return ptr_;
-	}
-	/// Allows access to the smart pointer for the managed object.
 	const Ptr<T>& ptr() const noexcept {
 		return ptr_;
 	}
