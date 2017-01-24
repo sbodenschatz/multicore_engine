@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/containers/scratch_pad_pool.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef CONTAINERS_SCRATCH_PAD_POOL_HPP_
@@ -24,6 +24,22 @@ namespace containers {
  * back using move semantics.
  * The type T further needs to have a clear() member function that resets it to the state it should have when
  * it is given out again to other users.
+ *
+ * Usage example:
+ * \code{.cpp}
+ * std::vector<int> input;
+ * //fill input
+ *
+ * scratch_pad_pool<std::vector<int>> pool;
+ * auto obj = pool.get();
+ * std::copy_if(input.begin(),input.end(),std::back_inserter(*obj),[](int element){
+ * //...
+ * });
+ *
+ * //Work with filtered data
+ *
+ * //When obj goes out of scope the container is handed back to the pool.
+ * \endcode
  */
 template <typename T>
 class scratch_pad_pool {
