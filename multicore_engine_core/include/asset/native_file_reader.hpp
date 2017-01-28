@@ -12,7 +12,7 @@
 namespace mce {
 namespace asset {
 
-/// Loads files directly from the operation system file system.
+/// Loads files directly from the operating system file system.
 class native_file_reader : public file_reader {
 public:
 	/// Reads the given file from the given path prefix into memory.
