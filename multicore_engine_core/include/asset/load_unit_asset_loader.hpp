@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/load_unit_asset_loader.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_LOAD_UNIT_ASSET_LOADER_HPP_
@@ -19,6 +19,7 @@ namespace mce {
 namespace asset {
 class load_unit;
 
+/// Implements loading of assets through load units that are read into memory as a whole.
 class load_unit_asset_loader : public asset_loader {
 	std::shared_timed_mutex load_units_rw_lock;
 	std::vector<std::shared_ptr<load_unit>> load_units;
@@ -34,7 +35,9 @@ class load_unit_asset_loader : public asset_loader {
 														  asset_manager& asset_manager);
 
 public:
+	/// Creates a file_asset_loader using the given path prefixes and with an empty load unit prefix.
 	explicit load_unit_asset_loader(const std::vector<path_prefix>& prefixes);
+	/// Creates a file_asset_loader using the given path prefixes and with an empty load unit prefix.
 	explicit load_unit_asset_loader(std::vector<path_prefix>&& prefixes);
 	virtual bool start_load_asset(const std::shared_ptr<asset>& asset, asset_manager& asset_manager,
 								  bool sync_hint) override;
