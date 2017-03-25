@@ -419,17 +419,17 @@ public:
 
 	template <typename K, typename V>
 	std::pair<iterator, bool> insert(K&& key, V&& value) {
+		auto it_after_key = std::upper_bound(this->keys.begin(), this->keys.end(), key, this->compare);
+		auto it_key = it_after_key;
+		if(it_key != this->keys.begin()) --it_key;
+		auto key_index = std::distance(this->keys.begin(), it_key);
+		if(!this->compare(*it_key, key) && !this->compare(key, *it_key))
+			return std::make_pair(iterator(key_index, this), false);
+		auto index = std::distance(this->keys.begin(), it_after_key);
+		auto it_after_value = this->values.begin() + index;
+		this->keys.reserve(this->keys.size() + 1);
+		this->values.reserve(this->values.size() + 1);
 		try {
-			auto it_after_key = std::upper_bound(this->keys.begin(), this->keys.end(), key, this->compare);
-			auto it_key = it_after_key;
-			if(it_key != this->keys.begin()) --it_key;
-			auto key_index = std::distance(this->keys.begin(), it_key);
-			if(!this->compare(*it_key, key) && !this->compare(key, *it_key))
-				return std::make_pair(iterator(key_index, this), false);
-			auto index = std::distance(this->keys.begin(), it_after_key);
-			auto it_after_value = this->values.begin() + index;
-			this->keys.reserve(this->keys.size() + 1);
-			this->values.reserve(this->values.size() + 1);
 			this->keys.emplace(it_after_key, std::forward<K>(key));
 			this->values.emplace(it_after_value, std::forward<V>(value));
 			return std::make_pair(iterator(index, this), true);
@@ -442,19 +442,19 @@ public:
 
 	template <typename K, typename V>
 	std::pair<iterator, bool> insert_or_assign(K&& key, V&& value) {
+		auto it_after_key = std::upper_bound(this->keys.begin(), this->keys.end(), key, this->compare);
+		auto it_key = it_after_key;
+		if(it_key != this->keys.begin()) --it_key;
+		auto key_index = std::distance(this->keys.begin(), it_key);
+		if(!this->compare(*it_key, key) && !this->compare(key, *it_key)) {
+			this->values[key_index] = std::forward<V>(value);
+			return std::make_pair(iterator(key_index, this), false);
+		}
+		auto index = std::distance(this->keys.begin(), it_after_key);
+		auto it_after_value = this->values.begin() + index;
+		this->keys.reserve(this->keys.size() + 1);
+		this->values.reserve(this->values.size() + 1);
 		try {
-			auto it_after_key = std::upper_bound(this->keys.begin(), this->keys.end(), key, this->compare);
-			auto it_key = it_after_key;
-			if(it_key != this->keys.begin()) --it_key;
-			auto key_index = std::distance(this->keys.begin(), it_key);
-			if(!this->compare(*it_key, key) && !this->compare(key, *it_key)) {
-				this->values[key_index] = std::forward<V>(value);
-				return std::make_pair(iterator(key_index, this), false);
-			}
-			auto index = std::distance(this->keys.begin(), it_after_key);
-			auto it_after_value = this->values.begin() + index;
-			this->keys.reserve(this->keys.size() + 1);
-			this->values.reserve(this->values.size() + 1);
 			this->keys.emplace(it_after_key, std::forward<K>(key));
 			this->values.emplace(it_after_value, std::forward<V>(value));
 			return std::make_pair(iterator(index, this), true);
@@ -591,12 +591,12 @@ public:
 	using Base::erase;
 	template <typename K, typename V>
 	iterator insert(K&& key, V&& value) {
+		auto it_after_key = std::upper_bound(this->keys.begin(), this->keys.end(), key, this->compare);
+		auto index = std::distance(this->keys.begin(), it_after_key);
+		auto it_after_value = this->values.begin() + index;
+		this->keys.reserve(this->keys.size() + 1);
+		this->values.reserve(this->values.size() + 1);
 		try {
-			auto it_after_key = std::upper_bound(this->keys.begin(), this->keys.end(), key, this->compare);
-			auto index = std::distance(this->keys.begin(), it_after_key);
-			auto it_after_value = this->values.begin() + index;
-			this->keys.reserve(this->keys.size() + 1);
-			this->values.reserve(this->values.size() + 1);
 			this->keys.emplace(it_after_key, std::forward<K>(key));
 			this->values.emplace(it_after_value, std::forward<V>(value));
 			return iterator(index, this);
