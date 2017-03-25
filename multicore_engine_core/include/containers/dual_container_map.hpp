@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/containers/dual_container_map.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef CONTAINERS_DUAL_CONTAINER_MAP_HPP_
@@ -96,7 +96,7 @@ public:
 	};
 
 	template <typename It_Map, typename It_Key, typename It_Value>
-	class iterator_ : public std::iterator<std::bidirectional_iterator_tag, std::pair<It_Key&, It_Value&>> {
+	class iterator_ : public std::iterator<std::random_access_iterator_tag, std::pair<It_Key&, It_Value&>> {
 		size_t index;
 		It_Map* map;
 
@@ -111,8 +111,8 @@ public:
 		typedef typename iterator_::value_type reference;
 		iterator_() = delete;
 		iterator_(const iterator_<std::remove_const_t<It_Map>, It_Key, std::remove_const_t<It_Value>>&
-						  it) noexcept
-				: index(it.index), map(it.map) {}
+						  it) noexcept : index(it.index),
+										 map(it.map) {}
 		iterator_& operator=(const iterator_<std::remove_const_t<It_Map>, It_Key,
 											 std::remove_const_t<It_Value>>& it) noexcept {
 			index = it.index;
