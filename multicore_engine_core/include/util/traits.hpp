@@ -43,7 +43,7 @@ struct nothrow_swappable_trait_impl<T, false> {
 /// Replacement for std::is_swappable<T> from C++17 where it is not available.
 /**
  * \bug This may give false positives where swap is not SFINAEd correctly (for C++17) yet. Unfortunately this
- * can not prevented without also replacing std::swap and excluding the original from ADL.
+ * can not be prevented without also replacing std::swap and excluding the original from ADL.
  */
 template <typename T>
 struct is_swappable {
@@ -53,7 +53,7 @@ struct is_swappable {
 /// Replacement for std::is_nothrow_swappable<T> from C++17 where it is not available.
 /**
  * \bug This may give false positives where swap is not SFINAEd correctly (for C++17) yet. Unfortunately this
- * can not prevented without also replacing std::swap and excluding the original from ADL.
+ * can not be prevented without also replacing std::swap and excluding the original from ADL.
  */
 template <typename T>
 struct is_nothrow_swappable {
