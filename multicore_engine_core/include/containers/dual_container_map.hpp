@@ -191,14 +191,17 @@ public:
 		friend iterator_ operator+(iterator_ it, typename iterator_::difference_type n) noexcept {
 			return it += n;
 		}
+
 		/// Returns a copy of it advanced n elements ahead.
 		friend iterator_ operator+(typename iterator_::difference_type n, iterator_ it) noexcept {
 			return it += n;
 		}
+
 		/// Returns a copy of it advanced n elements before.
 		friend iterator_ operator-(iterator_ it, typename iterator_::difference_type n) noexcept {
 			return it -= n;
 		}
+
 		/// Returns a copy of it advanced n elements before.
 		friend typename iterator_::difference_type operator-(iterator_ it1, iterator_ it2) noexcept {
 			return it1.index - it2.index;
@@ -217,6 +220,7 @@ public:
 		bool operator<(iterator_ other) noexcept {
 			return (map == other.map) && (index < other.index);
 		}
+
 		/// \brief Returns true if and only if the referenced element of *this is in the same map as the
 		/// referenced element of other and is located after it.
 		/**
@@ -225,6 +229,7 @@ public:
 		bool operator>(iterator_ other) noexcept {
 			return (map == other.map) && (index > other.index);
 		}
+
 		/// \brief Returns true if and only if the referenced element of *this is in the same map as the
 		/// referenced element of other and is located before it or if both reference the same element.
 		/**
@@ -233,6 +238,7 @@ public:
 		bool operator<=(iterator_ other) noexcept {
 			return (map == other.map) && (index <= other.index);
 		}
+
 		/// \brief Returns true if and only if the referenced element of *this is in the same map as the
 		/// referenced element of other and is located after it or if both reference the same element.
 		/**
@@ -316,6 +322,7 @@ public:
 			if(compare(key, *it)) it = keys.end();
 		return iterator(std::distance(keys.begin(), it), static_cast<Map*>(this));
 	}
+
 	/// \brief Looks up the element(s) with the given key and returns a const_iterator to the first such
 	/// element or an past-end-iterator if no such element exists.
 	const_iterator find(const Key& key) const {
@@ -511,11 +518,13 @@ public:
 	iterator begin() noexcept {
 		return iterator(0, static_cast<Map*>(this));
 	}
+
 	/// \brief Returns a const_iterator to the first key-value-pair in the map or a past-end-iterator if the
 	/// map is empty.
 	const_iterator begin() const noexcept {
 		return const_iterator(0, static_cast<const Map*>(this));
 	}
+
 	/// \brief Returns a const_iterator to the first key-value-pair in the map or a past-end-iterator if the
 	/// map is empty.
 	const_iterator cbegin() const noexcept {
@@ -526,10 +535,12 @@ public:
 	iterator end() noexcept {
 		return iterator(keys.size(), static_cast<Map*>(this));
 	}
+
 	/// Returns a constant past-end-iterator for the map.
 	const_iterator end() const noexcept {
 		return const_iterator(keys.size(), static_cast<const Map*>(this));
 	}
+
 	/// Returns a constant past-end-iterator for the map.
 	const_iterator cend() const noexcept {
 		return const_iterator(keys.size(), static_cast<const Map*>(this));
@@ -540,11 +551,13 @@ public:
 	reverse_iterator rbegin() noexcept {
 		return reverse_iterator(end());
 	}
+
 	/// \brief Return a constant reverse iterator to the last key-value-pair in the map or a
 	/// past-start-reverse-iterator if the map is empty.
 	const_reverse_iterator rbegin() const noexcept {
 		return const_reverse_iterator(end());
 	}
+
 	/// \brief Return a constant reverse iterator to the last key-value-pair in the map or a
 	/// past-start-reverse-iterator if the map is empty.
 	const_reverse_iterator crbegin() const noexcept {
@@ -555,10 +568,12 @@ public:
 	reverse_iterator rend() noexcept {
 		return reverse_iterator(begin());
 	}
+
 	/// Returns a constant past-start-reverse-iterator for the map.
 	const_reverse_iterator rend() const noexcept {
 		return const_reverse_iterator(begin());
 	}
+
 	/// Returns a constant past-start-reverse-iterator for the map.
 	const_reverse_iterator crend() const noexcept {
 		return const_reverse_iterator(cbegin());
@@ -604,20 +619,20 @@ public:
 	explicit dual_container_map(Compare&& compare, Args&&... args) noexcept(
 			std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: Base(std::move_if_noexcept(compare), std::forward<Args>(args)...) {}
-	/// Copy-constructs a dual_container_multimap from other.
+	/// Copy-constructs a dual_container_map from other.
 	dual_container_map(const dual_container_map& other) noexcept(
 			std::is_nothrow_copy_constructible<Base>::value)
 			: Base(other) {}
-	/// Move-assigns a dual_container_multimap from other.
+	/// Move-assigns a dual_container_map from other.
 	dual_container_map(dual_container_map&& other) noexcept(std::is_nothrow_move_constructible<Base>::value)
 			: Base(std::move(other)) {}
-	/// Copy-assigns a dual_container_multimap from other.
+	/// Copy-assigns a dual_container_map from other.
 	dual_container_map&
 	operator=(const dual_container_map& other) noexcept(std::is_nothrow_copy_assignable<Base>::value) {
 		Base::operator=(other);
 		return *this;
 	}
-	/// Move-assigns a dual_container_multimap from other.
+	/// Move-assigns a dual_container_map from other.
 	dual_container_map&
 	operator=(dual_container_map&& other) noexcept(std::is_nothrow_move_assignable<Base>::value) {
 		Base::operator=(std::move(other));
