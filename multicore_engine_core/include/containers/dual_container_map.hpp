@@ -587,10 +587,14 @@ void swap(dual_container_map_base<Map, Container, Key, Value, Compare>& m1,
 	m1.swap(m2);
 }
 
-// Interface resembling that of the STL map containers
-// But iterators return (by value) a pair of references to the key and value instead of a reference to a pair
-// of the values of the keys and the values. This means taking the dereferenced value into auto by value still
-// yields a pair of references which can modify the value in the map.
+/// \brief Implements a map by keeping the keys and the values in separate Container objects, key-value-pairs
+/// are linked by matching indexes.
+/**
+ * The interface of this class resembles that of the STL map containers.
+ * But iterators return (by value) a pair of references to the key and value instead of a reference to a pair
+ * of the values of the keys and the values. This means taking the dereferenced value into auto by value still
+ * yields a pair of references which can modify the value in the map.
+ */
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
 class dual_container_map : public dual_container_map_base<dual_container_map<Container, Key, Value, Compare>,
 														  Container, Key, Value, Compare> {
@@ -823,10 +827,14 @@ void swap(dual_container_map<Container, Key, Value, Compare>& m1,
 	m1.swap(m2);
 }
 
-// Interface resembling that of the STL map containers
-// But iterators return (by value) a pair of references to the key and value instead of a reference to a pair
-// of the values of the keys and the values. This means taking the dereferenced value into auto by value still
-// yields a pair of references which can modify the value in the map.
+/// \brief Implements a multimap by keeping the keys and the values in separate Container objects,
+/// key-value-pairs are linked by matching indexes.
+/**
+ * The interface of this class resembles that of the STL multimap containers.
+ * But iterators return (by value) a pair of references to the key and value instead of a reference to a pair
+ * of the values of the keys and the values. This means taking the dereferenced value into auto by value still
+ * yields a pair of references which can modify the value in the map.
+ */
 template <template <typename> class Container, typename Key, typename Value, typename Compare = std::less<>>
 class dual_container_multimap
 		: public dual_container_map_base<dual_container_multimap<Container, Key, Value, Compare>, Container,
