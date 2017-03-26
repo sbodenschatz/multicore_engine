@@ -36,6 +36,7 @@ public:
 					const Args&...) {}
 };
 
+/// Represents a property of any Root_Type object regardless of concrete type of property and object.
 template <typename Root_Type, template <typename> class Abstract_Assignment = abstract_null_assignment,
 		  typename... Assignment_Param>
 class abstract_property {
@@ -48,12 +49,19 @@ protected:
 public:
 	/// Forbids copy-construction.
 	abstract_property(const abstract_property&) = delete;
+	/// Forbids move-construction.
 	abstract_property(abstract_property&&) = delete;
+	/// Forbids copy-assignment.
 	abstract_property& operator=(const abstract_property&) = delete;
+	/// Forbids move-assignment.
 	abstract_property& operator=(abstract_property&&) = delete;
+	/// Allows polymorphic destruction.
 	virtual ~abstract_property() = default;
+	/// Returns a representation of the data type of the property.
 	virtual mce::reflection::type_t type() const noexcept = 0;
+	/// Creates an assignment object for the concrete property value type from the given parameters.
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>> make_assignment(Assignment_Param...) const = 0;
+	/// Returns the name of the property given on construction of the property object.
 	const std::string& name() const {
 		return name_;
 	}
@@ -76,6 +84,7 @@ struct property_type_helper<T, void> {
 
 } // namespace detail
 
+/// Represents a property of any Root_Type object with the value type T regardless of concrete object type.
 template <typename Root_Type, typename T,
 		  template <typename> class Abstract_Assignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
@@ -90,15 +99,29 @@ public:
 	typedef typename detail::property_type_helper<T, void>::accessor_value accessor_value;
 	/// Forbids copy-construction.
 	property(const property&) = delete;
+	/// Forbids move-construction.
 	property(property&&) = delete;
+	/// Forbids copy-assignment.
 	property& operator=(const property&) = delete;
+	/// Forbids move-assignment.
 	property& operator=(property&&) = delete;
+	/// Allows polymorphic destruction.
 	virtual ~property() = default;
+	/// Returns a representation of the data type of the property based on the template parameter T.
 	virtual mce::reflection::type_t type() const noexcept override {
 		return type_info<T>::type;
 	}
+	/// Provides read access to the property value for the given object.
+	/**
+	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 */
 	virtual accessor_value get_value(const Root_Type& object) const = 0;
+	/// Provides write access to the property value for the given object.
+	/**
+	 * The value parameter type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 */
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
+	/// Creates an assignment object for T from the given parameters.
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
 			make_assignment(Assignment_Param...) const override;
 };
