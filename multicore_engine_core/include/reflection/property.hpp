@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/reflection/property.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef REFLECTION_PROPERTY_HPP_
@@ -42,9 +42,11 @@ class abstract_property {
 protected:
 	std::string name_;
 
-public:
 	// cppcheck-suppress passedByValue
 	explicit abstract_property(std::string name) : name_(std::move(name)) {}
+
+public:
+	/// Forbids copy-construction.
 	abstract_property(const abstract_property&) = delete;
 	abstract_property(abstract_property&&) = delete;
 	abstract_property& operator=(const abstract_property&) = delete;
@@ -78,12 +80,15 @@ template <typename Root_Type, typename T,
 		  template <typename> class Abstract_Assignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
 class property : public abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...> {
+protected:
+	explicit property(const std::string& name)
+			: abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...>(name) {}
+
 public:
 	static_assert(std::is_base_of<Abstract_Assignment<Root_Type>, Assignment<Root_Type, T>>::value,
 				  "The Abstract_Assignment template class has to be a base of the Assignment_Class");
 	typedef typename detail::property_type_helper<T, void>::accessor_value accessor_value;
-	explicit property(const std::string& name)
-			: abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...>(name) {}
+	/// Forbids copy-construction.
 	property(const property&) = delete;
 	property(property&&) = delete;
 	property& operator=(const property&) = delete;
@@ -95,7 +100,7 @@ public:
 	virtual accessor_value get_value(const Root_Type& object) const = 0;
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
-	make_assignment(Assignment_Param...) const override;
+			make_assignment(Assignment_Param...) const override;
 };
 
 } // namespace reflection
@@ -107,8 +112,8 @@ namespace reflection {
 template <typename Root_Type, typename T, template <typename> class Abstract_Assignment,
 		  template <typename, typename> class Assignment, typename... Assignment_Param>
 std::unique_ptr<Abstract_Assignment<Root_Type>>
-property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>::make_assignment(
-		Assignment_Param... param) const {
+		property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>::make_assignment(
+				Assignment_Param... param) const {
 	return std::make_unique<Assignment<Root_Type, T>>(*this, param...);
 }
 
