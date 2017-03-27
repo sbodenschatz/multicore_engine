@@ -161,6 +161,10 @@ private:
 	setter_t setter;
 
 public:
+	/// Constructs a linked_property with the given name and using the given getter and setter.
+	/**
+	 * The getter and setter are allowed to be nullptr to disable read or write access.
+	 */
 	linked_property(const std::string& name, getter_t getter, setter_t setter)
 			: property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...>(name),
 			  getter(getter), setter(setter) {}
@@ -202,13 +206,17 @@ public:
 	}
 };
 
+/// \brief Represents a property of a Root_Type object with a type of T bound to a concrete object type using
+/// a member variable pointer on class Object_Type.
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
 class directly_linked_property
 		: public property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...> {
 public:
+	/// Defines the type of getter return value and setter value parameter as either T or const T&.
 	typedef typename detail::property_type_helper<T, Object_Type>::accessor_value accessor_value;
+	/// Defines the member variable pointer type for the bound variable.
 	typedef T Object_Type::*variable_t;
 
 private:
@@ -216,17 +224,38 @@ private:
 	bool read_only = false;
 
 public:
+	/// \brief Constructs a directly_linked_property with the given name that is bound to the member variable
+	/// to which a member pointer is given.
+	/**
+	 * Read access can be disabled by supplying true to the read_only parameter.
+	 */
 	directly_linked_property(const std::string& name, variable_t variable, bool read_only)
 			: property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...>(name),
 			  variable(variable), read_only(read_only) {}
+	/// Forbids copy-construction.
 	directly_linked_property(const directly_linked_property&) = delete;
+	/// Forbids move-construction.
 	directly_linked_property(directly_linked_property&&) = delete;
+	/// Forbids copy-assignment.
 	directly_linked_property& operator=(const directly_linked_property&) = delete;
+	/// Forbids move-assignment.
 	directly_linked_property& operator=(directly_linked_property&&) = delete;
+	/// Allows polymorphic destruction.
 	virtual ~directly_linked_property() = default;
+	/// Provides read access to the property value for the given object.
+	/**
+	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 */
 	virtual accessor_value get_value(const Root_Type& object) const noexcept override {
 		return static_cast<const Object_Type&>(object).*variable;
 	}
+	/// Provides write access to the property value for the given object.
+	/**
+	 * The value parameter type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 *
+	 * If read_only was true on construction of the property, this member function will throw an exception of
+	 * type invalid_property_access_exception.
+	 */
 	virtual void set_value(Root_Type& object, accessor_value value) const override {
 		if(read_only)
 			throw invalid_property_access_exception("Attempt to set not writable property.");
@@ -235,6 +264,12 @@ public:
 	}
 };
 
+/// Creates a property with the given name and using the given getter and setter.
+/**
+ * Creates a linked_property object.
+ *
+ * The getter and setter are allowed to be nullptr to disable read or write access.
+ */
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class Abstract_Assignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
@@ -246,6 +281,13 @@ make_property(const std::string& name, typename detail::property_type_helper<T, 
 			name, getter, setter);
 }
 
+/// \brief Creates a property with the given name that is bound to the member variable to which a member
+/// pointer is given.
+/**
+ * Creates a directly_linked_property object.
+ *
+ * Read access can be disabled by supplying true to the read_only parameter.
+ */
 template <typename Root_Type, template <typename> class Abstract_Assignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param,
 		  typename T, typename Object_Type>
