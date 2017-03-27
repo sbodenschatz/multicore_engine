@@ -179,7 +179,7 @@ struct type_parser<glm::ivec4> {
 
 template <>
 struct type_parser<std::string> {
-	static bool fromString(const std::string& s, std::string& t) {
+	static bool from_string(const std::string& s, std::string& t) {
 		t = s;
 		return true;
 	}
