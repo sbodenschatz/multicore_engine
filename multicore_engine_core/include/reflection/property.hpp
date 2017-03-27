@@ -8,6 +8,7 @@
 #define REFLECTION_PROPERTY_HPP_
 
 #include "type.hpp"
+#include <exceptions.hpp>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -143,13 +144,13 @@ public:
 		if(getter)
 			return (static_cast<const Object_Type&>(object).*getter)();
 		else
-			throw std::logic_error("Attempt to get not readable property.");
+			throw invalid_property_access_exception("Attempt to get not readable property.");
 	}
 	virtual void set_value(Root_Type& object, accessor_value value) const override {
 		if(setter)
 			(static_cast<Object_Type&>(object).*setter)(value);
 		else
-			throw std::logic_error("Attempt to set not writable property.");
+			throw invalid_property_access_exception("Attempt to set not writable property.");
 	}
 };
 
@@ -180,7 +181,7 @@ public:
 	}
 	virtual void set_value(Root_Type& object, accessor_value value) const override {
 		if(read_only)
-			throw std::logic_error("Attempt to set not writable property.");
+			throw invalid_property_access_exception("Attempt to set not writable property.");
 		else
 			static_cast<Object_Type&>(object).*variable = value;
 	}
