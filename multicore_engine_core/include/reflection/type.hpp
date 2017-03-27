@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/reflection/type.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef REFLECTION_TYPE_HPP_
@@ -16,75 +16,115 @@
 namespace mce {
 namespace reflection {
 
+/// Represents the type of a value.
 enum class type_t {
+	/// The type is not known or not supported.
 	unknown,
+	/// The value is a scalar integer.
 	int_1,
+	/// The value is a 2-dimensional vector of integers.
 	int_2,
+	/// The value is a 3-dimensional vector of integers.
 	int_3,
+	/// The value is a 4-dimensional vector of integers.
 	int_4,
+	/// The value is a scalar float.
 	float_1,
+	/// The value is a 2-dimensional vector of floats.
 	float_2,
+	/// The value is a 3-dimensional vector of floats.
 	float_3,
+	/// The value is a 4-dimensional vector of floats.
 	float_4,
+	/// The value is a quaternion.
 	quaternion,
+	/// The value is a textual string.
 	string,
+	/// The value is a list of textual strings.
 	string_list,
 };
 
+/// Allows conversion of C++ types to the appropriate type_t member value using specializations.
 template <typename T>
 struct type_info {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::unknown;
 };
 
+/// Specialization of type_info for int.
 template <>
 struct type_info<int> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::int_1;
 };
+
+/// Specialization of type_info for ivec2.
 template <>
 struct type_info<glm::ivec2> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::int_2;
 };
+
+/// Specialization of type_info for ivec3.
 template <>
 struct type_info<glm::ivec3> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::int_3;
 };
+
+/// Specialization of type_info for ivec4.
 template <>
 struct type_info<glm::ivec4> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::int_4;
 };
 
+/// Specialization of type_info for float.
 template <>
 struct type_info<float> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::float_1;
 };
 
+/// Specialization of type_info for vec2.
 template <>
 struct type_info<glm::vec2> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::float_2;
 };
 
+/// Specialization of type_info for vec3.
 template <>
 struct type_info<glm::vec3> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::float_3;
 };
 
+/// Specialization of type_info for vec4.
 template <>
 struct type_info<glm::vec4> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::float_4;
 };
 
+/// Specialization of type_info for quat.
 template <>
 struct type_info<glm::quat> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::quaternion;
 };
 
+/// Specialization of type_info for string.
 template <>
 struct type_info<std::string> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::string;
 };
 
+/// Specialization of type_info for vector<string>.
 template <>
 struct type_info<std::vector<std::string>> {
+	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::string_list;
 };
 
