@@ -97,6 +97,7 @@ protected:
 public:
 	static_assert(std::is_base_of<Abstract_Assignment<Root_Type>, Assignment<Root_Type, T>>::value,
 				  "The Abstract_Assignment template class has to be a base of the Assignment_Class");
+	/// Defines the type of getter return value and setter value parameter as either T or const T&.
 	typedef typename detail::property_type_helper<T, void>::accessor_value accessor_value;
 	/// Forbids copy-construction.
 	property(const property&) = delete;
@@ -141,13 +142,18 @@ std::unique_ptr<Abstract_Assignment<Root_Type>>
 	return std::make_unique<Assignment<Root_Type, T>>(*this, param...);
 }
 
+/// \brief Represents a property of a Root_Type object with a type of T bound to a concrete object type using
+/// a getter and setter member function pointer on class Object_Type.
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
 class linked_property : public property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...> {
 public:
+	/// Defines the type of getter return value and setter value parameter as either T or const T&.
 	typedef typename detail::property_type_helper<T, Object_Type>::accessor_value accessor_value;
+	/// Defines the member function pointer type for the getter.
 	typedef typename detail::property_type_helper<T, Object_Type>::getter getter_t;
+	/// Defines the member function pointer type for the setter.
 	typedef typename detail::property_type_helper<T, Object_Type>::setter setter_t;
 
 private:
@@ -158,17 +164,36 @@ public:
 	linked_property(const std::string& name, getter_t getter, setter_t setter)
 			: property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...>(name),
 			  getter(getter), setter(setter) {}
+	/// Forbids copy-construction.
 	linked_property(const linked_property&) = delete;
+	/// Forbids move-construction.
 	linked_property(linked_property&&) = delete;
+	/// Forbids copy-assignment.
 	linked_property& operator=(const linked_property&) = delete;
+	/// Forbids move-assignment.
 	linked_property& operator=(linked_property&&) = delete;
+	/// Allows polymorphic destruction.
 	virtual ~linked_property() = default;
+	/// Provides read access to the property value for the given object.
+	/**
+	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 *
+	 * If no getter was supplied on construction of the property, this member function will throw an exception
+	 * of type invalid_property_access_exception.
+	 */
 	virtual accessor_value get_value(const Root_Type& object) const override {
 		if(getter)
 			return (static_cast<const Object_Type&>(object).*getter)();
 		else
 			throw invalid_property_access_exception("Attempt to get not readable property.");
 	}
+	/// Provides write access to the property value for the given object.
+	/**
+	 * The value parameter type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 *
+	 * If no setter was supplied on construction of the property, this member function will throw an exception
+	 * of type invalid_property_access_exception.
+	 */
 	virtual void set_value(Root_Type& object, accessor_value value) const override {
 		if(setter)
 			(static_cast<Object_Type&>(object).*setter)(value);
