@@ -17,6 +17,9 @@ BOOST_AUTO_TEST_CASE(parse_int1) {
 	int res = 0;
 	type_parser<decltype(res)>::from_string("12345", res);
 	BOOST_CHECK(res == 12345);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "12345");
 }
 
 BOOST_AUTO_TEST_CASE(parse_int2) {
@@ -24,6 +27,9 @@ BOOST_AUTO_TEST_CASE(parse_int2) {
 	type_parser<decltype(res)>::from_string("1234 5678", res);
 	BOOST_CHECK(res.x == 1234);
 	BOOST_CHECK(res.y == 5678);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "1234 5678");
 }
 
 BOOST_AUTO_TEST_CASE(parse_int3) {
@@ -32,6 +38,9 @@ BOOST_AUTO_TEST_CASE(parse_int3) {
 	BOOST_CHECK(res.x == 123);
 	BOOST_CHECK(res.y == 456);
 	BOOST_CHECK(res.z == 789);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "123 456 789");
 }
 
 BOOST_AUTO_TEST_CASE(parse_int4) {
@@ -41,12 +50,18 @@ BOOST_AUTO_TEST_CASE(parse_int4) {
 	BOOST_CHECK(res.y == 34);
 	BOOST_CHECK(res.z == 56);
 	BOOST_CHECK(res.w == 78);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "12 34 56 78");
 }
 
 BOOST_AUTO_TEST_CASE(parse_float1) {
 	float res = 0;
 	type_parser<decltype(res)>::from_string("123.45", res);
 	BOOST_CHECK_CLOSE(res, 123.45f, 0.00001f);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "123.45");
 }
 
 BOOST_AUTO_TEST_CASE(parse_float2) {
@@ -54,6 +69,9 @@ BOOST_AUTO_TEST_CASE(parse_float2) {
 	type_parser<decltype(res)>::from_string("12.34 56.78", res);
 	BOOST_CHECK_CLOSE(res.x, 12.34f, 0.00001f);
 	BOOST_CHECK_CLOSE(res.y, 56.78f, 0.00001f);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "12.34 56.78");
 }
 
 BOOST_AUTO_TEST_CASE(parse_float3) {
@@ -62,6 +80,9 @@ BOOST_AUTO_TEST_CASE(parse_float3) {
 	BOOST_CHECK_CLOSE(res.x, 12.3f, 0.00001f);
 	BOOST_CHECK_CLOSE(res.y, 45.6f, 0.00001f);
 	BOOST_CHECK_CLOSE(res.z, 78.9f, 0.00001f);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "12.3 45.6 78.9");
 }
 
 BOOST_AUTO_TEST_CASE(parse_float4) {
@@ -71,12 +92,30 @@ BOOST_AUTO_TEST_CASE(parse_float4) {
 	BOOST_CHECK_CLOSE(res.y, 3.4f, 0.00001f);
 	BOOST_CHECK_CLOSE(res.z, 5.6f, 0.00001f);
 	BOOST_CHECK_CLOSE(res.w, 7.8f, 0.00001f);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "1.2 3.4 5.6 7.8");
+}
+
+BOOST_AUTO_TEST_CASE(parse_quat) {
+	glm::vec4 res{0, 0, 0, 0};
+	type_parser<decltype(res)>::from_string("1.2 3.4 5.6 7.8", res);
+	BOOST_CHECK_CLOSE(res.x, 1.2f, 0.00001f);
+	BOOST_CHECK_CLOSE(res.y, 3.4f, 0.00001f);
+	BOOST_CHECK_CLOSE(res.z, 5.6f, 0.00001f);
+	BOOST_CHECK_CLOSE(res.w, 7.8f, 0.00001f);
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "1.2 3.4 5.6 7.8");
 }
 
 BOOST_AUTO_TEST_CASE(parse_string) {
 	std::string res;
 	type_parser<decltype(res)>::from_string("Hello World", res);
 	BOOST_CHECK_EQUAL(res, "Hello World");
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "Hello World");
 }
 
 BOOST_AUTO_TEST_CASE(parse_string_list) {
@@ -85,6 +124,9 @@ BOOST_AUTO_TEST_CASE(parse_string_list) {
 	BOOST_CHECK_EQUAL(res.size(), 2);
 	BOOST_CHECK_EQUAL(res.at(0), "Hello");
 	BOOST_CHECK_EQUAL(res.at(1), "World");
+
+	auto s = type_parser<decltype(res)>::to_string(res);
+	BOOST_CHECK_EQUAL(s, "Hello;World");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
