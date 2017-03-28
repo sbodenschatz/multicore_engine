@@ -91,10 +91,10 @@ struct property_type_parser_helper {
 
 template <typename T>
 struct property_type_parser_helper<T, std::false_type> {
-	static std::pair<T, bool> from_string(const std::string& s) {
+	static std::pair<T, bool> from_string(const std::string&) {
 		throw invalid_property_access_exception("Parsing unknown values from strings is not supported.");
 	}
-	static std::string to_string(T& t) {
+	static std::string to_string(T&) {
 		throw invalid_property_access_exception("Formating unknown values to strings is not supported.");
 	}
 };
