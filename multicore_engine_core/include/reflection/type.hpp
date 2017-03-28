@@ -9,8 +9,10 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <numeric>
 #include <sstream>
 #include <string>
+#include <util/string_tools.hpp>
 #include <vector>
 
 namespace mce {
@@ -34,58 +36,70 @@ enum class type_t {
 template <typename T>
 struct type_info {
 	static const type_t type = type_t::unknown;
+	typedef std::false_type known_type;
 };
 
 template <>
 struct type_info<int> {
 	static const type_t type = type_t::int_1;
+	typedef std::true_type known_type;
 };
 template <>
 struct type_info<glm::ivec2> {
 	static const type_t type = type_t::int_2;
+	typedef std::true_type known_type;
 };
 template <>
 struct type_info<glm::ivec3> {
 	static const type_t type = type_t::int_3;
+	typedef std::true_type known_type;
 };
 template <>
 struct type_info<glm::ivec4> {
 	static const type_t type = type_t::int_4;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<float> {
 	static const type_t type = type_t::float_1;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<glm::vec2> {
 	static const type_t type = type_t::float_2;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<glm::vec3> {
 	static const type_t type = type_t::float_3;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<glm::vec4> {
 	static const type_t type = type_t::float_4;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<glm::quat> {
 	static const type_t type = type_t::quaternion;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<std::string> {
 	static const type_t type = type_t::string;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<std::vector<std::string>> {
 	static const type_t type = type_t::string_list;
+	typedef std::true_type known_type;
 };
 
 template <typename T>
@@ -94,6 +108,11 @@ struct type_parser {
 		std::istringstream stream(s);
 		stream >> t;
 		return bool(stream);
+	}
+	static std::string to_string(const T& t) {
+		std::ostringstream stream;
+		stream << t;
+		return stream.str();
 	}
 };
 
@@ -107,6 +126,11 @@ struct type_parser<glm::vec2> {
 		t = glm::vec2(x, y);
 		return bool(stream);
 	}
+	static std::string to_string(const glm::vec2& t) {
+		std::ostringstream stream;
+		stream << t.x << " " << t.y;
+		return stream.str();
+	}
 };
 template <>
 struct type_parser<glm::vec3> {
@@ -118,6 +142,11 @@ struct type_parser<glm::vec3> {
 		t = glm::vec3(x, y, z);
 		return bool(stream);
 	}
+	static std::string to_string(const glm::vec3& t) {
+		std::ostringstream stream;
+		stream << t.x << " " << t.y << " " << t.z;
+		return stream.str();
+	}
 };
 template <>
 struct type_parser<glm::vec4> {
@@ -128,6 +157,11 @@ struct type_parser<glm::vec4> {
 		stream >> x >> y >> z >> w;
 		t = glm::vec4(x, y, z, w);
 		return bool(stream);
+	}
+	static std::string to_string(const glm::vec4& t) {
+		std::ostringstream stream;
+		stream << t.x << " " << t.y << " " << t.z << " " << t.w;
+		return stream.str();
 	}
 };
 
@@ -141,6 +175,11 @@ struct type_parser<glm::quat> {
 		t = glm::quat(x, y, z, w);
 		return bool(stream);
 	}
+	static std::string to_string(const glm::quat& t) {
+		std::ostringstream stream;
+		stream << t.x << " " << t.y << " " << t.z << " " << t.w;
+		return stream.str();
+	}
 };
 
 template <>
@@ -153,6 +192,11 @@ struct type_parser<glm::ivec2> {
 		t = glm::ivec2(x, y);
 		return bool(stream);
 	}
+	static std::string to_string(const glm::ivec2& t) {
+		std::ostringstream stream;
+		stream << t.x << " " << t.y;
+		return stream.str();
+	}
 };
 template <>
 struct type_parser<glm::ivec3> {
@@ -163,6 +207,11 @@ struct type_parser<glm::ivec3> {
 		stream >> x >> y >> z;
 		t = glm::ivec3(x, y, z);
 		return bool(stream);
+	}
+	static std::string to_string(const glm::ivec3& t) {
+		std::ostringstream stream;
+		stream << t.x << " " << t.y << " " << t.z;
+		return stream.str();
 	}
 };
 template <>
@@ -175,15 +224,40 @@ struct type_parser<glm::ivec4> {
 		t = glm::ivec4(x, y, z, w);
 		return bool(stream);
 	}
+	static std::string to_string(const glm::ivec4& t) {
+		std::ostringstream stream;
+		stream << t.x << " " << t.y << " " << t.z << " " << t.w;
+		return stream.str();
+	}
 };
 
 template <>
 struct type_parser<std::string> {
-	static bool fromString(const std::string& s, std::string& t) {
+	static bool from_string(const std::string& s, std::string& t) {
 		t = s;
 		return true;
 	}
+	static std::string to_string(const std::string& t) {
+		return t;
+	}
 };
+
+template <>
+struct type_parser<std::vector<std::string>> {
+	static std::string delimiter;
+	static bool from_string(const std::string& s, std::vector<std::string>& t) {
+		t.clear();
+		util::split_iterate(s, delimiter, [&t](boost::string_view e) { t.emplace_back(e); });
+		return true;
+	}
+	static std::string to_string(const std::vector<std::string>& t) {
+		using namespace std::literals;
+		return std::accumulate(t.begin(), t.end(), ""s, [](const auto& x, const auto& y) {
+			return x + (x.empty() ? ""s : delimiter) + y;
+		});
+	}
+};
+
 
 } // namespace reflection
 } // namespace mce
