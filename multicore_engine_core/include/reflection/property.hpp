@@ -66,6 +66,8 @@ public:
 	const std::string& name() const {
 		return name_;
 	}
+	virtual bool from_string(Root_Type& object, const std::string& str) const = 0;
+	virtual std::string to_string(const Root_Type& object) const = 0;
 	// TODO: Implement interface for binary serialization of objects
 };
 
@@ -81,6 +83,28 @@ struct property_type_helper {
 template <typename T>
 struct property_type_helper<T, void> {
 	typedef typename std::conditional<std::is_fundamental<T>::value, T, const T&>::type accessor_value;
+};
+
+template <typename T, typename known_type>
+struct property_type_parser_helper {
+	static auto from_string(const std::string& s) {
+		T t;
+		auto res = type_parser<T>::from_string(s, t);
+		return std::make_pair(t, res);
+	}
+	static std::string to_string(const T& t) {
+		return type_parser<T>::to_string(t);
+	}
+};
+
+template <typename T>
+struct property_type_parser_helper<T, std::false_type> {
+	static std::pair<T, bool> from_string(const std::string&) {
+		throw invalid_property_access_exception("Parsing unknown values from strings is not supported.");
+	}
+	static std::string to_string(T&) {
+		throw invalid_property_access_exception("Formating unknown values to strings is not supported.");
+	}
 };
 
 } // namespace detail
@@ -123,6 +147,16 @@ public:
 	 * The value parameter type is T for primitive types and const T& for complex types (strings, vecN, etc.).
 	 */
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
+	virtual bool from_string(Root_Type& object, const std::string& str) const override {
+		using helper = detail::property_type_parser_helper<T, typename type_info<T>::known_type>;
+		auto r = helper::from_string(str);
+		if(r.second) set_value(object, r.first);
+		return r.second;
+	}
+	virtual std::string to_string(const Root_Type& object) const override {
+		using helper = detail::property_type_parser_helper<T, typename type_info<T>::known_type>;
+		return helper::to_string(get_value(object));
+	}
 	/// Creates an assignment object for T from the given parameters.
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
 			make_assignment(Assignment_Param...) const override;
