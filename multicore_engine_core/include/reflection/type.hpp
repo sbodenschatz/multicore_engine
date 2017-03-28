@@ -11,6 +11,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <sstream>
 #include <string>
+#include <util/string_tools.hpp>
 #include <vector>
 
 namespace mce {
@@ -184,6 +185,18 @@ struct type_parser<std::string> {
 		return true;
 	}
 };
+
+template <>
+struct type_parser<std::vector<std::string>> {
+	static std::string delimiter;
+	static bool from_string(const std::string& s, std::vector<std::string>& t) {
+		t.clear();
+		util::split_iterate(s, delimiter, [&t](boost::string_view e) { t.emplace_back(e); });
+		return true;
+	}
+};
+
+std::string type_parser<std::vector<std::string>>::delimiter = ";";
 
 } // namespace reflection
 } // namespace mce
