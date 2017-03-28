@@ -36,58 +36,70 @@ enum class type_t {
 template <typename T>
 struct type_info {
 	static const type_t type = type_t::unknown;
+	typedef std::false_type known_type;
 };
 
 template <>
 struct type_info<int> {
 	static const type_t type = type_t::int_1;
+	typedef std::true_type known_type;
 };
 template <>
 struct type_info<glm::ivec2> {
 	static const type_t type = type_t::int_2;
+	typedef std::true_type known_type;
 };
 template <>
 struct type_info<glm::ivec3> {
 	static const type_t type = type_t::int_3;
+	typedef std::true_type known_type;
 };
 template <>
 struct type_info<glm::ivec4> {
 	static const type_t type = type_t::int_4;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<float> {
 	static const type_t type = type_t::float_1;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<glm::vec2> {
 	static const type_t type = type_t::float_2;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<glm::vec3> {
 	static const type_t type = type_t::float_3;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<glm::vec4> {
 	static const type_t type = type_t::float_4;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<glm::quat> {
 	static const type_t type = type_t::quaternion;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<std::string> {
 	static const type_t type = type_t::string;
+	typedef std::true_type known_type;
 };
 
 template <>
 struct type_info<std::vector<std::string>> {
 	static const type_t type = type_t::string_list;
+	typedef std::true_type known_type;
 };
 
 template <typename T>
@@ -246,7 +258,6 @@ struct type_parser<std::vector<std::string>> {
 	}
 };
 
-std::string type_parser<std::vector<std::string>>::delimiter = ";";
 
 } // namespace reflection
 } // namespace mce
