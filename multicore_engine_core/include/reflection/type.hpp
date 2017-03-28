@@ -51,6 +51,7 @@ template <typename T>
 struct type_info {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::unknown;
+	/// Specifies that this is the general case where the type is not known.
 	typedef std::false_type known_type;
 };
 
@@ -59,6 +60,7 @@ template <>
 struct type_info<int> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::int_1;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -67,6 +69,7 @@ template <>
 struct type_info<glm::ivec2> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::int_2;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -75,6 +78,7 @@ template <>
 struct type_info<glm::ivec3> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::int_3;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -83,6 +87,7 @@ template <>
 struct type_info<glm::ivec4> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::int_4;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -91,6 +96,7 @@ template <>
 struct type_info<float> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::float_1;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -99,6 +105,7 @@ template <>
 struct type_info<glm::vec2> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::float_2;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -107,6 +114,7 @@ template <>
 struct type_info<glm::vec3> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::float_3;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -115,6 +123,7 @@ template <>
 struct type_info<glm::vec4> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::float_4;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -123,6 +132,7 @@ template <>
 struct type_info<glm::quat> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::quaternion;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -131,6 +141,7 @@ template <>
 struct type_info<std::string> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::string;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
@@ -139,16 +150,20 @@ template <>
 struct type_info<std::vector<std::string>> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::string_list;
+	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
 
+/// Allows formating and parsing of C++ types using specializations and stream IO operators.
 template <typename T>
 struct type_parser {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, T& t) {
 		std::istringstream stream(s);
 		stream >> t;
 		return bool(stream);
 	}
+	/// Formats t into a string.
 	static std::string to_string(const T& t) {
 		std::ostringstream stream;
 		stream << t;
@@ -156,8 +171,10 @@ struct type_parser {
 	}
 };
 
+/// Specialization of type_parser for glm::vec2.
 template <>
 struct type_parser<glm::vec2> {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, glm::vec2& t) {
 		std::istringstream stream(s);
 		float x, y;
@@ -166,14 +183,17 @@ struct type_parser<glm::vec2> {
 		t = glm::vec2(x, y);
 		return bool(stream);
 	}
+	/// Formats t into a string.
 	static std::string to_string(const glm::vec2& t) {
 		std::ostringstream stream;
 		stream << t.x << " " << t.y;
 		return stream.str();
 	}
 };
+/// Specialization of type_parser for glm::vec3.
 template <>
 struct type_parser<glm::vec3> {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, glm::vec3& t) {
 		std::istringstream stream(s);
 		float x, y, z;
@@ -182,14 +202,17 @@ struct type_parser<glm::vec3> {
 		t = glm::vec3(x, y, z);
 		return bool(stream);
 	}
+	/// Formats t into a string.
 	static std::string to_string(const glm::vec3& t) {
 		std::ostringstream stream;
 		stream << t.x << " " << t.y << " " << t.z;
 		return stream.str();
 	}
 };
+/// Specialization of type_parser for glm::vec4.
 template <>
 struct type_parser<glm::vec4> {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, glm::vec4& t) {
 		std::istringstream stream(s);
 		float x, y, z, w;
@@ -198,6 +221,7 @@ struct type_parser<glm::vec4> {
 		t = glm::vec4(x, y, z, w);
 		return bool(stream);
 	}
+	/// Formats t into a string.
 	static std::string to_string(const glm::vec4& t) {
 		std::ostringstream stream;
 		stream << t.x << " " << t.y << " " << t.z << " " << t.w;
@@ -205,8 +229,10 @@ struct type_parser<glm::vec4> {
 	}
 };
 
+/// Specialization of type_parser for glm::quat.
 template <>
 struct type_parser<glm::quat> {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, glm::quat& t) {
 		std::istringstream stream(s);
 		float x, y, z, w;
@@ -215,6 +241,7 @@ struct type_parser<glm::quat> {
 		t = glm::quat(x, y, z, w);
 		return bool(stream);
 	}
+	/// Formats t into a string.
 	static std::string to_string(const glm::quat& t) {
 		std::ostringstream stream;
 		stream << t.x << " " << t.y << " " << t.z << " " << t.w;
@@ -222,8 +249,10 @@ struct type_parser<glm::quat> {
 	}
 };
 
+/// Specialization of type_parser for glm::ivec2.
 template <>
 struct type_parser<glm::ivec2> {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, glm::ivec2& t) {
 		std::istringstream stream(s);
 		int x, y;
@@ -232,14 +261,17 @@ struct type_parser<glm::ivec2> {
 		t = glm::ivec2(x, y);
 		return bool(stream);
 	}
+	/// Formats t into a string.
 	static std::string to_string(const glm::ivec2& t) {
 		std::ostringstream stream;
 		stream << t.x << " " << t.y;
 		return stream.str();
 	}
 };
+/// Specialization of type_parser for glm::ivec3.
 template <>
 struct type_parser<glm::ivec3> {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, glm::ivec3& t) {
 		std::istringstream stream(s);
 		int x, y, z;
@@ -248,14 +280,17 @@ struct type_parser<glm::ivec3> {
 		t = glm::ivec3(x, y, z);
 		return bool(stream);
 	}
+	/// Formats t into a string.
 	static std::string to_string(const glm::ivec3& t) {
 		std::ostringstream stream;
 		stream << t.x << " " << t.y << " " << t.z;
 		return stream.str();
 	}
 };
+/// Specialization of type_parser for glm::ivec4.
 template <>
 struct type_parser<glm::ivec4> {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, glm::ivec4& t) {
 		std::istringstream stream(s);
 		int x, y, z, w;
@@ -264,6 +299,7 @@ struct type_parser<glm::ivec4> {
 		t = glm::ivec4(x, y, z, w);
 		return bool(stream);
 	}
+	/// Formats t into a string.
 	static std::string to_string(const glm::ivec4& t) {
 		std::ostringstream stream;
 		stream << t.x << " " << t.y << " " << t.z << " " << t.w;
@@ -271,25 +307,32 @@ struct type_parser<glm::ivec4> {
 	}
 };
 
+/// Specialization of type_parser for std::string.
 template <>
 struct type_parser<std::string> {
+	/// Parses s into t.
 	static bool from_string(const std::string& s, std::string& t) {
 		t = s;
 		return true;
 	}
+	/// Formats t into a string.
 	static std::string to_string(const std::string& t) {
 		return t;
 	}
 };
 
+/// Specialization of type_parser for std::vector<std::string>.
 template <>
 struct type_parser<std::vector<std::string>> {
+	/// The delimiter used to separate list elements (by default ";").
 	static std::string delimiter;
+	/// Parses s into t.
 	static bool from_string(const std::string& s, std::vector<std::string>& t) {
 		t.clear();
 		util::split_iterate(s, delimiter, [&t](boost::string_view e) { t.emplace_back(e); });
 		return true;
 	}
+	/// Formats t into a string.
 	static std::string to_string(const std::vector<std::string>& t) {
 		using namespace std::literals;
 		return std::accumulate(t.begin(), t.end(), ""s, [](const auto& x, const auto& y) {
@@ -297,7 +340,6 @@ struct type_parser<std::vector<std::string>> {
 		});
 	}
 };
-
 
 } // namespace reflection
 } // namespace mce

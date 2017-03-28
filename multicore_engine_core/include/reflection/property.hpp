@@ -66,7 +66,9 @@ public:
 	const std::string& name() const {
 		return name_;
 	}
+	/// Parses a value from a string and assigns it to the property on the given object.
 	virtual bool from_string(Root_Type& object, const std::string& str) const = 0;
+	/// Retrieves the property value from the given object, formats it to a string and returns it.
 	virtual std::string to_string(const Root_Type& object) const = 0;
 	// TODO: Implement interface for binary serialization of objects
 };
@@ -147,12 +149,14 @@ public:
 	 * The value parameter type is T for primitive types and const T& for complex types (strings, vecN, etc.).
 	 */
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
+	/// Parses a value from a string and assigns it to the property on the given object.
 	virtual bool from_string(Root_Type& object, const std::string& str) const override {
 		using helper = detail::property_type_parser_helper<T, typename type_info<T>::known_type>;
 		auto r = helper::from_string(str);
 		if(r.second) set_value(object, r.first);
 		return r.second;
 	}
+	/// Retrieves the property value from the given object, formats it to a string and returns it.
 	virtual std::string to_string(const Root_Type& object) const override {
 		using helper = detail::property_type_parser_helper<T, typename type_info<T>::known_type>;
 		return helper::to_string(get_value(object));
