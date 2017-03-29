@@ -687,6 +687,7 @@ public:
 	}
 
 	iterator begin() {
+		if(empty()) return iterator();
 		block* block = first_block;
 		if(block)
 			return iterator({block->entries, block}, this);
@@ -695,6 +696,7 @@ public:
 	}
 
 	const_iterator begin() const {
+		if(empty()) return const_iterator();
 		block* block = first_block;
 		if(block)
 			return const_iterator({block->entries, block}, this);
@@ -703,6 +705,7 @@ public:
 	}
 
 	const_iterator cbegin() const {
+		if(empty()) return const_iterator();
 		block* block = first_block;
 		if(block)
 			return const_iterator({block->entries, block}, this);
