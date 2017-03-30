@@ -143,6 +143,7 @@ public:
 			throw std::bad_weak_ptr();
 		}
 	}
+	/// Allows copy-assignment of smart_pool_ptr.
 	smart_pool_ptr<T>& operator=(const smart_pool_ptr& other) noexcept {
 		if(other.managed_object == managed_object) {
 			object = other.object;
@@ -155,6 +156,11 @@ public:
 		if(block) block->increment_strong_ref(managed_object);
 		return *this;
 	}
+	/// Allows copy-assignment from a pointer-assignment-compatible other smart_pool_ptr template instance.
+	/**
+	 * The smart_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be constructed from)
+	 * smart_pool_ptr<B> if B* is implicitly convertible to A*.
+	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr<T>& operator=(const smart_pool_ptr<U>& other) noexcept {
 		if(other.managed_object == managed_object) {
@@ -168,6 +174,7 @@ public:
 		if(block) block->increment_strong_ref(managed_object);
 		return *this;
 	}
+	/// Allows move-assignment for smart_pool_ptr.
 	smart_pool_ptr<T>& operator=(smart_pool_ptr&& other) noexcept {
 		assert(this != &other);
 		if(block) block->decrement_strong_ref(managed_object);
@@ -179,6 +186,11 @@ public:
 		other.block = nullptr;
 		return *this;
 	}
+	/// Allows move-assignment from a pointer-assignment-compatible other smart_pool_ptr template instance.
+	/**
+	 * The smart_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be constructed from)
+	 * smart_pool_ptr<B> if B* is implicitly convertible to A*.
+	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr<T>& operator=(smart_pool_ptr<U>&& other) noexcept {
 		assert(this != &other);
@@ -191,10 +203,15 @@ public:
 		other.block = nullptr;
 		return *this;
 	}
+
+	/// \brief  If the smart_pool_ptr takes part in an object's ownership, one reference to the object is
+	/// dropped and if it was the last reference the object is either deleted immediately or marked for
+	/// deletion.
 	~smart_pool_ptr() {
 		if(block) block->decrement_strong_ref(managed_object);
 	}
 
+	/// Swaps the values of *this and other.
 	void swap(smart_pool_ptr& other) noexcept {
 		using std::swap;
 		swap(object, other.object);
@@ -202,6 +219,9 @@ public:
 		swap(block, other.block);
 	}
 
+	/// \brief  If the smart_pool_ptr takes part in an object's ownership, one reference to the object is
+	/// dropped and if it was the last reference the object is either deleted immediately or marked for
+	/// deletion.
 	void reset() {
 		if(block) block->decrement_strong_ref(managed_object);
 		object = nullptr;
@@ -209,22 +229,26 @@ public:
 		block = nullptr;
 	}
 
+	/// Returns a pointer to the object referenced by the smart_pool_ptr.
 	T* get() const noexcept {
 		return object;
 	}
 
+	/// Dereferences the object referenced by the smart_pool_ptr and provides access to it.
 	T& operator*() const noexcept {
 		assert(block);
 		assert(object);
 		return *object;
 	}
 
+	/// Provides access to the object referenced by the smart_pool_ptr.
 	T* operator->() const noexcept {
 		assert(block);
 		assert(object);
 		return object;
 	}
 
+	/// Returns the number of smart_pool_ptr objects that participate in the ownership of the managed object.
 	ref_count_t use_count() const noexcept {
 		if(!block) return 0;
 		if(!object) return 0;
@@ -233,10 +257,13 @@ public:
 		return rc;
 	}
 
+	/// Returns true if and only if this smart_pool_ptr is the only one managing the ownership of the managed
+	/// object.
 	bool unique() const noexcept {
 		return use_count() == 1;
 	}
 
+	/// Converts the smart_pool_ptr to a bool representing the result of a not-null check.
 	explicit operator bool() const noexcept {
 		if(!block) return false;
 		if(object)
