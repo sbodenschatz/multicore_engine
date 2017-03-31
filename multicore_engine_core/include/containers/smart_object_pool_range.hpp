@@ -13,22 +13,28 @@
 namespace mce {
 namespace containers {
 
+/// \brief Implements the range concept of TBB to allow parallel iteration over a smart_object_pool by
+/// dividing the range into smaller ranges for the tasks.
 template <typename It>
 struct smart_object_pool_range {
-	It lower;
-	It upper;
+	It lower; ///< The start of this range
+	It upper; ///< The end of this range
+	/// Creates a range from a given start and end iterator.
 	smart_object_pool_range(It lower, It upper) : lower{lower}, upper{upper.make_limiter()} {
 		if(!lower.target.containing_block) throw logic_exception("Start of block can't be end iterator.");
 	}
+	/// Tests if the range is empty (doesn't contain objects to process).
 	bool empty() const noexcept {
 		return lower == upper;
 	}
+	/// Tests if the range can be divided into smaller ranges.
 	bool is_divisible() const noexcept {
 		auto x = lower;
 		if(x == upper) return false;
 		x++;
 		return x != upper;
 	}
+	/// Splits this range and stores on part in *this and the other part in other.
 	smart_object_pool_range(smart_object_pool_range& other, tbb::split)
 			: lower{other.lower}, upper{other.upper} {
 		if(!lower.target.containing_block || !lower.pool)
@@ -56,6 +62,7 @@ struct smart_object_pool_range {
 	}
 };
 
+/// Makes a smart_object_pool_range for the given smart_object_pool.
 template <typename T, size_t block_size = 0x10000u>
 smart_object_pool_range<typename smart_object_pool<T, block_size>::iterator>
 make_pool_range(smart_object_pool<T, block_size>& pool) {
@@ -63,6 +70,7 @@ make_pool_range(smart_object_pool<T, block_size>& pool) {
 																						pool.end());
 }
 
+/// Makes a constant smart_object_pool_range for the given smart_object_pool.
 template <typename T, size_t block_size = 0x10000u>
 smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>
 make_pool_range(const smart_object_pool<T, block_size>& pool) {
@@ -70,6 +78,7 @@ make_pool_range(const smart_object_pool<T, block_size>& pool) {
 																							  pool.end());
 }
 
+/// Makes a constant smart_object_pool_range for the given smart_object_pool.
 template <typename T, size_t block_size = 0x10000u>
 smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>
 make_pool_const_range(smart_object_pool<T, block_size>& pool) {
