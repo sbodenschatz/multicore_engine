@@ -121,13 +121,16 @@ public:
 
 		iterator_(size_t index, It_Map* map) noexcept : index(index), map(map) {}
 
-	public:
 		template <typename M, typename IK, typename IV>
 		friend class iterator_;
 		friend It_Map;
 		template <typename M, template <typename> class Cont, typename K, typename V, typename Comp>
 		friend class dual_container_map_base;
+
+	public:
+		/// The type referenced by the iterator.
 		typedef typename iterator_::value_type reference;
+		/// Disallow default-construction.
 		iterator_() = delete;
 
 		/// Copy-constructs an iterator.
