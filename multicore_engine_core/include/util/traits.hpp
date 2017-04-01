@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/util/traits.hpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
 #ifndef UTIL_TRAITS_HPP_
@@ -47,6 +47,7 @@ struct nothrow_swappable_trait_impl<T, false> {
  */
 template <typename T>
 struct is_swappable {
+	/// Contains true if T is swappable or false if T is not swappable.
 	static constexpr bool value = detail::swappable_trait_impl<T>::value;
 };
 
@@ -57,6 +58,7 @@ struct is_swappable {
  */
 template <typename T>
 struct is_nothrow_swappable {
+	/// Contains true if T is nothrow-swappable or false if T is not nothrow-swappable.
 	static constexpr bool value =
 			detail::nothrow_swappable_trait_impl<T, detail::swappable_trait_impl<T>::value>::value;
 };
