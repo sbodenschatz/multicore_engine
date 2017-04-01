@@ -105,8 +105,8 @@ public:
 	}
 	/// Allows copy-constructing from a pointer-assignment-compatible other smart_pool_ptr template instance.
 	/**
-	 * The smart_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be constructed from)
-	 * smart_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The smart_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be constructed from)
+	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr(const smart_pool_ptr<U>& other) noexcept : object(other.object),
@@ -116,8 +116,8 @@ public:
 	}
 	/// Allows move-constructing from a pointer-assignment-compatible other smart_pool_ptr template instance.
 	/**
-	 * The smart_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be constructed from)
-	 * smart_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The smart_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be constructed from)
+	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr(smart_pool_ptr<U>&& other) noexcept : object(other.object),
@@ -129,8 +129,8 @@ public:
 	}
 	/// Allows to construct a smart_pool_ptr by moving from a pointer-assignment-compatible weak_pool_ptr.
 	/**
-	 * The smart_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be constructed from)
-	 * smart_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The smart_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be constructed from)
+	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	// TODO Check, if this signature is correct or should be const L-ref.
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
@@ -158,8 +158,8 @@ public:
 	}
 	/// Allows copy-assignment from a pointer-assignment-compatible other smart_pool_ptr template instance.
 	/**
-	 * The smart_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be assigned from)
-	 * smart_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The smart_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be assigned from)
+	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr<T>& operator=(const smart_pool_ptr<U>& other) noexcept {
@@ -188,8 +188,8 @@ public:
 	}
 	/// Allows move-assignment from a pointer-assignment-compatible other smart_pool_ptr template instance.
 	/**
-	 * The smart_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be assigned from)
-	 * smart_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The smart_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be assigned from)
+	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	smart_pool_ptr<T>& operator=(smart_pool_ptr<U>&& other) noexcept {
@@ -312,8 +312,8 @@ public:
 	}
 	/// Allows copy-constructing from a pointer-assignment-compatible other weak_pool_ptr template instance.
 	/**
-	 * The weak_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be constructed from)
-	 * weak_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The weak_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be constructed from)
+	 * weak_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr(const weak_pool_ptr<U>& other) noexcept : object(other.object),
@@ -323,8 +323,8 @@ public:
 	}
 	/// Allows move-constructing from a pointer-assignment-compatible other weak_pool_ptr template instance.
 	/**
-	 * The weak_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be constructed from)
-	 * weak_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The weak_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be constructed from)
+	 * weak_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr(weak_pool_ptr<U>&& other) noexcept : object(other.object),
@@ -337,8 +337,8 @@ public:
 	/// \brief Constructs a weak_pool_ptr referencing the same object as the given
 	/// pointer-assignment-compatible smart_pool_ptr.
 	/**
-	 * The weak_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be constructed from)
-	 * weak_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The weak_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be constructed from)
+	 * weak_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	// cppcheck-suppress noExplicitConstructor
@@ -361,8 +361,8 @@ public:
 	}
 	/// Allows copy-assignment from a pointer-assignment-compatible other weak_pool_ptr template instance.
 	/**
-	 * The weak_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be assigned from)
-	 * weak_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The weak_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be assigned from)
+	 * weak_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr<T>& operator=(const weak_pool_ptr<U>& other) noexcept {
@@ -379,8 +379,8 @@ public:
 	}
 	/// Allows copy-assignment from a pointer-assignment-compatible smart_pool_ptr template instance.
 	/**
-	 * The weak_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be assigned from)
-	 * smart_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The weak_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be assigned from)
+	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr<T>& operator=(const smart_pool_ptr<U>& other) noexcept {
@@ -409,8 +409,8 @@ public:
 	}
 	/// Allows move-assignment from a pointer-assignment-compatible other weak_pool_ptr template instance.
 	/**
-	 * The weak_pool_ptr<A> is pointer-assignment-compatible with (i.e. can be assigned from)
-	 * weak_pool_ptr<B> if B* is implicitly convertible to A*.
+	 * The weak_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be assigned from)
+	 * weak_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	weak_pool_ptr<T>& operator=(weak_pool_ptr<U>&& other) noexcept {
