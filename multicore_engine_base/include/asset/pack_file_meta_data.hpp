@@ -48,6 +48,15 @@ struct pack_file_meta_data {
 	friend bstream::obstream& operator<<(bstream::obstream& obs, const pack_file_meta_data& value);
 };
 
+/// Deserializes the pack file element meta data from the bstream.
+bstream::ibstream& operator>>(bstream::ibstream& ibs, pack_file_element_meta_data& value);
+/// Serializes the pack file meta element data from the bstream.
+bstream::obstream& operator<<(bstream::obstream& obs, const pack_file_element_meta_data& value);
+/// Deserializes the pack file meta data from the bstream.
+bstream::ibstream& operator>>(bstream::ibstream& ibs, pack_file_meta_data& value);
+/// Serializes the load unit meta data from the bstream.
+bstream::obstream& operator<<(bstream::obstream& obs, const pack_file_meta_data& value);
+
 } // namespace asset
 } // namespace mce
 
