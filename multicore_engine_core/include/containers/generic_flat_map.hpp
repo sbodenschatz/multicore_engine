@@ -113,16 +113,18 @@ public:
 
 		explicit iterator_(It iterator) noexcept : iterator(iterator) {}
 
-	public:
 		template <typename M, typename I, typename IT>
 		friend class iterator_;
 		friend It_Map;
 		template <typename M, template <typename> class Cont, typename K, typename V, typename Comp>
 		friend class generic_flat_map_base;
+
+	public:
+		/// Disallow default-construction.
 		iterator_() = delete;
-		// cppcheck-suppress noExplicitConstructor
 
 		/// Copy-constructs an iterator.
+		// cppcheck-suppress noExplicitConstructor
 		iterator_(const typename It_Map::iterator& it) noexcept : iterator(it.iterator) {}
 
 		/// Copy-assigns an iterator.
