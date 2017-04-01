@@ -23,15 +23,20 @@ template <typename Map, template <typename> class Container, typename Key, typen
 		  typename Compare = std::less<>>
 class dual_container_map_base {
 protected:
+	/// The container that contains the keys.
 	Container<Key> keys;
+	/// The container that contains the values.
 	Container<Value> values;
+	/// The comparator object used to compare the keys of entries.
 	Compare compare;
 
+	/// Used by implementing classes to construct a base by copying the comparator and forwarding the args.
 	template <typename... Args>
 	explicit dual_container_map_base(const Compare& compare, Args&&... args) noexcept(
 			std::is_nothrow_constructible<Container<Key>, Args...>::value&& std::is_nothrow_constructible<
 					Container<Value>, Args...>::value&& std::is_nothrow_copy_constructible<Compare>::value)
 			: keys(std::forward<Args>(args)...), values(std::forward<Args>(args)...), compare(compare) {}
+	/// Used by implementing classes to construct a base by moving the comparator and forwarding the args.
 	template <typename... Args>
 	explicit dual_container_map_base(Compare&& compare, Args&&... args) noexcept(
 			std::is_nothrow_constructible<Container<Key>, Args...>::value&&
@@ -40,10 +45,12 @@ protected:
 			 std::is_nothrow_move_constructible<Compare>::value))
 			: keys(std::forward<Args>(args)...), values(std::forward<Args>(args)...),
 			  compare(std::move_if_noexcept(compare)) {}
+	/// Used by implementing classes to copy-construct.
 	dual_container_map_base(const dual_container_map_base& other) noexcept(
 			std::is_nothrow_copy_constructible<Container<Key>>::value&& std::is_nothrow_copy_constructible<
 					Container<Value>>::value&& std::is_nothrow_copy_constructible<Compare>::value)
 			: keys(other.keys), values(other.values), compare(other.compare) {}
+	/// Used by implementing classes to move-construct.
 	dual_container_map_base(dual_container_map_base&& other) noexcept(
 			(std::is_nothrow_copy_constructible<Container<Key>>::value ||
 			 std::is_nothrow_move_constructible<Container<Key>>::value) &&
@@ -53,6 +60,7 @@ protected:
 			 std::is_nothrow_move_constructible<Compare>::value))
 			: keys(std::move_if_noexcept(other.keys)), values(std::move_if_noexcept(other.values)),
 			  compare(std::move_if_noexcept(other.compare)) {}
+	/// Used by implementing classes to copy-assign.
 	dual_container_map_base& operator=(const dual_container_map_base& other) noexcept(
 			std::is_nothrow_copy_assignable<Container<Key>>::value&& std::is_nothrow_copy_assignable<
 					Container<Value>>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
@@ -69,6 +77,7 @@ protected:
 		}
 		return *this;
 	}
+	/// Used by implementing classes to move-assign.
 	dual_container_map_base& operator=(dual_container_map_base&& other) noexcept(
 			std::is_nothrow_copy_assignable<Container<Key>>::value&& std::is_nothrow_copy_assignable<
 					Container<Value>>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
@@ -120,9 +129,13 @@ public:
 		friend class dual_container_map_base;
 		typedef typename iterator_::value_type reference;
 		iterator_() = delete;
+
+		/// Copy-constructs an iterator.
 		iterator_(const iterator_<std::remove_const_t<It_Map>, It_Key, std::remove_const_t<It_Value>>&
 						  it) noexcept : index(it.index),
 										 map(it.map) {}
+
+		/// Copy-assigns an iterator.
 		iterator_& operator=(const iterator_<std::remove_const_t<It_Map>, It_Key,
 											 std::remove_const_t<It_Value>>& it) noexcept {
 			index = it.index;
