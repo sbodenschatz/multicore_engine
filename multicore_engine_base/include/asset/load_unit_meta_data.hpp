@@ -44,6 +44,15 @@ struct load_unit_meta_data {
 	friend bstream::obstream& operator<<(bstream::obstream& obs, const load_unit_meta_data& value);
 };
 
+/// Deserializes the asset meta data from the bstream.
+bstream::ibstream& operator>>(bstream::ibstream& ibs, asset_meta_data& value);
+/// Serializes the asset meta data to the bstream.
+bstream::obstream& operator<<(bstream::obstream& obs, const asset_meta_data& value);
+/// Deserializes the load unit meta data from the bstream.
+bstream::ibstream& operator>>(bstream::ibstream& ibs, load_unit_meta_data& value);
+/// Serializes the load unit meta data to the bstream.
+bstream::obstream& operator<<(bstream::obstream& obs, const load_unit_meta_data& value);
+
 } // namespace asset
 } // namespace mce
 
