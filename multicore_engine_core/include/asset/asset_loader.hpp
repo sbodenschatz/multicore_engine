@@ -18,9 +18,11 @@ class asset;
 class asset_manager;
 class file_reader;
 
+/// \brief Represents a combination of a file path prefix and a file_reader that are used together by most
+/// asset_loaders to specify where to load assets from.
 struct path_prefix {
-	std::shared_ptr<file_reader> reader;
-	std::string prefix;
+	std::shared_ptr<file_reader> reader; ///< A shared_ptr to the file_reader implementation.
+	std::string prefix; ///< The prefix of the path supplied to the file_reader implementation.
 };
 
 /// Provides the abstract base class for asset_loader implementations.
