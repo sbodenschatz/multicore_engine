@@ -17,6 +17,10 @@
 namespace mce {
 namespace reflection {
 
+/// Implements the abstract base for an assignment class that does nothing.
+/**
+ * Is not actually abstract because there are no member functions that would normally be abstract here.
+ */
 template <typename U>
 class abstract_null_assignment {};
 template <typename U, typename V>
@@ -28,9 +32,11 @@ template <typename Root_Type, typename T, template <typename> class AbstractAssi
 		  template <typename, typename> class Assignment, typename... Assignment_Param>
 class property;
 
+/// Implements an assignment class that does nothing.
 template <typename U, typename V>
 class null_assignment : public abstract_null_assignment<U> {
 public:
+	/// Creates a null assignment for the given property and arbitrary parameters.
 	template <typename... Args>
 	null_assignment(const mce::reflection::property<U, V, mce::reflection::abstract_null_assignment,
 													mce::reflection::null_assignment>&,
@@ -42,8 +48,9 @@ template <typename Root_Type, template <typename> class Abstract_Assignment = ab
 		  typename... Assignment_Param>
 class abstract_property {
 protected:
-	std::string name_;
+	std::string name_; ///< Stores the name of the property.
 
+	/// Constructs an abstract_property with the given name.
 	// cppcheck-suppress passedByValue
 	explicit abstract_property(std::string name) : name_(std::move(name)) {}
 
@@ -117,6 +124,7 @@ template <typename Root_Type, typename T,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
 class property : public abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...> {
 protected:
+	/// Constructs a property with the given name.
 	explicit property(const std::string& name)
 			: abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...>(name) {}
 
