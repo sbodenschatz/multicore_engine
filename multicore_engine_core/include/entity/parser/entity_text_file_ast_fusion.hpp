@@ -10,6 +10,11 @@
 #include "entity_text_file_ast.hpp"
 #include <boost/fusion/include/adapt_struct.hpp>
 
+/**
+ * \file
+ * Adaptation of entity text file AST nodes for boost.fusion.
+ */
+
 BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::float_node, (float, value))
 
 BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::rotation_element,	 //
