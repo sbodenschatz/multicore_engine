@@ -18,28 +18,40 @@
 
 namespace mce {
 namespace containers {
+
+/// Provides common functionality for generic_flat_map and generic_flat_multimap.
 template <typename Map, template <typename> class Container, typename Key, typename Value,
 		  typename Compare = std::less<>>
 class generic_flat_map_base {
 protected:
+	/// The type of the container used to store key-value-pairs.
 	typedef Container<std::pair<Key, Value>> container_t;
+	/// The container storing the key-value-pairs.
 	container_t values;
+	/// Comparator function object for keys.
 	Compare compare;
 
+	/// Comparator function object to compare keys with keys in elements for less than.
 	struct key_compare {
+		/// Constructs a key_compare from the given comparator.
 		explicit key_compare(const Compare& comp) : comp(comp) {}
+		/// The used comparator.
 		const Compare& comp;
+		/// Compares the key in the given element with the given key.
 		bool operator()(const std::pair<Key, Value>& a, const Key& b) const {
 			return comp(a.first, b);
 		}
+		/// Compares the given key with the key in the given element.
 		bool operator()(const Key& a, const std::pair<Key, Value>& b) const {
 			return comp(a, b.first);
 		}
+		/// Compares the keys in the given elements.
 		bool operator()(const std::pair<Key, Value>& a, const std::pair<Key, Value>& b) const {
 			return comp(a.first, b.first);
 		}
 	};
 
+	/// Used by implementing classes to construct a base by copying the comparator and forwarding the args.
 	template <typename... Args>
 	explicit generic_flat_map_base(const Compare& compare, Args&&... args) noexcept(
 			std::is_nothrow_constructible<container_t, Args...>::value&&
@@ -48,6 +60,7 @@ protected:
 		std::stable_sort(values.begin(), values.end(),
 						 [&compare](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
+	/// Used by implementing classes to construct a base by moving the comparator and forwarding the args.
 	template <typename... Args>
 	explicit generic_flat_map_base(Compare&& compare, Args&&... args) noexcept(
 			std::is_nothrow_constructible<container_t, Args...>::value &&
@@ -57,16 +70,19 @@ protected:
 		std::stable_sort(values.begin(), values.end(),
 						 [&compare](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
+	/// Used by implementing classes to copy-construct.
 	generic_flat_map_base(const generic_flat_map_base& other) noexcept(
 			std::is_nothrow_copy_constructible<container_t>::value&&
 					std::is_nothrow_copy_constructible<Compare>::value)
 			: values(other.values), compare(other.compare) {}
+	/// Used by implementing classes to move-construct.
 	generic_flat_map_base(generic_flat_map_base&& other) noexcept(
 			(std::is_nothrow_copy_constructible<container_t>::value ||
 			 std::is_nothrow_move_constructible<container_t>::value) &&
 			(std::is_nothrow_copy_constructible<Compare>::value ||
 			 std::is_nothrow_move_constructible<Compare>::value))
 			: values(std::move_if_noexcept(other.values)), compare(std::move_if_noexcept(other.compare)) {}
+	/// Used by implementing classes to copy-assign.
 	generic_flat_map_base& operator=(const generic_flat_map_base& other) noexcept(
 			std::is_nothrow_copy_assignable<container_t>::value&&
 					std::is_nothrow_copy_assignable<Compare>::value) {
@@ -75,6 +91,7 @@ protected:
 		values = other.values;
 		return *this;
 	}
+	/// Used by implementing classes to move-assign.
 	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(
 			std::is_nothrow_copy_assignable<container_t>::value&&
 					std::is_nothrow_copy_assignable<Compare>::value) {
