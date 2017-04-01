@@ -98,9 +98,11 @@ public:
 	/// Proxy type for wrapping temporaries in operator-> on iterators.
 	template <typename T>
 	struct member_access_wrapper {
-		T value;
+		T value; ///< The stored temporary value.
+		/// Constracts a member_access_wrapper with the given arguments forwarded to T's constructor.
 		template <typename... Args>
 		explicit member_access_wrapper(Args&&... args) : value{std::forward<Args>(args)...} {}
+		/// Accesses the members of value.
 		T* operator->() noexcept {
 			return &value;
 		}
