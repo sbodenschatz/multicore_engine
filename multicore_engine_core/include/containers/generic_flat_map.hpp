@@ -121,7 +121,11 @@ public:
 		friend class generic_flat_map_base;
 		iterator_() = delete;
 		// cppcheck-suppress noExplicitConstructor
+
+		/// Copy-constructs an iterator.
 		iterator_(const typename It_Map::iterator& it) noexcept : iterator(it.iterator) {}
+
+		/// Copy-assigns an iterator.
 		iterator_& operator=(const typename It_Map::iterator& it) noexcept {
 			iterator = it.iterator;
 			return *this;
