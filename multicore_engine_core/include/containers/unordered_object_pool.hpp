@@ -25,28 +25,42 @@ namespace unordered_object_pool_lock_policies {
 /// \brief Different threads can work on different objects in the same pool object. But regular data race
 /// rules apply for each object.
 struct safe_internals_policy {
+	/// The policy uses atomics for synchronizing POD values.
 	template <typename T>
 	using sync_type = std::atomic<T>;
+	/// The policy uses mutexes for locking more complex values.
 	typedef std::mutex lock;
+	/// This policy uses lock_guard to acquire and release locks.
 	typedef std::lock_guard<std::mutex> lock_guard;
+	/// This policy uses unique_lock to acquire and release locks in a delayed way.
 	typedef std::unique_lock<std::mutex> lock_guard_delayed;
+	/// This policy is thread-safe.
 	static constexpr bool safe = true;
 };
 
 /// Use no synchronization for internal management structures. Mutable pool object is not thread-safe at all.
 struct unsafe_internals_policy {
+	/// This policy uses uses POD types directly without synchronization.
 	template <typename T>
 	using sync_type = T;
+	/// Implements a no-op lock.
 	struct lock_ {
+		/// Does nothing.
 		void lock() {}
+		/// Does nothing.
 		void unlock() {}
 	};
+	/// This policy uses a simple no-op lock to disable locking for complex types.
 	typedef lock_ lock;
+	/// Implements a no-op lock_guard.
 	struct lock_guard {
 		explicit lock_guard(lock&) {}
 	};
+	/// Uses a no-op lock_guard for delayed "locking".
 	typedef lock_guard lock_guard_delayed;
+	/// This policy is not thread-safe.
 	typedef void unsafe;
+	/// This policy is not thread-safe.
 	static constexpr bool safe = false;
 };
 
