@@ -36,8 +36,8 @@ protected:
 	bool valid_;
 
 public:
-	explicit abstract_component_property_assignment(core::engine& engine) noexcept
-			: engine_(engine), valid_(false) {}
+	explicit abstract_component_property_assignment(core::engine& engine) noexcept : engine_(engine),
+																					 valid_(false) {}
 	abstract_component_property_assignment(const abstract_component_property_assignment&) = default;
 	abstract_component_property_assignment(abstract_component_property_assignment&&) = default;
 	abstract_component_property_assignment&
@@ -80,6 +80,7 @@ class component_property_assignment : public abstract_component_property_assignm
 				  void (*convert)(const U&, V&) = ast::ast_value_mapper<U, V>::convert>
 		void operator()(const U& ast_value) {
 			convert(ast_value, pa.value_);
+			pa.valid_ = true;
 		}
 	};
 
