@@ -7,6 +7,11 @@
 #ifndef ENTITY_COMPONENT_HPP_
 #define ENTITY_COMPONENT_HPP_
 
+/**
+ * \file
+ * Definition of the component class.
+ */
+
 #include <entity/component_property_assignment.hpp>
 #include <memory>
 #include <reflection/property.hpp>
