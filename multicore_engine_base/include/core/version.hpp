@@ -12,8 +12,11 @@
 namespace mce {
 namespace core {
 
+/// Returns a version string containing the version and branch from which this binary was built.
 std::string get_build_version_string();
+/// Returns the code version from which this binary was built.
 std::string get_build_version();
+/// Returns the branch from which this binary was built.
 std::string get_build_branch();
 
 } // namespace core

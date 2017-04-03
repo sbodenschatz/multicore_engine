@@ -111,6 +111,9 @@ boost::unique_future<std::shared_ptr<const asset>> asset_manager::load_asset_fut
 		auto it = loaded_assets.find(name);
 		if(it != loaded_assets.end()) {
 			if(it->second->ready()) return boost::make_ready_future(std::shared_ptr<const asset>(it->second));
+			if(it->second->has_error())
+				return boost::make_exceptional_future<std::shared_ptr<const asset>>(
+						path_not_found_exception("Requested asset '" + name + "' is cached as failed."));
 		}
 	}
 	future_load_task load_task{name, this};

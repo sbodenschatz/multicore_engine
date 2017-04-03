@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/containers/smart_object_pool.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef CONTAINERS_SMART_OBJECT_POOL_HPP_
@@ -31,6 +31,27 @@
 namespace mce {
 namespace containers {
 
+template <typename It>
+struct smart_object_pool_range;
+
+/// \brief Provides an object pool where object lifetimes are managed using smart pointers and objects are
+/// allocated in blocks to provide cache efficiency.
+/**
+ * The objects in the pool are created in the pool and are kept alive for the lifetime of smart pointers with
+ * shared or weak ownership semantics (see smart_pool_ptr and weak_pool_ptr).
+ * The objects are allocated in blocks with an compile-time adjustable size block_size in unspecified order.
+ * They can be iterated over in this unspecified ordering.
+ * To prevent races between iterating code and object destruction, active iterators delay actual object
+ * destruction.
+ * When the last owner of an object goes out of scope the destruction of the object is deferred until there
+ * are no active iterators on the pool.
+ *
+ * The structure is designed to minimize lock-based synchronization and uses atomics for many of the
+ * bookkeeping tasks.
+ * However locking is used for managing the list of free object blocks and the pending destruction list,
+ * therefore creating and destroying objects implies locking and destroying and iterator on the structure may
+ * trigger locking if it is the last active iterator.
+ */
 template <typename T, size_t block_size = 0x10000u>
 class smart_object_pool {
 private:
@@ -412,29 +433,67 @@ private:
 	}
 
 public:
+	/// Creates an empty pool.
 	smart_object_pool() noexcept {}
+	/// Destroys the pool.
+	/**
+	 * Note because destroying the pool releases the memory resources for objects in the pool and a mechanism
+	 * to notify object owners of premature destruction would introduce an impractical amount of performance
+	 * overhead and causes correctness problems in using code, a pool that is to be destroyed must not contain
+	 * any objects. Destroying a pool that has living objects in it is a critical correctness problem. It can
+	 * not be handled using exception because the detection is only possible in a destructor which is required
+	 * to be noexcept. Therefore in this case, std::terminate is called.
+	 */
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now."
+					  << std::endl;
 			std::terminate();
 		}
 	}
+	/// Forbids copying the pool.
 	smart_object_pool(const smart_object_pool&) = delete;
+	/// Forbids copying the pool.
 	smart_object_pool& operator=(const smart_object_pool&) = delete;
+	/// Forbids moving the pool.
 	smart_object_pool(smart_object_pool&&) noexcept = delete;
+	/// Forbids moving the pool.
 	smart_object_pool& operator=(smart_object_pool&&) noexcept = delete;
 
+	/// \brief Implements an iterator to iterate over living objects in the pool and fulfills the requirements
+	/// of ForwardIterator.
+	/**
+	 * To facilitate block-base parallelism this iterator class provides two types of iterator object:
+	 * - normal:
+	 * 	Skips over empty object slots and thus ensures that the iterator always either references a living
+	 * object or is a past-end-iterator.
+	 * - limiter:
+	 * 	Is set to a specific position in the internal data structure (block and element index in the list of
+	 * blocks) regardless of an active object lives in this slot. These limiter objects serve as an end marker
+	 * for a block of objects that should be processed. Therefore they compare equal not just to iterators
+	 * pointing to the same slot but also to iterators pointing to any slot logically after it. This type of
+	 * iterators should never be dereferenced (like past-end-iterators).
+	 */
 	template <typename It_T, typename Target_T>
 	class iterator_ : public std::iterator<std::forward_iterator_tag, It_T> {
 		Target_T target;
 		smart_object_pool<T, block_size>* pool;
 		bool is_limiter = false;
 		friend class smart_object_pool<T, block_size>;
+		template <typename It>
+		friend struct smart_object_pool_range;
+
+		struct no_skip_tag {};
+
+		iterator_(Target_T target, smart_object_pool<T, block_size>* pool, no_skip_tag)
+				: target(target), pool{pool} {
+			++(pool->active_iterators);
+		}
 
 		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
 			++(pool->active_iterators);
-			skip_until_valid(this->target);
+			skip_until_valid();
 		}
 
 		void drop_iterator() {
@@ -445,12 +504,27 @@ public:
 			}
 		}
 
+		static size_t pool_block_size() {
+			return block_size;
+		}
+
+		typedef Target_T target_type;
+
 	public:
+		/// Creates an iterator that represents any past-end-iterators.
 		iterator_() : target{nullptr, nullptr}, pool{nullptr} {}
+
+		/// Releases the iterator.
+		/**
+		 * Note that this might trigger deferred object deletion and can therefore cause locking and take more
+		 * processing time as might be expected for most other destructors especially of light-weight objects
+		 * like iterators.
+		 */
 		~iterator_() {
 			drop_iterator();
 		}
 
+		/// Allows copying of the iterator.
 		iterator_(const iterator_<T, block_entry_link>& it) noexcept
 				: target{it.target.entry, it.target.containing_block},
 				  pool{it.pool},
@@ -458,6 +532,7 @@ public:
 			if(pool) ++(pool->active_iterators);
 		}
 
+		/// Allows copying of the iterator.
 		iterator_& operator=(const iterator_<T, block_entry_link>& it) noexcept {
 			is_limiter = it.is_limiter;
 			target = {it.target.entry, it.target.containing_block};
@@ -469,6 +544,7 @@ public:
 			return *this;
 		}
 
+		/// Allows moving of the iterator.
 		iterator_(iterator_<T, block_entry_link>&& it) noexcept
 				: target{it.target.entry, it.target.containing_block},
 				  pool{it.pool},
@@ -479,6 +555,7 @@ public:
 			it.is_limiter = false;
 		}
 
+		/// Allows moving of the iterator.
 		iterator_& operator=(iterator_<T, block_entry_link>&& it) noexcept {
 			is_limiter = it.is_limiter;
 			target = {it.target.entry, it.target.containing_block};
@@ -491,16 +568,21 @@ public:
 			return *this;
 		}
 
+		/// Provides access to the currently referenced object.
 		typename iterator_<It_T, Target_T>::reference operator*() const {
 			assert(target.containing_block);
 			assert(target.entry);
 			return target.entry->object;
 		}
+
+		/// Provides access to members of the currently referenced object.
 		typename iterator_<It_T, Target_T>::pointer operator->() const {
 			assert(target.containing_block);
 			assert(target.entry);
 			return &(target.entry->object);
 		}
+
+		/// Compares *this with it and returns true if they are considered equal.
 		bool operator==(const iterator_<const T, const_block_entry_link>& it) const {
 			return (it.target.entry == target.entry &&
 					it.target.containing_block == target.containing_block) ||
@@ -511,9 +593,13 @@ public:
 					it.target.containing_block->block_index <= target.containing_block->block_index &&
 					it.target.entry <= target.entry);
 		}
+
+		/// Compares *this with it and returns true if they are considered not equal.
 		bool operator!=(const iterator_<const T, const_block_entry_link>& it) const {
 			return !(*this == it);
 		}
+
+		/// Compares *this with it and returns true if they are considered equal.
 		bool operator==(const iterator_<T, block_entry_link>& it) const {
 			return (it.target.entry == target.entry &&
 					it.target.containing_block == target.containing_block) ||
@@ -524,21 +610,28 @@ public:
 					it.target.containing_block->block_index <= target.containing_block->block_index &&
 					it.target.entry <= target.entry);
 		}
+
+		/// Compares *this with it and returns true if they are considered not equal.
 		bool operator!=(const iterator_<T, block_entry_link>& it) const {
 			return !(*this == it);
 		}
 
+		/// Advances the iterator and returns the advanced value.
 		iterator_& operator++() {
 			target.entry++;
-			skip_until_valid(this->target);
+			skip_until_valid();
 			return *this;
 		}
+
+		/// Advances the iterator and returns the old value.
 		iterator_ operator++(int) {
 			auto it = *this;
 			this->operator++();
 			return it;
 		}
 
+		/// \brief Attempts to obtain a smart pointer for the object the iterator is currently referencing.
+		/// May return an empty smart pointer if the object is already destroyed.
 		operator smart_pool_ptr<It_T>() const {
 			assert(target.containing_block);
 			assert(target.entry);
@@ -549,47 +642,59 @@ public:
 			}
 		}
 
+		/// Transforms this iterator to be a limiter.
 		void make_limiter_inplace() {
 			is_limiter = true;
 		}
 
+		/// Returns a copy of this limiter object that is transformed to be a limiter.
 		iterator_ make_limiter() const {
 			iterator_ ret = *this;
 			ret.make_limiter_inplace();
 			return ret;
 		}
 
+		/// Transforms this iterator to be a normal iterator.
 		void make_nonlimiter_inplace() {
 			is_limiter = false;
 		}
 
+		/// Returns a copy of this limiter object that is transformed to be a normal limiter.
 		iterator_ make_nonlimiter() const {
 			iterator_ ret = *this;
 			ret.make_nonlimiter_inplace();
 			return ret;
 		}
 
+		/// Compares *this and it according to their position in the block list.
 		bool operator<(const iterator_<const T, const_block_entry_link>& it) const {
 			return (!is_limiter) && target < it.target;
 		}
+		/// Compares *this and it according to their position in the block list.
 		bool operator>(const iterator_<const T, const_block_entry_link>& it) const {
 			return it < *this;
 		}
+		/// Compares *this and it according to their position in the block list.
 		bool operator<=(const iterator_<const T, const_block_entry_link>& it) const {
 			return (*this < it) || (*this == it);
 		}
+		/// Compares *this and it according to their position in the block list.
 		bool operator>=(const iterator_<const T, const_block_entry_link>& it) const {
 			return (*this > it) || (*this == it);
 		}
+		/// Compares *this and it according to their position in the block list.
 		bool operator<(const iterator_<T, block_entry_link>& it) const {
 			return (!is_limiter) && target < it.target;
 		}
+		/// Compares *this and it according to their position in the block list.
 		bool operator>(const iterator_<T, block_entry_link>& it) const {
 			return it < *this;
 		}
+		/// Compares *this and it according to their position in the block list.
 		bool operator<=(const iterator_<T, block_entry_link>& it) const {
 			return (*this < it) || (*this == it);
 		}
+		/// Compares *this and it according to their position in the block list.
 		bool operator>=(const iterator_<T, block_entry_link>& it) const {
 			return (*this > it) || (*this == it);
 		}
@@ -605,7 +710,7 @@ public:
 			}
 			target.entry = target.containing_block ? target.containing_block->entries : nullptr;
 		}
-		static void skip_until_valid(Target_T& target) {
+		void skip_until_valid() {
 			if(!target.containing_block) {
 				target.entry = nullptr;
 				return;
@@ -639,9 +744,13 @@ public:
 		}
 	};
 
+	/// ForwardIterator
 	typedef iterator_<T, block_entry_link> iterator;
+	/// Constant ForwardIterator
 	typedef iterator_<const T, const_block_entry_link> const_iterator;
 
+	///  \brief Creates an object in the the pool and returns a smart_pool_ptr as the initial owner that
+	///  manages the lifetime of the object.
 	template <typename... Args>
 	smart_pool_ptr<T> emplace(Args&&... args) {
 		auto entry = allocate();
@@ -649,16 +758,22 @@ public:
 		return smart_pool_ptr<T>(&entry.entry->object, entry.containing_block);
 	}
 
+	/// Returns true if and only if the pool has no active objects in it.
 	bool empty() const {
 		return active_objects == 0;
 	}
+
+	/// Returns the number active objects in the pool.
 	size_t size() const {
 		return active_objects;
 	}
+
+	/// Returns the number of objects, the pool can currently hold without allocating additional blocks.
 	size_t capacity() const {
 		return block_count * block_size;
 	}
 
+	/// Instructs the pool to increase capacity to reserved_size.
 	void reserve(size_t reserved_size) {
 		if(capacity() < reserved_size) {
 			std::lock_guard<std::mutex> lock(free_list_mutex);
@@ -668,7 +783,10 @@ public:
 		}
 	}
 
+	/// \brief Returns an iterator referring to the first object in the pool or a past-end-iterator if the
+	/// pool is empty.
 	iterator begin() {
+		if(empty()) return iterator();
 		block* block = first_block;
 		if(block)
 			return iterator({block->entries, block}, this);
@@ -676,7 +794,10 @@ public:
 			return iterator();
 	}
 
+	/// \brief Returns an const_iterator referring to the first object in the pool or a past-end-iterator if
+	/// the pool is empty.
 	const_iterator begin() const {
+		if(empty()) return const_iterator();
 		block* block = first_block;
 		if(block)
 			return const_iterator({block->entries, block}, this);
@@ -684,7 +805,10 @@ public:
 			return const_iterator();
 	}
 
+	/// \brief Returns an const_iterator referring to the first object in the pool or a past-end-iterator if
+	/// the pool is empty.
 	const_iterator cbegin() const {
+		if(empty()) return const_iterator();
 		block* block = first_block;
 		if(block)
 			return const_iterator({block->entries, block}, this);
@@ -692,14 +816,17 @@ public:
 			return const_iterator();
 	}
 
+	/// Returns a past-end-iterator for this pool.
 	iterator end() {
 		return iterator();
 	}
 
+	/// Returns a constant past-end-iterator for this pool.
 	const_iterator end() const {
 		return const_iterator();
 	}
 
+	/// Returns a constant past-end-iterator for this pool.
 	const_iterator cend() const {
 		return const_iterator();
 	}

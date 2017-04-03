@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/util/path_util.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef UTIL_PATH_UTIL_HPP_
@@ -12,6 +12,7 @@
 namespace mce {
 namespace util {
 
+/// Sanitizes the given part in place for the right type of slashes.
 void sanitize_path_inplace(std::string& path) noexcept;
 
 } // namespace util

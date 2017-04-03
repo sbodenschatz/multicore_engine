@@ -15,19 +15,19 @@ stages:
 
 .windows-cache-spec-template: &windows-cache-spec
     cache:
-        paths: *cache-paths
-        key: "%CI_RUNNER_ID%/%CI_BUILD_REF_NAME%/%CI_BUILD_NAME%"
+        #paths: *cache-paths
+        key: "%CI_RUNNER_ID%/%CI_COMMIT_REF_NAME%/%CI_JOB_NAME%"
 
 .artifacts-spec-build-linux-template: &artifact-spec-build-linux
     artifacts:
-        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        name: "mce_${CI_COMMIT_REF_NAME##*/}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
         expire_in: 1 week
         paths:
         - ${BUILD_COMPILER_NAME}
 
 .artifacts-spec-build-windows-template: &artifact-spec-build-windows
     artifacts:
-        name: "mce_%CI_BUILD_REF_NAME%_%CI_BUILD_ID%_%CI_BUILD_REF%_%CI_BUILD_NAME%"
+        name: "mce_%CI_COMMIT_REF_NAME:*/=%_%CI_JOB_ID%_%CI_COMMIT_SHA%_%CI_JOB_NAME%"
         expire_in: 1 week
         paths:
         - "%BUILD_COMPILER_NAME%"
@@ -106,8 +106,9 @@ stages:
     tags:
     - package
     artifacts: &package-artifact-spec
-        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}"
+        name: "mce_${CI_COMMIT_REF_NAME##*/}_${CI_JOB_ID}_${CI_COMMIT_SHA}"
         paths:
+        - refman_html
         - refman.pdf
         - cloc_report.txt
         - gcc
@@ -229,6 +230,9 @@ api-doc:
     - pdflatex refman.tex
     - pdflatex refman.tex
     - mv refman.pdf ../..
+    - cd ..
+    - mv html ../refman_html
+    - cat warnings.log
     tags:
     - latex
     - doxygen
@@ -236,10 +240,11 @@ api-doc:
         paths:
         - doc
     artifacts:
-        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        name: "mce_${CI_COMMIT_REF_NAME##*/}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
         expire_in: 1 week
         paths:
         - refman.pdf
+        - refman_html
         - cloc_report.txt
 
 license-pack-windows:
@@ -264,7 +269,7 @@ license-pack-windows:
     tags:
     - win-cpp
     artifacts:
-        name: "mce_%CI_BUILD_REF_NAME%_%CI_BUILD_ID%_%CI_BUILD_REF%_%CI_BUILD_NAME%"
+        name: "mce_%CI_COMMIT_REF_NAME:*/=%_%CI_JOB_ID%_%CI_COMMIT_SHA%_%CI_JOB_NAME%"
         expire_in: 1 week
         paths:
         - licenses
@@ -277,7 +282,7 @@ license-pack-linux:
     - cd licenses/linux
     - mkdir Boost glfw gli glm TBB vulkan-hpp vulkan-sdk zlib libc++ libstdc++ libgcc llvm-runtime g++ gcc-base
     - cp /usr/local/share/doc/local-boost/LICENSE_1_0.txt Boost
-    - cp /usr/local/share/doc/glfw/COPYING.txt glfw
+    - cp /usr/local/share/doc/glfw/LICENSE.md glfw
     - cp /usr/share/doc/libgli-dev/copyright gli
     - cp /usr/share/doc/libglm-dev/copyright glm
     - cp /usr/share/doc/libtbb-dev/copyright TBB
@@ -294,7 +299,7 @@ license-pack-linux:
     tags:
     - cpp
     artifacts:
-        name: "mce_${CI_BUILD_REF_NAME}_${CI_BUILD_ID}_${CI_BUILD_REF}_${CI_BUILD_NAME}"
+        name: "mce_${CI_COMMIT_REF_NAME##*/}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
         expire_in: 1 week
         paths:
         - licenses

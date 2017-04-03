@@ -1,15 +1,21 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/memory/aligned_new.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef MEMORY_ALIGNED_NEW_HPP_
 #define MEMORY_ALIGNED_NEW_HPP_
 
+/**
+ * \file
+ * Support for alligned allocation of overaligned types.
+ */
+
 #include "align.hpp"
 #include <cassert>
 
+/// Adds new and delete operators that ensure correct alignment for overaligned types.
 #define ALIGNED_NEW_AND_DELETE(TYPE)                                                                         \
 	static void* operator new(std::size_t count) {                                                           \
 		size_t alignment = alignof(TYPE);                                                                    \

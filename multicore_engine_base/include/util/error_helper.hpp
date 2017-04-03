@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_base/include/util/error_helper.hpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
 #ifndef UTIL_ERROR_HELPER_HPP_
@@ -17,6 +17,7 @@ namespace mce {
 namespace util {
 namespace detail {
 
+/// Formats an error position like the used build system expects them.
 inline void print_error_position(std::ostream& ostr, const std::string& filename, size_t line,
 								 size_t column) {
 #ifdef _MSC_VER
@@ -37,6 +38,7 @@ inline void print_error_position(std::ostream& ostr, const std::string& filename
 
 } // namespace detail
 
+/// Throws a syntax error exception for the given position in the given filename with the supplied message.
 template <typename It>
 void throw_syntax_error(const std::string& filename, It buffer_start, It pos, const std::string& message) {
 	auto p = std::accumulate(buffer_start, pos, std::make_pair(size_t(1), size_t(1)),
@@ -51,6 +53,8 @@ void throw_syntax_error(const std::string& filename, It buffer_start, It pos, co
 	throw syntax_exception(msgstream.str());
 }
 
+/// \brief Throws a syntax error exception for the given position in the given filename with the supplied
+/// message and expected element.
 template <typename It, typename Expected>
 void throw_syntax_error(const std::string& filename, It buffer_start, It pos, const std::string& message,
 						const Expected& expected) {

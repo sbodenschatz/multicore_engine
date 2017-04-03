@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/asset.hpp
- * Copyright 2015-2016 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_HPP_
@@ -21,9 +21,25 @@
 namespace mce {
 namespace asset {
 
+/// Represents abstracted file-like data (with a name and content) used by the engine.
+/**
+ * An asset is a data object with a defined name that can be synchronously and asynchronously loaded from
+ * different sources. It can be used by different parts of the engine that need data to work (assets can
+ * contain e.g. models, textures, collision geometry or entity descriptions).
+ */
 class asset : public std::enable_shared_from_this<asset> {
 public:
-	enum class state { initial, loading, ready, error };
+	/// Represents the current status of the asset.
+	enum class state {
+		/// The asset was requested but the loading has not been started yet (it is waiting in queue).
+		initial,
+		/// The asset is currently being loaded.
+		loading,
+		/// The asset is resident in memory and can be used.
+		ready,
+		/// An error prevented the asset from being loaded.
+		error
+	};
 
 private:
 	std::atomic<state> current_state_;
@@ -36,11 +52,26 @@ private:
 	mutable std::condition_variable completed_cv;
 
 public:
+	/// \brief Creates an asset object with the given name. Should only be used within the asset system but
+	/// can't be private due to being used in make_shared.
 	explicit asset(const std::string& name);
+	/// \brief Creates an asset object with the given name. Should only be used within the asset system but
+	/// can't be private due to being used in make_shared.
 	explicit asset(std::string&& name);
+	/// Forbids copy-construction for asset.
 	asset(const asset&) = delete;
+	/// Forbids copy-assignment for asset.
 	asset& operator=(const asset&) = delete;
 
+	/// \brief Instructs the asset system to run the handler function object when the asset has completed
+	/// loading or to run the error_handler if an error occurred during loading.
+	/**
+	 * The handler function object must have the signature <code>void(const asset_ptr& asset)</code>.
+	 * The error_handler function object must have the signature <code>void(std::exception_ptr)</code>.
+	 * Both handlers are called either on the thread calling this function or on a worker thread of the asset
+	 * system. Both must fit into their respective handler function wrapper type asset_completion_handler and
+	 * error_handler.
+	 */
 	template <typename F, typename E>
 	void run_when_loaded(F handler, E error_handler) {
 		if(current_state_ == state::ready) {
@@ -64,36 +95,36 @@ public:
 			error_handlers.emplace_back(std::move(error_handler));
 		}
 	}
-
+	/// Checks if the asset is ready for use.
 	bool ready() const noexcept {
 		return current_state_ == state::ready;
 	}
-
+	/// Checks if an error prevented loading.
 	bool has_error() const noexcept {
 		return current_state_ == state::error;
 	}
-
+	/// Triggers an error check by throwing an exception if an error prevented loading.
 	void check_error_flag() const {
 		if(current_state_ == state::error)
 			throw path_not_found_exception("Error loading asset '" + name_ + "'.");
 	}
-
+	/// Returns the current state of the asset.
 	state current_state() const noexcept {
 		return current_state_;
 	}
-
+	/// Allows access to the content data when the asset is loaded.
 	const char* data() const noexcept {
 		return data_.get();
 	}
-
+	/// Returns a pointer to the content participating in ownership of the data block.
 	const std::shared_ptr<const char>& data_shared() const noexcept {
 		return data_;
 	}
-
+	/// Returns the name of the asset.
 	const std::string& name() const noexcept {
 		return name_;
 	}
-
+	/// Returns the size of the assets content when it is loaded.
 	size_t size() const noexcept {
 		return size_;
 	}
