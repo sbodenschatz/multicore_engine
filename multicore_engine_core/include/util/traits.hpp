@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/util/traits.hpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
 #ifndef UTIL_TRAITS_HPP_
@@ -40,13 +40,25 @@ struct nothrow_swappable_trait_impl<T, false> {
 
 } // namespace detail
 
+/// Replacement for std::is_swappable<T> from C++17 where it is not available.
+/**
+ * \bug This may give false positives where swap is not SFINAEd correctly (for C++17) yet. Unfortunately this
+ * can not be prevented without also replacing std::swap and excluding the original from ADL.
+ */
 template <typename T>
 struct is_swappable {
+	/// Contains true if T is swappable or false if T is not swappable.
 	static constexpr bool value = detail::swappable_trait_impl<T>::value;
 };
 
+/// Replacement for std::is_nothrow_swappable<T> from C++17 where it is not available.
+/**
+ * \bug This may give false positives where swap is not SFINAEd correctly (for C++17) yet. Unfortunately this
+ * can not be prevented without also replacing std::swap and excluding the original from ADL.
+ */
 template <typename T>
 struct is_nothrow_swappable {
+	/// Contains true if T is nothrow-swappable or false if T is not nothrow-swappable.
 	static constexpr bool value =
 			detail::nothrow_swappable_trait_impl<T, detail::swappable_trait_impl<T>::value>::value;
 };

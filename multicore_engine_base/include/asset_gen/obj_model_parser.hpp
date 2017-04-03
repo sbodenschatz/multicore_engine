@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_base/include/asset_gen/obj_model_parser.hpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_GEN_OBJ_MODEL_PARSER_HPP_
@@ -22,6 +22,11 @@
 namespace mce {
 namespace asset_gen {
 
+/// The central class for providing the parser for the Wavefront OBJ model format.
+/**
+ * An object of this class represents a model that is to be parsed and contains the associated state.
+ * Parsing another model also requires another parser object.
+ */
 class obj_model_parser {
 private:
 	struct tripple_comparator {
@@ -75,10 +80,15 @@ private:
 	long long stoll(boost::string_view str, std::size_t* pos = nullptr);
 
 public:
+	/// Constructs a new parser using the given path for file references.
 	explicit obj_model_parser(boost::filesystem::path refs_dir) : refs_dir(refs_dir){};
+	/// Parses model data from the specified file.
 	void parse_file(const std::string& filename);
+	/// Parses model data from the given input stream.
 	void parse(std::istream& input);
+	/// Finalizes the model parsing by performing a few final calculations and returning the parsed model.
 	std::tuple<static_model, model::static_model_collision_data> finalize_model();
+	/// Creates a list of all files referenced by the given model files (required for build dependencies).
 	std::vector<boost::filesystem::path> list_refs(const std::string& filename) const;
 };
 

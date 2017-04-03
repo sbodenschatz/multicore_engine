@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/file_asset_loader.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_FILE_ASSET_LOADER_HPP_
@@ -15,13 +15,16 @@
 namespace mce {
 namespace asset {
 
+/// Loads assets directly from the reader and models load units as additional path prefixes.
 class file_asset_loader : public asset_loader {
 	std::shared_timed_mutex load_units_rw_lock;
 	std::vector<std::string> load_units;
 	const std::vector<path_prefix> prefixes;
 
 public:
+	/// Creates a file_asset_loader using the given path prefixes and with an empty load unit prefix.
 	explicit file_asset_loader(const std::vector<path_prefix>& prefixes);
+	/// Creates a file_asset_loader using the given path prefixes and with an empty load unit prefix.
 	explicit file_asset_loader(std::vector<path_prefix>&& prefixes);
 	virtual bool start_load_asset(const std::shared_ptr<asset>& asset, asset_manager& asset_manager,
 								  bool sync_hint) override;

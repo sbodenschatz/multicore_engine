@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/util/compression.hpp
- * Copyright 2015-2016 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef UTIL_COMPRESSION_HPP_
@@ -18,11 +18,16 @@
 namespace mce {
 namespace util {
 
+/// Compresses the data in the given vector with the given level and returns the compressed data.
 std::vector<char> compress(const std::vector<char>& input, int level = -1);
+/// Compresses the data in the given vector into the given target vector with the given level.
 void compress(const std::vector<char>& input, int level, std::vector<char>& out_buffer);
+/// Decompresses the data in the given vector and returns the decompressed data.
 std::vector<char> decompress(const std::vector<char>& input);
+/// Decompresses the data in the given vector into the given target vector.
 void decompress(const std::vector<char>& input, std::vector<char>& out_buffer);
 
+namespace detail {
 namespace zlib_wrappers {
 
 enum class flush_mode {
@@ -141,6 +146,7 @@ public:
 };
 
 } // namespace zlib_wrappers
+} // namespace detail
 } // namespace util
 } // namespace mce
 

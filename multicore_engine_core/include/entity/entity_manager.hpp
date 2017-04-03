@@ -1,11 +1,16 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/entity/entity_manager.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef ENTITY_ENTITY_MANAGER_HPP_
 #define ENTITY_ENTITY_MANAGER_HPP_
+
+/**
+ * \file
+ * Definition of the entity_manager class.
+ */
 
 #include "component_type.hpp"
 #include "ecs_types.hpp"
@@ -31,6 +36,7 @@ class entity_text_file_parser_backend;
 class entity_configuration;
 class abstract_component_type;
 
+/// Manages the entities in a scene and the available component types.
 class entity_manager {
 	core::engine& engine;
 	std::atomic<entity_id_t> next_id{1};
@@ -50,27 +56,47 @@ class entity_manager {
 
 public:
 	friend class mce::entity::parser::entity_text_file_parser_backend;
+	/// Constructs an entity_manager for the given engine object.
 	explicit entity_manager(core::engine& engine);
+	/// Forbids copy-construction for entity_manager.
 	entity_manager(const entity_manager&) = delete;
+	/// Forbids move-construction for entity_manager.
 	entity_manager(entity_manager&&) = delete;
+	/// Forbids copy-assignment for entity_manager.
 	entity_manager& operator=(const entity_manager&) = delete;
+	/// Forbids move-assignment for entity_manager.
 	entity_manager& operator=(entity_manager&&) = delete;
+	/// Destroys the entity_manager.
 	~entity_manager();
 
+	/// Deletes all entity objects from the manager.
 	void clear_entities();
+	/// Deletes all entity objects and entity_configuration objects from the manager.
 	void clear_entities_and_entity_configurations();
+	/// Loads entities and entity configurations from the entity text file represented by the given asset.
 	void load_entities_from_text_file(const asset::asset_ptr& text_file_asset);
+	/// Adds an entity_configuration to the manager.
 	void add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config);
+	/// Creates an entity from the referenced entity_configuration.
 	entity* create_entity(const entity_configuration& config);
+	/// Destroys the entity with the given id.
 	void destroy_entity(entity_id_t id);
+	/// Destroys the referenced entity.
 	void destroy_entity(entity* entity);
 
+	/// Returns a pointer to the entity with the given id or nullptr if no such entity exists.
 	entity* find_entity(long long id) const;
+	/// Returns a pointer to the entity with the given name or nullptr if no such entity exists.
 	entity* find_entity(const std::string& name) const;
+	/// Assigns the given entity name to the given entity id.
 	void assign_entity_name(const std::string& name, long long id);
+	/// \brief Returns a pointer to the entity_configuration with the given name or nullptr if no such
+	/// entity_configuration exists.
 	const entity_configuration* find_entity_configuration(const std::string& name) const;
+	/// \brief Returns a pointer to the abstract_component_type with the given name or nullptr if no such
+	/// abstract_component_type exists.
 	const abstract_component_type* find_component_type(const std::string& name) const;
-
+	/// Registers a component type with the given name and factory function.
 	template <typename T, typename F>
 	void register_component_type(const std::string& name, const F& factory_function) {
 		bool success = false;
@@ -83,12 +109,15 @@ public:
 } // namespace entity
 } // namespace mce
 
+/// Simplifies the registration of a component type by reducing boilerplate.
 #define REGISTER_COMPONENT_TYPE(ENTITYMANAGER, TYPE, NAME, FACTORYEXPR)                                      \
 	ENTITYMANAGER.register_component_type<TYPE>(NAME, [](auto&& owner, auto&& config, auto&& engine) {       \
 		UNUSED(owner), UNUSED(config), UNUSED(engine);                                                       \
 		return FACTORYEXPR;                                                                                  \
 	})
 
+/// \brief Simplifies the registration of a component type by applying the convention, that component classes
+/// are named [component type name]_component.
 #define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR)                                     \
 	ENTITYMANAGER.register_component_type<NAME##_component>(                                                 \
 			#NAME, [](auto&& owner, auto&& config, auto&& engine) {                                          \

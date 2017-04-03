@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/entity/parser/entity_text_file_parser.hpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_HPP_
@@ -20,17 +20,31 @@ namespace parser {
 struct entity_text_file_grammar;
 struct entity_text_file_skipper;
 
+/// Implements the front-end of the entity text file parser.
+/**
+ * Parses the text file into an AST.
+ */
 class entity_text_file_parser_frontend {
+	/// Stores the grammar of the parsers.
 	std::unique_ptr<entity_text_file_grammar> grammar;
+	/// Stores the skip parser of the parser.
 	std::unique_ptr<entity_text_file_skipper> skipper;
 
 public:
+	/// Constructs a parser front-end object.
 	entity_text_file_parser_frontend();
+	/// Destroys the parser front-end object.
 	~entity_text_file_parser_frontend();
 
+	/// \brief Parses the character sequence represented by first and last and uses the given filename for
+	/// error messages.
 	ast::ast_root parse(const std::string& filename, const char*& first, const char* last);
 };
 
+/// Implements the back-end of the entity text file parser.
+/**
+ * Processes the AST and feeds the entity type definitions and instantiations into a given entity_manager.
+ */
 class entity_text_file_parser_backend {
 	friend class entity_manager;
 	struct ast_definition_visitor : boost::static_visitor<> {
@@ -73,7 +87,9 @@ class entity_text_file_parser_backend {
 	ast::ast_root load_file(const asset::asset_ptr& text_file_asset);
 
 public:
+	/// Constructs a parser back-end for the given entity_manager.
 	explicit entity_text_file_parser_backend(entity_manager& em) : em(em) {}
+	/// Loads and processes the file represented by the given asset.
 	void load_and_process_file(const asset::asset_ptr& text_file_asset);
 };
 

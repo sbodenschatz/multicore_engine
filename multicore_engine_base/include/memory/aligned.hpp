@@ -12,6 +12,7 @@
 namespace mce {
 namespace memory {
 
+/// Checks if the given memory address is aligned to the given granularity.
 inline bool is_aligned(const void* addr, uintptr_t alignment) noexcept {
 	uintptr_t addr_int = uintptr_t(addr);
 	return addr_int % alignment == 0;

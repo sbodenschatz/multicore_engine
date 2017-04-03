@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/asset/asset_manager.hpp
- * Copyright 2015-2016 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef ASSET_ASSET_MANAGER_HPP_
@@ -35,6 +35,7 @@ namespace asset {
 class asset_loader;
 class asset;
 
+/// Manages the loading and retention of asset data in the engine.
 class asset_manager {
 	util::copy_on_write<std::vector<std::shared_ptr<asset_loader>>> asset_loaders;
 	std::shared_timed_mutex loaded_assets_rw_lock;
@@ -58,26 +59,46 @@ class asset_manager {
 
 public:
 	friend class asset_loader;
+	/// Initializes the asset_manager.
+	/**
+	 * Spawns worker threads for asynchronous tasks like asset loading and the corresponding completion
+	 * handlers.
+	 */
 	asset_manager();
+	/// Waits for all pending asynchronous tasks to complete and destroys the asset manager.
 	~asset_manager();
+	/// Forbids copying an asset_manager.
 	asset_manager(const asset_manager&) = delete;
+	/// Forbids copying an asset_manager.
 	asset_manager& operator=(const asset_manager&) = delete;
+	/// Asynchronously load the given asset and run the given completion handler when it is loaded.
 	template <typename F>
 	std::shared_ptr<const asset> load_asset_async(const std::string& name, F&& completion_handler) {
 		return load_asset_async(name, std::forward<F>(completion_handler), [](std::exception_ptr) {});
 	}
+	/// \brief Asynchronously load the given asset and run the given completion handler when it is loaded and
+	/// use the given error handler when loading fails.
 	template <typename F, typename E>
 	std::shared_ptr<const asset> load_asset_async(const std::string& name, F completion_handler,
 												  E error_handler);
+	/// Load the given asset and block the calling thread until the asset is loaded.
 	std::shared_ptr<const asset> load_asset_sync(const std::string& name);
+	/// Asynchronously load the given asset, signal completion using the returned future.
 	boost::unique_future<std::shared_ptr<const asset>> load_asset_future(const std::string& name);
+	/// Starts a cleanup task, that unloads unused assets.
 	void start_clean();
+	/// Start making the given load_unit available.
 	void start_pin_load_unit(const std::string& name);
+	/// \brief Start making the given load_unit available and call the given completion handler when done or
+	/// the given error handler if failed.
 	void start_pin_load_unit(const std::string& name, const simple_completion_handler& completion_handler,
 							 const error_handler& error_handler);
+	/// Starts a task to unload the given load_unit.
 	void start_unpin_load_unit(const std::string& name);
 
+	/// Adds the given asset_loader implementation to the search list.
 	void add_asset_loader(std::shared_ptr<asset_loader>&& loader);
+	/// Clears the asset_loader search list.
 	void clear_asset_loaders();
 };
 
