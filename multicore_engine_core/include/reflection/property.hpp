@@ -180,6 +180,7 @@ public:
 namespace mce {
 namespace reflection {
 
+///@cond DOXYGEN_IGNORE
 template <typename Root_Type, typename T, template <typename> class Abstract_Assignment,
 		  template <typename, typename> class Assignment, typename... Assignment_Param>
 std::unique_ptr<Abstract_Assignment<Root_Type>>
@@ -187,6 +188,7 @@ std::unique_ptr<Abstract_Assignment<Root_Type>>
 				Assignment_Param... param) const {
 	return std::make_unique<Assignment<Root_Type, T>>(*this, param...);
 }
+///@endcond
 
 /// \brief Represents a property of a Root_Type object with a type of T bound to a concrete object type using
 /// a getter and setter member function pointer on class Object_Type.
