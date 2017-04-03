@@ -54,6 +54,7 @@ struct unsafe_internals_policy {
 	typedef lock_ lock;
 	/// Implements a no-op lock_guard.
 	struct lock_guard {
+		/// Constructs a no-op lock_quard.
 		explicit lock_guard(lock&) {}
 	};
 	/// Uses a no-op lock_guard for delayed "locking".
@@ -756,9 +757,9 @@ public:
 			}
 		}
 		if(reallocated_objects) {
-			blocks.erase(std::remove_if(blocks.begin(), blocks.end(),
-										[](auto& b) { return b->active_objects == 0; }),
-						 blocks.end());
+			blocks.erase(std::remove_if(blocks.begin(), blocks.end(), [](auto& b) {
+				return b->active_objects == 0;
+			}), blocks.end());
 			block_count = blocks.size();
 			if(blocks.empty()) {
 				first_block = nullptr;
