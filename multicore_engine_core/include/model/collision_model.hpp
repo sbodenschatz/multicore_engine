@@ -76,7 +76,7 @@ public:
 	 * collision_model_completion_handler and error_handler.
 	 */
 	template <typename F, typename E>
-	void run_when_loaded(F handler, E error_handler) {
+	void run_when_ready(F handler, E error_handler) {
 		if(current_state_ == state::ready) {
 			handler(this->shared_from_this());
 			return;
