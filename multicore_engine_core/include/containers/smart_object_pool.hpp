@@ -14,10 +14,12 @@
 #include <atomic>
 #include <cassert>
 #include <exceptions.hpp>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
 #include <type_traits>
 #include <vector>
 
@@ -181,7 +183,7 @@ private:
 		ref_count_tag_t version;
 	};
 
-	static tagged_ref_count pre_increment_tagged_ref_count(std::atomic<tagged_ref_count>& rc) {
+	static tagged_ref_count pre_increment_tagged_ref_count(std::atomic<tagged_ref_count>& rc) noexcept {
 		tagged_ref_count tmp = rc.load();
 		tagged_ref_count res;
 		while(!rc.compare_exchange_weak(tmp, res = {tmp.count + 1, tmp.version + 1}))
@@ -189,7 +191,7 @@ private:
 		return res;
 	}
 
-	static tagged_ref_count pre_decrement_tagged_ref_count(std::atomic<tagged_ref_count>& rc) {
+	static tagged_ref_count pre_decrement_tagged_ref_count(std::atomic<tagged_ref_count>& rc) noexcept {
 		tagged_ref_count tmp = rc.load();
 		tagged_ref_count res;
 		while(!rc.compare_exchange_weak(tmp, res = {tmp.count - 1, tmp.version + 1}))
@@ -197,7 +199,8 @@ private:
 		return res;
 	}
 
-	static void store_tagged_ref_count(std::atomic<tagged_ref_count>& rc, ref_count_t new_ref_count) {
+	static void store_tagged_ref_count(std::atomic<tagged_ref_count>& rc,
+									   ref_count_t new_ref_count) noexcept {
 		tagged_ref_count tmp = rc.load();
 		while(!rc.compare_exchange_weak(tmp, {new_ref_count, tmp.version + 1}))
 			;
@@ -353,6 +356,9 @@ private:
 	std::mutex pending_destruction_list_mutex;
 	std::vector<pending_destruction_list_entry> pending_destruction_list;
 
+	alignas(cacheline_alignment) std::mutex destruction_error_callback_mutex;
+	std::function<void(std::exception_ptr)> destruction_error_callback;
+
 	static scratch_pad_pool<std::vector<pending_destruction_list_entry>> pending_destruction_scratch_pads;
 
 	friend class smart_pool_ptr<T>;
@@ -393,48 +399,60 @@ private:
 		--allocated_objects;
 	}
 
-	void mark_for_deferred_destruction(block_entry* entry, block* block, ref_count_tag_t version_tag)
-	/*TODO Find a way to make this noexcept because it will be called in a destructor*/ {
-		std::lock_guard<std::mutex> lock(pending_destruction_list_mutex);
-		if(active_iterators > 0) { // Check again because iterator might already be finished
-			pending_destruction_list.push_back(
-					pending_destruction_list_entry{block_entry_link{entry, block}, version_tag});
-			++pending_destructions;
-		} else {
-			if(block->try_to_destroy_object(entry, version_tag)) {
-				// Object itself carries a weakref
-				block->decrement_weak_ref(&entry->object);
+	void mark_for_deferred_destruction(block_entry* entry, block* block,
+									   ref_count_tag_t version_tag) noexcept {
+		try {
+			std::lock_guard<std::mutex> lock(pending_destruction_list_mutex);
+			if(active_iterators > 0) { // Check again because iterator might already be finished
+				pending_destruction_list.push_back(
+						pending_destruction_list_entry{block_entry_link{entry, block}, version_tag});
+				++pending_destructions;
+			} else {
+				if(block->try_to_destroy_object(entry, version_tag)) {
+					// Object itself carries a weakref
+					block->decrement_weak_ref(&entry->object);
+				}
 			}
+		} catch(...) {
+			auto ep = std::current_exception();
+			std::lock_guard<std::mutex> lock(destruction_error_callback_mutex);
+			destruction_error_callback(ep);
 		}
 	}
 
 	// Call this only after decrementing the iterator counter
-	void process_deferred_destruction()
-	/*TODO Find a way to make this noexcept because it will be called in a destructor*/ {
-		if(pending_destructions == 0) return;
-		auto pending = pending_destruction_scratch_pads.get();
-		auto dealloc = pending_destruction_scratch_pads.get();
-		{
-			std::lock_guard<std::mutex> lock(pending_destruction_list_mutex);
-			std::swap(*pending, pending_destruction_list);
-		}
-		for(auto& obj : *pending) {
-			if(obj.ptr.containing_block->try_to_destroy_object(obj.ptr.entry, obj.version)) {
-				auto& rc = obj.ptr.containing_block->ref_count(obj.ptr.entry);
-				if(--(rc.weak) == 0) {
-					dealloc->push_back(obj);
+	void process_deferred_destruction() noexcept {
+		try {
+			if(pending_destructions == 0) return;
+			auto pending = pending_destruction_scratch_pads.get();
+			auto dealloc = pending_destruction_scratch_pads.get();
+			{
+				std::lock_guard<std::mutex> lock(pending_destruction_list_mutex);
+				std::swap(*pending, pending_destruction_list);
+			}
+			for(auto& obj : *pending) {
+				if(obj.ptr.containing_block->try_to_destroy_object(obj.ptr.entry, obj.version)) {
+					auto& rc = obj.ptr.containing_block->ref_count(obj.ptr.entry);
+					if(--(rc.weak) == 0) {
+						dealloc->push_back(obj);
+					}
 				}
 			}
-		}
-		std::lock_guard<std::mutex> lock(free_list_mutex);
-		for(auto& obj : *dealloc) {
-			deallocate_inner(obj.ptr.entry, obj.ptr.containing_block);
+			std::lock_guard<std::mutex> lock(free_list_mutex);
+			for(auto& obj : *dealloc) {
+				deallocate_inner(obj.ptr.entry, obj.ptr.containing_block);
+			}
+		} catch(...) {
+			auto ep = std::current_exception();
+			std::lock_guard<std::mutex> lock(destruction_error_callback_mutex);
+			destruction_error_callback(ep);
 		}
 	}
 
 public:
 	/// Creates an empty pool.
-	smart_object_pool() noexcept {}
+	smart_object_pool() noexcept
+			: destruction_error_callback{[](std::exception_ptr ep) { std::rethrow_exception(ep); }} {}
 	/// Destroys the pool.
 	/**
 	 * Note because destroying the pool releases the memory resources for objects in the pool and a mechanism
@@ -461,7 +479,22 @@ public:
 	/// Forbids moving the pool.
 	smart_object_pool& operator=(smart_object_pool&&) noexcept = delete;
 
-	/// \brief Implements an iterator to iterate over living objects in the pool and fulfills the requirements
+	/// Sets the callback function that is called by object or iterator destruction code if an error happens.
+	/**
+	 * Because destructors need to be noexcept such an error would normally lead to std::terminate being
+	 * called. This callback allows to hook on such errors and handle them despite try and catch not being
+	 * available. The signature of the callback must be <code>void(std::exception_ptr)</code>. The default
+	 * callback function rethrows the exception and therefore lets the runtime environment call
+	 * std::terminate.
+	 */
+	template <typename F>
+	void set_destruction_error_callback(F&& error_callback_function) {
+		std::lock_guard<std::mutex> lock(destruction_error_callback_mutex);
+		destruction_error_callback = std::forward<F>(error_callback_function);
+	}
+
+	/// \brief Implements an iterator to iterate over living objects in the pool and fulfills the
+	/// requirements
 	/// of ForwardIterator.
 	/**
 	 * To facilitate block-base parallelism this iterator class provides two types of iterator object:
@@ -469,11 +502,11 @@ public:
 	 * 	Skips over empty object slots and thus ensures that the iterator always either references a living
 	 * object or is a past-end-iterator.
 	 * - limiter:
-	 * 	Is set to a specific position in the internal data structure (block and element index in the list of
-	 * blocks) regardless of an active object lives in this slot. These limiter objects serve as an end marker
-	 * for a block of objects that should be processed. Therefore they compare equal not just to iterators
-	 * pointing to the same slot but also to iterators pointing to any slot logically after it. This type of
-	 * iterators should never be dereferenced (like past-end-iterators).
+	 * 	Is set to a specific position in the internal data structure (block and element index in the list
+	 * of blocks) regardless of an active object lives in this slot. These limiter objects serve as an end
+	 * marker for a block of objects that should be processed. Therefore they compare equal not just to
+	 * iterators pointing to the same slot but also to iterators pointing to any slot logically after it. This
+	 * type of iterators should never be dereferenced (like past-end-iterators).
 	 */
 	template <typename It_T, typename Target_T>
 	class iterator_ : public std::iterator<std::forward_iterator_tag, It_T> {
@@ -516,9 +549,9 @@ public:
 
 		/// Releases the iterator.
 		/**
-		 * Note that this might trigger deferred object deletion and can therefore cause locking and take more
-		 * processing time as might be expected for most other destructors especially of light-weight objects
-		 * like iterators.
+		 * Note that this might trigger deferred object deletion and can therefore cause locking and take
+		 * more processing time as might be expected for most other destructors especially of light-weight
+		 * objects like iterators.
 		 */
 		~iterator_() {
 			drop_iterator();
@@ -794,8 +827,8 @@ public:
 			return iterator();
 	}
 
-	/// \brief Returns an const_iterator referring to the first object in the pool or a past-end-iterator if
-	/// the pool is empty.
+	/// \brief Returns an const_iterator referring to the first object in the pool or a past-end-iterator
+	/// if the pool is empty.
 	const_iterator begin() const {
 		if(empty()) return const_iterator();
 		block* block = first_block;
@@ -805,8 +838,8 @@ public:
 			return const_iterator();
 	}
 
-	/// \brief Returns an const_iterator referring to the first object in the pool or a past-end-iterator if
-	/// the pool is empty.
+	/// \brief Returns an const_iterator referring to the first object in the pool or a past-end-iterator
+	/// if the pool is empty.
 	const_iterator cbegin() const {
 		if(empty()) return const_iterator();
 		block* block = first_block;
