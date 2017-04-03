@@ -14,13 +14,13 @@
 #include <atomic>
 #include <cassert>
 #include <exceptions.hpp>
-#include <functional>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <type_traits>
+#include <util/local_function.hpp>
 #include <vector>
 
 #ifdef _MSC_VER
@@ -357,7 +357,7 @@ private:
 	std::vector<pending_destruction_list_entry> pending_destruction_list;
 
 	alignas(cacheline_alignment) std::mutex destruction_error_callback_mutex;
-	std::function<void(std::exception_ptr)> destruction_error_callback;
+	util::local_function<0x200, void(std::exception_ptr)> destruction_error_callback;
 
 	static scratch_pad_pool<std::vector<pending_destruction_list_entry>> pending_destruction_scratch_pads;
 
@@ -415,8 +415,7 @@ private:
 			}
 		} catch(...) {
 			auto ep = std::current_exception();
-			std::lock_guard<std::mutex> lock(destruction_error_callback_mutex);
-			destruction_error_callback(ep);
+			call_destruction_error_callback(ep);
 		}
 	}
 
@@ -444,9 +443,17 @@ private:
 			}
 		} catch(...) {
 			auto ep = std::current_exception();
-			std::lock_guard<std::mutex> lock(destruction_error_callback_mutex);
-			destruction_error_callback(ep);
+			call_destruction_error_callback(ep);
 		}
+	}
+
+	void call_destruction_error_callback(std::exception_ptr ep) {
+		decltype(destruction_error_callback) local_cb;
+		{
+			std::lock_guard<std::mutex> lock(destruction_error_callback_mutex);
+			local_cb = destruction_error_callback;
+		}
+		local_cb(ep);
 	}
 
 public:
