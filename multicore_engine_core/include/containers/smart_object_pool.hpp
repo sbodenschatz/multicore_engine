@@ -451,9 +451,8 @@ private:
 
 public:
 	/// Creates an empty pool.
-	smart_object_pool() noexcept {
-		destruction_error_callback = [](std::exception_ptr ep) { std::rethrow_exception(ep); };
-	}
+	smart_object_pool() noexcept
+			: destruction_error_callback{[](std::exception_ptr ep) { std::rethrow_exception(ep); }} {}
 	/// Destroys the pool.
 	/**
 	 * Note because destroying the pool releases the memory resources for objects in the pool and a mechanism
