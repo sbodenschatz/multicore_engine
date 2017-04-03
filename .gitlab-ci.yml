@@ -230,7 +230,9 @@ api-doc:
     - pdflatex refman.tex
     - pdflatex refman.tex
     - mv refman.pdf ../..
-    - mv ../html ../../refman_html
+    - cd ..
+    - mv html ../refman_html
+    - cat warnings.log
     tags:
     - latex
     - doxygen
