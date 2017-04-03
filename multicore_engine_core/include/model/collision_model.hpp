@@ -115,6 +115,9 @@ public:
 		return current_state_;
 	}
 	/// Allows access to the collision data stored in the model.
+	/**
+	 * Requires the model to be ready for use.
+	 */
 	const static_model_collision_data& data() const noexcept {
 		return data_;
 	}
