@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/model/collision_model.hpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
 #ifndef MODEL_COLLISION_MODEL_HPP_
@@ -20,8 +20,10 @@
 namespace mce {
 namespace model {
 
+/// Represents a (3D-)model asset used for collision detection.
 class collision_model : public std::enable_shared_from_this<collision_model> {
 public:
+	/// Represents the status of the model.
 	enum class state { loading, ready, error };
 
 private:
@@ -53,11 +55,26 @@ private:
 	friend class model_manager;
 
 public:
+	/// \brief Creates an model object with the given name. Should only be used within the model system but
+	/// can't be private due to being used in make_shared.
 	explicit collision_model(const std::string& name);
+	/// \brief Creates an model object with the given name. Should only be used within the model system but
+	/// can't be private due to being used in make_shared.
 	explicit collision_model(std::string&& name);
+	/// Forbids copy-construction of collision_model.
 	collision_model(const collision_model&) = delete;
+	/// Forbids copy-assignment of collision_model.
 	collision_model& operator=(const collision_model&) = delete;
-
+	/// \brief Instructs the model system to run the handler function object when the model has completed
+	/// loading or to run the error_handler if an error occurred during loading.
+	/**
+	 * The handler function object must have the signature <code>void(const collision_model_ptr&
+	 * model)</code>.
+	 * The error_handler function object must have the signature <code>void(std::exception_ptr)</code>.
+	 * Both handlers are called either on the thread calling this function or on a worker thread of the asset
+	 * system. Both must fit into their respective handler function wrapper type
+	 * collision_model_completion_handler and error_handler.
+	 */
 	template <typename F, typename E>
 	void run_when_loaded(F handler, E error_handler) {
 		if(current_state_ == state::ready) {
@@ -80,28 +97,28 @@ public:
 			error_handlers.emplace_back(std::move(error_handler));
 		}
 	}
-
+	/// Checks if the model is ready for use.
 	bool ready() const noexcept {
 		return current_state_ == state::ready;
 	}
-
+	/// Checks if an error prevented loading.
 	bool has_error() const noexcept {
 		return current_state_ == state::error;
 	}
-
+	/// Triggers an error check by throwing an exception if an error prevented loading.
 	void check_error_flag() const {
 		if(current_state_ == state::error)
 			throw path_not_found_exception("Error loading model '" + name_ + "'.");
 	}
-
+	/// Returns the current state of the model.
 	state current_state() const noexcept {
 		return current_state_;
 	}
-
+	/// Allows access to the collision data stored in the model.
 	const static_model_collision_data& data() const noexcept {
 		return data_;
 	}
-
+	/// Returns the name of the collision_model.
 	const std::string& name() const noexcept {
 		return name_;
 	}
