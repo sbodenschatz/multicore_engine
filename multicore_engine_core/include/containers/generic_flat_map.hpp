@@ -71,9 +71,8 @@ protected:
 						 [&compare](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
 	/// Used by implementing classes to copy-construct.
-	generic_flat_map_base(const generic_flat_map_base& other) noexcept(
-			std::is_nothrow_copy_constructible<container_t>::value&&
-					std::is_nothrow_copy_constructible<Compare>::value)
+	generic_flat_map_base(const generic_flat_map_base& other) noexcept(std::is_nothrow_copy_constructible<
+			container_t>::value&& std::is_nothrow_copy_constructible<Compare>::value)
 			: values(other.values), compare(other.compare) {}
 	/// Used by implementing classes to move-construct.
 	generic_flat_map_base(generic_flat_map_base&& other) noexcept(
@@ -92,9 +91,8 @@ protected:
 		return *this;
 	}
 	/// Used by implementing classes to move-assign.
-	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(
-			std::is_nothrow_copy_assignable<container_t>::value&&
-					std::is_nothrow_copy_assignable<Compare>::value) {
+	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(std::is_nothrow_copy_assignable<
+			container_t>::value&& std::is_nothrow_copy_assignable<Compare>::value) {
 		assert(this == &other);
 		compare = std::move_if_noexcept(other.compare);
 		values = std::move_if_noexcept(other.values);
@@ -160,7 +158,7 @@ public:
 		}
 
 		/// Advances the iterator to the next element and returns the old iterator.
-		iterator_ operator++(int)noexcept {
+		iterator_ operator++(int) noexcept {
 			auto it = *this;
 			this->operator++();
 			return it;
@@ -173,7 +171,7 @@ public:
 		}
 
 		/// Advances the iterator to the previous element and returns the old iterator.
-		iterator_ operator--(int)noexcept {
+		iterator_ operator--(int) noexcept {
 			auto it = *this;
 			this->operator--();
 			return it;
@@ -593,17 +591,15 @@ class generic_flat_map : public generic_flat_map_base<generic_flat_map<Container
 													  Container, Key, Value, Compare> {
 
 	typedef generic_flat_map_base<generic_flat_map<Container, Key, Value, Compare>, Container, Key, Value,
-								  Compare>
-			Base;
+								  Compare> Base;
 	typedef typename Base::key_compare key_compare;
 
 public:
 	/// \brief Constructs a generic_flat_map by forwarding the given parameters to the constructor of the
 	/// underlying container type and default-constructing the Compare object.
 	template <typename... Args>
-	explicit generic_flat_map(Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Compare>::value&&
-					std::is_nothrow_constructible<Base, Compare, Args...>::value)
+	explicit generic_flat_map(Args&&... args) noexcept(std::is_nothrow_default_constructible<
+			Compare>::value&& std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: generic_flat_map(Compare(), std::forward<Args>(args)...) {}
 	/// \brief Constructs a generic_flat_map by forwarding the given parameters to the constructor of the
 	/// underlying container type and copying the Compare object.
@@ -800,16 +796,14 @@ class generic_flat_multimap
 									   Value, Compare> {
 
 	typedef generic_flat_map_base<generic_flat_multimap<Container, Key, Value, Compare>, Container, Key,
-								  Value, Compare>
-			Base;
+								  Value, Compare> Base;
 
 public:
 	/// \brief Constructs a dual_container_multimap by forwarding the given parameters to the constructor of
 	/// the underlying container type and default-constructing the Compare object.
 	template <typename... Args>
-	explicit generic_flat_multimap(Args&&... args) noexcept(
-			std::is_nothrow_default_constructible<Compare>::value&&
-					std::is_nothrow_constructible<Base, Compare, Args...>::value)
+	explicit generic_flat_multimap(Args&&... args) noexcept(std::is_nothrow_default_constructible<
+			Compare>::value&& std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: generic_flat_multimap(Compare(), std::forward<Args>(args)...) {}
 
 	/// \brief Constructs a dual_container_multimap by forwarding the given parameters to the constructor of
@@ -846,6 +840,7 @@ public:
 		return *this;
 	}
 
+	/// Comparator function to compare keys in elements with keys.
 	typedef typename Base::key_compare key_compare;
 	/// RandomAccessIterator
 	typedef typename Base::iterator iterator;
