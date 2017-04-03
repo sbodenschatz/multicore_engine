@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/model/model.hpp
+ * File /multicore_engine_core/include/model/polygon_model.hpp
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
