@@ -8,6 +8,8 @@
 #define REFLECTION_PROPERTY_HPP_
 
 #include "type.hpp"
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
 #include <exceptions.hpp>
 #include <memory>
 #include <stdexcept>
@@ -77,7 +79,10 @@ public:
 	virtual bool from_string(Root_Type& object, const std::string& str) const = 0;
 	/// Retrieves the property value from the given object, formats it to a string and returns it.
 	virtual std::string to_string(const Root_Type& object) const = 0;
-	// TODO: Implement interface for binary serialization of objects
+	/// Writes the value of the property on the given object to the given binary stream.
+	virtual void from_bstream(Root_Type& object, bstream::ibstream& istr) const = 0;
+	/// Reads the value of the property on the given object from the given binary stream.
+	virtual void to_bstream(const Root_Type& object, bstream::obstream& ostr) const = 0;
 };
 
 namespace detail {
@@ -172,6 +177,17 @@ public:
 	/// Creates an assignment object for T from the given parameters.
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
 			make_assignment(Assignment_Param...) const override;
+	/// Writes the value of the property on the given object to the given binary stream.
+	virtual void from_bstream(Root_Type& object, bstream::ibstream& istr) const override {
+		T val;
+		istr >> val;
+		set_value(object, val);
+	}
+	/// Reads the value of the property on the given object from the given binary stream.
+	virtual void to_bstream(const Root_Type& object, bstream::obstream& ostr) const override {
+		accessor_value val = get_value(object);
+		ostr << val;
+	}
 };
 
 } // namespace reflection
