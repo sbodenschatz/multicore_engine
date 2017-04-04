@@ -124,6 +124,12 @@ struct property_type_parser_helper<T, std::false_type> {
 } // namespace detail
 
 /// Represents a property of any Root_Type object with the value type T regardless of concrete object type.
+/**
+ * Beware that for non-fundamental types T bound getters must be able to return the value by const reference,
+ * therefore they are not allowed to return locals or temporaries. This requirement is added a a trade of to
+ * not require copying of complex types. Because the type is specified in the virtual interface function that
+ * only depends on T it can't be changed by the linked property.
+ */
 template <typename Root_Type, typename T,
 		  template <typename> class Abstract_Assignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
@@ -208,6 +214,12 @@ std::unique_ptr<Abstract_Assignment<Root_Type>>
 
 /// \brief Represents a property of a Root_Type object with a type of T bound to a concrete object type using
 /// a getter and setter member function pointer on class Object_Type.
+/**
+ * Beware that for non-fundamental types T bound getters must be able to return the value by const reference,
+ * therefore they are not allowed to return locals or temporaries. This requirement is added a a trade of to
+ * not require copying of complex types. Because the type is specified in the virtual interface function that
+ * only depends on T it can't be changed by the linked property.
+ */
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
