@@ -11,11 +11,14 @@
 #include "../containers/smart_pool_ptr.hpp"
 #include "ecs_types.hpp"
 #include <boost/container/small_vector.hpp>
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
 
 namespace mce {
 namespace entity {
 
 class component;
+class entity_manager;
 
 /// \brief Represents an entity (aka game object) that is constructed from several component objects following
 /// the composition over inheritance technique.
@@ -73,6 +76,16 @@ public:
 	components() const {
 		return components_;
 	}
+
+	/// \brief Stores the current state of the entity (position, orientation, attached components and their
+	/// property values) to the given bstream.
+	void store_to_bstream(bstream::obstream& ostr) const;
+	/// Loads the state of the entity (as stored by store_to_bstream) from the given bstream.
+	/**
+	 * The given entity_manager is used to resolve component_types.
+	 */
+	void load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine& engine);
+
 	/// Returns the id of the entity.
 	entity_id_t id() const {
 		return id_;
