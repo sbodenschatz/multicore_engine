@@ -42,9 +42,8 @@ protected:
 
 public:
 	/// Specifies the type of the list of properties.
-	typedef std::vector<std::unique_ptr<
-			reflection::abstract_property<component, abstract_component_property_assignment, core::engine&>>>
-			property_list;
+	typedef std::vector<std::unique_ptr<reflection::abstract_property<
+			component, abstract_component_property_assignment, core::engine&>>> property_list;
 	/// Enables virtual destruction for derived classes.
 	virtual ~component() = default;
 	/// Allows access to the component_configuration from which this component object was created.
@@ -65,9 +64,19 @@ public:
 	static void fill_property_list(property_list& properties);
 
 	/// Stores the current state of the components (it's property values) to the given bstream.
-	void store_to_bstream(bstream::obstream& ostr) const;
+	/**
+	 * If compatible is true, a format containing the names and types of properties is used that allows
+	 * forward compatibility because the stored data contains the structure and non-matching properties can be
+	 * ignored on load.
+	 */
+	void store_to_bstream(bstream::obstream& ostr, bool compatible = true) const;
 	/// Loads the state of the component (as stored by store_to_bstream) from the given bstream.
-	void load_from_bstream(bstream::ibstream& istr);
+	/**
+	 * If compatible is true, a format containing the names and types of properties is used that allows
+	 * forward compatibility because the stored data contains the structure and non-matching properties can be
+	 * ignored on load.
+	 */
+	void load_from_bstream(bstream::ibstream& istr, bool compatible = true);
 
 protected:
 	/// \brief Allows derived classes to register a property specified by the given name, getter and setter to
