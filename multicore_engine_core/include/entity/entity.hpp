@@ -30,7 +30,8 @@ private:
 	template <typename T>
 	using component_container = boost::container::small_vector<T, 16>;
 	containers::generic_flat_map<component_container, component_type_id_t,
-								 containers::smart_pool_ptr<mce::entity::component>> components_;
+								 containers::smart_pool_ptr<mce::entity::component>>
+			components_;
 	bool marker_for_despawn = false;
 
 public:
@@ -78,23 +79,13 @@ public:
 
 	/// \brief Stores the current state of the entity (position, orientation, attached components and their
 	/// property values) to the given bstream.
-	/**
-	 * If compatible is true, a format containing the names and types of properties is used that allows
-	 * forward compatibility because the stored data contains the structure and non-matching properties can be
-	 * ignored on load.
-	 */
-	void store_to_bstream(bstream::obstream& ostr, bool compatible = true) const;
+	void store_to_bstream(bstream::obstream& ostr) const;
 	/// Loads the state of the entity (as stored by store_to_bstream) from the given bstream.
 	/**
 	 * The given entity_manager is used to resolve component_types.
 	 * The given engine reference is forwarded to component constructors.
-	 *
-	 * If compatible is true, a format containing the names and types of properties is used that allows
-	 * forward compatibility because the stored data contains the structure and non-matching properties can be
-	 * ignored on load.
 	 */
-	void load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine& engine,
-						   bool compatible = true);
+	void load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine& engine);
 
 	/// Returns the id of the entity.
 	entity_id_t id() const {
