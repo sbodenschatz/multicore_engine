@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/entity/entity_manager.cpp
- * Copyright 2015-2016 by Stefan Bodenschatz
+ * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #include <entity/component_type.hpp>
@@ -108,6 +108,15 @@ const abstract_component_type* entity_manager::find_component_type(const std::st
 		return nullptr;
 	}
 }
+const abstract_component_type* entity_manager::find_component_type(component_type_id_t id) const {
+	auto it = component_types_by_id.find(id);
+	if(it != component_types_by_id.end()) {
+		return it->second;
+	} else {
+		return nullptr;
+	}
+}
+
 void entity_manager::add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config) {
 	bool success = false;
 	const auto& name = entity_config->name();

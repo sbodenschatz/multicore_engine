@@ -51,6 +51,7 @@ class entity_manager {
 	// The following members may only be written to in strictly single-threaded access:
 	boost::container::flat_map<std::string, std::unique_ptr<entity_configuration>> entity_configurations;
 	boost::container::flat_map<std::string, std::unique_ptr<abstract_component_type>> component_types;
+	boost::container::flat_map<component_type_id_t, abstract_component_type*> component_types_by_id;
 
 	void register_builtin_components();
 
@@ -96,13 +97,18 @@ public:
 	/// \brief Returns a pointer to the abstract_component_type with the given name or nullptr if no such
 	/// abstract_component_type exists.
 	const abstract_component_type* find_component_type(const std::string& name) const;
+	/// \brief Returns a pointer to the abstract_component_type with the given type id or nullptr if no such
+	/// abstract_component_type exists.
+	const abstract_component_type* find_component_type(component_type_id_t id) const;
 	/// Registers a component type with the given name and factory function.
 	template <typename T, typename F>
 	void register_component_type(const std::string& name, const F& factory_function) {
 		bool success = false;
-		std::tie(std::ignore, success) =
-				component_types.emplace(name, make_component_type<T>(name, factory_function));
+		decltype(component_types)::iterator it;
+		std::tie(it, success) =
+				component_types.emplace(name, make_component_type<T>(engine, name, factory_function));
 		if(!success) throw std::logic_error("Duplicate component type name.");
+		component_types_by_id.emplace(it->second->id(), it->second.get());
 	}
 };
 
