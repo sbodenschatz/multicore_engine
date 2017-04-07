@@ -9,6 +9,7 @@
 
 #include "component_type_id_manager.hpp"
 #include "ecs_types.hpp"
+#include <entity/component_configuration.hpp>
 #include <memory>
 #include <reflection/property.hpp>
 #include <string>
@@ -20,7 +21,6 @@ class engine;
 } // namespace core
 
 namespace entity {
-class component_configuration;
 class entity;
 
 /// \brief Represents an abstract base class for component type descriptions to allow inserting them into a
@@ -35,13 +35,15 @@ public:
 private:
 	component_type_id_t id_;
 	std::string name_;
+	component_configuration empty_configuration_;
 
 protected:
 	/// Stores the list of properties registered for the component type.
 	property_list properties_;
 	/// Allows implementing classes to construct the base class with the given type id and name.
 	// cppcheck-suppress passedByValue
-	abstract_component_type(component_type_id_t id, std::string name) : id_(id), name_(std::move(name)) {}
+	abstract_component_type(core::engine& engine, component_type_id_t id, std::string name)
+			: id_(id), name_(std::move(name)), empty_configuration_(engine, *this) {}
 
 public:
 	/// Forbids copy-construction of abstract_component_type.
@@ -70,6 +72,10 @@ public:
 	const std::string& name() const noexcept {
 		return name_;
 	}
+	/// Returns an empty component_configuration for this component_type.
+	const component_configuration& empty_configuration() const noexcept {
+		return empty_configuration_;
+	}
 };
 
 /// \brief Represents a concrete description of a component type with a specific type T of the component and
@@ -81,8 +87,8 @@ class component_type : public abstract_component_type {
 public:
 	/// \brief Constructs a component_type description for T with the given name and component object factory
 	/// function.
-	component_type(const std::string& name, const F& factory_function)
-			: abstract_component_type(component_type_id_manager::id<T>(), name),
+	component_type(core::engine& engine, const std::string& name, const F& factory_function)
+			: abstract_component_type(engine, component_type_id_manager::id<T>(), name),
 			  factory_function_(factory_function) {
 		T::fill_property_list(properties_);
 	}
@@ -98,9 +104,9 @@ public:
 
 /// Create a component type description for T with the given name and factory function.
 template <typename T, typename F>
-std::unique_ptr<abstract_component_type> make_component_type(const std::string& name,
+std::unique_ptr<abstract_component_type> make_component_type(core::engine& engine, const std::string& name,
 															 const F& factory_function) {
-	return std::make_unique<component_type<T, F>>(name, factory_function);
+	return std::make_unique<component_type<T, F>>(engine, name, factory_function);
 }
 
 } // namespace entity
