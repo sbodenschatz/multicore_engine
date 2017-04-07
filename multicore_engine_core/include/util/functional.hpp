@@ -41,6 +41,39 @@ auto chain_fn(F1&& f1, F2&& f2) {
 	return chain_functor<std::decay_t<F1>, std::decay_t<F2>>(f1, f2);
 }
 
+/// A generic functor class that combines multiple function object types into an overload set.
+template <typename... Funcs>
+class overload_functor;
+
+/// Specialization of overload_functor for the step case.
+template <typename Func1, typename... Funcs>
+class overload_functor<Func1, Funcs...> : public Func1, public overload_functor<Funcs...>::cur {
+	using cur = overload_functor;
+
+public:
+	template <typename F1, typename... Fs>
+	overload_functor(F1&& f1, Fs&&... fs)
+			: Func1(std::forward<F1>(f1)), overload_functor<Funcs...>::cur(std::forward<Fs>(fs)...) {}
+
+	using Func1::operator();
+	using overload_functor<Funcs...>::cur::operator();
+};
+
+/// Specialization of overload_functor for the anchor case.
+template <typename Func>
+class overload_functor<Func> : public Func {
+	using cur = Func;
+
+public:
+	using Func::operator();
+};
+
+/// Returns a function object whose operator() is overloaded by combining the given function objects.
+template <typename... Funcs>
+overload_functor<std::remove_reference<Funcs>...> overload(Funcs&&... fs) {
+	return overload_functor<std::remove_reference<Funcs>...>(std::forward<Funcs>(fs)...);
+}
+
 } // namespace util
 } // namespace mce
 
