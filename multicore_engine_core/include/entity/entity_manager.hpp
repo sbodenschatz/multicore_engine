@@ -101,6 +101,22 @@ public:
 	/// abstract_component_type exists.
 	const abstract_component_type* find_component_type(component_type_id_t id) const;
 	/// Registers a component type with the given name and factory function.
+
+	/// \brief Stores the current state of the entities (position, orientation, attached components and their
+	/// property values) to the given bstream.
+	/**
+	 * May only be called if no other threads manipulate the stored entity data concurrently and the set of
+	 * entities.
+	 * Therefore this operation transitions the entity_manager to read-only mode.
+	 */
+	void store_entities_to_bstream(bstream::obstream& ostr) const;
+	/// Loads the state of the entities (as stored by store_to_bstream) from the given bstream.
+	/**
+	 * May only be called if no other threads manipulate the stored entity data concurrently and the set of
+	 * entities.
+	 */
+	void load_entities_from_bstream(bstream::ibstream& istr);
+
 	template <typename T, typename F>
 	void register_component_type(const std::string& name, const F& factory_function) {
 		bool success = false;
