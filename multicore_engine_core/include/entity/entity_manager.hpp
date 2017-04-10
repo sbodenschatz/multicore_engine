@@ -100,7 +100,6 @@ public:
 	/// \brief Returns a pointer to the abstract_component_type with the given type id or nullptr if no such
 	/// abstract_component_type exists.
 	const abstract_component_type* find_component_type(component_type_id_t id) const;
-	/// Registers a component type with the given name and factory function.
 
 	/// \brief Stores the current state of the entities (position, orientation, attached components and their
 	/// property values) to the given bstream.
@@ -117,6 +116,7 @@ public:
 	 */
 	void load_entities_from_bstream(bstream::ibstream& istr);
 
+	/// Registers a component type with the given name and factory function.
 	template <typename T, typename F>
 	void register_component_type(const std::string& name, const F& factory_function) {
 		bool success = false;
