@@ -20,6 +20,7 @@ private:
 	const entity_manager* entity_manager_;
 
 public:
+	// cppcheck-suppress passedByValue
 	entity_reference(std::string referenced_entity_name, const entity_manager& entity_manager)
 			: referenced_entity_name_{std::move(referenced_entity_name)}, entity_manager_{&entity_manager} {}
 
