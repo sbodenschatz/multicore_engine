@@ -22,6 +22,7 @@ template <typename Root_Type>
 class abstract_component_property_assignment;
 class entity;
 class abstract_component_type;
+class entity_manager;
 
 /// Represents the configuration of a component in an entity_configuration.
 /**
@@ -53,7 +54,7 @@ public:
 	/// \brief Adds a property assignment for the named property with the given value using the given
 	/// entity_context for error messages.
 	void make_assignment(const std::string& property_name, const ast::variable_value& ast_value,
-						 const std::string& entity_context);
+						 const std::string& entity_context, entity_manager& entity_manager);
 	/// Returns the type of the component this configuration specifies.
 	const abstract_component_type& type() const {
 		return type_;
