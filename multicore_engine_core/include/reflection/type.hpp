@@ -16,6 +16,11 @@
 #include <vector>
 
 namespace mce {
+namespace bstream {
+class ibstream;
+class obstream;
+} // namespace bstream
+
 namespace reflection {
 
 /// Represents the type of a value.
@@ -45,6 +50,10 @@ enum class type_t {
 	/// The value is a list of textual strings.
 	string_list,
 };
+/// Deserializes the value type representation from the bstream.
+bstream::ibstream& operator>>(bstream::ibstream& ibs, type_t& value);
+/// Serializes the value type representation to the bstream.
+bstream::obstream& operator<<(bstream::obstream& obs, type_t value);
 
 /// Allows conversion of C++ types to the appropriate type_t member value using specializations.
 template <typename T>
