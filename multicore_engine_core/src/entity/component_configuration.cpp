@@ -35,7 +35,8 @@ component_configuration::~component_configuration() {}
 
 void component_configuration::make_assignment(const std::string& property_name,
 											  const ast::variable_value& ast_value,
-											  const std::string& entity_context) {
+											  const std::string& entity_context,
+											  entity_manager& entity_manager) {
 	auto it = std::find_if(assignments.begin(), assignments.end(), [&](const auto& elem) {
 		return elem->abstract_property().name() == property_name;
 	});
@@ -47,7 +48,7 @@ void component_configuration::make_assignment(const std::string& property_name,
 											 type_.name() + "'.");
 		it = assignments.emplace(assignments.end(), it2->get()->make_assignment(engine));
 	}
-	it->get()->parse(ast_value, entity_context, type_.name());
+	it->get()->parse(ast_value, entity_context, type_.name(), entity_manager);
 }
 
 } // namespace entity

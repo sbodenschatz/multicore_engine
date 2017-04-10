@@ -29,6 +29,7 @@ class property;
 } // namespace reflection
 
 namespace entity {
+class entity_manager;
 /// \brief Represents the abstract base class for component_property_assignment template instances to allow
 /// inserting them into a polymorphic container.
 template <typename Root_Type>
@@ -56,7 +57,7 @@ public:
 	virtual void assign(Root_Type& object) const = 0;
 	/// Parses a value from the given variable_value and stores it in the assignment object.
 	virtual void parse(const ast::variable_value& ast_value, const std::string& entity_context,
-					   const std::string& component_context) = 0;
+					   const std::string& component_context, entity_manager& entity_manager) = 0;
 	/// Returns the property to which this assignment assigns a value.
 	virtual const mce::reflection::abstract_property<
 			Root_Type, mce::entity::abstract_component_property_assignment, core::engine&>&
@@ -82,9 +83,11 @@ class component_property_assignment : public abstract_component_property_assignm
 		const std::string& entity_context;
 		const std::string& component_context;
 		component_property_assignment& pa;
+		entity_manager& entity_manager_;
 		ast_visitor(const std::string& entity_context, const std::string& component_context,
-					component_property_assignment& pa)
-				: entity_context(entity_context), component_context(component_context), pa(pa) {}
+					component_property_assignment& pa, entity_manager& entity_manager)
+				: entity_context(entity_context), component_context(component_context), pa(pa),
+				  entity_manager_(entity_manager) {}
 		template <typename U, typename V = T, typename W = typename ast::ast_value_mapper<U, V>::error>
 		void operator()(const U&, W* = nullptr) {
 			throw value_type_exception("Invalid value for " + pa.property_.name() + " of " +
@@ -93,7 +96,7 @@ class component_property_assignment : public abstract_component_property_assignm
 		template <typename U, typename V = T,
 				  void (*convert)(const U&, V&) = ast::ast_value_mapper<U, V>::convert>
 		void operator()(const U& ast_value) {
-			convert(ast_value, pa.value_);
+			convert(ast_value, pa.value_, entity_manager_);
 			pa.valid_ = true;
 		}
 	};
@@ -122,8 +125,8 @@ public:
 	}
 	/// Parses a value from the given variable_value and stores it in the assignment object.
 	virtual void parse(const ast::variable_value& ast_value, const std::string& entity_context,
-					   const std::string& component_context) override {
-		ast_visitor visitor(entity_context, component_context, *this);
+					   const std::string& component_context, entity_manager& entity_manager) override {
+		ast_visitor visitor(entity_context, component_context, *this, entity_manager);
 		ast_value.apply_visitor(visitor);
 	}
 	/// Returns the property to which this assignment assigns a value.
