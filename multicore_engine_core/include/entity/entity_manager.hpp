@@ -109,7 +109,7 @@ public:
 	 * entities.
 	 * Therefore this operation transitions the entity_manager to read-only mode.
 	 */
-	void store_entities_to_bstream(bstream::obstream& ostr) const;
+	void store_entities_to_bstream(bstream::obstream& ostr);
 	/// Loads the state of the entities (as stored by store_to_bstream) from the given bstream.
 	/**
 	 * May only be called if no other threads manipulate the stored entity data concurrently and the set of
