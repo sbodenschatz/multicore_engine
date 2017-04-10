@@ -8,6 +8,8 @@
 #define REFLECTION_PROPERTY_HPP_
 
 #include "type.hpp"
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
 #include <exceptions.hpp>
 #include <memory>
 #include <stdexcept>
@@ -48,11 +50,13 @@ template <typename Root_Type, template <typename> class Abstract_Assignment = ab
 		  typename... Assignment_Param>
 class abstract_property {
 protected:
-	std::string name_; ///< Stores the name of the property.
+	std::string name_;			   ///< Stores the name of the property.
+	mce::reflection::type_t type_; ///< Stores the type representation of the property.
 
-	/// Constructs an abstract_property with the given name.
+	/// Constructs an abstract_property with the given name and type.
 	// cppcheck-suppress passedByValue
-	explicit abstract_property(std::string name) : name_(std::move(name)) {}
+	explicit abstract_property(std::string name, mce::reflection::type_t type)
+			: name_(std::move(name)), type_(type) {}
 
 public:
 	/// Forbids copy-construction.
@@ -66,7 +70,9 @@ public:
 	/// Allows polymorphic destruction.
 	virtual ~abstract_property() = default;
 	/// Returns a representation of the data type of the property.
-	virtual mce::reflection::type_t type() const noexcept = 0;
+	mce::reflection::type_t type() const noexcept {
+		return type_;
+	}
 	/// Creates an assignment object for the concrete property value type from the given parameters.
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>> make_assignment(Assignment_Param...) const = 0;
 	/// Returns the name of the property given on construction of the property object.
@@ -77,7 +83,10 @@ public:
 	virtual bool from_string(Root_Type& object, const std::string& str) const = 0;
 	/// Retrieves the property value from the given object, formats it to a string and returns it.
 	virtual std::string to_string(const Root_Type& object) const = 0;
-	// TODO: Implement interface for binary serialization of objects
+	/// Writes the value of the property on the given object to the given binary stream.
+	virtual void from_bstream(Root_Type& object, bstream::ibstream& istr) const = 0;
+	/// Reads the value of the property on the given object from the given binary stream.
+	virtual void to_bstream(const Root_Type& object, bstream::obstream& ostr) const = 0;
 };
 
 namespace detail {
@@ -119,14 +128,22 @@ struct property_type_parser_helper<T, std::false_type> {
 } // namespace detail
 
 /// Represents a property of any Root_Type object with the value type T regardless of concrete object type.
+/**
+ * Beware that for non-fundamental types T bound getters must be able to return the value by const reference,
+ * therefore they are not allowed to return locals or temporaries. This requirement is added a a trade of to
+ * not require copying of complex types. Because the type is specified in the virtual interface function that
+ * only depends on T it can't be changed by the linked property.
+ */
 template <typename Root_Type, typename T,
 		  template <typename> class Abstract_Assignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
 class property : public abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...> {
 protected:
-	/// Constructs a property with the given name.
+	/// \brief Constructs a property with the given name and a representation of the data type of the property
+	/// based on the template parameter T.
 	explicit property(const std::string& name)
-			: abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...>(name) {}
+			: abstract_property<Root_Type, Abstract_Assignment, Assignment_Param...>(name,
+																					 type_info<T>::type) {}
 
 public:
 	static_assert(std::is_base_of<Abstract_Assignment<Root_Type>, Assignment<Root_Type, T>>::value,
@@ -143,10 +160,6 @@ public:
 	property& operator=(property&&) = delete;
 	/// Allows polymorphic destruction.
 	virtual ~property() = default;
-	/// Returns a representation of the data type of the property based on the template parameter T.
-	virtual mce::reflection::type_t type() const noexcept override {
-		return type_info<T>::type;
-	}
 	/// Provides read access to the property value for the given object.
 	/**
 	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
@@ -172,6 +185,17 @@ public:
 	/// Creates an assignment object for T from the given parameters.
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
 			make_assignment(Assignment_Param...) const override;
+	/// Writes the value of the property on the given object to the given binary stream.
+	virtual void from_bstream(Root_Type& object, bstream::ibstream& istr) const override {
+		T val;
+		istr >> val;
+		set_value(object, val);
+	}
+	/// Reads the value of the property on the given object from the given binary stream.
+	virtual void to_bstream(const Root_Type& object, bstream::obstream& ostr) const override {
+		accessor_value val = get_value(object);
+		ostr << val;
+	}
 };
 
 } // namespace reflection
@@ -192,6 +216,12 @@ std::unique_ptr<Abstract_Assignment<Root_Type>>
 
 /// \brief Represents a property of a Root_Type object with a type of T bound to a concrete object type using
 /// a getter and setter member function pointer on class Object_Type.
+/**
+ * Beware that for non-fundamental types T bound getters must be able to return the value by const reference,
+ * therefore they are not allowed to return locals or temporaries. This requirement is added a a trade of to
+ * not require copying of complex types. Because the type is specified in the virtual interface function that
+ * only depends on T it can't be changed by the linked property.
+ */
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>

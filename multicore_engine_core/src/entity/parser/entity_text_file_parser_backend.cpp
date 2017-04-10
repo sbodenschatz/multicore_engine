@@ -69,7 +69,7 @@ void entity_text_file_parser_backend::ast_instance_visitor::operator()(const ast
 	auto entity_conf = backend.em.find_entity_configuration(node.type_name);
 	if(!entity_conf)
 		throw missing_entity_config_exception("Unknown entity configuration '" + node.type_name + "'.");
-	auto entity = backend.em.create_entity(*entity_conf);
+	auto entity = backend.em.create_entity(entity_conf);
 	ast_position_visitor pos_visitor(backend);
 	entity->position(node.position_parameter.apply_visitor(pos_visitor));
 	ast_orientation_visitor orientation_visitor(backend);

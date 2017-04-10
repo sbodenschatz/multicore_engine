@@ -64,6 +64,11 @@ public:
 	/// implementation is used through inheritance.
 	static void fill_property_list(property_list& properties);
 
+	/// Stores the current state of the components (it's property values) to the given bstream.
+	void store_to_bstream(bstream::obstream& ostr) const;
+	/// Loads the state of the component (as stored by store_to_bstream) from the given bstream.
+	void load_from_bstream(bstream::ibstream& istr);
+
 protected:
 	/// \brief Allows derived classes to register a property specified by the given name, getter and setter to
 	/// the given list of properties.
