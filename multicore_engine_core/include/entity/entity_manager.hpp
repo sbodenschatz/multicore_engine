@@ -79,7 +79,7 @@ public:
 	/// Adds an entity_configuration to the manager.
 	void add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config);
 	/// Creates an entity from the referenced entity_configuration.
-	entity* create_entity(const entity_configuration& config);
+	entity* create_entity(const entity_configuration* config = nullptr);
 	/// Destroys the entity with the given id.
 	void destroy_entity(entity_id_t id);
 	/// Destroys the referenced entity.

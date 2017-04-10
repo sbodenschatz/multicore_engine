@@ -34,11 +34,11 @@ void entity_manager::load_entities_from_text_file(const asset::asset_ptr& text_f
 	parser::entity_text_file_parser_backend parser_backend(*this);
 	parser_backend.load_and_process_file(text_file_asset);
 }
-entity* entity_manager::create_entity(const entity_configuration& config) {
+entity* entity_manager::create_entity(const entity_configuration* config) {
 	assert(!read_only_mode);
 	auto id = next_id++;
 	auto it = entities.emplace(id);
-	config.create_components(*it);
+	if(config) config->create_components(*it);
 	std::lock_guard<std::mutex> lock(id_map_mutex);
 	entity_id_map.insert(std::make_pair(id, it));
 	return it;
