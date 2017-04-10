@@ -51,6 +51,7 @@ class overload_functor<Func1, Funcs...> : public Func1, public overload_functor<
 	using cur = overload_functor;
 
 public:
+	/// Constructs an overload_functor object for the given function objects.
 	template <typename F1, typename... Fs>
 	overload_functor(F1&& f1, Fs&&... fs)
 			: Func1(std::forward<F1>(f1)), overload_functor<Funcs...>::cur(std::forward<Fs>(fs)...) {}
