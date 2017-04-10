@@ -4,47 +4,44 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <boost/test/unit_test.hpp>
 #include <boost/variant/get.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_compare.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
 #include <exceptions.hpp>
+#include <gtest.hpp>
 #include <string>
 
 namespace mce {
 namespace entity {
 namespace parser {
 
-BOOST_AUTO_TEST_SUITE(entity)
-BOOST_AUTO_TEST_SUITE(entity_text_file_parser_frontend_test)
-
-BOOST_AUTO_TEST_CASE(empty_file_valid) {
+TEST(entity_entity_text_file_parser_frontend_test, empty_file_valid) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
-	BOOST_CHECK(root.size() == 0);
+	ASSERT_TRUE(first == last);
+	ASSERT_TRUE(root.size() == 0);
 }
-BOOST_AUTO_TEST_CASE(only_comment_valid) {
+TEST(entity_entity_text_file_parser_frontend_test, only_comment_valid) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "//Comment\n";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
-	BOOST_CHECK(root.size() == 0);
+	ASSERT_TRUE(first == last);
+	ASSERT_TRUE(root.size() == 0);
 }
 
-BOOST_AUTO_TEST_CASE(single_instance_unnamed_intlist_rotlist) {
+TEST(entity_entity_text_file_parser_frontend_test, single_instance_unnamed_intlist_rotlist) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "Test (1,2,3),(x:45,y:30);";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_instance ei;
 	ei.type_name = "Test";
@@ -52,16 +49,16 @@ BOOST_AUTO_TEST_CASE(single_instance_unnamed_intlist_rotlist) {
 	ei.orientation_parameter = ast::rotation_list({ast::rotation_element{ast::rotation_axis::x, 45},
 												   ast::rotation_element{ast::rotation_axis::y, 30}});
 	root_expected.emplace_back(ei);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_instance_named_floatlist_floatlist) {
+TEST(entity_entity_text_file_parser_frontend_test, single_instance_named_floatlist_floatlist) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_instance ei;
 	ei.type_name = "Test";
@@ -69,44 +66,44 @@ BOOST_AUTO_TEST_CASE(single_instance_named_floatlist_floatlist) {
 	ei.position_parameter = ast::float_list{1, 2, 3.0};
 	ei.orientation_parameter = ast::float_list{1.0, 2.0, 3.0, 4.0};
 	root_expected.emplace_back(ei);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_include) {
+TEST(entity_entity_text_file_parser_frontend_test, single_include) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::include_instruction ii;
 	ii.filename = "testfile.etf";
 	root_expected.emplace_back(ii);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_empty) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_empty) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_empty) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_empty) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -114,16 +111,16 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_empty) {
 	cd.name = "TestComp";
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_intvar) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_intvar) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=42;}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -135,16 +132,16 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_intvar) {
 	cd.variables.emplace_back(var);
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_floatvar) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_floatvar) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=42.0;}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -156,16 +153,16 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_floatvar) {
 	cd.variables.emplace_back(var);
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_stringvar) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_stringvar) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=\"Hello World!!\";}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -177,16 +174,16 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_stringvar) {
 	cd.variables.emplace_back(var);
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_intlist) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_intlist) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=(1,2,3);test2=();}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -206,16 +203,16 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_intlist) {
 	}
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_floatlist) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_floatlist) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=(1,2,3.0);}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -227,16 +224,16 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_floatlist) {
 	cd.variables.emplace_back(var);
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_stringlist) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_stringlist) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=(\"Hello\",\"World\");}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -248,16 +245,16 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_stringlist) {
 	cd.variables.emplace_back(var);
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_entityref) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_entityref) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=entity testent;}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -269,16 +266,16 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_entityref) {
 	cd.variables.emplace_back(var);
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_marker) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_marker) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=marker \"testmarker\";}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -290,10 +287,10 @@ BOOST_AUTO_TEST_CASE(single_definition_nosuper_comp_marker) {
 	cd.variables.emplace_back(var);
 	ed.components.emplace_back(cd);
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(single_definition_super_compreplace_comp) {
+TEST(entity_entity_text_file_parser_frontend_test, single_definition_super_compreplace_comp) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "TestEnt:SuperEnt{"
 						   "replace TestComp{test=(\"Hello\",\"World\");}"
@@ -302,7 +299,7 @@ BOOST_AUTO_TEST_CASE(single_definition_super_compreplace_comp) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -327,10 +324,10 @@ BOOST_AUTO_TEST_CASE(single_definition_super_compreplace_comp) {
 		ed.components.emplace_back(cd);
 	}
 	root_expected.emplace_back(ed);
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
 
-BOOST_AUTO_TEST_CASE(combined) {
+TEST(entity_entity_text_file_parser_frontend_test, combined) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -347,7 +344,7 @@ BOOST_AUTO_TEST_CASE(combined) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
-	BOOST_CHECK(first == last);
+	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::include_instruction ii;
 	ii.filename = "testfile.etf";
@@ -391,9 +388,9 @@ BOOST_AUTO_TEST_CASE(combined) {
 		ei.orientation_parameter = ast::float_list{1.0, 2.0, 3.0, 4.0};
 		root_expected.emplace_back(ei);
 	}
-	BOOST_CHECK(root == root_expected);
+	ASSERT_TRUE(root == root_expected);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_include_non_string) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_include_non_string) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include testfile.etf;\n"
 						   "//Comment\n"
@@ -410,9 +407,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_include_non_string) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_missing_super) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_super) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -429,9 +426,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_missing_super) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_missing_template_name) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_template_name) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -448,9 +445,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_missing_template_name) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_invalid_modifier) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_invalid_modifier) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -467,9 +464,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_invalid_modifier) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_missing_comp_name) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_comp_name) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -486,9 +483,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_missing_comp_name) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_missing_var_name) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_var_name) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -505,9 +502,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_missing_var_name) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_missing_delimiter) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_delimiter) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -524,9 +521,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_missing_delimiter) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_missing_value) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_value) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -543,9 +540,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_missing_value) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_missing_semicolon) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_semicolon) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -562,9 +559,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_missing_semicolon) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_delimiter) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_instance_missing_delimiter) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -581,9 +578,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_delimiter) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_internal_delimiter) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_instance_missing_internal_delimiter) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -600,9 +597,9 @@ BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_internal_delimiter) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_semicolon) {
+TEST(entity_entity_text_file_parser_frontend_test, syntax_error_instance_missing_semicolon) {
 	entity_text_file_parser_frontend parser;
 	std::string testdata = "include \"testfile.etf\";\n"
 						   "//Comment\n"
@@ -619,11 +616,8 @@ BOOST_AUTO_TEST_CASE(syntax_error_instance_missing_semicolon) {
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	ast::ast_root root;
-	BOOST_CHECK_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
+	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace parser
 } // namespace entity

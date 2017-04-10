@@ -5,8 +5,8 @@
  */
 
 #include <atomic>
-#include <boost/test/unit_test.hpp>
 #include <containers/smart_object_pool_range.hpp>
+#include <gtest.hpp>
 
 namespace mce {
 namespace containers {
@@ -111,10 +111,7 @@ size_t dummy_iterator<T>::pool_block_size_ = 128;
 
 using namespace test;
 
-BOOST_AUTO_TEST_SUITE(containers)
-BOOST_AUTO_TEST_SUITE(smart_object_pool_range_test)
-
-BOOST_AUTO_TEST_CASE(construct) {
+TEST(containers_smart_object_pool_range_test, construct) {
 	typedef dummy_iterator<int> dit_t;
 	int data[2 * 128];
 	dit_t::pool_t dpool;
@@ -136,19 +133,19 @@ BOOST_AUTO_TEST_CASE(construct) {
 
 	smart_object_pool_range<dummy_iterator<int>> r1(it0, it1);
 
-	BOOST_CHECK(!r1.lower.limiter);
-	BOOST_CHECK(r1.lower.valid);
-	BOOST_CHECK(r1.lower.pool == &dpool);
-	BOOST_CHECK(r1.lower.target.containing_block == dblocks);
-	BOOST_CHECK(r1.lower.target.entry == data);
+	ASSERT_TRUE(!r1.lower.limiter);
+	ASSERT_TRUE(r1.lower.valid);
+	ASSERT_TRUE(r1.lower.pool == &dpool);
+	ASSERT_TRUE(r1.lower.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.lower.target.entry == data);
 
-	BOOST_CHECK(r1.upper.limiter);
-	BOOST_CHECK(!r1.upper.valid);
-	BOOST_CHECK(r1.upper.target.containing_block == nullptr);
-	BOOST_CHECK(r1.upper.target.entry == nullptr);
+	ASSERT_TRUE(r1.upper.limiter);
+	ASSERT_TRUE(!r1.upper.valid);
+	ASSERT_TRUE(r1.upper.target.containing_block == nullptr);
+	ASSERT_TRUE(r1.upper.target.entry == nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(split) {
+TEST(containers_smart_object_pool_range_test, split) {
 	typedef dummy_iterator<int> dit_t;
 	int data[2 * 128];
 	dit_t::pool_t dpool;
@@ -171,30 +168,30 @@ BOOST_AUTO_TEST_CASE(split) {
 	smart_object_pool_range<dummy_iterator<int>> r1(it0, it1);
 	decltype(r1) r2(r1, tbb::split{});
 
-	BOOST_CHECK(!r1.lower.limiter);
-	BOOST_CHECK(r1.lower.valid);
-	BOOST_CHECK(r1.lower.pool == &dpool);
-	BOOST_CHECK(r1.lower.target.containing_block == dblocks);
-	BOOST_CHECK(r1.lower.target.entry == data);
+	ASSERT_TRUE(!r1.lower.limiter);
+	ASSERT_TRUE(r1.lower.valid);
+	ASSERT_TRUE(r1.lower.pool == &dpool);
+	ASSERT_TRUE(r1.lower.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.lower.target.entry == data);
 
-	BOOST_CHECK(r1.upper.limiter);
-	BOOST_CHECK(!r1.upper.valid);
-	BOOST_CHECK(r1.upper.pool == &dpool);
-	BOOST_CHECK(r1.upper.target.containing_block == dblocks + 1);
-	BOOST_CHECK(r1.upper.target.entry == data + 128);
+	ASSERT_TRUE(r1.upper.limiter);
+	ASSERT_TRUE(!r1.upper.valid);
+	ASSERT_TRUE(r1.upper.pool == &dpool);
+	ASSERT_TRUE(r1.upper.target.containing_block == dblocks + 1);
+	ASSERT_TRUE(r1.upper.target.entry == data + 128);
 
-	BOOST_CHECK(!r2.lower.limiter);
-	BOOST_CHECK(r2.lower.valid);
-	BOOST_CHECK(r2.lower.pool == &dpool);
-	BOOST_CHECK(r2.lower.target.containing_block == dblocks + 1);
-	BOOST_CHECK(r2.lower.target.entry == data + 128);
+	ASSERT_TRUE(!r2.lower.limiter);
+	ASSERT_TRUE(r2.lower.valid);
+	ASSERT_TRUE(r2.lower.pool == &dpool);
+	ASSERT_TRUE(r2.lower.target.containing_block == dblocks + 1);
+	ASSERT_TRUE(r2.lower.target.entry == data + 128);
 
-	BOOST_CHECK(r2.upper.limiter);
-	BOOST_CHECK(!r2.upper.valid);
-	BOOST_CHECK(r2.upper.target.containing_block == nullptr);
-	BOOST_CHECK(r2.upper.target.entry == nullptr);
+	ASSERT_TRUE(r2.upper.limiter);
+	ASSERT_TRUE(!r2.upper.valid);
+	ASSERT_TRUE(r2.upper.target.containing_block == nullptr);
+	ASSERT_TRUE(r2.upper.target.entry == nullptr);
 }
-BOOST_AUTO_TEST_CASE(empty_positive) {
+TEST(containers_smart_object_pool_range_test, empty_positive) {
 	typedef dummy_iterator<int> dit_t;
 	int data[2 * 128];
 	dit_t::pool_t dpool;
@@ -216,21 +213,21 @@ BOOST_AUTO_TEST_CASE(empty_positive) {
 
 	smart_object_pool_range<dummy_iterator<int>> r1(it0, it1);
 
-	BOOST_CHECK(!r1.lower.limiter);
-	BOOST_CHECK(r1.lower.valid);
-	BOOST_CHECK(r1.lower.pool == &dpool);
-	BOOST_CHECK(r1.lower.target.containing_block == dblocks);
-	BOOST_CHECK(r1.lower.target.entry == data);
+	ASSERT_TRUE(!r1.lower.limiter);
+	ASSERT_TRUE(r1.lower.valid);
+	ASSERT_TRUE(r1.lower.pool == &dpool);
+	ASSERT_TRUE(r1.lower.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.lower.target.entry == data);
 
-	BOOST_CHECK(r1.upper.limiter);
-	BOOST_CHECK(!r1.upper.valid);
-	BOOST_CHECK(r1.upper.pool == &dpool);
-	BOOST_CHECK(r1.upper.target.containing_block == dblocks);
-	BOOST_CHECK(r1.upper.target.entry == data);
+	ASSERT_TRUE(r1.upper.limiter);
+	ASSERT_TRUE(!r1.upper.valid);
+	ASSERT_TRUE(r1.upper.pool == &dpool);
+	ASSERT_TRUE(r1.upper.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.upper.target.entry == data);
 
-	BOOST_CHECK(r1.empty());
+	ASSERT_TRUE(r1.empty());
 }
-BOOST_AUTO_TEST_CASE(empty_negative) {
+TEST(containers_smart_object_pool_range_test, empty_negative) {
 	typedef dummy_iterator<int> dit_t;
 	int data[2 * 128];
 	dit_t::pool_t dpool;
@@ -252,22 +249,22 @@ BOOST_AUTO_TEST_CASE(empty_negative) {
 
 	smart_object_pool_range<dummy_iterator<int>> r1(it0, it1);
 
-	BOOST_CHECK(!r1.lower.limiter);
-	BOOST_CHECK(r1.lower.valid);
-	BOOST_CHECK(r1.lower.pool == &dpool);
-	BOOST_CHECK(r1.lower.target.containing_block == dblocks);
-	BOOST_CHECK(r1.lower.target.entry == data);
+	ASSERT_TRUE(!r1.lower.limiter);
+	ASSERT_TRUE(r1.lower.valid);
+	ASSERT_TRUE(r1.lower.pool == &dpool);
+	ASSERT_TRUE(r1.lower.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.lower.target.entry == data);
 
-	BOOST_CHECK(r1.upper.limiter);
-	BOOST_CHECK(!r1.upper.valid);
-	BOOST_CHECK(r1.upper.pool == &dpool);
-	BOOST_CHECK(r1.upper.target.containing_block == dblocks);
-	BOOST_CHECK(r1.upper.target.entry == data + 1);
+	ASSERT_TRUE(r1.upper.limiter);
+	ASSERT_TRUE(!r1.upper.valid);
+	ASSERT_TRUE(r1.upper.pool == &dpool);
+	ASSERT_TRUE(r1.upper.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.upper.target.entry == data + 1);
 
-	BOOST_CHECK(!r1.empty());
+	ASSERT_TRUE(!r1.empty());
 }
 
-BOOST_AUTO_TEST_CASE(divisibility_positive) {
+TEST(containers_smart_object_pool_range_test, divisibility_positive) {
 	typedef dummy_iterator<int> dit_t;
 	int data[2 * 128];
 	dit_t::pool_t dpool;
@@ -289,21 +286,21 @@ BOOST_AUTO_TEST_CASE(divisibility_positive) {
 
 	smart_object_pool_range<dummy_iterator<int>> r1(it0, it1);
 
-	BOOST_CHECK(!r1.lower.limiter);
-	BOOST_CHECK(r1.lower.valid);
-	BOOST_CHECK(r1.lower.pool == &dpool);
-	BOOST_CHECK(r1.lower.target.containing_block == dblocks);
-	BOOST_CHECK(r1.lower.target.entry == data);
+	ASSERT_TRUE(!r1.lower.limiter);
+	ASSERT_TRUE(r1.lower.valid);
+	ASSERT_TRUE(r1.lower.pool == &dpool);
+	ASSERT_TRUE(r1.lower.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.lower.target.entry == data);
 
-	BOOST_CHECK(r1.upper.limiter);
-	BOOST_CHECK(!r1.upper.valid);
-	BOOST_CHECK(r1.upper.pool == &dpool);
-	BOOST_CHECK(r1.upper.target.containing_block == dblocks);
-	BOOST_CHECK(r1.upper.target.entry == data + 2);
+	ASSERT_TRUE(r1.upper.limiter);
+	ASSERT_TRUE(!r1.upper.valid);
+	ASSERT_TRUE(r1.upper.pool == &dpool);
+	ASSERT_TRUE(r1.upper.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.upper.target.entry == data + 2);
 
-	BOOST_CHECK(r1.is_divisible());
+	ASSERT_TRUE(r1.is_divisible());
 }
-BOOST_AUTO_TEST_CASE(divisibility_negative) {
+TEST(containers_smart_object_pool_range_test, divisibility_negative) {
 	typedef dummy_iterator<int> dit_t;
 	int data[2 * 128];
 	dit_t::pool_t dpool;
@@ -325,23 +322,20 @@ BOOST_AUTO_TEST_CASE(divisibility_negative) {
 
 	smart_object_pool_range<dummy_iterator<int>> r1(it0, it1);
 
-	BOOST_CHECK(!r1.lower.limiter);
-	BOOST_CHECK(r1.lower.valid);
-	BOOST_CHECK(r1.lower.pool == &dpool);
-	BOOST_CHECK(r1.lower.target.containing_block == dblocks);
-	BOOST_CHECK(r1.lower.target.entry == data);
+	ASSERT_TRUE(!r1.lower.limiter);
+	ASSERT_TRUE(r1.lower.valid);
+	ASSERT_TRUE(r1.lower.pool == &dpool);
+	ASSERT_TRUE(r1.lower.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.lower.target.entry == data);
 
-	BOOST_CHECK(r1.upper.limiter);
-	BOOST_CHECK(!r1.upper.valid);
-	BOOST_CHECK(r1.upper.pool == &dpool);
-	BOOST_CHECK(r1.upper.target.containing_block == dblocks);
-	BOOST_CHECK(r1.upper.target.entry == data + 1);
+	ASSERT_TRUE(r1.upper.limiter);
+	ASSERT_TRUE(!r1.upper.valid);
+	ASSERT_TRUE(r1.upper.pool == &dpool);
+	ASSERT_TRUE(r1.upper.target.containing_block == dblocks);
+	ASSERT_TRUE(r1.upper.target.entry == data + 1);
 
-	BOOST_CHECK(!r1.is_divisible());
+	ASSERT_TRUE(!r1.is_divisible());
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace containers
 } // namespace mce

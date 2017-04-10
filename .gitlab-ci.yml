@@ -267,6 +267,8 @@ license-pack-windows:
     - cmake -E copy_directory C:/mingw-w64/mingw64/licenses/winpthreads mingw-w64/winpthreads
     - cmake -E copy_directory C:/mingw-w64/mingw64/licenses/gcc mingw-w64/gcc
     - copy C:\mingw-w64\mingw64\licenses\mingw-w64\COPYING.MinGW-w64-runtime.txt mingw-w64
+    - copy C:\Libs\gtest\GMOCK-LICENSE.txt
+    - copy C:\Libs\gtest\GTEST-LICENSE.txt
     tags:
     - win-cpp
     artifacts:
@@ -281,7 +283,7 @@ license-pack-linux:
     script:
     - mkdir -p licenses/linux
     - cd licenses/linux
-    - mkdir Boost glfw gli glm TBB vulkan-hpp vulkan-sdk zlib libc++ libstdc++ libgcc llvm-runtime g++ gcc-base
+    - mkdir Boost glfw gli glm TBB vulkan-hpp vulkan-sdk zlib libc++ libstdc++ libgcc llvm-runtime g++ gcc-base gtest gmock
     - cp /usr/local/share/doc/local-boost/LICENSE_1_0.txt Boost
     - cp /usr/local/share/doc/glfw/LICENSE.md glfw
     - cp /usr/share/doc/libgli-dev/copyright gli
@@ -297,6 +299,8 @@ license-pack-linux:
     - cp /usr/share/doc/llvm-3.8-runtime/copyright llvm-runtime
     - cp /usr/share/doc/g++-6/copyright g++
     - cp /usr/share/doc/gcc-6-base/copyright gcc-base
+    - cp /usr/share/doc/googletest/copyright gtest
+    - cp /usr/share/doc/google-mock/copyright gmock
     tags:
     - cpp
     artifacts:

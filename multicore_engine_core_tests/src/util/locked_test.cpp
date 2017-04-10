@@ -5,7 +5,7 @@
  */
 
 #include <atomic>
-#include <boost/test/unit_test.hpp>
+#include <gtest.hpp>
 #include <mutex>
 #include <thread>
 #include <util/locked.hpp>
@@ -15,10 +15,7 @@
 namespace mce {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE(util)
-BOOST_AUTO_TEST_SUITE(locked_test)
-
-BOOST_AUTO_TEST_CASE(thread_safety_stress_test) {
+TEST(util_locked_test, thread_safety_stress_test) {
 	struct locked_thread_safety_stress_test_object {
 		uint64_t a = 1;
 		uint64_t b = 0;
@@ -47,12 +44,12 @@ BOOST_AUTO_TEST_CASE(thread_safety_stress_test) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
-	BOOST_CHECK(locked_test_object->a == thread_count * iterations_per_thread + 1);
-	BOOST_CHECK(locked_test_object->b == thread_count * iterations_per_thread);
+	ASSERT_TRUE(ok);
+	ASSERT_TRUE(locked_test_object->a == thread_count * iterations_per_thread + 1);
+	ASSERT_TRUE(locked_test_object->b == thread_count * iterations_per_thread);
 }
 
-BOOST_AUTO_TEST_CASE(mutex_mock_test) {
+TEST(util_locked_test, mutex_mock_test) {
 	static int mocked_mutex_counter = 0;
 	struct mocked_mutex {
 		void lock() {
@@ -68,12 +65,12 @@ BOOST_AUTO_TEST_CASE(mutex_mock_test) {
 		}
 	};
 	locked<mocked_value_object, mocked_mutex> locked_test_object;
-	BOOST_CHECK(mocked_mutex_counter == 0);
-	BOOST_CHECK(locked_test_object->test());
-	BOOST_CHECK(mocked_mutex_counter == 0);
+	ASSERT_TRUE(mocked_mutex_counter == 0);
+	ASSERT_TRUE(locked_test_object->test());
+	ASSERT_TRUE(mocked_mutex_counter == 0);
 }
 
-BOOST_AUTO_TEST_CASE(mutex_mock_test_explicit_transaction) {
+TEST(util_locked_test, mutex_mock_test_explicit_transaction) {
 	static int mocked_mutex_counter = 0;
 	struct mocked_mutex {
 		void lock() {
@@ -85,15 +82,12 @@ BOOST_AUTO_TEST_CASE(mutex_mock_test_explicit_transaction) {
 	};
 	struct mocked_value_object {};
 	locked<mocked_value_object, mocked_mutex> locked_test_object;
-	BOOST_CHECK(mocked_mutex_counter == 0);
+	ASSERT_TRUE(mocked_mutex_counter == 0);
 	{
 		auto transaction = locked_test_object.start_transaction();
-		BOOST_CHECK(mocked_mutex_counter == 1);
+		ASSERT_TRUE(mocked_mutex_counter == 1);
 	}
-	BOOST_CHECK(mocked_mutex_counter == 0);
+	ASSERT_TRUE(mocked_mutex_counter == 0);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 }
 }

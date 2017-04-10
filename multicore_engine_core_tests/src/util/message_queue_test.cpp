@@ -5,7 +5,7 @@
  */
 
 #include <boost/container/flat_set.hpp>
-#include <boost/test/unit_test.hpp>
+#include <gtest.hpp>
 #include <mutex>
 #include <thread>
 #include <util/message_queue.hpp>
@@ -16,10 +16,7 @@
 namespace mce {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE(util)
-BOOST_AUTO_TEST_SUITE(message_queue_test)
-
-BOOST_AUTO_TEST_CASE(thread_safety_push_pop_spin_lock) {
+TEST(util_message_queue_test, thread_safety_push_pop_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 128;
@@ -46,11 +43,11 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_pop_spin_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(queue.empty());
-	BOOST_CHECK(actual == expected);
+	ASSERT_TRUE(queue.empty());
+	ASSERT_TRUE(actual == expected);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_push_pop_mutex) {
+TEST(util_message_queue_test, thread_safety_push_pop_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 128;
@@ -77,11 +74,11 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_pop_mutex) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(queue.empty());
-	BOOST_CHECK(actual == expected);
+	ASSERT_TRUE(queue.empty());
+	ASSERT_TRUE(actual == expected);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_push_try_pop_spin_lock) {
+TEST(util_message_queue_test, thread_safety_push_try_pop_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 128;
@@ -112,11 +109,11 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_try_pop_spin_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(queue.empty());
-	BOOST_CHECK(actual == expected);
+	ASSERT_TRUE(queue.empty());
+	ASSERT_TRUE(actual == expected);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_push_try_pop_mutex) {
+TEST(util_message_queue_test, thread_safety_push_try_pop_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 128;
@@ -147,12 +144,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_push_try_pop_mutex) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(queue.empty());
-	BOOST_CHECK(actual == expected);
+	ASSERT_TRUE(queue.empty());
+	ASSERT_TRUE(actual == expected);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace util
 } // namespace mce

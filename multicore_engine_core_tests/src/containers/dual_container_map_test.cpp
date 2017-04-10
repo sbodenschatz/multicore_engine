@@ -6,9 +6,9 @@
 
 #include <algorithm>
 #include <boost/container/small_vector.hpp>
-#include <boost/test/unit_test.hpp>
 #include <containers/dual_container_map.hpp>
 #include <future>
+#include <gtest.hpp>
 #include <iostream>
 #include <map>
 #include <string>
@@ -16,32 +16,31 @@
 namespace mce {
 namespace containers {
 
-struct dual_container_map_fixture {
+struct containers_dual_container_map_test : public ::testing::Test {
 	typedef int key_element;
 	typedef std::string value_element;
 	template <typename T>
 	using container = boost::container::small_vector<T, 32>;
 	mce::containers::dual_container_map<container, key_element, value_element> dcm;
 	std::map<key_element, value_element> stdmap;
-	dual_container_map_fixture() {}
-	~dual_container_map_fixture() {}
+	containers_dual_container_map_test() {}
+	~containers_dual_container_map_test() {}
 };
 
-struct dual_container_multimap_fixture {
+struct containers_dual_container_multimap_test : public ::testing::Test {
 	typedef int key_element;
 	typedef std::string value_element;
 	template <typename T>
 	using container = boost::container::small_vector<T, 32>;
 	mce::containers::dual_container_multimap<container, key_element, value_element> dcm;
 	std::multimap<key_element, value_element> stdmap;
-	dual_container_multimap_fixture() {}
-	~dual_container_multimap_fixture() {}
+	containers_dual_container_multimap_test() {}
+	~containers_dual_container_multimap_test() {}
 };
 
-BOOST_AUTO_TEST_SUITE(containers)
-BOOST_FIXTURE_TEST_SUITE(dual_container_map_test, dual_container_map_fixture)
+// containers_dual_container_map_test
 
-BOOST_AUTO_TEST_CASE(insert) {
+TEST_F(containers_dual_container_map_test, insert) {
 	dcm.insert(123, "ABCD");
 	stdmap.emplace(123, "ABCD");
 	dcm.insert(456, "XYZ");
@@ -50,11 +49,11 @@ BOOST_AUTO_TEST_CASE(insert) {
 	stdmap.emplace(42, "hello");
 	dcm.insert(43, "world");
 	stdmap.emplace(43, "world");
-	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+	ASSERT_TRUE(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
 }
-BOOST_AUTO_TEST_CASE(insert_duplicate) {
+TEST_F(containers_dual_container_map_test, insert_duplicate) {
 	dcm.insert(123, "ABCD");
 	stdmap.emplace(123, "ABCD");
 	dcm.insert(123, "EFG");
@@ -65,11 +64,11 @@ BOOST_AUTO_TEST_CASE(insert_duplicate) {
 	stdmap.emplace(42, "hello");
 	dcm.insert(43, "world");
 	stdmap.emplace(43, "world");
-	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+	ASSERT_TRUE(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
 }
-BOOST_AUTO_TEST_CASE(insert_or_assign_duplicate) {
+TEST_F(containers_dual_container_map_test, insert_or_assign_duplicate) {
 	dcm.insert_or_assign(123, "ABCD");
 	stdmap.emplace(123, "ABCD");
 	dcm.insert_or_assign(123, "EFG");
@@ -80,12 +79,12 @@ BOOST_AUTO_TEST_CASE(insert_or_assign_duplicate) {
 	stdmap.emplace(42, "hello");
 	dcm.insert_or_assign(43, "world");
 	stdmap.emplace(43, "world");
-	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+	ASSERT_TRUE(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
 }
 
-BOOST_AUTO_TEST_CASE(erase) {
+TEST_F(containers_dual_container_map_test, erase) {
 	dcm.insert(123, "ABCD");
 	stdmap.emplace(123, "ABCD");
 	dcm.insert(456, "XYZ");
@@ -97,16 +96,14 @@ BOOST_AUTO_TEST_CASE(erase) {
 
 	dcm.erase(456);
 	stdmap.erase(456);
-	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+	ASSERT_TRUE(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+// containers_dual_container_multimap_test
 
-BOOST_FIXTURE_TEST_SUITE(dual_container_multimap_test, dual_container_multimap_fixture)
-
-BOOST_AUTO_TEST_CASE(insert) {
+TEST_F(containers_dual_container_multimap_test, insert) {
 	dcm.insert(123, "ABCD");
 	stdmap.emplace(123, "ABCD");
 	dcm.insert(456, "XYZ");
@@ -115,11 +112,11 @@ BOOST_AUTO_TEST_CASE(insert) {
 	stdmap.emplace(42, "hello");
 	dcm.insert(43, "world");
 	stdmap.emplace(43, "world");
-	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+	ASSERT_TRUE(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
 }
-BOOST_AUTO_TEST_CASE(insert_duplicate) {
+TEST_F(containers_dual_container_multimap_test, insert_duplicate) {
 	dcm.insert(123, "ABCD");
 	stdmap.emplace(123, "ABCD");
 	dcm.insert(123, "EFG");
@@ -130,12 +127,12 @@ BOOST_AUTO_TEST_CASE(insert_duplicate) {
 	stdmap.emplace(42, "hello");
 	dcm.insert(43, "world");
 	stdmap.emplace(43, "world");
-	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+	ASSERT_TRUE(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
 }
 
-BOOST_AUTO_TEST_CASE(erase) {
+TEST_F(containers_dual_container_multimap_test, erase) {
 	dcm.insert(123, "ABCD");
 	stdmap.emplace(123, "ABCD");
 	dcm.insert(456, "XYZ");
@@ -147,14 +144,10 @@ BOOST_AUTO_TEST_CASE(erase) {
 
 	dcm.erase(456);
 	stdmap.erase(456);
-	BOOST_CHECK(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
+	ASSERT_TRUE(std::equal(dcm.begin(), dcm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace containers */
 } /* namespace mce */
