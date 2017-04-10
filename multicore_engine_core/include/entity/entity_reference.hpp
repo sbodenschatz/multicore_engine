@@ -26,6 +26,14 @@ public:
 	entity_reference() : referenced_entity_name_{""}, entity_manager_{nullptr} {}
 
 	entity* resolve() const;
+
+	const entity_manager* entity_manager() const {
+		return entity_manager_;
+	}
+
+	const std::string& referenced_entity_name() const {
+		return referenced_entity_name_;
+	}
 };
 
 } // namespace entity
