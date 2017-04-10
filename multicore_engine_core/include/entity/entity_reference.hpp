@@ -17,7 +17,7 @@ class entity;
 class entity_reference {
 private:
 	std::string referenced_entity_name_;
-	const entity_manager* entity_manager_;
+	const mce::entity::entity_manager* entity_manager_;
 
 public:
 	// cppcheck-suppress passedByValue
@@ -28,7 +28,7 @@ public:
 
 	entity* resolve() const;
 
-	const entity_manager* entity_manager() const {
+	const mce::entity::entity_manager* entity_manager() const {
 		return entity_manager_;
 	}
 
