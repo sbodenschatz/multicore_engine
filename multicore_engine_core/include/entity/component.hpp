@@ -36,7 +36,7 @@ private:
 protected:
 	/// \brief Allows derived classes to construct the base class with a given owner entity and reference to a
 	/// component_configuration.
-	component(entity& owner, component_configuration& configuration) noexcept
+	component(entity& owner, const component_configuration& configuration) noexcept
 			: owner_(owner),
 			  configuration_(configuration) {}
 
