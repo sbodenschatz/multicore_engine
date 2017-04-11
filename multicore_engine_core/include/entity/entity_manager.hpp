@@ -132,17 +132,18 @@ public:
 } // namespace mce
 
 /// Simplifies the registration of a component type by reducing boilerplate.
-#define REGISTER_COMPONENT_TYPE(ENTITYMANAGER, TYPE, NAME, FACTORYEXPR)                                      \
-	ENTITYMANAGER.register_component_type<TYPE>(NAME, [](auto&& owner, auto&& config, auto&& engine) {       \
-		UNUSED(owner), UNUSED(config), UNUSED(engine);                                                       \
-		return FACTORYEXPR;                                                                                  \
-	})
+#define REGISTER_COMPONENT_TYPE(ENTITYMANAGER, TYPE, NAME, FACTORYEXPR, CAPTURE)                             \
+	ENTITYMANAGER.register_component_type<TYPE>(NAME,                                                        \
+												[CAPTURE](auto&& owner, auto&& config, auto&& engine) {      \
+													UNUSED(owner), UNUSED(config), UNUSED(engine);           \
+													return FACTORYEXPR;                                      \
+												})
 
 /// \brief Simplifies the registration of a component type by applying the convention, that component classes
 /// are named [component type name]_component.
-#define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR)                                     \
+#define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR, CAPTURE)                            \
 	ENTITYMANAGER.register_component_type<NAME##_component>(                                                 \
-			#NAME, [](auto&& owner, auto&& config, auto&& engine) {                                          \
+			#NAME, [CAPTURE](auto&& owner, auto&& config, auto&& engine) {                                   \
 				UNUSED(owner), UNUSED(config), UNUSED(engine);                                               \
 				return FACTORYEXPR;                                                                          \
 			})
