@@ -55,7 +55,7 @@ void entity::store_to_bstream(bstream::obstream& ostr) const {
 		comp.second->store_to_bstream(ostr);
 	}
 }
-void entity::load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine& engine) {
+void entity::load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine* engine) {
 	istr >> position_;
 	istr >> orientation_;
 	component_container<component_type_id_t> loaded_component_ids;

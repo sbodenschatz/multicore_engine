@@ -53,8 +53,11 @@ void entity_text_file_parser_backend::ast_definition_visitor::operator()(const a
 	backend.em.add_entity_configuration(std::move(config));
 }
 void entity_text_file_parser_backend::ast_definition_visitor::operator()(ast::include_instruction& node) {
+	if(!backend.em.engine)
+		throw invalid_operation_exception("Can't include files because a null-engine is given and therefore "
+										  "no asset_loader is available");
 	// TODO Handle relative paths if needed
-	auto included = backend.em.engine.asset_manager().load_asset_sync(node.filename);
+	auto included = backend.em.engine->asset_manager().load_asset_sync(node.filename);
 	node.included_ast = std::make_shared<ast::ast_wrapper>(backend.load_file(included));
 	backend.process_entity_definitions(node.included_ast->root);
 }

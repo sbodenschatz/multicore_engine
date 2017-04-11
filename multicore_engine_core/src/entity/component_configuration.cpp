@@ -14,7 +14,7 @@
 namespace mce {
 namespace entity {
 
-component_configuration::component_configuration(core::engine& engine, const abstract_component_type& type)
+component_configuration::component_configuration(core::engine* engine, const abstract_component_type& type)
 		: engine(engine), type_(type) {}
 
 component_configuration::component_configuration(const component_configuration& other)

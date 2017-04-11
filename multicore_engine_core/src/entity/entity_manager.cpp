@@ -14,7 +14,7 @@
 namespace mce {
 namespace entity {
 
-entity_manager::entity_manager(core::engine& engine) : engine(engine) {
+entity_manager::entity_manager(core::engine* engine) : engine(engine) {
 	register_builtin_components();
 }
 
