@@ -8,7 +8,7 @@
 #include <asset/load_unit_asset_loader.hpp>
 #include <asset/pack_file_reader.hpp>
 #include <atomic>
-#include <boost/test/unit_test.hpp>
+#include <gtest.hpp>
 #include <model/model_manager.hpp>
 #include <thread>
 #include <vector>
@@ -16,10 +16,7 @@
 namespace mce {
 namespace model {
 
-BOOST_AUTO_TEST_SUITE(model)
-BOOST_AUTO_TEST_SUITE(collision_model_test)
-
-BOOST_AUTO_TEST_CASE(load_example_collision_model) {
+TEST(model_collision_model_test, load_example_collision_model) {
 	using namespace std::chrono_literals;
 	asset::asset_manager am;
 	auto loader = std::make_shared<asset::load_unit_asset_loader>(std::vector<asset::path_prefix>(
@@ -32,8 +29,8 @@ BOOST_AUTO_TEST_CASE(load_example_collision_model) {
 	while(!load_unit_ready && !load_unit_failed) {
 		std::this_thread::sleep_for(1ms);
 	}
-	BOOST_CHECK(load_unit_ready);
-	BOOST_CHECK(!load_unit_failed);
+	ASSERT_TRUE(load_unit_ready);
+	ASSERT_TRUE(!load_unit_failed);
 	if(load_unit_failed) return;
 	model_manager mm(am);
 	std::atomic<bool> model_loaded{false};
@@ -44,11 +41,11 @@ BOOST_AUTO_TEST_CASE(load_example_collision_model) {
 	while(!model_loaded && !model_failed) {
 		std::this_thread::sleep_for(1ms);
 	}
-	BOOST_CHECK(model_loaded);
-	BOOST_CHECK(!model_failed);
+	ASSERT_TRUE(model_loaded);
+	ASSERT_TRUE(!model_failed);
 }
 
-BOOST_AUTO_TEST_CASE(load_example_polygon_model) {
+TEST(model_collision_model_test, load_example_polygon_model) {
 	using namespace std::chrono_literals;
 	asset::asset_manager am;
 	auto loader = std::make_shared<asset::load_unit_asset_loader>(std::vector<asset::path_prefix>(
@@ -61,8 +58,8 @@ BOOST_AUTO_TEST_CASE(load_example_polygon_model) {
 	while(!load_unit_ready && !load_unit_failed) {
 		std::this_thread::sleep_for(1ms);
 	}
-	BOOST_CHECK(load_unit_ready);
-	BOOST_CHECK(!load_unit_failed);
+	ASSERT_TRUE(load_unit_ready);
+	ASSERT_TRUE(!load_unit_failed);
 	model_manager mm(am);
 	std::atomic<bool> model_loaded{false};
 	std::atomic<bool> model_failed{false};
@@ -71,12 +68,9 @@ BOOST_AUTO_TEST_CASE(load_example_polygon_model) {
 	while(!model_loaded && !model_failed) {
 		std::this_thread::sleep_for(1ms);
 	}
-	BOOST_CHECK(model_loaded);
-	BOOST_CHECK(!model_failed);
+	ASSERT_TRUE(model_loaded);
+	ASSERT_TRUE(!model_failed);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace model
 } // namespace mce

@@ -13,10 +13,10 @@
 #include <asset_gen/load_unit_gen.hpp>
 #include <asset_gen/pack_file_gen.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/test/unit_test.hpp>
 #include <cstring>
 #include <fstream>
 #include <future>
+#include <gtest.hpp>
 #include <iostream>
 #include <memory>
 #include <random>
@@ -30,35 +30,35 @@ namespace fs = boost::filesystem;
 namespace mce {
 namespace asset {
 
-struct asset_gen_and_load_test_fixture {
+struct assets_generators_and_loaders_test : public ::testing::Test {
 	struct test_file {
 		std::string name;
 		std::vector<char> data;
 		template <typename F>
 		test_file(const std::string& name, F f) : name(name) {
 			std::fstream out(name, std::ios::binary | std::ios::trunc | std::ios::in | std::ios::out);
-			BOOST_CHECK(out);
+			EXPECT_TRUE(out);
 			f(out);
-			BOOST_CHECK(out);
+			EXPECT_TRUE(out);
 			auto len = out.tellp();
 			data.resize(len);
-			BOOST_CHECK(data.size());
+			EXPECT_TRUE(data.size());
 			out.seekg(0, std::ios::beg);
 			out.read(data.data(), data.size());
-			BOOST_CHECK(out);
+			EXPECT_TRUE(out);
 		}
 		~test_file() {
 			fs::remove(name);
 		}
 		bool check(const std::string& filename) const {
 			std::ifstream in(filename, std::ios::binary | std::ios::in);
-			BOOST_CHECK(in);
+			EXPECT_TRUE(in);
 			in.seekg(0, std::ios::end);
 			auto size = in.tellg();
 			in.seekg(0, std::ios::beg);
 			std::vector<char> actual(size);
 			in.read(actual.data(), actual.size());
-			BOOST_CHECK(in);
+			EXPECT_TRUE(in);
 			return actual == data;
 		}
 		bool check(const char* actual_data, size_t actual_size) {
@@ -74,7 +74,7 @@ struct asset_gen_and_load_test_fixture {
 	std::unique_ptr<test_file> file_c;
 	std::unique_ptr<test_file> file_d;
 
-	asset_gen_and_load_test_fixture() {
+	assets_generators_and_loaders_test() {
 		// cppcheck-suppress useInitializationList
 		file_a = std::make_unique<test_file>("bin_sequence.test", [](std::ostream& str) {
 			for(size_t i = 0; i < 0x10000; ++i) {
@@ -105,28 +105,25 @@ struct asset_gen_and_load_test_fixture {
 			}
 		});
 	}
-	~asset_gen_and_load_test_fixture() {}
+	~assets_generators_and_loaders_test() {}
 };
 
-BOOST_AUTO_TEST_SUITE(assets)
-BOOST_FIXTURE_TEST_SUITE(generators_and_loaders, asset_gen_and_load_test_fixture)
-
-BOOST_AUTO_TEST_CASE(load_files_sync) {
+TEST_F(assets_generators_and_loaders_test, load_files_sync) {
 	asset_manager m;
 	auto loader = std::make_shared<file_asset_loader>(
 			std::vector<path_prefix>({{std::make_unique<native_file_reader>(), "."}}));
 	m.add_asset_loader(loader);
 	auto a1 = m.load_asset_sync(file_a->name);
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
 	auto a2 = m.load_asset_sync(file_b->name);
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
 	auto a3 = m.load_asset_sync(file_c->name);
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
 	auto a4 = m.load_asset_sync(file_d->name);
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
 
-BOOST_AUTO_TEST_CASE(load_files_future) {
+TEST_F(assets_generators_and_loaders_test, load_files_future) {
 	asset_manager m;
 	auto loader = std::make_shared<file_asset_loader>(
 			std::vector<path_prefix>({{std::make_unique<native_file_reader>(), "."}}));
@@ -139,13 +136,13 @@ BOOST_AUTO_TEST_CASE(load_files_future) {
 	auto a2 = f2.get();
 	auto a3 = f3.get();
 	auto a4 = f4.get();
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
 
-BOOST_AUTO_TEST_CASE(load_files_async) {
+TEST_F(assets_generators_and_loaders_test, load_files_async) {
 	asset_manager m;
 	auto loader = std::make_shared<file_asset_loader>(
 			std::vector<path_prefix>({{std::make_unique<native_file_reader>(), "."}}));
@@ -166,13 +163,13 @@ BOOST_AUTO_TEST_CASE(load_files_async) {
 			file_c->name, [&p3, this](const auto& a) { p3.set_value(file_c->check(a->data(), a->size())); });
 	auto a4 = m.load_asset_async(
 			file_d->name, [&p4, this](const auto& a) { p4.set_value(file_d->check(a->data(), a->size())); });
-	BOOST_CHECK(f1.get());
-	BOOST_CHECK(f2.get());
-	BOOST_CHECK(f3.get());
-	BOOST_CHECK(f4.get());
+	ASSERT_TRUE(f1.get());
+	ASSERT_TRUE(f2.get());
+	ASSERT_TRUE(f3.get());
+	ASSERT_TRUE(f4.get());
 }
 
-BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_sync) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_load_unit_sync) {
 	mce::asset_gen::load_unit_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -189,15 +186,15 @@ BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_sync) {
 	m.add_asset_loader(loader);
 	m.start_pin_load_unit("test");
 	auto a1 = m.load_asset_sync("file_a");
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
 	auto a2 = m.load_asset_sync("file_b");
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
 	auto a3 = m.load_asset_sync("file_c");
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
 	auto a4 = m.load_asset_sync("file_d");
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
-BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_future) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_load_unit_future) {
 	mce::asset_gen::load_unit_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -221,12 +218,12 @@ BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_future) {
 	auto a2 = f2.get();
 	auto a3 = f3.get();
 	auto a4 = f4.get();
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
-BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_async) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_load_unit_async) {
 	mce::asset_gen::load_unit_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -258,13 +255,13 @@ BOOST_AUTO_TEST_CASE(gen_and_load_load_unit_async) {
 			"file_c", [&p3, this](const auto& a) { p3.set_value(file_c->check(a->data(), a->size())); });
 	auto a4 = m.load_asset_async(
 			"file_d", [&p4, this](const auto& a) { p4.set_value(file_d->check(a->data(), a->size())); });
-	BOOST_CHECK(f1.get());
-	BOOST_CHECK(f2.get());
-	BOOST_CHECK(f3.get());
-	BOOST_CHECK(f4.get());
+	ASSERT_TRUE(f1.get());
+	ASSERT_TRUE(f2.get());
+	ASSERT_TRUE(f3.get());
+	ASSERT_TRUE(f4.get());
 }
 
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_sync) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_sync) {
 	mce::asset_gen::pack_file_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -277,16 +274,16 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_sync) {
 			std::vector<path_prefix>({{std::make_unique<pack_file_reader>(), "test.pack"}}));
 	m.add_asset_loader(loader);
 	auto a1 = m.load_asset_sync("file_a");
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
 	auto a2 = m.load_asset_sync("file_b");
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
 	auto a3 = m.load_asset_sync("file_c");
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
 	auto a4 = m.load_asset_sync("file_d");
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
 
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_future) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_future) {
 	mce::asset_gen::pack_file_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -306,12 +303,12 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_future) {
 	auto a2 = f2.get();
 	auto a3 = f3.get();
 	auto a4 = f4.get();
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_async) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_async) {
 	mce::asset_gen::pack_file_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -339,13 +336,13 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_async) {
 			"file_c", [&p3, this](const auto& a) { p3.set_value(file_c->check(a->data(), a->size())); });
 	auto a4 = m.load_asset_async(
 			"file_d", [&p4, this](const auto& a) { p4.set_value(file_d->check(a->data(), a->size())); });
-	BOOST_CHECK(f1.get());
-	BOOST_CHECK(f2.get());
-	BOOST_CHECK(f3.get());
-	BOOST_CHECK(f4.get());
+	ASSERT_TRUE(f1.get());
+	ASSERT_TRUE(f2.get());
+	ASSERT_TRUE(f3.get());
+	ASSERT_TRUE(f4.get());
 }
 
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_sync_compressed) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_sync_compressed) {
 	mce::asset_gen::pack_file_gen gen;
 	gen.add_file_compressed(file_a->name, "file_a");
 	gen.add_file_compressed(file_b->name, "file_b", 1);
@@ -358,16 +355,16 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_sync_compressed) {
 			std::vector<path_prefix>({{std::make_unique<pack_file_reader>(), "test.pack"}}));
 	m.add_asset_loader(loader);
 	auto a1 = m.load_asset_sync("file_a");
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
 	auto a2 = m.load_asset_sync("file_b");
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
 	auto a3 = m.load_asset_sync("file_c");
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
 	auto a4 = m.load_asset_sync("file_d");
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
 
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_future_compressed) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_future_compressed) {
 	mce::asset_gen::pack_file_gen gen;
 	gen.add_file_compressed(file_a->name, "file_a");
 	gen.add_file_compressed(file_b->name, "file_b", 1);
@@ -387,12 +384,12 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_future_compressed) {
 	auto a2 = f2.get();
 	auto a3 = f3.get();
 	auto a4 = f4.get();
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_async_compressed) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_async_compressed) {
 	mce::asset_gen::pack_file_gen gen;
 	gen.add_file_compressed(file_a->name, "file_a");
 	gen.add_file_compressed(file_b->name, "file_b", 1);
@@ -420,13 +417,13 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_async_compressed) {
 			"file_c", [&p3, this](const auto& a) { p3.set_value(file_c->check(a->data(), a->size())); });
 	auto a4 = m.load_asset_async(
 			"file_d", [&p4, this](const auto& a) { p4.set_value(file_d->check(a->data(), a->size())); });
-	BOOST_CHECK(f1.get());
-	BOOST_CHECK(f2.get());
-	BOOST_CHECK(f3.get());
-	BOOST_CHECK(f4.get());
+	ASSERT_TRUE(f1.get());
+	ASSERT_TRUE(f2.get());
+	ASSERT_TRUE(f3.get());
+	ASSERT_TRUE(f4.get());
 }
 
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_sync) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_and_load_unit_sync) {
 	mce::asset_gen::load_unit_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -448,15 +445,15 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_sync) {
 	m.add_asset_loader(loader);
 	m.start_pin_load_unit("test_lu");
 	auto a1 = m.load_asset_sync("file_a");
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
 	auto a2 = m.load_asset_sync("file_b");
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
 	auto a3 = m.load_asset_sync("file_c");
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
 	auto a4 = m.load_asset_sync("file_d");
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_future) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_and_load_unit_future) {
 	mce::asset_gen::load_unit_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -485,12 +482,12 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_future) {
 	auto a2 = f2.get();
 	auto a3 = f3.get();
 	auto a4 = f4.get();
-	BOOST_CHECK(file_a->check(a1->data(), a1->size()));
-	BOOST_CHECK(file_b->check(a2->data(), a2->size()));
-	BOOST_CHECK(file_c->check(a3->data(), a3->size()));
-	BOOST_CHECK(file_d->check(a4->data(), a4->size()));
+	ASSERT_TRUE(file_a->check(a1->data(), a1->size()));
+	ASSERT_TRUE(file_b->check(a2->data(), a2->size()));
+	ASSERT_TRUE(file_c->check(a3->data(), a3->size()));
+	ASSERT_TRUE(file_d->check(a4->data(), a4->size()));
 }
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_async) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_and_load_unit_async) {
 	mce::asset_gen::load_unit_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -527,13 +524,13 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_async) {
 			"file_c", [&p3, this](const auto& a) { p3.set_value(file_c->check(a->data(), a->size())); });
 	auto a4 = m.load_asset_async(
 			"file_d", [&p4, this](const auto& a) { p4.set_value(file_d->check(a->data(), a->size())); });
-	BOOST_CHECK(f1.get());
-	BOOST_CHECK(f2.get());
-	BOOST_CHECK(f3.get());
-	BOOST_CHECK(f4.get());
+	ASSERT_TRUE(f1.get());
+	ASSERT_TRUE(f2.get());
+	ASSERT_TRUE(f3.get());
+	ASSERT_TRUE(f4.get());
 }
 
-BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_async_mt) {
+TEST_F(assets_generators_and_loaders_test, gen_and_load_pack_file_and_load_unit_async_mt) {
 	mce::asset_gen::load_unit_gen gen;
 	gen.add_file(file_a->name, "file_a");
 	gen.add_file(file_b->name, "file_b");
@@ -574,12 +571,9 @@ BOOST_AUTO_TEST_CASE(gen_and_load_pack_file_and_load_unit_async_mt) {
 		}));
 	}
 	for(auto& future : futures) {
-		BOOST_CHECK(future.get());
+		ASSERT_TRUE(future.get());
 	}
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace asset */
 } /* namespace mce */

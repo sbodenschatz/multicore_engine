@@ -5,23 +5,23 @@
  */
 
 #include <algorithm>
-#include <boost/test/unit_test.hpp>
 #include <containers/unordered_object_pool.hpp>
+#include <gtest.hpp>
 #include <string>
 #include <unordered_set>
 
 namespace mce {
 namespace containers {
 
-struct unordered_object_pool_fixture {
+struct containers_unordered_object_pool_test : public ::testing::Test {
 	typedef long long element;
 	mce::containers::unordered_object_pool<element, 0x100u> uop;
-	unordered_object_pool_fixture() {
+	containers_unordered_object_pool_test() {
 		for(int i = 0; i < 1024; ++i) {
 			uop.emplace(i);
 		}
 	}
-	~unordered_object_pool_fixture() {}
+	~containers_unordered_object_pool_test() {}
 	void checkSet(std::unordered_multiset<element> expected) {
 		bool correct = true;
 		for(auto& s : uop) {
@@ -32,8 +32,8 @@ struct unordered_object_pool_fixture {
 				correct = false;
 			}
 		}
-		BOOST_CHECK(correct);
-		BOOST_CHECK(expected.empty());
+		ASSERT_TRUE(correct);
+		ASSERT_TRUE(expected.empty());
 	}
 	std::unordered_multiset<element> startSet() {
 		std::unordered_multiset<element> s;
@@ -44,57 +44,55 @@ struct unordered_object_pool_fixture {
 	}
 };
 
-BOOST_AUTO_TEST_SUITE(containers)
-BOOST_FIXTURE_TEST_SUITE(unordered_object_pool_test, unordered_object_pool_fixture)
-BOOST_AUTO_TEST_CASE(emplace_one) {
+TEST_F(containers_unordered_object_pool_test, emplace_one) {
 	auto it = uop.emplace(42);
-	BOOST_CHECK(*it == 42);
+	ASSERT_TRUE(*it == 42);
 	auto expect = startSet();
 	expect.emplace(42);
 	checkSet(expect);
 }
-BOOST_AUTO_TEST_CASE(emplace_many) {
+TEST_F(containers_unordered_object_pool_test, emplace_many) {
 	bool correct = true;
 	for(int i = 0; i < 0x1000; ++i) {
 		auto it = uop.emplace(i);
 		if(*it != i) correct = false;
 	}
-	BOOST_CHECK(correct);
+	ASSERT_TRUE(correct);
 	auto expect = startSet();
 	for(int i = 0; i < 0x1000; ++i) {
 		expect.emplace(i);
 	}
 	checkSet(expect);
 }
-BOOST_AUTO_TEST_CASE(insert_one) {
+TEST_F(containers_unordered_object_pool_test, insert_one) {
 	auto it = uop.emplace(42);
-	BOOST_CHECK(*it == 42);
+	ASSERT_TRUE(*it == 42);
 	auto expect = startSet();
 	expect.insert(element(42));
 	checkSet(expect);
 }
-BOOST_AUTO_TEST_CASE(insert_many) {
+TEST_F(containers_unordered_object_pool_test, insert_many) {
 	bool correct = true;
 	for(int i = 0; i < 0x1000; ++i) {
 		auto it = uop.insert(element(i));
 		if(*it != i) correct = false;
 	}
-	BOOST_CHECK(correct);
+	ASSERT_TRUE(correct);
 	auto expect = startSet();
 	for(int i = 0; i < 0x1000; ++i) {
 		expect.emplace(i);
 	}
 	checkSet(expect);
 }
-BOOST_AUTO_TEST_CASE(erase_one) {
+TEST_F(containers_unordered_object_pool_test, erase_one) {
 	auto val = *uop.begin();
 	auto it = uop.erase(uop.begin());
-	BOOST_CHECK(it == uop.begin());
+	ASSERT_TRUE(it == uop.begin());
 	auto expect = startSet();
 	expect.erase(val);
 	checkSet(expect);
 }
-BOOST_AUTO_TEST_CASE(erase_many) {
+TEST_F(containers_unordered_object_pool_test, erase_many) {
 	auto pred = [](auto& v) { return v % 2 == 0; };
 	uop.erase(std::remove_if(uop.begin(), uop.end(), pred), uop.end());
 	auto tmp = startSet();
@@ -106,32 +104,32 @@ BOOST_AUTO_TEST_CASE(erase_many) {
 	}
 	checkSet(expect);
 }
-BOOST_AUTO_TEST_CASE(clear) {
+TEST_F(containers_unordered_object_pool_test, clear) {
 	uop.clear();
 	bool correct = true;
 	for(auto& v : uop) {
 		(void)v;
 		correct = false;
 	}
-	BOOST_CHECK(correct);
-	BOOST_CHECK(uop.empty());
+	ASSERT_TRUE(correct);
+	ASSERT_TRUE(uop.empty());
 }
 
-BOOST_AUTO_TEST_CASE(clear_and_refill) {
+TEST_F(containers_unordered_object_pool_test, clear_and_refill) {
 	uop.clear();
 	bool correct = true;
 	for(int i = 0; i < 0x2000; ++i) {
 		auto it = uop.insert(element(i));
 		if(*it != i) correct = false;
 	}
-	BOOST_CHECK(correct);
+	ASSERT_TRUE(correct);
 	std::unordered_multiset<element> expect;
 	for(int i = 0; i < 0x2000; ++i) {
 		expect.emplace(i);
 	}
 	checkSet(expect);
 }
-BOOST_AUTO_TEST_CASE(reorganize) {
+TEST_F(containers_unordered_object_pool_test, reorganize) {
 	auto pred = [](auto& v) { return v % 2 == 0; };
 	for(auto it = uop.begin(); it != uop.end();) {
 		if(pred(*it)) {
@@ -148,12 +146,9 @@ BOOST_AUTO_TEST_CASE(reorganize) {
 		}
 	}
 	size_t count = uop.reorganize();
-	BOOST_CHECK(count != 0u);
+	ASSERT_TRUE(count != 0u);
 	checkSet(expect);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace containers */
 } /* namespace mce */

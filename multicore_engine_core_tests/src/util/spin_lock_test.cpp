@@ -5,8 +5,8 @@
  */
 
 #include <atomic>
-#include <boost/test/unit_test.hpp>
 #include <cstdint>
+#include <gtest.hpp>
 #include <mutex>
 #include <thread>
 #include <util/spin_lock.hpp>
@@ -15,10 +15,7 @@
 namespace mce {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE(util)
-BOOST_AUTO_TEST_SUITE(spin_lock_test)
-
-BOOST_AUTO_TEST_CASE(thread_safety_lock) {
+TEST(util_spin_lock_test, thread_safety_lock) {
 	std::vector<std::thread> threads;
 	std::vector<uint64_t> test;
 	mce::util::spin_lock lock;
@@ -37,9 +34,9 @@ BOOST_AUTO_TEST_CASE(thread_safety_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(test.size() == thread_count * elements_per_thread);
+	ASSERT_TRUE(test.size() == thread_count * elements_per_thread);
 }
-BOOST_AUTO_TEST_CASE(thread_safety_try_lock) {
+TEST(util_spin_lock_test, thread_safety_try_lock) {
 	std::vector<std::thread> threads;
 	std::vector<uint64_t> test;
 	mce::util::spin_lock lock;
@@ -62,11 +59,8 @@ BOOST_AUTO_TEST_CASE(thread_safety_try_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(test.size() == successful_insertions.load());
+	ASSERT_TRUE(test.size() == successful_insertions.load());
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace util
 } // namespace mce
