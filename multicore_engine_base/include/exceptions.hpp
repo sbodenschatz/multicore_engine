@@ -84,6 +84,10 @@ struct invalid_component_type_exception : std::runtime_error {
 struct invalid_property_access_exception : std::logic_error {
 	using std::logic_error::logic_error;
 };
+/// Exception used to signal an operation that is not supported by an object in it's given configuration.
+struct invalid_operation_exception : std::logic_error {
+	using std::logic_error::logic_error;
+};
 
 } // namespace mce
 
