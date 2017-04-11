@@ -268,7 +268,9 @@ license-pack-windows:
     - cmake -E copy_directory C:/mingw-w64/mingw64/licenses/gcc mingw-w64/gcc
     - copy C:\mingw-w64\mingw64\licenses\mingw-w64\COPYING.MinGW-w64-runtime.txt mingw-w64
     - copy C:\Libs\gtest\GMOCK-LICENSE.txt
+    - copy C:\Libs\gtest\GMOCK-CONTRIBUTORS.txt
     - copy C:\Libs\gtest\GTEST-LICENSE.txt
+    - copy C:\Libs\gtest\GTEST-CONTRIBUTORS.txt
     tags:
     - win-cpp
     artifacts:
