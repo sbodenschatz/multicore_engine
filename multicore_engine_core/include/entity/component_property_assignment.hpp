@@ -105,9 +105,9 @@ public:
 	/// Constructs a component_property_assignment for the given property and referenced engine object.
 	component_property_assignment(
 			const mce::reflection::property<Root_Type, T, mce::entity::abstract_component_property_assignment,
-											mce::entity::component_property_assignment, core::engine&>&
+											mce::entity::component_property_assignment, core::engine*>&
 					property,
-			core::engine& engine)
+			core::engine* engine)
 			: abstract_component_property_assignment<Root_Type>(engine), property_(property) {}
 	/// Allows copy-construction of component_property_assignment.
 	component_property_assignment(const component_property_assignment&) = default;
@@ -131,7 +131,7 @@ public:
 	}
 	/// Returns the property to which this assignment assigns a value.
 	virtual const mce::reflection::abstract_property<
-			Root_Type, mce::entity::abstract_component_property_assignment, core::engine&>&
+			Root_Type, mce::entity::abstract_component_property_assignment, core::engine*>&
 	abstract_property() noexcept override {
 		return property_;
 	}

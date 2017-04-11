@@ -76,14 +76,14 @@ protected:
 	static void register_component_property(
 			property_list& list, const std::string& name,
 			typename reflection::linked_property<component, T, Comp, abstract_component_property_assignment,
-												 component_property_assignment, core::engine&>::getter_t
+												 component_property_assignment, core::engine*>::getter_t
 					getter,
 			typename reflection::linked_property<component, T, Comp, abstract_component_property_assignment,
-												 component_property_assignment, core::engine&>::setter_t
+												 component_property_assignment, core::engine*>::setter_t
 					setter) {
 		list.emplace_back(
 				reflection::make_property<component, T, Comp, abstract_component_property_assignment,
-										  component_property_assignment, core::engine&>(name, getter,
+										  component_property_assignment, core::engine*>(name, getter,
 																						setter));
 	}
 	/// \brief Allows derived classes to register a property specified by the given name and member variable
@@ -93,10 +93,10 @@ protected:
 	register_component_property(property_list& list, const std::string& name,
 								typename reflection::directly_linked_property<
 										component, T, Comp, abstract_component_property_assignment,
-										component_property_assignment, core::engine&>::variable_t variable) {
+										component_property_assignment, core::engine*>::variable_t variable) {
 		list.emplace_back(
 				reflection::make_property<component, abstract_component_property_assignment,
-										  component_property_assignment, core::engine&>(name, variable));
+										  component_property_assignment, core::engine*>(name, variable));
 	}
 };
 
@@ -110,10 +110,10 @@ protected:
 			LIST, #NAME,                                                                                     \
 			static_cast<mce::reflection::linked_property<                                                    \
 					component, TYPE, COMP, mce::entity::abstract_component_property_assignment,              \
-					mce::entity::component_property_assignment, mce::core::engine&>::getter_t>(&COMP::NAME), \
+					mce::entity::component_property_assignment, mce::core::engine*>::getter_t>(&COMP::NAME), \
 			static_cast<mce::reflection::linked_property<                                                    \
 					component, TYPE, COMP, mce::entity::abstract_component_property_assignment,              \
-					mce::entity::component_property_assignment, mce::core::engine&>::setter_t>(&COMP::NAME))
+					mce::entity::component_property_assignment, mce::core::engine*>::setter_t>(&COMP::NAME))
 
 /// \brief Allows more comfortable registration of properties by applying the convention that the property is
 /// represented by a member variable that has the same name as the property.
