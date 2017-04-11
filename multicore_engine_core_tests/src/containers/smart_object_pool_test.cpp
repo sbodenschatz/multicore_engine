@@ -5,9 +5,9 @@
  */
 
 #include <algorithm>
-#include <boost/test/unit_test.hpp>
 #include <containers/smart_object_pool.hpp>
 #include <future>
+#include <gtest.hpp>
 #include <iterator>
 #include <string>
 #include <unordered_set>
@@ -16,7 +16,7 @@
 namespace mce {
 namespace containers {
 
-struct smart_object_pool_fixture {
+struct containers_smart_object_pool_test : public ::testing::Test {
 	struct X {
 		long long x;
 		explicit X(const long long& o) : x(o) {}
@@ -38,67 +38,64 @@ struct smart_object_pool_fixture {
 	};
 	typedef X element;
 	mce::containers::smart_object_pool<element> sop;
-	smart_object_pool_fixture() {}
-	~smart_object_pool_fixture() {}
+	containers_smart_object_pool_test() {}
+	~containers_smart_object_pool_test() {}
 };
 
-BOOST_AUTO_TEST_SUITE(containers)
-BOOST_FIXTURE_TEST_SUITE(smart_object_pool_test, smart_object_pool_fixture)
-
-BOOST_AUTO_TEST_CASE(emplace_and_destroy_one) {
+TEST_F(containers_smart_object_pool_test, emplace_and_destroy_one) {
 	auto ptr = sop.emplace(42);
-	BOOST_CHECK(*ptr == 42);
-	BOOST_CHECK(sop.size() == 1);
+	ASSERT_TRUE(*ptr == 42);
+	ASSERT_TRUE(sop.size() == 1);
 	ptr.reset();
-	BOOST_CHECK(sop.size() == 0);
-	BOOST_CHECK(sop.empty());
+	ASSERT_TRUE(sop.size() == 0);
+	ASSERT_TRUE(sop.empty());
 }
 
-BOOST_AUTO_TEST_CASE(emplace_and_destroy_many) {
+TEST_F(containers_smart_object_pool_test, emplace_and_destroy_many) {
 	std::vector<smart_pool_ptr<element>> elem_ptrs;
 	for(int i = 0; i < 512; ++i) {
 		auto ptr = sop.emplace(i);
 		elem_ptrs.emplace_back(ptr);
-		BOOST_CHECK(*ptr == i);
+		ASSERT_TRUE(*ptr == i);
 	}
-	BOOST_CHECK(sop.size() == 512);
+	ASSERT_TRUE(sop.size() == 512);
 	for(int i = 0; i < 512; ++i) {
-		BOOST_CHECK(*(elem_ptrs[i]) == i);
+		ASSERT_TRUE(*(elem_ptrs[i]) == i);
 	}
 	elem_ptrs.clear();
-	BOOST_CHECK(sop.size() == 0);
+	ASSERT_TRUE(sop.size() == 0);
 }
 
-BOOST_AUTO_TEST_CASE(iterator_holds_object) {
+TEST_F(containers_smart_object_pool_test, iterator_holds_object) {
 	auto ptr = sop.emplace(42);
-	BOOST_CHECK(*ptr == 42);
-	BOOST_CHECK(sop.size() == 1);
+	ASSERT_TRUE(*ptr == 42);
+	ASSERT_TRUE(sop.size() == 1);
 	auto it = sop.begin();
 	ptr.reset();
-	BOOST_CHECK(sop.size() == 1);
+	ASSERT_TRUE(sop.size() == 1);
 	it = decltype(sop)::iterator();
-	BOOST_CHECK(sop.size() == 0);
-	BOOST_CHECK(sop.empty());
+	ASSERT_TRUE(sop.size() == 0);
+	ASSERT_TRUE(sop.empty());
 }
 
-BOOST_AUTO_TEST_CASE(rescue_object) {
+TEST_F(containers_smart_object_pool_test, rescue_object) {
 	auto ptr = sop.emplace(42);
-	BOOST_CHECK(*ptr == 42);
-	BOOST_CHECK(sop.size() == 1);
+	ASSERT_TRUE(*ptr == 42);
+	ASSERT_TRUE(sop.size() == 1);
 	auto it = sop.begin();
 	weak_pool_ptr<element> wptr = ptr;
 	ptr.reset();
 	ptr = wptr.lock();
-	BOOST_CHECK(ptr);
-	BOOST_CHECK(sop.size() == 1);
+	ASSERT_TRUE(ptr);
+	ASSERT_TRUE(sop.size() == 1);
 	it = decltype(sop)::iterator();
-	BOOST_CHECK(*ptr == 42);
+	ASSERT_TRUE(*ptr == 42);
 	ptr.reset();
-	BOOST_CHECK(sop.size() == 0);
-	BOOST_CHECK(sop.empty());
+	ASSERT_TRUE(sop.size() == 0);
+	ASSERT_TRUE(sop.empty());
 }
 
-BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
+TEST_F(containers_smart_object_pool_test, mt_emplace_and_destroy_many) {
 	auto t1 = std::chrono::high_resolution_clock::now();
 	sop.reserve(128 * 0x1000);
 	auto t2 = std::chrono::high_resolution_clock::now();
@@ -126,7 +123,7 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 										t));
 	}
 	for(auto& f : futures) {
-		BOOST_CHECK(f.get());
+		ASSERT_TRUE(f.get());
 	}
 	auto t3 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> diff2 = t3 - t2;
@@ -134,7 +131,7 @@ BOOST_AUTO_TEST_CASE(mt_emplace_and_destroy_many) {
 	UNUSED(diff2);
 }
 
-BOOST_AUTO_TEST_CASE(iterator_prevent_skip_over_end) {
+TEST_F(containers_smart_object_pool_test, iterator_prevent_skip_over_end) {
 	auto ptr1 = sop.emplace(1);
 	auto ptr2 = sop.emplace(2);
 	auto ptr3 = sop.emplace(3);
@@ -149,17 +146,14 @@ BOOST_AUTO_TEST_CASE(iterator_prevent_skip_over_end) {
 	for(auto it = it2; it != it1; ++it) {
 		val = *it;
 	}
-	BOOST_CHECK(val == 3);
+	ASSERT_TRUE(val == 3);
 	ptr4.reset();
 	val = 0;
 	for(auto it = it2; it != it1; ++it) {
 		val = *it;
 	}
-	BOOST_CHECK(val == 3);
+	ASSERT_TRUE(val == 3);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace containers */
 } /* namespace mce */

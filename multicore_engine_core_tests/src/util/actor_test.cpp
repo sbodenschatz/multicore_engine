@@ -5,14 +5,11 @@
  */
 
 #include <atomic>
-#include <boost/test/unit_test.hpp>
+#include <gtest.hpp>
 #include <util/actor.hpp>
 
 namespace mce {
 namespace util {
-
-BOOST_AUTO_TEST_SUITE(util)
-BOOST_AUTO_TEST_SUITE(actor_test)
 
 struct actor_test_object {
 	static uint64_t step_id() {
@@ -44,7 +41,7 @@ struct actor_test_object {
 	}
 };
 
-BOOST_AUTO_TEST_CASE(enqueue_lambda) {
+TEST(util_actor_test, enqueue_lambda) {
 	actor_test_object obj;
 	actor<actor_test_object, 0x100> actr(&obj);
 	actr.enqueue([](actor_test_object* o) { o->a(); });
@@ -54,14 +51,14 @@ BOOST_AUTO_TEST_CASE(enqueue_lambda) {
 	actr.enqueue([](actor_test_object* o) { o->e(123, 456); });
 	actr.process();
 
-	BOOST_CHECK(0 < obj.a_);
-	BOOST_CHECK(obj.a_ < obj.b_);
-	BOOST_CHECK(obj.b_ < obj.c_);
-	BOOST_CHECK(obj.d_ == 42);
-	BOOST_CHECK(obj.e1_ == 123);
-	BOOST_CHECK(obj.e2_ == 456);
+	ASSERT_TRUE(0 < obj.a_);
+	ASSERT_TRUE(obj.a_ < obj.b_);
+	ASSERT_TRUE(obj.b_ < obj.c_);
+	ASSERT_TRUE(obj.d_ == 42);
+	ASSERT_TRUE(obj.e1_ == 123);
+	ASSERT_TRUE(obj.e2_ == 456);
 }
-BOOST_AUTO_TEST_CASE(enqueue_member) {
+TEST(util_actor_test, enqueue_member) {
 	actor_test_object obj;
 	actor<actor_test_object, 0x100> actr(&obj);
 	actr.enqueue(&actor_test_object::a);
@@ -71,16 +68,13 @@ BOOST_AUTO_TEST_CASE(enqueue_member) {
 	actr.enqueue(&actor_test_object::e, 123, 456);
 	actr.process();
 
-	BOOST_CHECK(0 < obj.a_);
-	BOOST_CHECK(obj.a_ < obj.b_);
-	BOOST_CHECK(obj.b_ < obj.c_);
-	BOOST_CHECK(obj.d_ == 42);
-	BOOST_CHECK(obj.e1_ == 123);
-	BOOST_CHECK(obj.e2_ == 456);
+	ASSERT_TRUE(0 < obj.a_);
+	ASSERT_TRUE(obj.a_ < obj.b_);
+	ASSERT_TRUE(obj.b_ < obj.c_);
+	ASSERT_TRUE(obj.d_ == 42);
+	ASSERT_TRUE(obj.e1_ == 123);
+	ASSERT_TRUE(obj.e2_ == 456);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace util
 } // namespace mce

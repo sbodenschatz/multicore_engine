@@ -47,7 +47,7 @@ void entity_text_file_parser_backend::ast_definition_visitor::operator()(const a
 		}
 		auto& comp_conf = **comp_conf_it;
 		for(const auto& var_entry : comp_def.variables) {
-			comp_conf.make_assignment(var_entry.name, var_entry.value, node.name);
+			comp_conf.make_assignment(var_entry.name, var_entry.value, node.name, backend.em);
 		}
 	}
 	backend.em.add_entity_configuration(std::move(config));

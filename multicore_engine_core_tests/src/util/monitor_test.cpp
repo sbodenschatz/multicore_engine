@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <atomic>
-#include <boost/test/unit_test.hpp>
+#include <gtest.hpp>
 #include <mutex>
 #include <thread>
 #include <tuple>
@@ -33,10 +33,7 @@ struct monitor_test_object {
 	}
 };
 
-BOOST_AUTO_TEST_SUITE(util)
-BOOST_AUTO_TEST_SUITE(monitor_test)
-
-BOOST_AUTO_TEST_CASE(thread_safety_copy_assign_convert_spin_lock) {
+TEST(util_monitor_test, thread_safety_copy_assign_convert_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -57,10 +54,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_assign_convert_spin_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_move_assign_convert_spin_lock) {
+TEST(util_monitor_test, thread_safety_move_assign_convert_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -80,10 +77,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_assign_convert_spin_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_copy_store_load_spin_lock) {
+TEST(util_monitor_test, thread_safety_copy_store_load_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -104,10 +101,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_store_load_spin_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_move_store_load_spin_lock) {
+TEST(util_monitor_test, thread_safety_move_store_load_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -127,10 +124,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_store_load_spin_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_copy_exchange_spin_lock) {
+TEST(util_monitor_test, thread_safety_copy_exchange_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -150,10 +147,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_exchange_spin_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_move_exchange_spin_lock) {
+TEST(util_monitor_test, thread_safety_move_exchange_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -172,10 +169,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_exchange_spin_lock) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_copy_compare_exchange_spin_lock) {
+TEST(util_monitor_test, thread_safety_copy_compare_exchange_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -199,12 +196,12 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_compare_exchange_spin_lock) {
 		thread.join();
 	}
 	monitor_test_object val = monitor.load();
-	BOOST_CHECK(val.check());
-	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(val.check());
+	ASSERT_TRUE(val.data[0] == thread_count * elements_per_thread);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_move_compare_exchange_spin_lock) {
+TEST(util_monitor_test, thread_safety_move_compare_exchange_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -227,12 +224,12 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_compare_exchange_spin_lock) {
 		thread.join();
 	}
 	monitor_test_object val = monitor.load();
-	BOOST_CHECK(val.check());
-	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(val.check());
+	ASSERT_TRUE(val.data[0] == thread_count * elements_per_thread);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_do_atomically_spin_lock) {
+TEST(util_monitor_test, thread_safety_do_atomically_spin_lock) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -255,12 +252,12 @@ BOOST_AUTO_TEST_CASE(thread_safety_do_atomically_spin_lock) {
 		thread.join();
 	}
 	monitor_test_object val = monitor.load();
-	BOOST_CHECK(val.check());
-	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(val.check());
+	ASSERT_TRUE(val.data[0] == thread_count * elements_per_thread);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_copy_assign_convert_mutex) {
+TEST(util_monitor_test, thread_safety_copy_assign_convert_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -281,10 +278,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_assign_convert_mutex) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_move_assign_convert_mutex) {
+TEST(util_monitor_test, thread_safety_move_assign_convert_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -304,10 +301,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_assign_convert_mutex) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_copy_store_load_mutex) {
+TEST(util_monitor_test, thread_safety_copy_store_load_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -328,10 +325,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_store_load_mutex) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_move_store_load_mutex) {
+TEST(util_monitor_test, thread_safety_move_store_load_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -351,10 +348,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_store_load_mutex) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_copy_exchange_mutex) {
+TEST(util_monitor_test, thread_safety_copy_exchange_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -374,10 +371,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_exchange_mutex) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_move_exchange_mutex) {
+TEST(util_monitor_test, thread_safety_move_exchange_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -396,10 +393,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_exchange_mutex) {
 	for(auto& thread : threads) {
 		thread.join();
 	}
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_copy_compare_exchange_mutex) {
+TEST(util_monitor_test, thread_safety_copy_compare_exchange_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -423,12 +420,12 @@ BOOST_AUTO_TEST_CASE(thread_safety_copy_compare_exchange_mutex) {
 		thread.join();
 	}
 	monitor_test_object val = monitor.load();
-	BOOST_CHECK(val.check());
-	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(val.check());
+	ASSERT_TRUE(val.data[0] == thread_count * elements_per_thread);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_move_compare_exchange_mutex) {
+TEST(util_monitor_test, thread_safety_move_compare_exchange_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -451,12 +448,12 @@ BOOST_AUTO_TEST_CASE(thread_safety_move_compare_exchange_mutex) {
 		thread.join();
 	}
 	monitor_test_object val = monitor.load();
-	BOOST_CHECK(val.check());
-	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(val.check());
+	ASSERT_TRUE(val.data[0] == thread_count * elements_per_thread);
+	ASSERT_TRUE(ok);
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety_do_atomically_mutex) {
+TEST(util_monitor_test, thread_safety_do_atomically_mutex) {
 	std::vector<std::thread> threads;
 	const int thread_count = 32;
 	const int elements_per_thread = 1024;
@@ -479,13 +476,10 @@ BOOST_AUTO_TEST_CASE(thread_safety_do_atomically_mutex) {
 		thread.join();
 	}
 	monitor_test_object val = monitor.load();
-	BOOST_CHECK(val.check());
-	BOOST_CHECK(val.data[0] == thread_count * elements_per_thread);
-	BOOST_CHECK(ok);
+	ASSERT_TRUE(val.check());
+	ASSERT_TRUE(val.data[0] == thread_count * elements_per_thread);
+	ASSERT_TRUE(ok);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace util
 } // namespace mce
