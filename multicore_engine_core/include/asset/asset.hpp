@@ -131,6 +131,7 @@ public:
 
 	friend class asset_loader;
 	friend class asset_manager;
+	friend class dummy_asset;
 
 private:
 	void complete_loading(const std::shared_ptr<const char>& data, size_t size) noexcept;
