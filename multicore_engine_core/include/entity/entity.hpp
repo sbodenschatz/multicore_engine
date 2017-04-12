@@ -13,6 +13,7 @@
 #include <boost/container/small_vector.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
+#include <entity/component_type_id_manager.hpp>
 
 namespace mce {
 namespace entity {
@@ -51,14 +52,20 @@ public:
 	/// \brief Returns the component object of type T associated with this entity if it has such a component
 	/// or nullptr otherwise.
 	template <typename T>
-	const mce::entity::component* component() const;
+	const T* component() const {
+		return static_cast<const T*>(component(component_type_id_manager::id<T>()));
+	}
 	/// \brief Returns the component object of type T associated with this entity if it has such a component
 	/// or nullptr otherwise.
 	template <typename T>
-	mce::entity::component* component();
+	T* component() {
+		return static_cast<T*>(component(component_type_id_manager::id<T>()));
+	}
 	/// Checks if the entity has a associated component of type T.
 	template <typename T>
-	bool has_component() const;
+	bool has_component() const {
+		return has_component(component_type_id_manager::id<T>());
+	}
 
 	/// \brief Returns the component object with the given type id associated with this entity if it has such
 	/// a component or nullptr otherwise.
