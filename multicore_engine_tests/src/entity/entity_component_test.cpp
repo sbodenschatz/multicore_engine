@@ -96,6 +96,28 @@ TEST(entity_entity_component_test, entity_serialize_and_deserialize) {
 		ASSERT_EQ("World", test_a_1_comp->values()[1]);
 	}
 }
-
+TEST(entity_entity_component_test, entity_despawn) {
+	test_a_system tasys;
+	entity_manager em(nullptr);
+	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
+						"Test_Ent_Conf test_ent_1 (0,0,0),();"
+						"Test_Ent_Conf test_ent_2 (0,0,0),();"));
+	auto test_ent_1 = em.find_entity("test_ent_1");
+	auto test_ent_2 = em.find_entity("test_ent_2");
+	ASSERT_TRUE(test_ent_1);
+	ASSERT_TRUE(test_ent_2);
+	em.destroy_entity(test_ent_1);
+	test_ent_1 = em.find_entity("test_ent_1");
+	test_ent_2 = em.find_entity("test_ent_2");
+	ASSERT_FALSE(test_ent_1);
+	ASSERT_TRUE(test_ent_2);
+	em.destroy_entity(test_ent_2);
+	test_ent_1 = em.find_entity("test_ent_1");
+	test_ent_2 = em.find_entity("test_ent_2");
+	ASSERT_FALSE(test_ent_1);
+	ASSERT_FALSE(test_ent_2);
+}
 } // namespace entity
 } // namespace mce
