@@ -49,11 +49,14 @@ public:
 		return referenced_entity_name_;
 	}
 
-	/// Serializes the entity_reference by saving the referenced name.
 	friend bstream::obstream& operator<<(bstream::obstream& stream, const entity_reference& value);
-	/// Deserializes the entity reference's referenced name, the entity_manager is not deserialized.
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, entity_reference& value);
 };
+
+/// Serializes the entity_reference by saving the referenced name.
+bstream::obstream& operator<<(bstream::obstream& stream, const entity_reference& value);
+/// Deserializes the entity reference's referenced name, the entity_manager is not deserialized.
+bstream::ibstream& operator>>(bstream::ibstream& stream, entity_reference& value);
 
 } // namespace entity
 } // namespace mce
