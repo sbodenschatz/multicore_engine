@@ -94,6 +94,9 @@ void entity::load_from_bstream(bstream::ibstream& istr, const entity_manager& en
 			throw invalid_component_type_exception("Unknown component_type id " + std::to_string(id) + ".");
 		components_.insert(id, comp_type->create_component(*this, comp_type->empty_configuration(), engine));
 	}
+	for (auto& comp : components_) {
+		comp.second->load_from_bstream(istr);
+	}
 }
 
 } // namespace entity
