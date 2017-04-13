@@ -47,9 +47,9 @@ void entity::add_component(component_pool_ptr&& comp) {
 void entity::store_to_bstream(bstream::obstream& ostr) const {
 	ostr << position_;
 	ostr << orientation_;
-	ostr << components_.size();
+	ostr << uint32_t(components_.size());
 	for(const auto& comp : components_) {
-		ostr << uint32_t(comp.first);
+		ostr << comp.first;
 	}
 	for(const auto& comp : components_) {
 		comp.second->store_to_bstream(ostr);
