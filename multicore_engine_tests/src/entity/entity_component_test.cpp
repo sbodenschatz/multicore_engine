@@ -119,5 +119,58 @@ TEST(entity_entity_component_test, entity_despawn) {
 	ASSERT_FALSE(test_ent_1);
 	ASSERT_FALSE(test_ent_2);
 }
+
+class test_b_entref_component : public component {
+private:
+	entity_reference ent_ref_;
+
+public:
+	test_b_entref_component(entity& owner, const component_configuration& configuration) noexcept
+			: component(owner, configuration) {}
+
+	static void fill_property_list(property_list& prop) {
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_entref_component, entity_reference, ent_ref);
+	}
+
+	const entity_reference& ent_ref() const {
+		return ent_ref_;
+	}
+
+	void ent_ref(const entity_reference& ent_ref) {
+		ent_ref_ = ent_ref;
+	}
+};
+
+class test_b_system {
+	containers::smart_object_pool<test_b_entref_component, 256> entref_components;
+
+public:
+	containers::smart_pool_ptr<test_b_entref_component>
+	create_entref_component(entity& owner, const component_configuration& configuration) {
+		return entref_components.emplace(owner, configuration);
+	}
+};
+
+TEST(entity_entity_component_test, entity_component_property_entity_reference) {
+	test_a_system tasys;
+	test_b_system tbsys;
+	entity_manager em(nullptr);
+	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config), &tbsys);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
+						"Test2_Ent_Conf{test_b_entref{ent_ref=entity test_ent1;}}"
+						"Test_Ent_Conf test_ent1 (0,0,0),();"
+						"Test2_Ent_Conf test_ent2 (0,0,0),();"));
+	auto test_ent1 = em.find_entity("test_ent1");
+	auto test_ent2 = em.find_entity("test_ent2");
+	ASSERT_TRUE(test_ent2);
+	auto test_ent2_ent_ref_comp = test_ent2->component<test_b_entref_component>();
+	ASSERT_TRUE(test_ent2_ent_ref_comp);
+	auto ent_ref = test_ent2_ent_ref_comp->ent_ref().resolve();
+	ASSERT_TRUE(ent_ref);
+	ASSERT_EQ(test_ent1, ent_ref);
+}
+
 } // namespace entity
 } // namespace mce
