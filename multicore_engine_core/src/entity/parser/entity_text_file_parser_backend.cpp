@@ -18,7 +18,7 @@ namespace parser {
 
 void entity_text_file_parser_backend::ast_definition_visitor::operator()(const ast::entity_definition& node) {
 	std::unique_ptr<entity_configuration> config;
-	if(node.super_name.empty()) {
+	if(!node.super_name.empty()) {
 		auto super_config = backend.em.find_entity_configuration(node.super_name);
 		if(!super_config)
 			throw missing_entity_config_exception("Super entity configuration '" + node.super_name +

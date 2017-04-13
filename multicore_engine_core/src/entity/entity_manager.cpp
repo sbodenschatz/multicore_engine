@@ -69,7 +69,7 @@ void entity_manager::destroy_entity(entity* entity) {
 }
 
 entity* entity_manager::find_entity(long long id) const {
-	std::unique_lock<std::mutex> lock(id_map_mutex);
+	std::unique_lock<std::mutex> lock(id_map_mutex, std::defer_lock);
 	if(!read_only_mode) lock.lock();
 	auto it = entity_id_map.find(id);
 	if(it != entity_id_map.end()) {
@@ -79,7 +79,7 @@ entity* entity_manager::find_entity(long long id) const {
 	}
 }
 entity* entity_manager::find_entity(const std::string& name) const {
-	std::unique_lock<std::mutex> lock(name_map_mutex);
+	std::unique_lock<std::mutex> lock(name_map_mutex, std::defer_lock);
 	if(!read_only_mode) lock.lock();
 	auto it = entity_name_map.find(name);
 	if(it != entity_name_map.end()) {
