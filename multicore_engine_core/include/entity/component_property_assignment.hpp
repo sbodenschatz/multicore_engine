@@ -96,7 +96,7 @@ class component_property_assignment : public abstract_component_property_assignm
 		template <typename U, typename V = T,
 				  void (*convert)(const U&, V&, entity_manager&) = ast::ast_value_mapper<U, V>::convert>
 		void operator()(const U& ast_value) {
-			convert(ast_value, pa.value_, entity_manager_);
+			ast::ast_value_mapper<U, V>::convert(ast_value, pa.value_, entity_manager_);
 			pa.valid_ = true;
 		}
 	};
