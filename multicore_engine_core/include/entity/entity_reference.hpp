@@ -7,9 +7,15 @@
 #ifndef ENTITY_ENTITY_REFERENCE_HPP_
 #define ENTITY_ENTITY_REFERENCE_HPP_
 
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
 #include <string>
 
 namespace mce {
+namespace bstream {
+class ibstream;
+class obstream;
+} // namespace bstream
 namespace entity {
 class entity_manager;
 class entity;
@@ -42,6 +48,11 @@ public:
 	const std::string& referenced_entity_name() const {
 		return referenced_entity_name_;
 	}
+
+	/// Serializes the entity_reference by saving the referenced name.
+	friend bstream::obstream& operator<<(bstream::obstream& stream, const entity_reference& value);
+	/// Deserializes the entity reference's referenced name, the entity_manager is not deserialized.
+	friend bstream::ibstream& operator>>(bstream::ibstream& stream, entity_reference& value);
 };
 
 } // namespace entity
