@@ -5,6 +5,7 @@
  */
 
 #include <asset/dummy_asset.hpp>
+#include <bstream/vector_iobstream.hpp>
 #include <containers/smart_object_pool.hpp>
 #include <entity/component.hpp>
 #include <entity/entity_manager.hpp>
@@ -55,16 +56,13 @@ public:
 };
 
 TEST(entity_entity_component_test, load_entity_with_simple_component) {
-	entity_manager em(nullptr);
 	test_a_system tasys;
+	entity_manager em(nullptr);
 	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
 	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 						"Test_Ent_Conf test_ent (0,0,0),();"));
 	auto test_ent = em.find_entity("test_ent");
-	auto finally_v = util::finally([&em]() { 
-		em.clear_entities();
-	});
 	ASSERT_TRUE(test_ent);
 	auto test_a_1_comp = test_ent->component<test_a_1_component>();
 	ASSERT_TRUE(test_a_1_comp);
@@ -72,6 +70,31 @@ TEST(entity_entity_component_test, load_entity_with_simple_component) {
 	ASSERT_EQ(2, test_a_1_comp->values().size());
 	ASSERT_EQ("Hello", test_a_1_comp->values()[0]);
 	ASSERT_EQ("World", test_a_1_comp->values()[1]);
+}
+TEST(entity_entity_component_test, entity_serialize_and_deserialize) {
+	bstream::vector_iobstream stream;
+	test_a_system tasys;
+	{
+		entity_manager em(nullptr);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+				"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
+							"Test_Ent_Conf test_ent (0,0,0),();"));
+		em.store_entities_to_bstream(stream);
+	}
+	{
+		entity_manager em(nullptr);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+		em.load_entities_from_bstream(stream);
+		auto test_ent = em.find_entity("test_ent");
+		ASSERT_TRUE(test_ent);
+		auto test_a_1_comp = test_ent->component<test_a_1_component>();
+		ASSERT_TRUE(test_a_1_comp);
+		ASSERT_EQ("TestComp", test_a_1_comp->name());
+		ASSERT_EQ(2, test_a_1_comp->values().size());
+		ASSERT_EQ("Hello", test_a_1_comp->values()[0]);
+		ASSERT_EQ("World", test_a_1_comp->values()[1]);
+	}
 }
 
 } // namespace entity
