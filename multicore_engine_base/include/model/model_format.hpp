@@ -10,9 +10,11 @@
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
 #include <exceptions.hpp>
-#include <string>
+#include <glm/glm.hpp>
 #include <util/composite_magic_number.hpp>
 #include <util/offset_range.hpp>
+#include <cstdint>
+#include <string>
 #include <vector>
 
 namespace mce {

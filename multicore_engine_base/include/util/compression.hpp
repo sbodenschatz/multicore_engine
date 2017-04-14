@@ -9,11 +9,12 @@
 
 #include <cerrno>
 #include <exceptions.hpp>
+#include <zconf.h>
+#include <zlib.h>
+#include <cstddef>
 #include <limits>
-#include <stdexcept>
 #include <string>
 #include <vector>
-#include <zlib.h>
 
 namespace mce {
 namespace util {

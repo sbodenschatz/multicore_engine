@@ -5,6 +5,7 @@
  */
 
 #include <bstream/vector_iobstream.hpp>
+#include <cstdint>
 
 namespace mce {
 namespace bstream {

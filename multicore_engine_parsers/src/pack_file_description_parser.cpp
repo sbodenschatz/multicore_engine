@@ -6,11 +6,15 @@
 
 //#define BOOST_SPIRIT_DEBUG
 
+#include <asset_gen/base_ast.hpp>
+#include <boost/phoenix/core/actor.hpp>
+#include <boost/phoenix/fusion/at.hpp>
+#include <algorithm>
 #include <fstream>
-#include <istream>
 #include <iterator>
 #include <string>
 #include <vector>
+
 #ifdef _MSC_VER
 #pragma warning(disable : 4459)
 #pragma warning(disable : 4503)

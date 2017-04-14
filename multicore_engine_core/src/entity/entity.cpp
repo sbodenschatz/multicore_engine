@@ -4,6 +4,7 @@
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
+#include <boost/container/vector.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
 #include <entity/component.hpp>
@@ -11,7 +12,13 @@
 #include <entity/component_type.hpp>
 #include <entity/entity.hpp>
 #include <entity/entity_manager.hpp>
-#include <util/functional.hpp>
+#include <exceptions.hpp>
+#include <algorithm>
+#include <iterator>
+#include <stdexcept>
+#include <string>
+#include <tuple>
+#include <utility>
 
 namespace mce {
 namespace entity {

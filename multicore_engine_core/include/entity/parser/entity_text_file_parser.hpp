@@ -7,10 +7,12 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_HPP_
 
-#include "../ecs_types.hpp"
-#include "entity_text_file_ast.hpp"
 #include <asset/asset_defs.hpp>
+#include <boost/variant/static_visitor.hpp>
+#include <entity/ecs_types.hpp>
+#include <entity/parser/entity_text_file_ast.hpp>
 #include <memory>
+#include <string>
 
 namespace mce {
 namespace entity {

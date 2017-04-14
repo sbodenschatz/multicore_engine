@@ -7,9 +7,12 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_COMPARE_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_COMPARE_HPP_
 
-#include "entity_text_file_ast.hpp"
+#include <boost/variant/variant.hpp>
+#include <entity/parser/entity_text_file_ast.hpp>
 #include <cmath>
 #include <limits>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace entity {

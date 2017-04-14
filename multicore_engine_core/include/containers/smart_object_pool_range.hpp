@@ -8,7 +8,10 @@
 #define CONTAINERS_SMART_OBJECT_POOL_RANGE_HPP_
 
 #include <containers/smart_object_pool.hpp>
+#include <cstdint>
+#include <exceptions.hpp>
 #include <tbb/tbb_stddef.h>
+#include <cassert>
 
 namespace mce {
 namespace containers {

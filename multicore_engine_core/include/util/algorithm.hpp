@@ -14,7 +14,6 @@
  */
 
 #include <cstddef>
-#include <utility>
 
 namespace mce {
 namespace util {

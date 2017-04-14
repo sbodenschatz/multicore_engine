@@ -8,8 +8,11 @@
 #define ASSET_GEN_PACK_FILE_GEN_HPP_
 
 #include <asset/pack_file_meta_data.hpp>
+#include <algorithm>
 #include <cstdint>
+#include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace mce {

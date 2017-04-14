@@ -4,10 +4,13 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <algorithm>
 #include <bstream/debug_print_obstream.hpp>
-#include <iomanip>
+#include <cstddef>
 #include <memory/aligned.hpp>
+#include <algorithm>
+#include <cstdint>
+#include <iomanip>
+#include <iostream>
 
 namespace mce {
 namespace bstream {

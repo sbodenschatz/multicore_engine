@@ -7,11 +7,15 @@
 #ifndef ENTITY_COMPONENT_TYPE_HPP_
 #define ENTITY_COMPONENT_TYPE_HPP_
 
-#include "component_type_id_manager.hpp"
-#include "ecs_types.hpp"
+#include <core/engine.hpp>
+#include <entity/component.hpp>
 #include <entity/component_configuration.hpp>
-#include <memory>
+#include <entity/component_property_assignment.hpp>
+#include <entity/component_type_id_manager.hpp>
+#include <entity/ecs_types.hpp>
 #include <reflection/property.hpp>
+#include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 

@@ -7,15 +7,17 @@
 #ifndef ASSET_ASSET_MANAGER_HPP_
 #define ASSET_ASSET_MANAGER_HPP_
 
-#include "asset_defs.hpp"
-#include <exception>
+#include <asset/asset_defs.hpp>
+#include <boost/container/vector.hpp>
 #include <exceptions.hpp>
+#include <util/copy_on_write.hpp>
+#include <algorithm>
+#include <exception>
 #include <memory>
+#include <mutex>
 #include <shared_mutex>
 #include <string>
 #include <thread>
-#include <util/copy_on_write.hpp>
-#include <util/unused.hpp>
 #include <vector>
 
 #ifdef _MSC_VER

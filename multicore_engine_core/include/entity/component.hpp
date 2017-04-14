@@ -12,9 +12,11 @@
  * Definition of the component class.
  */
 
+#include <core/engine.hpp>
 #include <entity/component_property_assignment.hpp>
-#include <memory>
 #include <reflection/property.hpp>
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace mce {

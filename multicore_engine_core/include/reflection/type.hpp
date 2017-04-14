@@ -9,11 +9,12 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <numeric>
-#include <sstream>
-#include <string>
 #include <util/string_tools.hpp>
+#include <numeric>
+#include <string>
+#include <type_traits>
 #include <vector>
+#include <sstream>
 
 namespace mce {
 namespace bstream {

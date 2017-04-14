@@ -7,9 +7,9 @@
 #ifndef BSTREAM_IBSTREAM_HPP_
 #define BSTREAM_IBSTREAM_HPP_
 
+#include <glm/glm.hpp>
 #include <cstddef>
 #include <cstdint>
-#include <glm/glm.hpp>
 #include <string>
 #include <vector>
 
@@ -111,7 +111,7 @@ public:
 	ibstream& operator>>(std::string& value);
 	/// Allows reading fixed size arrays of other supported types from the stream.
 	template <typename T, size_t N>
-	ibstream& operator>>(T (&value)[N]) {
+	ibstream& operator>>(T(&value)[N]) {
 		for(size_t i = 0; i < N && *this; ++i) {
 			*this >> value[i];
 		}

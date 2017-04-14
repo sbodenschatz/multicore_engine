@@ -4,13 +4,15 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <algorithm>
 #include <asset/pack_file_reader.hpp>
-#include <cassert>
+#include <boost/container/vector.hpp>
 #include <exceptions.hpp>
-#include <fstream>
+#include <cstring>
 #include <util/compression.hpp>
-#include <util/unused.hpp>
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <mutex>
 
 namespace mce {
 namespace asset {

@@ -5,6 +5,7 @@
  */
 
 #include <bstream/istream_bstream.hpp>
+#include <cstdint>
 
 namespace mce {
 namespace bstream {

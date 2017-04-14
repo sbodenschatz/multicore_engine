@@ -4,9 +4,15 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <algorithm>
+#include <asset/asset.hpp>
 #include <asset/file_asset_loader.hpp>
 #include <asset/file_reader.hpp>
+#include <util/local_function.hpp>
+#include <algorithm>
+#include <iterator>
+#include <mutex>
+#include <tuple>
+#include <utility>
 
 namespace mce {
 namespace asset {
