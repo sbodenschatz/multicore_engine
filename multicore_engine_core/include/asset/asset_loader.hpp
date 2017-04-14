@@ -7,7 +7,8 @@
 #ifndef ASSET_ASSET_LOADER_HPP_
 #define ASSET_ASSET_LOADER_HPP_
 
-#include "asset_defs.hpp"
+#include <asset/asset_defs.hpp>
+#include <boost/asio/io_service.hpp>
 #include <exception>
 #include <memory>
 #include <string>

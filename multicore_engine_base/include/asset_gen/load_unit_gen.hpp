@@ -8,7 +8,9 @@
 #define ASSET_GEN_LOAD_UNIT_GEN_HPP_
 
 #include <asset/load_unit_meta_data.hpp>
+#include <algorithm>
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 

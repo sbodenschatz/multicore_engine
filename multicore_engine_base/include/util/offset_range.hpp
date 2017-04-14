@@ -11,7 +11,6 @@
 #include <bstream/obstream.hpp>
 #include <exceptions.hpp>
 #include <limits>
-#include <stdexcept>
 #include <type_traits>
 
 namespace mce {

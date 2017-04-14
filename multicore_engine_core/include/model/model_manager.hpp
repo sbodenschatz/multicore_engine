@@ -11,7 +11,9 @@
 #include <model/collision_model.hpp>
 #include <model/model_defs.hpp>
 #include <model/polygon_model.hpp>
+#include <memory>
 #include <shared_mutex>
+#include <string>
 
 namespace mce {
 namespace asset {

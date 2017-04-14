@@ -7,11 +7,15 @@
 #ifndef ASSET_GEN_STATIC_MODEL_EXPORTER_HPP_
 #define ASSET_GEN_STATIC_MODEL_EXPORTER_HPP_
 
-#include "static_model.hpp"
 #include <string>
 
 namespace mce {
+namespace model {
+struct static_model_collision_data;
+} // namespace model
+
 namespace asset_gen {
+struct static_model;
 
 /// Implements the functionality to export models into the engine format for polygon and collision models.
 class static_model_exporter {

@@ -4,12 +4,18 @@
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
-#include <entity/component_type.hpp>
+#include <boost/container/vector.hpp>
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
 #include <entity/entity_configuration.hpp>
 #include <entity/entity_manager.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
 #include <exceptions.hpp>
 #include <util/finally.hpp>
+#include <algorithm>
+#include <cassert>
+#include <tuple>
+#include <utility>
 
 namespace mce {
 namespace entity {

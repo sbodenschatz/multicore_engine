@@ -7,7 +7,6 @@
 #include <entity/component.hpp>
 #include <entity/component_configuration.hpp>
 #include <entity/component_type.hpp>
-#include <util/unused.hpp>
 
 namespace mce {
 namespace entity {

@@ -7,13 +7,16 @@
 #ifndef ENTITY_ENTITY_HPP_
 #define ENTITY_ENTITY_HPP_
 
-#include "../containers/generic_flat_map.hpp"
-#include "../containers/smart_pool_ptr.hpp"
-#include "ecs_types.hpp"
 #include <boost/container/small_vector.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
+#include <containers/generic_flat_map.hpp>
+#include <containers/smart_pool_ptr.hpp>
+#include <entity/component.hpp>
 #include <entity/component_type_id_manager.hpp>
+#include <entity/ecs_types.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace mce {
 namespace entity {
@@ -31,8 +34,7 @@ private:
 	template <typename T>
 	using component_container = boost::container::small_vector<T, 16>;
 	containers::generic_flat_map<component_container, component_type_id_t,
-								 containers::smart_pool_ptr<mce::entity::component>>
-			components_;
+								 containers::smart_pool_ptr<mce::entity::component>> components_;
 	bool marker_for_despawn = false;
 
 public:

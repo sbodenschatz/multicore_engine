@@ -4,9 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <util/program_name.hpp>
 #include <algorithm>
 #include <cctype>
-#include <util/program_name.hpp>
+#include <iterator>
 
 namespace mce {
 namespace util {

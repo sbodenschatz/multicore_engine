@@ -7,10 +7,9 @@
 #ifndef ASSET_FILE_READER_HPP_
 #define ASSET_FILE_READER_HPP_
 
-#include "asset_defs.hpp"
-#include <memory>
+#include <asset/asset_defs.hpp>
 #include <string>
-#include <tuple>
+#include <utility>
 
 namespace mce {
 namespace asset {

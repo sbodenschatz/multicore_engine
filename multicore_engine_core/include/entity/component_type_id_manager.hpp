@@ -7,7 +7,7 @@
 #ifndef ENTITY_COMPONENT_TYPE_ID_MANAGER_HPP_
 #define ENTITY_COMPONENT_TYPE_ID_MANAGER_HPP_
 
-#include "ecs_types.hpp"
+#include <entity/ecs_types.hpp>
 
 namespace mce {
 namespace entity {

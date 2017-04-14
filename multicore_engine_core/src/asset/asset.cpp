@@ -5,6 +5,7 @@
  */
 
 #include <asset/asset.hpp>
+#include <algorithm>
 
 namespace mce {
 namespace asset {

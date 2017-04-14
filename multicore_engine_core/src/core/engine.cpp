@@ -4,7 +4,9 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <asset/asset_manager.hpp>
 #include <core/engine.hpp>
+#include <entity/entity_manager.hpp>
 
 namespace mce {
 namespace core {

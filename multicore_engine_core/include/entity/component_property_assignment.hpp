@@ -7,11 +7,13 @@
 #ifndef ENTITY_COMPONENT_PROPERTY_ASSIGNMENT_HPP_
 #define ENTITY_COMPONENT_PROPERTY_ASSIGNMENT_HPP_
 
+#include <boost/variant/static_visitor.hpp>
+#include <core/engine.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_value_mapper.hpp>
 #include <exceptions.hpp>
-#include <memory>
 #include <reflection/property.hpp>
+#include <memory>
 #include <string>
 
 namespace mce {

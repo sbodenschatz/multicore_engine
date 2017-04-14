@@ -7,8 +7,6 @@
 #ifndef CONTAINERS_SCRATCH_PAD_POOL_HPP_
 #define CONTAINERS_SCRATCH_PAD_POOL_HPP_
 
-#include <deque>
-#include <memory>
 #include <mutex>
 #include <stack>
 #include <type_traits>

@@ -6,9 +6,10 @@
 
 #include <asset/native_file_reader.hpp>
 #include <exceptions.hpp>
-#include <exceptions.hpp>
-#include <fstream>
 #include <util/path_util.hpp>
+#include <fstream>
+#include <iostream>
+#include <memory>
 
 namespace mce {
 namespace asset {

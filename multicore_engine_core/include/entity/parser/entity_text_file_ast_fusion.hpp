@@ -7,8 +7,11 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_FUSION_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_FUSION_HPP_
 
-#include "entity_text_file_ast.hpp"
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/mpl/sequence_tag.hpp>
+#include <entity/parser/entity_text_file_ast.hpp>
+#include <string>
+#include <vector>
 
 /**
  * \file

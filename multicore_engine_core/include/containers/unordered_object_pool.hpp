@@ -7,15 +7,16 @@
 #ifndef CONTAINERS_UNORDERED_OBJECT_POOL_HPP_
 #define CONTAINERS_UNORDERED_OBJECT_POOL_HPP_
 
-#include <algorithm>
+#include <cstdint>
+#include <util/unused.hpp>
 #include <atomic>
 #include <cassert>
 #include <iterator>
 #include <memory>
 #include <mutex>
 #include <type_traits>
-#include <util/unused.hpp>
 #include <vector>
+#include <algorithm>
 
 namespace mce {
 namespace containers {

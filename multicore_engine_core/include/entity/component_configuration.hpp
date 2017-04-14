@@ -7,9 +7,12 @@
 #ifndef ENTITY_COMPONENT_CONFIGURATION_HPP_
 #define ENTITY_COMPONENT_CONFIGURATION_HPP_
 
-#include "ecs_types.hpp"
-#include "parser/entity_text_file_ast.hpp"
-#include <unordered_map>
+#include <entity/component.hpp>
+#include <entity/component_property_assignment.hpp>
+#include <entity/ecs_types.hpp>
+#include <entity/parser/entity_text_file_ast.hpp>
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace mce {

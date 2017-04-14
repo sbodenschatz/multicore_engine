@@ -8,7 +8,8 @@
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_HPP_
 
 #include <boost/variant.hpp>
-#include <cstdint>
+#include <algorithm>
+#include <memory>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -94,8 +95,7 @@ struct entity_reference {
 
 /// Represents any value for a variable.
 typedef boost::variant<long long, float_node, std::string, int_list, float_list, string_list, rotation_list,
-					   marker_evaluation, entity_reference>
-		variable_value;
+					   marker_evaluation, entity_reference> variable_value;
 
 /// Represents a variable assignment.
 struct variable {

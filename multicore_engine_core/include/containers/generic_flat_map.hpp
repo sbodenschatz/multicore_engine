@@ -7,11 +7,13 @@
 #ifndef CONTAINERS_GENERIC_FLAT_MAP_HPP_
 #define CONTAINERS_GENERIC_FLAT_MAP_HPP_
 
+#include <cstdint>
 #include <algorithm>
 #include <cassert>
 #include <functional>
 #include <iterator>
 #include <stdexcept>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>

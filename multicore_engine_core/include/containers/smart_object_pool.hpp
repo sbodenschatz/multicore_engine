@@ -7,19 +7,18 @@
 #ifndef CONTAINERS_SMART_OBJECT_POOL_HPP_
 #define CONTAINERS_SMART_OBJECT_POOL_HPP_
 
-#include "../memory/aligned_new.hpp"
-#include "scratch_pad_pool.hpp"
-#include "smart_pool_ptr.hpp"
-#include <algorithm>
+#include <containers/scratch_pad_pool.hpp>
+#include <containers/smart_pool_ptr.hpp>
+#include <cstdint>
+#include <memory/aligned_new.hpp>
+#include <util/local_function.hpp>
 #include <atomic>
 #include <cassert>
-#include <exceptions.hpp>
+#include <exception>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <mutex>
-#include <stdexcept>
-#include <type_traits>
 #include <util/local_function.hpp>
 #include <vector>
 
@@ -472,8 +471,7 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now."
-					  << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
 			std::terminate();
 		}
 	}

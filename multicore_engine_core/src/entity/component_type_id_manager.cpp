@@ -5,6 +5,7 @@
  */
 
 #include <entity/component_type_id_manager.hpp>
+
 namespace mce {
 namespace entity {
 

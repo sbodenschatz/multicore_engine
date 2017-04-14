@@ -7,8 +7,8 @@
 #ifndef MODEL_MODEL_DEFS_HPP_
 #define MODEL_MODEL_DEFS_HPP_
 
-#include <memory>
 #include <util/local_function.hpp>
+#include <memory>
 
 namespace mce {
 namespace model {

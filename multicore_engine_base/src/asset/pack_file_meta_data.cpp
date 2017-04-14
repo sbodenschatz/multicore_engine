@@ -7,6 +7,8 @@
 #include <asset/pack_file_meta_data.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
+#include <algorithm>
+#include <iterator>
 
 namespace mce {
 namespace asset {

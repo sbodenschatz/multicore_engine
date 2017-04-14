@@ -12,9 +12,11 @@
  * Definition of the component class.
  */
 
+#include <core/engine.hpp>
 #include <entity/component_property_assignment.hpp>
-#include <memory>
 #include <reflection/property.hpp>
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace mce {
@@ -42,9 +44,8 @@ protected:
 
 public:
 	/// Specifies the type of the list of properties.
-	typedef std::vector<std::unique_ptr<
-			reflection::abstract_property<component, abstract_component_property_assignment, core::engine&>>>
-			property_list;
+	typedef std::vector<std::unique_ptr<reflection::abstract_property<
+			component, abstract_component_property_assignment, core::engine&>>> property_list;
 	/// Enables virtual destruction for derived classes.
 	virtual ~component() = default;
 	/// Allows access to the component_configuration from which this component object was created.

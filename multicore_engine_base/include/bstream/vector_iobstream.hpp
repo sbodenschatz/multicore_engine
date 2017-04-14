@@ -7,7 +7,9 @@
 #ifndef BSTREAM_VECTOR_IOBSTREAM_HPP_
 #define BSTREAM_VECTOR_IOBSTREAM_HPP_
 
+#include <bstream/ibstream.hpp>
 #include <bstream/iobstream.hpp>
+#include <bstream/obstream.hpp>
 #include <cstdint>
 #include <vector>
 
