@@ -6,11 +6,15 @@
 
 //#define BOOST_SPIRIT_DEBUG
 
+#include <asset_gen/base_ast.hpp>
+#include <boost/phoenix/core/actor.hpp>
+#include <boost/phoenix/fusion/at.hpp>
+#include <algorithm>
 #include <fstream>
-#include <istream>
 #include <iterator>
 #include <string>
 #include <vector>
+
 #ifdef _MSC_VER
 #pragma warning(disable : 4459)
 #pragma warning(disable : 4503)
@@ -106,9 +110,9 @@ ast::load_unit_ast_root load_unit_description_parser::parse(const std::string& f
 	const char* buffer_start = first;
 	try {
 		bool r = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
-		if(!r || !std::all_of(first, last, [](char c) {
-			   return c == ' ' || c == '\t' || c == '\0' || c == '\n';
-		   })) {
+		if(!r ||
+		   !std::all_of(first, last,
+						[](char c) { return c == ' ' || c == '\t' || c == '\0' || c == '\n'; })) {
 			util::throw_syntax_error(filename, buffer_start, first, "General syntax error");
 		}
 	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
