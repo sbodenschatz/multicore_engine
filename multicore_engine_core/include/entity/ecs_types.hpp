@@ -8,9 +8,10 @@
 #define ENTITY_ECS_TYPES_HPP_
 
 #include <containers/smart_pool_ptr.hpp>
-#include <cstdint>
+#include <entity/component.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <cstdint>
 
 namespace mce {
 namespace entity {

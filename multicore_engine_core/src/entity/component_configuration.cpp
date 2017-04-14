@@ -4,12 +4,16 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <algorithm>
+#include <containers/smart_pool_ptr.hpp>
 #include <entity/component_configuration.hpp>
 #include <entity/component_property_assignment.hpp>
 #include <entity/component_type.hpp>
 #include <exceptions.hpp>
+#include <reflection/property.hpp>
+#include <algorithm>
 #include <iterator>
+#include <memory>
+#include <string>
 
 namespace mce {
 namespace entity {

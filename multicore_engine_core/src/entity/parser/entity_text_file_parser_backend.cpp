@@ -5,12 +5,26 @@
  */
 
 #include <asset/asset.hpp>
+#include <asset/asset_defs.hpp>
+#include <asset/asset_manager.hpp>
+#include <boost/variant/variant.hpp>
 #include <core/engine.hpp>
 #include <entity/component_configuration.hpp>
+#include <entity/component_type.hpp>
+#include <entity/ecs_types.hpp>
+#include <entity/entity.hpp>
 #include <entity/entity_configuration.hpp>
 #include <entity/entity_manager.hpp>
+#include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
 #include <exceptions.hpp>
+#include <glm/glm.hpp>
+#include <algorithm>
+#include <iterator>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace entity {

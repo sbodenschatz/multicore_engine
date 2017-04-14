@@ -7,14 +7,15 @@
 #ifndef REFLECTION_PROPERTY_HPP_
 #define REFLECTION_PROPERTY_HPP_
 
-#include "type.hpp"
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
 #include <exceptions.hpp>
+#include <reflection/type.hpp>
+#include <algorithm>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 namespace mce {
 namespace reflection {

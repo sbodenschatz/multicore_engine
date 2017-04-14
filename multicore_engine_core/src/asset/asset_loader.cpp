@@ -6,7 +6,6 @@
 
 #include <asset/asset.hpp>
 #include <asset/asset_loader.hpp>
-#include <exception>
 
 namespace mce {
 namespace asset {

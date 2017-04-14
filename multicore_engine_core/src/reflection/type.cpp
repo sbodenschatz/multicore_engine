@@ -4,9 +4,9 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <reflection/type.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
+#include <reflection/type.hpp>
 #include <type_traits>
 
 namespace mce {

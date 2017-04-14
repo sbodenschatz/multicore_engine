@@ -7,7 +7,10 @@
 #ifndef ASSET_NATIVE_FILE_READER_HPP_
 #define ASSET_NATIVE_FILE_READER_HPP_
 
-#include "file_reader.hpp"
+#include <asset/asset_defs.hpp>
+#include <asset/file_reader.hpp>
+#include <string>
+#include <utility>
 
 namespace mce {
 namespace asset {

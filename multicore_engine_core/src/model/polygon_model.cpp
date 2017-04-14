@@ -4,11 +4,14 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <asset/asset_manager.hpp>
 #include <bstream/asset_ibstream.hpp>
 #include <exceptions.hpp>
 #include <model/model_manager.hpp>
 #include <model/polygon_model.hpp>
+#include <util/local_function.hpp>
+#include <algorithm>
+#include <exception>
+#include <string>
 
 namespace mce {
 namespace model {

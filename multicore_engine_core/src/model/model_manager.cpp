@@ -4,9 +4,15 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
+#include <asset/asset.hpp>
+#include <asset/asset_defs.hpp>
 #include <asset/asset_manager.hpp>
+#include <boost/container/vector.hpp>
 #include <model/model_manager.hpp>
-#include <util/unused.hpp>
+#include <exception>
+#include <memory>
+#include <mutex>
+#include <string>
 
 namespace mce {
 namespace model {

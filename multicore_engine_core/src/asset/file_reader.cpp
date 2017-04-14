@@ -4,7 +4,6 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <algorithm>
 #include <asset/file_reader.hpp>
 
 namespace mce {
