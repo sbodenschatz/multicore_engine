@@ -7,10 +7,9 @@
 #ifndef ASSET_GEN_STATIC_MODEL_HPP_
 #define ASSET_GEN_STATIC_MODEL_HPP_
 
-#include <cstdint>
-#include <glm/glm.hpp>
 #include <model/model_format.hpp>
-#include <util/offset_range.hpp>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace asset_gen {

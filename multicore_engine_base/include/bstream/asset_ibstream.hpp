@@ -8,6 +8,7 @@
 #define BSTREAM_ASSET_IBSTREAM_HPP_
 
 #include <bstream/ibstream.hpp>
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 

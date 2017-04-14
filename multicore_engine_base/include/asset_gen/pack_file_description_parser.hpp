@@ -7,8 +7,9 @@
 #ifndef ASSET_GEN_PACK_FILE_DESCRIPTION_PARSER_HPP_
 #define ASSET_GEN_PACK_FILE_DESCRIPTION_PARSER_HPP_
 
-#include "pack_file_description_ast.hpp"
+#include <asset_gen/pack_file_description_ast.hpp>
 #include <memory>
+#include <string>
 
 namespace mce {
 namespace asset_gen {

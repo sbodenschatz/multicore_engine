@@ -12,8 +12,12 @@
  * Adaptation of load unit description AST nodes for boost.fusion.
  */
 
-#include "load_unit_description_ast.hpp"
+#include <asset_gen/base_ast.hpp>
+#include <asset_gen/load_unit_description_ast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/mpl/sequence_tag.hpp>
+#include <string>
+#include <vector>
 
 BOOST_FUSION_ADAPT_STRUCT(mce::asset_gen::ast::load_unit_entry,		 //
 						  (std::string, external_path)				 //

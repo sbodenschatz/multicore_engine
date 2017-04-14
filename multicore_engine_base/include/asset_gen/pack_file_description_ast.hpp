@@ -7,8 +7,8 @@
 #ifndef ASSET_GEN_PACK_FILE_DESCRIPTION_AST_HPP_
 #define ASSET_GEN_PACK_FILE_DESCRIPTION_AST_HPP_
 
-#include "base_ast.hpp"
-#include <ostream>
+#include <asset_gen/base_ast.hpp>
+#include <algorithm>
 #include <string>
 #include <vector>
 

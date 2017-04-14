@@ -7,11 +7,11 @@
 #ifndef UTIL_ERROR_HELPER_HPP_
 #define UTIL_ERROR_HELPER_HPP_
 
+#include <cstdint>
 #include <exceptions.hpp>
-#include <numeric>
 #include <sstream>
-#include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace mce {
 namespace util {
