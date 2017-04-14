@@ -11,9 +11,8 @@
 namespace mce {
 namespace core {
 
-engine::engine() {
+engine::engine() : asset_manager_{std::make_unique<asset::asset_manager>()} {
 	entity_manager_ = std::make_unique<entity::entity_manager>(*this);
-	asset_manager_ = std::make_unique<asset::asset_manager>();
 }
 
 } // namespace core
