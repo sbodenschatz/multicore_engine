@@ -264,11 +264,35 @@ public:
 	}
 };
 
+class test_b_direct_prop_component : public component {
+private:
+	int int_val = 0.0f;
+	std::string string_val;
+
+public:
+	test_b_direct_prop_component(entity& owner, const component_configuration& configuration) noexcept
+			: component(owner, configuration) {}
+
+	static void fill_property_list(property_list& prop) {
+		REGISTER_COMPONENT_PROPERTY_DIRECT(prop, test_b_direct_prop_component, int, int_val);
+		REGISTER_COMPONENT_PROPERTY_DIRECT(prop, test_b_direct_prop_component, std::string, string_val);
+	}
+
+	int get_int_val() const {
+		return int_val;
+	}
+
+	const std::string& get_string_val() const {
+		return string_val;
+	}
+};
+
 class test_b_system {
 	containers::smart_object_pool<test_b_entref_component, 256> entref_components;
 	containers::smart_object_pool<test_b_quat_component, 256> quat_components;
 	containers::smart_object_pool<test_b_float_component, 256> float_components;
 	containers::smart_object_pool<test_b_int_component, 256> int_components;
+	containers::smart_object_pool<test_b_direct_prop_component, 256> direct_prop_components;
 
 public:
 	containers::smart_pool_ptr<test_b_entref_component>
@@ -287,12 +311,18 @@ public:
 	create_int_component(entity& owner, const component_configuration& configuration) {
 		return int_components.emplace(owner, configuration);
 	}
+	containers::smart_pool_ptr<test_b_direct_prop_component>
+	create_direct_prop_component(entity& owner, const component_configuration& configuration) {
+		return direct_prop_components.emplace(owner, configuration);
+	}
 
 	void register_with_manager(entity_manager& em) {
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, this->create_entref_component(owner, config), this);
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, this->create_quat_component(owner, config), this);
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_float, this->create_float_component(owner, config), this);
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_int, this->create_int_component(owner, config), this);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_direct_prop,
+									   this->create_direct_prop_component(owner, config), this);
 	}
 };
 
@@ -525,6 +555,29 @@ TEST(entity_entity_component_test, entity_component_property_int_serialize_deser
 		em.load_entities_from_bstream(stream);
 		entity_component_property_int_verify(em);
 	}
+}
+
+static void entity_component_property_direct_prop_verify(entity_manager& em) {
+	auto test_ent = em.find_entity("test_ent1");
+	ASSERT_TRUE(test_ent);
+	auto test_ent_direct_prop_comp = test_ent->component<test_b_direct_prop_component>();
+	ASSERT_TRUE(test_ent_direct_prop_comp);
+
+	ASSERT_EQ(12345, test_ent_direct_prop_comp->get_int_val());
+	ASSERT_EQ("Hello World", test_ent_direct_prop_comp->get_string_val());
+}
+
+TEST(entity_entity_component_test, entity_component_property_direct_prop) {
+	test_b_system tbsys;
+	entity_manager em(nullptr);
+	tbsys.register_with_manager(em);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf{test_b_direct_prop{"
+						"int_val=12345;"
+						"string_val=\"Hello World\";"
+						"}}"
+						"Test_Ent_Conf test_ent1 (0,0,0),(x:90,y:0,z:0);"));
+	entity_component_property_direct_prop_verify(em);
 }
 
 } // namespace entity
