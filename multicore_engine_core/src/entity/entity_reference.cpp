@@ -4,6 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
 #include <entity/entity_manager.hpp>
 #include <entity/entity_reference.hpp>
 

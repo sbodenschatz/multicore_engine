@@ -7,6 +7,10 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_FRONTEND_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_FRONTEND_HPP_
 
+#include <entity/parser/entity_text_file_ast.hpp>
+#include <memory>
+#include <string>
+
 namespace mce {
 namespace entity {
 namespace parser {
