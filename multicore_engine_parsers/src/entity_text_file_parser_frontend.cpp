@@ -6,9 +6,9 @@
 
 //#define BOOST_SPIRIT_DEBUG
 
+#include <algorithm>
 #include <boost/phoenix/core/actor.hpp>
 #include <boost/phoenix/fusion/at.hpp>
-#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -29,7 +29,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_fusion.hpp>
-#include <entity/parser/entity_text_file_parser.hpp>
+#include <entity/parser/entity_text_file_parser_frontend.hpp>
 #include <util/error_helper.hpp>
 
 namespace spirit = boost::spirit;
@@ -158,9 +158,9 @@ ast::ast_root entity_text_file_parser_frontend::parse(const std::string& filenam
 	const char* buffer_start = first;
 	try {
 		bool result = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
-		if(!result ||
-		   !std::all_of(first, last,
-						[](char c) { return c == ' ' || c == '\t' || c == '\0' || c == '\n'; })) {
+		if(!result || !std::all_of(first, last, [](char c) {
+			   return c == ' ' || c == '\t' || c == '\0' || c == '\n';
+		   })) {
 			util::throw_syntax_error(filename, buffer_start, first, "General syntax error");
 		}
 	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
