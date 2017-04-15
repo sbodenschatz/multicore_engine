@@ -7,6 +7,7 @@
 #ifndef ENTITY_COMPONENT_TYPE_ID_MANAGER_HPP_
 #define ENTITY_COMPONENT_TYPE_ID_MANAGER_HPP_
 
+#include <atomic>
 #include <entity/ecs_types.hpp>
 
 namespace mce {
@@ -15,10 +16,11 @@ namespace entity {
 /// Provides a way to assign unique ids to component types.
 /**
  * The ids generated are dependent on the order in which the id member function is first called for a given
- * type.
+ * type. This class is used rather than mce::util::type_id for component types to provide an isolated id
+ * 'namespace' for them, so they can be made consistent by deterministic registration.
  */
 class component_type_id_manager {
-	static component_type_id_t next_id;
+	static std::atomic<component_type_id_t> next_id;
 
 public:
 	/// Returns a unique id for the given type T.
