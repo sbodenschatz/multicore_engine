@@ -493,6 +493,21 @@ TEST(entity_entity_component_test, entity_component_property_float_serialize_des
 	}
 }
 
+TEST(entity_entity_component_test, entity_component_property_float_scalar_as_1d_vector) {
+	test_b_system tbsys;
+	entity_manager em(nullptr);
+	tbsys.register_with_manager(em);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf{test_b_float{"
+						"scalar=(1.2);"
+						"vec2=(3.4,5.6);"
+						"vec3=(7.8,9.10,11.12);"
+						"vec4=(13.14,15.16,17.18,19.20);"
+						"}}"
+						"Test_Ent_Conf test_ent1 (0,0,0),(x:90,y:0,z:0);"));
+	entity_component_property_float_verify(em);
+}
+
 static void entity_component_property_int_verify(entity_manager& em) {
 	auto test_ent = em.find_entity("test_ent1");
 	ASSERT_TRUE(test_ent);
@@ -555,6 +570,21 @@ TEST(entity_entity_component_test, entity_component_property_int_serialize_deser
 		em.load_entities_from_bstream(stream);
 		entity_component_property_int_verify(em);
 	}
+}
+
+TEST(entity_entity_component_test, entity_component_property_int_scalar_as_1d_vector) {
+	test_b_system tbsys;
+	entity_manager em(nullptr);
+	tbsys.register_with_manager(em);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf{test_b_int{"
+						"scalar=(123);"
+						"vec2=(456, 789);"
+						"vec3=(101112, 131415, 161718);"
+						"vec4=(192021, 222324, 252627, 282930);"
+						"}}"
+						"Test_Ent_Conf test_ent1 (0,0,0),(x:90,y:0,z:0);"));
+	entity_component_property_int_verify(em);
 }
 
 static void entity_component_property_direct_prop_verify(entity_manager& em) {
