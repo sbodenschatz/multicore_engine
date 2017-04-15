@@ -503,5 +503,29 @@ TEST(entity_entity_component_test, entity_component_property_int) {
 	entity_component_property_int_verify(em);
 }
 
+TEST(entity_entity_component_test, entity_component_property_int_serialize_deserialize) {
+	bstream::vector_iobstream stream;
+	test_b_system tbsys;
+	{
+		entity_manager em(nullptr);
+		tbsys.register_with_manager(em);
+		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+				"test.etf", "Test_Ent_Conf{test_b_float{"
+							"scalar=123;"
+							"vec2=(456, 789);"
+							"vec3=(101112, 131415, 161718);"
+							"vec4=(192021, 222324, 252627, 282930);"
+							"}}"
+							"Test_Ent_Conf test_ent1 (0,0,0),(x:90,y:0,z:0);"));
+		em.store_entities_to_bstream(stream);
+	}
+	{
+		entity_manager em(nullptr);
+		tbsys.register_with_manager(em);
+		em.load_entities_from_bstream(stream);
+		entity_component_property_int_verify(em);
+	}
+}
+
 } // namespace entity
 } // namespace mce
