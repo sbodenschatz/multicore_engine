@@ -4,17 +4,17 @@
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <boost/container/vector.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
+#include <cassert>
 #include <entity/entity_configuration.hpp>
 #include <entity/entity_manager.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
 #include <exceptions.hpp>
-#include <util/finally.hpp>
-#include <algorithm>
-#include <cassert>
 #include <tuple>
+#include <util/finally.hpp>
 #include <utility>
 
 namespace mce {
@@ -170,6 +170,20 @@ void entity_manager::load_entities_from_bstream(bstream::ibstream& istr) {
 		istr >> name;
 		istr >> read_id;
 		assign_entity_name(name, read_id);
+	}
+	// Fix entity references:
+	for(entity& ent : entities) {
+		for(auto& comp_entry : ent.components()) {
+			const component_pool_ptr& comp = comp_entry.second;
+			auto& props = comp->configuration().type().properties();
+			for(auto& abst_prop : props) {
+				auto prop = abst_prop->as_type<entity_reference>();
+				if(prop) {
+					prop->set_value(*comp,
+									entity_reference(prop->get_value(*comp).referenced_entity_name(), *this));
+				}
+			}
+		}
 	}
 }
 
