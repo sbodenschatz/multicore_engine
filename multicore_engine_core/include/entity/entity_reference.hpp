@@ -7,8 +7,6 @@
 #ifndef ENTITY_ENTITY_REFERENCE_HPP_
 #define ENTITY_ENTITY_REFERENCE_HPP_
 
-#include <bstream/ibstream.hpp>
-#include <bstream/obstream.hpp>
 #include <string>
 
 namespace mce {
