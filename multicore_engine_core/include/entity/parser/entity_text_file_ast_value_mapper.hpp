@@ -15,6 +15,8 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <cstdint>
+#include <limits>
 
 namespace mce {
 namespace entity {
@@ -29,12 +31,23 @@ struct ast_value_mapper {
 	typedef void error;
 };
 
+template <typename T>
+T checked_numeric_conversion(long long val) {
+	if(intmax_t(val) < intmax_t(std::numeric_limits<T>::lowest())) {
+		throw value_type_exception("Numeric underflow.");
+	} else if(intmax_t(std::numeric_limits<T>::max()) < intmax_t(val)) {
+		throw value_type_exception("Numeric overflow.");
+	} else {
+		return T(val);
+	}
+}
+
 /// Maps integers from the AST (represented by long long) to any arithmetic type.
 template <typename T>
 struct ast_value_mapper<long long, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to T and stores it in val.
 	static void convert(const long long& ast_val, T& val, entity_manager&) {
-		val = T(ast_val);
+		val = checked_numeric_conversion<T>(ast_val);
 	}
 };
 
@@ -120,7 +133,7 @@ struct ast_value_mapper<int_list, int> {
 	static void convert(const int_list& ast_val, int& val, entity_manager&) {
 		val = 0;
 		if(ast_val.size()) {
-			val = ast_val[0];
+			val = checked_numeric_conversion<int>(ast_val[0]);
 		}
 	}
 };
@@ -132,7 +145,7 @@ struct ast_value_mapper<int_list, glm::tvec2<T, p>, std::enable_if_t<std::is_ari
 	static void convert(const int_list& ast_val, glm::tvec2<T, p>& val, entity_manager&) {
 		val = glm::tvec2<T, p>();
 		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) {
-			val[i] = T(ast_val[i]);
+			val[i] = checked_numeric_conversion<T>(ast_val[i]);
 		}
 	}
 };
@@ -144,7 +157,7 @@ struct ast_value_mapper<int_list, glm::tvec3<T, p>, std::enable_if_t<std::is_ari
 	static void convert(const int_list& ast_val, glm::tvec3<T, p>& val, entity_manager&) {
 		val = glm::tvec3<T, p>();
 		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) {
-			val[i] = T(ast_val[i]);
+			val[i] = checked_numeric_conversion<T>(ast_val[i]);
 		}
 	}
 };
@@ -156,7 +169,7 @@ struct ast_value_mapper<int_list, glm::tvec4<T, p>, std::enable_if_t<std::is_ari
 	static void convert(const int_list& ast_val, glm::tvec4<T, p>& val, entity_manager&) {
 		val = glm::tvec4<T, p>();
 		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) {
-			val[i] = T(ast_val[i]);
+			val[i] = checked_numeric_conversion<T>(ast_val[i]);
 		}
 	}
 };
@@ -190,8 +203,10 @@ struct ast_value_mapper<ast::int_list, glm::tquat<T, p>> {
 	static void convert(const ast::int_list& ast_val, glm::tquat<T, p>& val, entity_manager&) {
 		if(ast_val.empty()) val = glm::tquat<T, p>();
 		if(ast_val.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
-		val = glm::angleAxis(glm::radians(T(ast_val[0])),
-							 glm::tvec3<T, p>(ast_val[1], ast_val[2], ast_val[3]));
+		val = glm::angleAxis(glm::radians(checked_numeric_conversion<T>(ast_val[0])),
+							 glm::tvec3<T, p>(checked_numeric_conversion<T>(ast_val[1]),
+											  checked_numeric_conversion<T>(ast_val[2]),
+											  checked_numeric_conversion<T>(ast_val[3])));
 	}
 };
 
