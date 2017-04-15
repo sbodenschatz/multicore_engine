@@ -39,7 +39,7 @@ class abstract_component_type;
 
 /// Manages the entities in a scene and the available component types.
 class entity_manager {
-	core::engine& engine;
+	core::engine* engine;
 	std::atomic<entity_id_t> next_id{1};
 	containers::unordered_object_pool<entity> entities;
 	// TODO: Check if this can be non-atomic:
@@ -59,7 +59,7 @@ class entity_manager {
 public:
 	friend class mce::entity::parser::entity_text_file_parser_backend;
 	/// Constructs an entity_manager for the given engine object.
-	explicit entity_manager(core::engine& engine);
+	explicit entity_manager(core::engine* engine);
 	/// Forbids copy-construction for entity_manager.
 	entity_manager(const entity_manager&) = delete;
 	/// Forbids move-construction for entity_manager.

@@ -94,7 +94,7 @@ public:
 	 * The given entity_manager is used to resolve component_types.
 	 * The given engine reference is forwarded to component constructors.
 	 */
-	void load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine& engine);
+	void load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine* engine);
 
 	/// Returns the id of the entity.
 	entity_id_t id() const {

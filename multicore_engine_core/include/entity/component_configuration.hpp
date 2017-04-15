@@ -34,14 +34,14 @@ class entity_manager;
  * assignments to parameterize the component.
  */
 class component_configuration {
-	core::engine& engine;
+	core::engine* engine;
 	const abstract_component_type& type_;
 	std::vector<std::unique_ptr<abstract_component_property_assignment<component>>> assignments;
 
 public:
 	/// \brief Creates a component_configuration for the given engine object and with the given
 	/// abstract_component_type.
-	component_configuration(core::engine& engine, const abstract_component_type& type);
+	component_configuration(core::engine* engine, const abstract_component_type& type);
 	/// Allows copy-construction for component_configuration.
 	component_configuration(const component_configuration& other);
 	/// Allows move-construction for component_configuration.

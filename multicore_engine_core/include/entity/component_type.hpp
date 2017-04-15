@@ -33,7 +33,7 @@ class abstract_component_type {
 public:
 	/// Specifies the type of the list of properties.
 	typedef std::vector<std::unique_ptr<reflection::abstract_property<
-			component, abstract_component_property_assignment, component_property_assignment, core::engine&>>>
+			component, abstract_component_property_assignment, component_property_assignment, core::engine*>>>
 			property_list;
 
 private:
@@ -46,7 +46,7 @@ protected:
 	property_list properties_;
 	/// Allows implementing classes to construct the base class with the given type id and name.
 	// cppcheck-suppress passedByValue
-	abstract_component_type(core::engine& engine, component_type_id_t id, std::string name)
+	abstract_component_type(core::engine* engine, component_type_id_t id, std::string name)
 			: id_(id), name_(std::move(name)), empty_configuration_(engine, *this) {}
 
 public:
@@ -63,7 +63,7 @@ public:
 	/// \brief Creates a component object of the type described by this component_type for the given owner
 	/// entity, component_configuration and engine object.
 	virtual component_pool_ptr create_component(entity& owner, const component_configuration& config,
-												core::engine& engine) const = 0;
+												core::engine* engine) const = 0;
 	/// Provides access to the list of properties registered for the described type.
 	const property_list& properties() const noexcept {
 		return properties_;
@@ -91,7 +91,7 @@ class component_type : public abstract_component_type {
 public:
 	/// \brief Constructs a component_type description for T with the given name and component object factory
 	/// function.
-	component_type(core::engine& engine, const std::string& name, const F& factory_function)
+	component_type(core::engine* engine, const std::string& name, const F& factory_function)
 			: abstract_component_type(engine, component_type_id_manager::id<T>(), name),
 			  factory_function_(factory_function) {
 		T::fill_property_list(properties_);
@@ -101,14 +101,14 @@ public:
 	/// \brief Creates a component object of the type described by this component_type for the given owner
 	/// entity, component_configuration and engine object.
 	virtual component_pool_ptr create_component(entity& owner, const component_configuration& config,
-												core::engine& engine) const override {
+												core::engine* engine) const override {
 		return factory_function_(owner, config, engine);
 	}
 };
 
 /// Create a component type description for T with the given name and factory function.
 template <typename T, typename F>
-std::unique_ptr<abstract_component_type> make_component_type(core::engine& engine, const std::string& name,
+std::unique_ptr<abstract_component_type> make_component_type(core::engine* engine, const std::string& name,
 															 const F& factory_function) {
 	return std::make_unique<component_type<T, F>>(engine, name, factory_function);
 }
