@@ -382,5 +382,29 @@ TEST(entity_entity_component_test, entity_component_property_float) {
 	entity_component_property_float_verify(em);
 }
 
+TEST(entity_entity_component_test, entity_component_property_float_serialize_deserialize) {
+	bstream::vector_iobstream stream;
+	test_b_system tbsys;
+	{
+		entity_manager em(nullptr);
+		tbsys.register_with_manager(em);
+		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+				"test.etf", "Test_Ent_Conf{test_b_float{"
+							"scalar=1.2;"
+							"vec2=(3.4,5.6);"
+							"vec3=(7.8,9.10,11.12);"
+							"vec4=(13.14,15.16,17.18,19.20);"
+							"}}"
+							"Test_Ent_Conf test_ent1 (0,0,0),(x:90,y:0,z:0);"));
+		em.store_entities_to_bstream(stream);
+	}
+	{
+		entity_manager em(nullptr);
+		tbsys.register_with_manager(em);
+		em.load_entities_from_bstream(stream);
+		entity_component_property_float_verify(em);
+	}
+}
+
 } // namespace entity
 } // namespace mce
