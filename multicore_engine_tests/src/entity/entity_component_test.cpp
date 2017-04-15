@@ -55,13 +55,7 @@ public:
 	}
 };
 
-TEST(entity_entity_component_test, load_entity_with_simple_component) {
-	test_a_system tasys;
-	entity_manager em(nullptr);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
-			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
-						"Test_Ent_Conf test_ent (0,0,0),();"));
+static void simple_ecs_test_verfiy(entity_manager& em) {
 	auto test_ent = em.find_entity("test_ent");
 	ASSERT_TRUE(test_ent);
 	auto test_a_1_comp = test_ent->component<test_a_1_component>();
@@ -70,6 +64,15 @@ TEST(entity_entity_component_test, load_entity_with_simple_component) {
 	ASSERT_EQ(2, test_a_1_comp->values().size());
 	ASSERT_EQ("Hello", test_a_1_comp->values()[0]);
 	ASSERT_EQ("World", test_a_1_comp->values()[1]);
+}
+TEST(entity_entity_component_test, load_entity_with_simple_component) {
+	test_a_system tasys;
+	entity_manager em(nullptr);
+	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
+						"Test_Ent_Conf test_ent (0,0,0),();"));
+	simple_ecs_test_verfiy(em);
 }
 TEST(entity_entity_component_test, entity_serialize_and_deserialize) {
 	bstream::vector_iobstream stream;
@@ -86,14 +89,7 @@ TEST(entity_entity_component_test, entity_serialize_and_deserialize) {
 		entity_manager em(nullptr);
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
 		em.load_entities_from_bstream(stream);
-		auto test_ent = em.find_entity("test_ent");
-		ASSERT_TRUE(test_ent);
-		auto test_a_1_comp = test_ent->component<test_a_1_component>();
-		ASSERT_TRUE(test_a_1_comp);
-		ASSERT_EQ("TestComp", test_a_1_comp->name());
-		ASSERT_EQ(2, test_a_1_comp->values().size());
-		ASSERT_EQ("Hello", test_a_1_comp->values()[0]);
-		ASSERT_EQ("World", test_a_1_comp->values()[1]);
+		simple_ecs_test_verfiy(em);
 	}
 }
 TEST(entity_entity_component_test, entity_despawn) {
@@ -177,6 +173,17 @@ public:
 	}
 };
 
+static void entity_component_property_entity_reference_verfiy(entity_manager& em) {
+	auto test_ent1 = em.find_entity("test_ent1");
+	auto test_ent2 = em.find_entity("test_ent2");
+	ASSERT_TRUE(test_ent2);
+	auto test_ent2_ent_ref_comp = test_ent2->component<test_b_entref_component>();
+	ASSERT_TRUE(test_ent2_ent_ref_comp);
+	auto ent_ref = test_ent2_ent_ref_comp->ent_ref().resolve();
+	ASSERT_TRUE(ent_ref);
+	ASSERT_EQ(test_ent1, ent_ref);
+}
+
 TEST(entity_entity_component_test, entity_component_property_entity_reference) {
 	test_a_system tasys;
 	test_b_system tbsys;
@@ -188,14 +195,7 @@ TEST(entity_entity_component_test, entity_component_property_entity_reference) {
 						"Test2_Ent_Conf{test_b_entref{ent_ref=entity test_ent1;}}"
 						"Test_Ent_Conf test_ent1 (0,0,0),();"
 						"Test2_Ent_Conf test_ent2 (0,0,0),();"));
-	auto test_ent1 = em.find_entity("test_ent1");
-	auto test_ent2 = em.find_entity("test_ent2");
-	ASSERT_TRUE(test_ent2);
-	auto test_ent2_ent_ref_comp = test_ent2->component<test_b_entref_component>();
-	ASSERT_TRUE(test_ent2_ent_ref_comp);
-	auto ent_ref = test_ent2_ent_ref_comp->ent_ref().resolve();
-	ASSERT_TRUE(ent_ref);
-	ASSERT_EQ(test_ent1, ent_ref);
+	entity_component_property_entity_reference_verfiy(em);
 }
 
 TEST(entity_entity_component_test, entity_component_property_entity_reference_serialize_deserialize) {
@@ -220,27 +220,11 @@ TEST(entity_entity_component_test, entity_component_property_entity_reference_se
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
 									   &tbsys);
 		em.load_entities_from_bstream(stream);
-		auto test_ent1 = em.find_entity("test_ent1");
-		auto test_ent2 = em.find_entity("test_ent2");
-		ASSERT_TRUE(test_ent2);
-		auto test_ent2_ent_ref_comp = test_ent2->component<test_b_entref_component>();
-		ASSERT_TRUE(test_ent2_ent_ref_comp);
-		auto ent_ref = test_ent2_ent_ref_comp->ent_ref().resolve();
-		ASSERT_TRUE(ent_ref);
-		ASSERT_EQ(test_ent1, ent_ref);
+		entity_component_property_entity_reference_verfiy(em);
 	}
 }
 
-TEST(entity_entity_component_test, entity_component_property_quaternion) {
-	test_b_system tbsys;
-	entity_manager em(nullptr);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config), &tbsys);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
-			"test.etf", "Test_Ent_Conf_1{test_b_quat{orientation=(x:90,y:0,z:0);}}"
-						"Test_Ent_Conf_2{test_b_quat{orientation=(90,1,0,0);}}"
-						"Test_Ent_Conf_1 test_ent1 (0,0,0),(x:90,y:0,z:0);"
-						"Test_Ent_Conf_2 test_ent2 (0,0,0),(90,1,0,0);"));
+static void entity_component_property_quaternion_verify(entity_manager& em) {
 	auto test_ent1 = em.find_entity("test_ent1");
 	auto test_ent2 = em.find_entity("test_ent2");
 	ASSERT_TRUE(test_ent1);
@@ -259,6 +243,19 @@ TEST(entity_entity_component_test, entity_component_property_quaternion) {
 	ASSERT_FLOAT_EQ(expected.y, test_ent2_quat_comp->orientation().y);
 	ASSERT_FLOAT_EQ(expected.z, test_ent2_quat_comp->orientation().z);
 	ASSERT_FLOAT_EQ(expected.w, test_ent2_quat_comp->orientation().w);
+}
+
+TEST(entity_entity_component_test, entity_component_property_quaternion) {
+	test_b_system tbsys;
+	entity_manager em(nullptr);
+	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config), &tbsys);
+	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf_1{test_b_quat{orientation=(x:90,y:0,z:0);}}"
+						"Test_Ent_Conf_2{test_b_quat{orientation=(90,1,0,0);}}"
+						"Test_Ent_Conf_1 test_ent1 (0,0,0),(x:90,y:0,z:0);"
+						"Test_Ent_Conf_2 test_ent2 (0,0,0),(90,1,0,0);"));
+	entity_component_property_quaternion_verify(em);
 }
 
 TEST(entity_entity_component_test, entity_component_property_quaternion_serialize_deserialize) {
@@ -282,24 +279,7 @@ TEST(entity_entity_component_test, entity_component_property_quaternion_serializ
 									   &tbsys);
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
 		em.load_entities_from_bstream(stream);
-		auto test_ent1 = em.find_entity("test_ent1");
-		auto test_ent2 = em.find_entity("test_ent2");
-		ASSERT_TRUE(test_ent1);
-		ASSERT_TRUE(test_ent2);
-		auto test_ent1_quat_comp = test_ent1->component<test_b_quat_component>();
-		auto test_ent2_quat_comp = test_ent2->component<test_b_quat_component>();
-		ASSERT_TRUE(test_ent1_quat_comp);
-		ASSERT_TRUE(test_ent2_quat_comp);
-		glm::quat expected = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		ASSERT_FLOAT_EQ(expected.x, test_ent1_quat_comp->orientation().x);
-		ASSERT_FLOAT_EQ(expected.y, test_ent1_quat_comp->orientation().y);
-		ASSERT_FLOAT_EQ(expected.z, test_ent1_quat_comp->orientation().z);
-		ASSERT_FLOAT_EQ(expected.w, test_ent1_quat_comp->orientation().w);
-
-		ASSERT_FLOAT_EQ(expected.x, test_ent2_quat_comp->orientation().x);
-		ASSERT_FLOAT_EQ(expected.y, test_ent2_quat_comp->orientation().y);
-		ASSERT_FLOAT_EQ(expected.z, test_ent2_quat_comp->orientation().z);
-		ASSERT_FLOAT_EQ(expected.w, test_ent2_quat_comp->orientation().w);
+		entity_component_property_quaternion_verify(em);
 	}
 }
 
