@@ -65,6 +65,18 @@ struct ast_value_mapper<string_list, std::vector<std::string>> {
 	}
 };
 
+/// Maps float lists from the AST to float.
+template <>
+struct ast_value_mapper<float_list, float> {
+	/// Converts ast_val to float and stores it in val.
+	static void convert(const float_list& ast_val, float& val, entity_manager&) {
+		val = 0.0f;
+		if(ast_val.size()) {
+			val = ast_val[0];
+		}
+	}
+};
+
 /// Maps float lists from the AST to vec2.
 template <>
 struct ast_value_mapper<float_list, glm::vec2> {
@@ -97,6 +109,18 @@ struct ast_value_mapper<float_list, glm::vec4> {
 		val = glm::vec4();
 		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) {
 			val[i] = ast_val[i];
+		}
+	}
+};
+
+/// Maps integer lists from the AST to int.
+template <>
+struct ast_value_mapper<int_list, int> {
+	/// Converts ast_val to int and stores it in val.
+	static void convert(const int_list& ast_val, int& val, entity_manager&) {
+		val = 0;
+		if(ast_val.size()) {
+			val = ast_val[0];
 		}
 	}
 };
