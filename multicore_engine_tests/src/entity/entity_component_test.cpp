@@ -235,7 +235,7 @@ public:
 		return scalar_;
 	}
 
-	void scalar(int scalar = 0.0f) {
+	void scalar(int scalar) {
 		scalar_ = scalar;
 	}
 
@@ -466,26 +466,26 @@ TEST(entity_entity_component_test, entity_component_property_float_serialize_des
 static void entity_component_property_int_verify(entity_manager& em) {
 	auto test_ent = em.find_entity("test_ent1");
 	ASSERT_TRUE(test_ent);
-	auto test_ent_float_comp = test_ent->component<test_b_float_component>();
-	ASSERT_TRUE(test_ent_float_comp);
+	auto test_ent_int_comp = test_ent->component<test_b_int_component>();
+	ASSERT_TRUE(test_ent_int_comp);
 	int expected1{123};
 	glm::ivec2 expected2{456, 789};
 	glm::ivec3 expected3{101112, 131415, 161718};
 	glm::ivec4 expected4{192021, 222324, 252627, 282930};
 
-	ASSERT_EQ(expected1, test_ent_float_comp->scalar());
+	ASSERT_EQ(expected1, test_ent_int_comp->scalar());
 
-	ASSERT_EQ(expected2.x, test_ent_float_comp->vec2().x);
-	ASSERT_EQ(expected2.y, test_ent_float_comp->vec2().y);
+	ASSERT_EQ(expected2.x, test_ent_int_comp->vec2().x);
+	ASSERT_EQ(expected2.y, test_ent_int_comp->vec2().y);
 
-	ASSERT_EQ(expected3.x, test_ent_float_comp->vec3().x);
-	ASSERT_EQ(expected3.y, test_ent_float_comp->vec3().y);
-	ASSERT_EQ(expected3.z, test_ent_float_comp->vec3().z);
+	ASSERT_EQ(expected3.x, test_ent_int_comp->vec3().x);
+	ASSERT_EQ(expected3.y, test_ent_int_comp->vec3().y);
+	ASSERT_EQ(expected3.z, test_ent_int_comp->vec3().z);
 
-	ASSERT_EQ(expected4.x, test_ent_float_comp->vec4().x);
-	ASSERT_EQ(expected4.y, test_ent_float_comp->vec4().y);
-	ASSERT_EQ(expected4.z, test_ent_float_comp->vec4().z);
-	ASSERT_EQ(expected4.w, test_ent_float_comp->vec4().w);
+	ASSERT_EQ(expected4.x, test_ent_int_comp->vec4().x);
+	ASSERT_EQ(expected4.y, test_ent_int_comp->vec4().y);
+	ASSERT_EQ(expected4.z, test_ent_int_comp->vec4().z);
+	ASSERT_EQ(expected4.w, test_ent_int_comp->vec4().w);
 }
 
 TEST(entity_entity_component_test, entity_component_property_int) {
@@ -493,7 +493,7 @@ TEST(entity_entity_component_test, entity_component_property_int) {
 	entity_manager em(nullptr);
 	tbsys.register_with_manager(em);
 	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
-			"test.etf", "Test_Ent_Conf{test_b_float{"
+			"test.etf", "Test_Ent_Conf{test_b_int{"
 						"scalar=123;"
 						"vec2=(456, 789);"
 						"vec3=(101112, 131415, 161718);"
@@ -510,7 +510,7 @@ TEST(entity_entity_component_test, entity_component_property_int_serialize_deser
 		entity_manager em(nullptr);
 		tbsys.register_with_manager(em);
 		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
-				"test.etf", "Test_Ent_Conf{test_b_float{"
+				"test.etf", "Test_Ent_Conf{test_b_int{"
 							"scalar=123;"
 							"vec2=(456, 789);"
 							"vec3=(101112, 131415, 161718);"
