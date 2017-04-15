@@ -53,6 +53,10 @@ public:
 	create_component_1(entity& owner, const component_configuration& configuration) {
 		return components1.emplace(owner, configuration);
 	}
+
+	static void register_with_manager(entity_manager& em) {
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+	}
 };
 
 static void simple_ecs_test_verfiy(entity_manager& em) {
@@ -68,7 +72,7 @@ static void simple_ecs_test_verfiy(entity_manager& em) {
 TEST(entity_entity_component_test, load_entity_with_simple_component) {
 	test_a_system tasys;
 	entity_manager em(nullptr);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+	test_a_system::register_with_manager(em);
 	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 						"Test_Ent_Conf test_ent (0,0,0),();"));
@@ -79,7 +83,7 @@ TEST(entity_entity_component_test, entity_serialize_and_deserialize) {
 	test_a_system tasys;
 	{
 		entity_manager em(nullptr);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+		test_a_system::register_with_manager(em);
 		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
 				"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 							"Test_Ent_Conf test_ent (0,0,0),();"));
@@ -87,7 +91,7 @@ TEST(entity_entity_component_test, entity_serialize_and_deserialize) {
 	}
 	{
 		entity_manager em(nullptr);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+		test_a_system::register_with_manager(em);
 		em.load_entities_from_bstream(stream);
 		simple_ecs_test_verfiy(em);
 	}
@@ -95,7 +99,7 @@ TEST(entity_entity_component_test, entity_serialize_and_deserialize) {
 TEST(entity_entity_component_test, entity_despawn) {
 	test_a_system tasys;
 	entity_manager em(nullptr);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+	test_a_system::register_with_manager(em);
 	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 						"Test_Ent_Conf test_ent_1 (0,0,0),();"
@@ -171,6 +175,12 @@ public:
 	create_quat_component(entity& owner, const component_configuration& configuration) {
 		return quat_components.emplace(owner, configuration);
 	}
+
+	static void register_with_manager(entity_manager& em) {
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
+									   &tbsys);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
+	}
 };
 
 static void entity_component_property_entity_reference_verfiy(entity_manager& em) {
@@ -188,8 +198,8 @@ TEST(entity_entity_component_test, entity_component_property_entity_reference) {
 	test_a_system tasys;
 	test_b_system tbsys;
 	entity_manager em(nullptr);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config), &tbsys);
+	test_a_system::register_with_manager(em);
+	test_b_system::register_with_manager(em);
 	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 						"Test2_Ent_Conf{test_b_entref{ent_ref=entity test_ent1;}}"
@@ -204,9 +214,8 @@ TEST(entity_entity_component_test, entity_component_property_entity_reference_se
 	test_b_system tbsys;
 	{
 		entity_manager em(nullptr);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
-									   &tbsys);
+		test_a_system::register_with_manager(em);
+		test_b_system::register_with_manager(em);
 		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
 				"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 							"Test2_Ent_Conf{test_b_entref{ent_ref=entity test_ent1;}}"
@@ -216,9 +225,8 @@ TEST(entity_entity_component_test, entity_component_property_entity_reference_se
 	}
 	{
 		entity_manager em(nullptr);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
-									   &tbsys);
+		test_a_system::register_with_manager(em);
+		test_b_system::register_with_manager(em);
 		em.load_entities_from_bstream(stream);
 		entity_component_property_entity_reference_verfiy(em);
 	}
@@ -248,8 +256,7 @@ static void entity_component_property_quaternion_verify(entity_manager& em) {
 TEST(entity_entity_component_test, entity_component_property_quaternion) {
 	test_b_system tbsys;
 	entity_manager em(nullptr);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config), &tbsys);
-	REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
+	test_b_system::register_with_manager(em);
 	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf_1{test_b_quat{orientation=(x:90,y:0,z:0);}}"
 						"Test_Ent_Conf_2{test_b_quat{orientation=(90,1,0,0);}}"
@@ -263,9 +270,7 @@ TEST(entity_entity_component_test, entity_component_property_quaternion_serializ
 	test_b_system tbsys;
 	{
 		entity_manager em(nullptr);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
-									   &tbsys);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
+		test_b_system::register_with_manager(em);
 		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
 				"test.etf", "Test_Ent_Conf_1{test_b_quat{orientation=(x:90,y:0,z:0);}}"
 							"Test_Ent_Conf_2{test_b_quat{orientation=(90,1,0,0);}}"
@@ -275,9 +280,7 @@ TEST(entity_entity_component_test, entity_component_property_quaternion_serializ
 	}
 	{
 		entity_manager em(nullptr);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
-									   &tbsys);
-		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
+		test_b_system::register_with_manager(em);
 		em.load_entities_from_bstream(stream);
 		entity_component_property_quaternion_verify(em);
 	}
