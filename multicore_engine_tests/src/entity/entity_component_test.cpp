@@ -162,9 +162,61 @@ public:
 	}
 };
 
+class test_b_float_component : public component {
+private:
+	float scalar_ = 0.0f;
+	glm::vec2 vec2_;
+	glm::vec3 vec3_;
+	glm::vec4 vec4_;
+
+public:
+	test_b_float_component(entity& owner, const component_configuration& configuration) noexcept
+			: component(owner, configuration) {}
+
+	static void fill_property_list(property_list& prop) {
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_float_component, float, scalar);
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_float_component, glm::vec2, vec2);
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_float_component, glm::vec3, vec3);
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_float_component, glm::vec4, vec4);
+	}
+
+	float scalar() const {
+		return scalar_;
+	}
+
+	void scalar(float scalar) {
+		scalar_ = scalar;
+	}
+
+	const glm::vec2& vec2() const {
+		return vec2_;
+	}
+
+	void vec2(const glm::vec2& vec2) {
+		vec2_ = vec2;
+	}
+
+	const glm::vec3& vec3() const {
+		return vec3_;
+	}
+
+	void vec3(const glm::vec3& vec3) {
+		vec3_ = vec3;
+	}
+
+	const glm::vec4& vec4() const {
+		return vec4_;
+	}
+
+	void vec4(const glm::vec4& vec4) {
+		vec4_ = vec4;
+	}
+};
+
 class test_b_system {
 	containers::smart_object_pool<test_b_entref_component, 256> entref_components;
 	containers::smart_object_pool<test_b_quat_component, 256> quat_components;
+	containers::smart_object_pool<test_b_float_component, 256> float_components;
 
 public:
 	containers::smart_pool_ptr<test_b_entref_component>
@@ -175,10 +227,15 @@ public:
 	create_quat_component(entity& owner, const component_configuration& configuration) {
 		return quat_components.emplace(owner, configuration);
 	}
+	containers::smart_pool_ptr<test_b_float_component>
+	create_float_component(entity& owner, const component_configuration& configuration) {
+		return float_components.emplace(owner, configuration);
+	}
 
 	void register_with_manager(entity_manager& em) {
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, this->create_entref_component(owner, config), this);
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, this->create_quat_component(owner, config), this);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_float, this->create_float_component(owner, config), this);
 	}
 };
 
@@ -283,6 +340,46 @@ TEST(entity_entity_component_test, entity_component_property_quaternion_serializ
 		em.load_entities_from_bstream(stream);
 		entity_component_property_quaternion_verify(em);
 	}
+}
+
+static void entity_component_property_float_verify(entity_manager& em) {
+	auto test_ent = em.find_entity("test_ent1");
+	ASSERT_TRUE(test_ent);
+	auto test_ent_float_comp = test_ent->component<test_b_float_component>();
+	ASSERT_TRUE(test_ent_float_comp);
+	float expected1{1.2f};
+	glm::vec2 expected2{3.4f, 5.6f};
+	glm::vec3 expected3{7.8f, 9.10f, 11.12f};
+	glm::vec4 expected4{13.14f, 15.16f, 17.18f, 19.20f};
+
+	ASSERT_FLOAT_EQ(expected1, test_ent_float_comp->scalar());
+
+	ASSERT_FLOAT_EQ(expected2.x, test_ent_float_comp->vec2().x);
+	ASSERT_FLOAT_EQ(expected2.y, test_ent_float_comp->vec2().y);
+
+	ASSERT_FLOAT_EQ(expected3.x, test_ent_float_comp->vec3().x);
+	ASSERT_FLOAT_EQ(expected3.y, test_ent_float_comp->vec3().y);
+	ASSERT_FLOAT_EQ(expected3.z, test_ent_float_comp->vec3().z);
+
+	ASSERT_FLOAT_EQ(expected4.x, test_ent_float_comp->vec4().x);
+	ASSERT_FLOAT_EQ(expected4.y, test_ent_float_comp->vec4().y);
+	ASSERT_FLOAT_EQ(expected4.z, test_ent_float_comp->vec4().z);
+	ASSERT_FLOAT_EQ(expected4.w, test_ent_float_comp->vec4().w);
+}
+
+TEST(entity_entity_component_test, entity_component_property_float) {
+	test_b_system tbsys;
+	entity_manager em(nullptr);
+	tbsys.register_with_manager(em);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf{test_b_float{"
+						"scalar=1.2;"
+						"vec2=(3.4,5.6);"
+						"vec3=(7.8,9.10,11.12);"
+						"vec4=(13.14,15.16,17.18,19.20);"
+						"}}"
+						"Test_Ent_Conf test_ent1 (0,0,0),(x:90,y:0,z:0);"));
+	entity_component_property_float_verify(em);
 }
 
 } // namespace entity
