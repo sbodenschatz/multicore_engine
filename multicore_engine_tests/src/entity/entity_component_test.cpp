@@ -261,5 +261,47 @@ TEST(entity_entity_component_test, entity_component_property_quaternion) {
 	ASSERT_FLOAT_EQ(expected.w, test_ent2_quat_comp->orientation().w);
 }
 
+TEST(entity_entity_component_test, entity_component_property_quaternion_serialize_deserialize) {
+	bstream::vector_iobstream stream;
+	test_b_system tbsys;
+	{
+		entity_manager em(nullptr);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
+									   &tbsys);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
+		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+				"test.etf", "Test_Ent_Conf_1{test_b_quat{orientation=(x:90,y:0,z:0);}}"
+							"Test_Ent_Conf_2{test_b_quat{orientation=(90,1,0,0);}}"
+							"Test_Ent_Conf_1 test_ent1 (0,0,0),(x:90,y:0,z:0);"
+							"Test_Ent_Conf_2 test_ent2 (0,0,0),(90,1,0,0);"));
+		em.store_entities_to_bstream(stream);
+	}
+	{
+		entity_manager em(nullptr);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
+									   &tbsys);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, tbsys.create_quat_component(owner, config), &tbsys);
+		em.load_entities_from_bstream(stream);
+		auto test_ent1 = em.find_entity("test_ent1");
+		auto test_ent2 = em.find_entity("test_ent2");
+		ASSERT_TRUE(test_ent1);
+		ASSERT_TRUE(test_ent2);
+		auto test_ent1_quat_comp = test_ent1->component<test_b_quat_component>();
+		auto test_ent2_quat_comp = test_ent2->component<test_b_quat_component>();
+		ASSERT_TRUE(test_ent1_quat_comp);
+		ASSERT_TRUE(test_ent2_quat_comp);
+		glm::quat expected = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		ASSERT_FLOAT_EQ(expected.x, test_ent1_quat_comp->orientation().x);
+		ASSERT_FLOAT_EQ(expected.y, test_ent1_quat_comp->orientation().y);
+		ASSERT_FLOAT_EQ(expected.z, test_ent1_quat_comp->orientation().z);
+		ASSERT_FLOAT_EQ(expected.w, test_ent1_quat_comp->orientation().w);
+
+		ASSERT_FLOAT_EQ(expected.x, test_ent2_quat_comp->orientation().x);
+		ASSERT_FLOAT_EQ(expected.y, test_ent2_quat_comp->orientation().y);
+		ASSERT_FLOAT_EQ(expected.z, test_ent2_quat_comp->orientation().z);
+		ASSERT_FLOAT_EQ(expected.w, test_ent2_quat_comp->orientation().w);
+	}
+}
+
 } // namespace entity
 } // namespace mce
