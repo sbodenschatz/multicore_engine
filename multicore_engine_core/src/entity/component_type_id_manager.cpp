@@ -9,7 +9,7 @@
 namespace mce {
 namespace entity {
 
-component_type_id_t component_type_id_manager::next_id = 1;
+std::atomic<component_type_id_t> component_type_id_manager::next_id{1};
 
 } // namespace entity
 } // namespace mce

@@ -13,12 +13,12 @@
  */
 
 #include <asset/asset_defs.hpp>
+#include <atomic>
 #include <boost/container/flat_map.hpp>
 #include <containers/unordered_object_pool.hpp>
 #include <entity/component_type.hpp>
 #include <entity/ecs_types.hpp>
 #include <entity/entity.hpp>
-#include <atomic>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -136,8 +136,8 @@ public:
 #define REGISTER_COMPONENT_TYPE(ENTITYMANAGER, TYPE, NAME, FACTORYEXPR, CAPTURE)                             \
 	ENTITYMANAGER.register_component_type<TYPE>(NAME,                                                        \
 												[CAPTURE](auto&& owner, auto&& config, auto&& engine) {      \
-		UNUSED(owner), UNUSED(config), UNUSED(engine);                                                       \
-		return FACTORYEXPR;                                                                                  \
+													UNUSED(owner), UNUSED(config), UNUSED(engine);           \
+													return FACTORYEXPR;                                      \
 												})
 
 /// \brief Simplifies the registration of a component type by applying the convention, that component classes
@@ -145,8 +145,8 @@ public:
 #define REGISTER_COMPONENT_TYPE_SIMPLE(ENTITYMANAGER, NAME, FACTORYEXPR, CAPTURE)                            \
 	ENTITYMANAGER.register_component_type<NAME##_component>(                                                 \
 			#NAME, [CAPTURE](auto&& owner, auto&& config, auto&& engine) {                                   \
-		UNUSED(owner), UNUSED(config), UNUSED(engine);                                                       \
-		return FACTORYEXPR;                                                                                  \
+				UNUSED(owner), UNUSED(config), UNUSED(engine);                                               \
+				return FACTORYEXPR;                                                                          \
 			})
 
 #endif /* ENTITY_ENTITY_MANAGER_HPP_ */
