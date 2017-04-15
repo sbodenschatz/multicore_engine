@@ -15,6 +15,7 @@
 #include <reflection/type.hpp>
 #include <string>
 #include <type_traits>
+#include <util/type_id.hpp>
 #include <utility>
 
 namespace mce {
@@ -52,13 +53,15 @@ template <typename Root_Type, template <typename> class Abstract_Assignment = ab
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
 class abstract_property {
 protected:
-	std::string name_;			   ///< Stores the name of the property.
-	mce::reflection::type_t type_; ///< Stores the type representation of the property.
+	std::string name_;						///< Stores the name of the property.
+	mce::reflection::type_t type_;			///< Stores the type representation of the property.
+	mce::util::type_id::type_id_t type_id_; ///< Stores the type_id of the type of the property.
 
-	/// Constructs an abstract_property with the given name and type.
+	/// Constructs an abstract_property with the given name, type and type_id.
 	// cppcheck-suppress passedByValue
-	explicit abstract_property(std::string name, mce::reflection::type_t type)
-			: name_(std::move(name)), type_(type) {}
+	explicit abstract_property(std::string name, mce::reflection::type_t type,
+							   util::type_id::type_id_t type_id)
+			: name_(std::move(name)), type_(type), type_id_(type_id) {}
 
 public:
 	/// Forbids copy-construction.
@@ -74,6 +77,10 @@ public:
 	/// Returns a representation of the data type of the property.
 	mce::reflection::type_t type() const noexcept {
 		return type_;
+	}
+	/// Returns the type_id of the data type of the property.
+	mce::util::type_id::type_id_t type_id() const noexcept {
+		return type_id_;
 	}
 	/// Creates an assignment object for the concrete property value type from the given parameters.
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>> make_assignment(Assignment_Param...) const = 0;
@@ -94,13 +101,19 @@ public:
 	/// nullptr otherwise.
 	template <typename T>
 	const property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>* as_type() const {
-		if(type_ == type_info<T>::type && type_ != type_t::unknown) {
+		if(mce::util::type_id::id<T>() == type_id_) {
 			return static_cast<
 					const property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>*>(
 					this);
 		} else {
 			return nullptr;
 		}
+	}
+
+	/// Returns true if the property is of the given data type T or false otherwise.
+	template <typename T>
+	bool is_type() const {
+		return mce::util::type_id::id<T>() == type_id_;
 	}
 };
 
@@ -158,7 +171,7 @@ protected:
 	/// based on the template parameter T.
 	explicit property(const std::string& name)
 			: abstract_property<Root_Type, Abstract_Assignment, Assignment, Assignment_Param...>(
-					  name, type_info<T>::type) {}
+					  name, type_info<T>::type, mce::util::type_id::id<T>()) {}
 
 public:
 	static_assert(std::is_base_of<Abstract_Assignment<Root_Type>, Assignment<Root_Type, T>>::value,
