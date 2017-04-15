@@ -94,7 +94,7 @@ public:
 	/// nullptr otherwise.
 	template <typename T>
 	const property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>* as_type() const {
-		if(type_ == type_info<T>::type) {
+		if(type_ == type_info<T>::type && type_ != type_t::unknown) {
 			return static_cast<
 					const property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>*>(
 					this);
