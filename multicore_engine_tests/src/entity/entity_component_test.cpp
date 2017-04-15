@@ -213,10 +213,62 @@ public:
 	}
 };
 
+class test_b_int_component : public component {
+private:
+	int scalar_ = 0.0f;
+	glm::ivec2 vec2_;
+	glm::ivec3 vec3_;
+	glm::ivec4 vec4_;
+
+public:
+	test_b_int_component(entity& owner, const component_configuration& configuration) noexcept
+			: component(owner, configuration) {}
+
+	static void fill_property_list(property_list& prop) {
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_int_component, int, scalar);
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_int_component, glm::ivec2, vec2);
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_int_component, glm::ivec3, vec3);
+		REGISTER_COMPONENT_PROPERTY(prop, test_b_int_component, glm::ivec4, vec4);
+	}
+
+	int scalar() const {
+		return scalar_;
+	}
+
+	void scalar(int scalar = 0.0f) {
+		scalar_ = scalar;
+	}
+
+	const glm::ivec2& vec2() const {
+		return vec2_;
+	}
+
+	void vec2(const glm::ivec2& vec2) {
+		vec2_ = vec2;
+	}
+
+	const glm::ivec3& vec3() const {
+		return vec3_;
+	}
+
+	void vec3(const glm::ivec3& vec3) {
+		vec3_ = vec3;
+	}
+
+	const glm::ivec4& vec4() const {
+		return vec4_;
+	}
+
+	void vec4(const glm::ivec4& vec4) {
+		vec4_ = vec4;
+	}
+};
+
 class test_b_system {
 	containers::smart_object_pool<test_b_entref_component, 256> entref_components;
 	containers::smart_object_pool<test_b_quat_component, 256> quat_components;
 	containers::smart_object_pool<test_b_float_component, 256> float_components;
+	containers::smart_object_pool<test_b_int_component, 256> int_components;
 
 public:
 	containers::smart_pool_ptr<test_b_entref_component>
@@ -231,11 +283,16 @@ public:
 	create_float_component(entity& owner, const component_configuration& configuration) {
 		return float_components.emplace(owner, configuration);
 	}
+	containers::smart_pool_ptr<test_b_int_component>
+	create_int_component(entity& owner, const component_configuration& configuration) {
+		return int_components.emplace(owner, configuration);
+	}
 
 	void register_with_manager(entity_manager& em) {
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, this->create_entref_component(owner, config), this);
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_quat, this->create_quat_component(owner, config), this);
 		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_float, this->create_float_component(owner, config), this);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_int, this->create_int_component(owner, config), this);
 	}
 };
 
@@ -404,6 +461,46 @@ TEST(entity_entity_component_test, entity_component_property_float_serialize_des
 		em.load_entities_from_bstream(stream);
 		entity_component_property_float_verify(em);
 	}
+}
+
+static void entity_component_property_int_verify(entity_manager& em) {
+	auto test_ent = em.find_entity("test_ent1");
+	ASSERT_TRUE(test_ent);
+	auto test_ent_float_comp = test_ent->component<test_b_float_component>();
+	ASSERT_TRUE(test_ent_float_comp);
+	int expected1{123};
+	glm::ivec2 expected2{456, 789};
+	glm::ivec3 expected3{101112, 131415, 161718};
+	glm::ivec4 expected4{192021, 222324, 252627, 282930};
+
+	ASSERT_EQ(expected1, test_ent_float_comp->scalar());
+
+	ASSERT_EQ(expected2.x, test_ent_float_comp->vec2().x);
+	ASSERT_EQ(expected2.y, test_ent_float_comp->vec2().y);
+
+	ASSERT_EQ(expected3.x, test_ent_float_comp->vec3().x);
+	ASSERT_EQ(expected3.y, test_ent_float_comp->vec3().y);
+	ASSERT_EQ(expected3.z, test_ent_float_comp->vec3().z);
+
+	ASSERT_EQ(expected4.x, test_ent_float_comp->vec4().x);
+	ASSERT_EQ(expected4.y, test_ent_float_comp->vec4().y);
+	ASSERT_EQ(expected4.z, test_ent_float_comp->vec4().z);
+	ASSERT_EQ(expected4.w, test_ent_float_comp->vec4().w);
+}
+
+TEST(entity_entity_component_test, entity_component_property_int) {
+	test_b_system tbsys;
+	entity_manager em(nullptr);
+	tbsys.register_with_manager(em);
+	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+			"test.etf", "Test_Ent_Conf{test_b_float{"
+						"scalar=123;"
+						"vec2=(456, 789);"
+						"vec3=(101112, 131415, 161718);"
+						"vec4=(192021, 222324, 252627, 282930);"
+						"}}"
+						"Test_Ent_Conf test_ent1 (0,0,0),(x:90,y:0,z:0);"));
+	entity_component_property_int_verify(em);
 }
 
 } // namespace entity
