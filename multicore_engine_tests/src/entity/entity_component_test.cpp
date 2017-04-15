@@ -215,7 +215,7 @@ public:
 
 class test_b_int_component : public component {
 private:
-	int scalar_ = 0.0f;
+	int scalar_ = 0;
 	glm::ivec2 vec2_;
 	glm::ivec3 vec3_;
 	glm::ivec4 vec4_;
@@ -266,7 +266,7 @@ public:
 
 class test_b_direct_prop_component : public component {
 private:
-	int int_val = 0.0f;
+	int int_val = 0;
 	std::string string_val;
 
 public:
