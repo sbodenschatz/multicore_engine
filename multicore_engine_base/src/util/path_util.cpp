@@ -4,8 +4,9 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <algorithm>
 #include <util/path_util.hpp>
+#include <algorithm>
+#include <iterator>
 
 namespace mce {
 namespace util {

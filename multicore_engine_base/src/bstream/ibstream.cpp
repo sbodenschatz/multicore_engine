@@ -5,7 +5,6 @@
  */
 
 #include <bstream/ibstream.hpp>
-#include <cstring>
 
 namespace mce {
 namespace bstream {

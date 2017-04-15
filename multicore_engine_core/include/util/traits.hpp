@@ -51,6 +51,9 @@ struct is_swappable {
 	static constexpr bool value = detail::swappable_trait_impl<T>::value;
 };
 
+template <typename T>
+constexpr bool is_swappable<T>::value;
+
 /// Replacement for std::is_nothrow_swappable<T> from C++17 where it is not available.
 /**
  * \bug This may give false positives where swap is not SFINAEd correctly (for C++17) yet. Unfortunately this
@@ -62,6 +65,9 @@ struct is_nothrow_swappable {
 	static constexpr bool value =
 			detail::nothrow_swappable_trait_impl<T, detail::swappable_trait_impl<T>::value>::value;
 };
+
+template <typename T>
+constexpr bool is_nothrow_swappable<T>::value;
 
 } // namespace util
 } // namespace mce

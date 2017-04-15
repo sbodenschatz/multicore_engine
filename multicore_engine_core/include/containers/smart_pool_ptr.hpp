@@ -7,6 +7,7 @@
 #ifndef CONTAINERS_SMART_POOL_PTR_HPP_
 #define CONTAINERS_SMART_POOL_PTR_HPP_
 
+#include <cstdint>
 #include <cassert>
 #include <memory>
 #include <type_traits>

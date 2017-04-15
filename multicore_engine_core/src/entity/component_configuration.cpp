@@ -4,17 +4,21 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <algorithm>
+#include <containers/smart_pool_ptr.hpp>
 #include <entity/component_configuration.hpp>
 #include <entity/component_property_assignment.hpp>
 #include <entity/component_type.hpp>
 #include <exceptions.hpp>
+#include <reflection/property.hpp>
+#include <algorithm>
 #include <iterator>
+#include <memory>
+#include <string>
 
 namespace mce {
 namespace entity {
 
-component_configuration::component_configuration(core::engine& engine, const abstract_component_type& type)
+component_configuration::component_configuration(core::engine* engine, const abstract_component_type& type)
 		: engine(engine), type_(type) {}
 
 component_configuration::component_configuration(const component_configuration& other)
@@ -35,7 +39,8 @@ component_configuration::~component_configuration() {}
 
 void component_configuration::make_assignment(const std::string& property_name,
 											  const ast::variable_value& ast_value,
-											  const std::string& entity_context) {
+											  const std::string& entity_context,
+											  entity_manager& entity_manager) {
 	auto it = std::find_if(assignments.begin(), assignments.end(), [&](const auto& elem) {
 		return elem->abstract_property().name() == property_name;
 	});
@@ -47,7 +52,7 @@ void component_configuration::make_assignment(const std::string& property_name,
 											 type_.name() + "'.");
 		it = assignments.emplace(assignments.end(), it2->get()->make_assignment(engine));
 	}
-	it->get()->parse(ast_value, entity_context, type_.name());
+	it->get()->parse(ast_value, entity_context, type_.name(), entity_manager);
 }
 
 } // namespace entity

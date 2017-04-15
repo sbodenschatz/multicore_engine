@@ -4,15 +4,15 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <algorithm>
-#include <asset/asset_defs.hpp>
 #include <asset_gen/load_unit_gen.hpp>
 #include <bstream/iostream_bstream.hpp>
-#include <bstream/vector_iobstream.hpp>
+#include <cstdint>
 #include <exceptions.hpp>
+#include <util/path_util.hpp>
+#include <algorithm>
+#include <iostream>
 #include <fstream>
 #include <iterator>
-#include <util/path_util.hpp>
 
 namespace mce {
 namespace asset_gen {

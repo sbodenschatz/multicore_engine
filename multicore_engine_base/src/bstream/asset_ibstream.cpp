@@ -4,12 +4,12 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <algorithm>
 #include <asset/asset.hpp>
 #include <bstream/asset_ibstream.hpp>
-#include <cstring>
+#include <cstdint>
 #include <exceptions.hpp>
-#include <stdexcept>
+#include <algorithm>
+#include <cstring>
 
 namespace mce {
 namespace bstream {

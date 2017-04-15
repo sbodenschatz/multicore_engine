@@ -7,7 +7,9 @@
 #ifndef BSTREAM_IOSTREAM_BSTREAM_HPP_
 #define BSTREAM_IOSTREAM_BSTREAM_HPP_
 
+#include <bstream/ibstream.hpp>
 #include <bstream/iobstream.hpp>
+#include <bstream/obstream.hpp>
 #include <cstdint>
 #include <istream>
 

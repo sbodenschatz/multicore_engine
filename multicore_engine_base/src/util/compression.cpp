@@ -4,11 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <cstdint>
+#include <util/compression.hpp>
 #include <algorithm>
 #include <cstring>
-#include <util/compression.hpp>
-#include <util/unused.hpp>
-#include <zlib.h>
 
 // TODO Cite in sources
 // Based on http://www.zlib.net/zlib_how.html

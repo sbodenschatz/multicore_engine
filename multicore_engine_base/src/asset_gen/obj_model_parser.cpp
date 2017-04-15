@@ -4,18 +4,23 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <algorithm>
-#include <array>
 #include <asset_gen/obj_model_parser.hpp>
+#include <boost/container/vector.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/utility/string_view.hpp>
 #include <exceptions.hpp>
-#include <fstream>
+#include <glm/glm.hpp>
+#include <util/string_tools.hpp>
+#include <util/unused.hpp>
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <initializer_list>
 #include <iterator>
 #include <limits>
 #include <numeric>
-#include <stdexcept>
-#include <util/string_tools.hpp>
-#include <util/unused.hpp>
+#include <string>
 
 namespace mce {
 namespace asset_gen {

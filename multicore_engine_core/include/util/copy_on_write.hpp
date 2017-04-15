@@ -7,7 +7,7 @@
 #ifndef UTIL_COPY_ON_WRITE_HPP_
 #define UTIL_COPY_ON_WRITE_HPP_
 
-#include "monitor.hpp"
+#include <util/monitor.hpp>
 #include <memory>
 
 namespace mce {

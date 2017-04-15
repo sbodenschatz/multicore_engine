@@ -7,12 +7,17 @@
 #ifndef CORE_ENGINE_HPP_
 #define CORE_ENGINE_HPP_
 
-#include <asset/asset_manager.hpp>
 #include <cassert>
-#include <entity/entity_manager.hpp>
 #include <memory>
 
 namespace mce {
+namespace asset {
+class asset_manager;
+} // namespace asset
+namespace entity {
+class entity_manager;
+} // namespace entity
+
 namespace core {
 
 /// Represents the central management class for the subsystems of the engine.

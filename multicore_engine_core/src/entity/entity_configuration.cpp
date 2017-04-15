@@ -4,10 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <algorithm>
 #include <entity/component_configuration.hpp>
 #include <entity/entity.hpp>
 #include <entity/entity_configuration.hpp>
+#include <algorithm>
 #include <iterator>
 
 namespace mce {

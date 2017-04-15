@@ -4,16 +4,22 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <algorithm>
+#include <asset_gen/static_model.hpp>
 #include <asset_gen/static_model_exporter.hpp>
 #include <bstream/iostream_bstream.hpp>
 #include <bstream/vector_iobstream.hpp>
-#include <cassert>
 #include <exceptions.hpp>
 #include <fstream>
-#include <iterator>
 #include <model/model_format.hpp>
+#include <util/offset_range.hpp>
 #include <util/unused.hpp>
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <iterator>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace asset_gen {

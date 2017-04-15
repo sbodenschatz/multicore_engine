@@ -7,8 +7,8 @@
 #ifndef BSTREAM_IOBSTREAM_HPP_
 #define BSTREAM_IOBSTREAM_HPP_
 
-#include "ibstream.hpp"
-#include "obstream.hpp"
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
 
 namespace mce {
 namespace bstream {

@@ -8,12 +8,15 @@
 #define MODEL_POLYGON_MODEL_HPP_
 
 #include <asset/asset_defs.hpp>
-#include <atomic>
 #include <exceptions.hpp>
-#include <memory>
 #include <model/model_defs.hpp>
 #include <model/model_format.hpp>
+#include <util/local_function.hpp>
+#include <atomic>
+#include <exception>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <vector>
 
 namespace mce {

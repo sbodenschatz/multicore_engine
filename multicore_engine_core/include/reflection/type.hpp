@@ -9,13 +9,23 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <numeric>
-#include <sstream>
-#include <string>
 #include <util/string_tools.hpp>
+#include <numeric>
+#include <string>
+#include <type_traits>
 #include <vector>
+#include <sstream>
 
 namespace mce {
+namespace bstream {
+class ibstream;
+class obstream;
+} // namespace bstream
+
+namespace entity {
+class entity_reference;
+} // namespace entity
+
 namespace reflection {
 
 /// Represents the type of a value.
@@ -44,7 +54,13 @@ enum class type_t {
 	string,
 	/// The value is a list of textual strings.
 	string_list,
+	/// The value is a reference to a named entity.
+	entity_reference
 };
+/// Deserializes the value type representation from the bstream.
+bstream::ibstream& operator>>(bstream::ibstream& ibs, type_t& value);
+/// Serializes the value type representation to the bstream.
+bstream::obstream& operator<<(bstream::obstream& obs, type_t value);
 
 /// Allows conversion of C++ types to the appropriate type_t member value using specializations.
 template <typename T>
@@ -150,6 +166,15 @@ template <>
 struct type_info<std::vector<std::string>> {
 	/// The value representing the type_t representation of T.
 	static const type_t type = type_t::string_list;
+	/// Specifies that this is a specialized case where the type is known.
+	typedef std::true_type known_type;
+};
+
+/// Specialization of type_info for entity::entity_reference.
+template <>
+struct type_info<entity::entity_reference> {
+	/// The value representing the type_t representation of T.
+	static const type_t type = type_t::entity_reference;
 	/// Specifies that this is a specialized case where the type is known.
 	typedef std::true_type known_type;
 };
@@ -338,6 +363,29 @@ struct type_parser<std::vector<std::string>> {
 		return std::accumulate(t.begin(), t.end(), ""s, [](const auto& x, const auto& y) {
 			return x + (x.empty() ? ""s : delimiter) + y;
 		});
+	}
+};
+
+} // namespace reflection
+} // namespace mce
+
+#include <entity/entity_reference.hpp>
+
+namespace mce {
+namespace reflection {
+
+/// Specialization of type_parser for entity::entity_reference.
+template <>
+struct type_parser<entity::entity_reference> {
+	/// Parses s into t.
+	static bool from_string(const std::string&, entity::entity_reference&) {
+		/// TODO: Check if this operation can be supported in the future (an entity_manager would be required
+		/// here, reducing generality of the property).
+		return false;
+	}
+	/// Formats t into a string.
+	static std::string to_string(const entity::entity_reference& t) {
+		return t.referenced_entity_name();
 	}
 };
 

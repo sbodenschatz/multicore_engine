@@ -7,10 +7,11 @@
 #ifndef UTIL_ACTOR_HPP_
 #define UTIL_ACTOR_HPP_
 
-#include "local_function.hpp"
-#include "message_queue.hpp"
-#include <mutex>
+#include <cstdint>
+#include <util/local_function.hpp>
+#include <util/message_queue.hpp>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace mce {

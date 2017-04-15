@@ -5,12 +5,26 @@
  */
 
 #include <asset/asset.hpp>
+#include <asset/asset_defs.hpp>
+#include <asset/asset_manager.hpp>
+#include <boost/variant/variant.hpp>
 #include <core/engine.hpp>
 #include <entity/component_configuration.hpp>
+#include <entity/component_type.hpp>
+#include <entity/ecs_types.hpp>
+#include <entity/entity.hpp>
 #include <entity/entity_configuration.hpp>
 #include <entity/entity_manager.hpp>
+#include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_parser.hpp>
 #include <exceptions.hpp>
+#include <glm/glm.hpp>
+#include <algorithm>
+#include <iterator>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace mce {
 namespace entity {
@@ -18,7 +32,7 @@ namespace parser {
 
 void entity_text_file_parser_backend::ast_definition_visitor::operator()(const ast::entity_definition& node) {
 	std::unique_ptr<entity_configuration> config;
-	if(node.super_name.empty()) {
+	if(!node.super_name.empty()) {
 		auto super_config = backend.em.find_entity_configuration(node.super_name);
 		if(!super_config)
 			throw missing_entity_config_exception("Super entity configuration '" + node.super_name +
@@ -47,14 +61,17 @@ void entity_text_file_parser_backend::ast_definition_visitor::operator()(const a
 		}
 		auto& comp_conf = **comp_conf_it;
 		for(const auto& var_entry : comp_def.variables) {
-			comp_conf.make_assignment(var_entry.name, var_entry.value, node.name);
+			comp_conf.make_assignment(var_entry.name, var_entry.value, node.name, backend.em);
 		}
 	}
 	backend.em.add_entity_configuration(std::move(config));
 }
 void entity_text_file_parser_backend::ast_definition_visitor::operator()(ast::include_instruction& node) {
+	if(!backend.em.engine)
+		throw invalid_operation_exception("Can't include files because a null-engine is given and therefore "
+										  "no asset_loader is available");
 	// TODO Handle relative paths if needed
-	auto included = backend.em.engine.asset_manager().load_asset_sync(node.filename);
+	auto included = backend.em.engine->asset_manager().load_asset_sync(node.filename);
 	node.included_ast = std::make_shared<ast::ast_wrapper>(backend.load_file(included));
 	backend.process_entity_definitions(node.included_ast->root);
 }
@@ -69,7 +86,7 @@ void entity_text_file_parser_backend::ast_instance_visitor::operator()(const ast
 	auto entity_conf = backend.em.find_entity_configuration(node.type_name);
 	if(!entity_conf)
 		throw missing_entity_config_exception("Unknown entity configuration '" + node.type_name + "'.");
-	auto entity = backend.em.create_entity(*entity_conf);
+	auto entity = backend.em.create_entity(entity_conf);
 	ast_position_visitor pos_visitor(backend);
 	entity->position(node.position_parameter.apply_visitor(pos_visitor));
 	ast_orientation_visitor orientation_visitor(backend);
@@ -114,13 +131,14 @@ entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::int_list& node) {
 	if(node.empty()) return entity_orientation_t();
 	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
-	return glm::angleAxis(float(node[0]), glm::vec3(float(node[1]), float(node[2]), float(node[3])));
+	return glm::angleAxis(glm::radians(float(node[0])),
+						  glm::vec3(float(node[1]), float(node[2]), float(node[3])));
 }
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::float_list& node) {
 	if(node.empty()) return entity_orientation_t();
 	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
-	return glm::angleAxis(float(node[0]), glm::vec3(node[1], node[2], node[3]));
+	return glm::angleAxis(glm::radians(float(node[0])), glm::vec3(node[1], node[2], node[3]));
 }
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::rotation_list& node) {
@@ -133,7 +151,7 @@ operator()(const ast::rotation_list& node) {
 		case ast::rotation_axis::z: axis.z = 1.0f; break;
 		default: throw std::logic_error("Invalid rotation axis in AST."); break;
 		}
-		orientation = orientation * glm::angleAxis(entry.angle, axis);
+		orientation = orientation * glm::angleAxis(glm::radians(entry.angle), axis);
 	}
 	return orientation;
 }

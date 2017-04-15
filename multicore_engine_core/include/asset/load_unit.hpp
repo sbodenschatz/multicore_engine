@@ -7,16 +7,19 @@
 #ifndef ASSET_LOAD_UNIT_HPP_
 #define ASSET_LOAD_UNIT_HPP_
 
-#include "asset_defs.hpp"
+#include <asset/asset_defs.hpp>
 #include <asset/load_unit_meta_data.hpp>
+#include <cstddef>
+#include <exceptions.hpp>
+#include <util/local_function.hpp>
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
 #include <exception>
-#include <exceptions.hpp>
 #include <memory>
 #include <mutex>
-#include <stdexcept>
-#include <util/local_function.hpp>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace mce {

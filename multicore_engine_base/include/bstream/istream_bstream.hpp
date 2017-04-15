@@ -10,7 +10,6 @@
 #include <bstream/ibstream.hpp>
 #include <cstdint>
 #include <istream>
-#include <memory>
 
 namespace mce {
 namespace bstream {

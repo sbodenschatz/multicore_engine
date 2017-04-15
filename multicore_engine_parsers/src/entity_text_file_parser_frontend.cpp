@@ -6,9 +6,12 @@
 
 //#define BOOST_SPIRIT_DEBUG
 
-#include <istream>
+#include <algorithm>
+#include <boost/phoenix/core/actor.hpp>
+#include <boost/phoenix/fusion/at.hpp>
+#include <memory>
 #include <string>
-#include <vector>
+
 #ifdef _MSC_VER
 #pragma warning(disable : 4459)
 #pragma warning(disable : 4503)
@@ -26,7 +29,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_fusion.hpp>
-#include <entity/parser/entity_text_file_parser.hpp>
+#include <entity/parser/entity_text_file_parser_frontend.hpp>
 #include <util/error_helper.hpp>
 
 namespace spirit = boost::spirit;

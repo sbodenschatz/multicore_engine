@@ -7,15 +7,22 @@
 #ifndef ENTITY_ENTITY_HPP_
 #define ENTITY_ENTITY_HPP_
 
-#include "../containers/generic_flat_map.hpp"
-#include "../containers/smart_pool_ptr.hpp"
-#include "ecs_types.hpp"
 #include <boost/container/small_vector.hpp>
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
+#include <containers/generic_flat_map.hpp>
+#include <containers/smart_pool_ptr.hpp>
+#include <entity/component.hpp>
+#include <entity/component_type_id_manager.hpp>
+#include <entity/ecs_types.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace mce {
 namespace entity {
 
 class component;
+class entity_manager;
 
 /// \brief Represents an entity (aka game object) that is constructed from several component objects following
 /// the composition over inheritance technique.
@@ -27,8 +34,7 @@ private:
 	template <typename T>
 	using component_container = boost::container::small_vector<T, 16>;
 	containers::generic_flat_map<component_container, component_type_id_t,
-								 containers::smart_pool_ptr<mce::entity::component>>
-			components_;
+								 containers::smart_pool_ptr<mce::entity::component>> components_;
 	bool marker_for_despawn = false;
 
 public:
@@ -48,14 +54,20 @@ public:
 	/// \brief Returns the component object of type T associated with this entity if it has such a component
 	/// or nullptr otherwise.
 	template <typename T>
-	const mce::entity::component* component() const;
+	const T* component() const {
+		return static_cast<const T*>(component(component_type_id_manager::id<T>()));
+	}
 	/// \brief Returns the component object of type T associated with this entity if it has such a component
 	/// or nullptr otherwise.
 	template <typename T>
-	mce::entity::component* component();
+	T* component() {
+		return static_cast<T*>(component(component_type_id_manager::id<T>()));
+	}
 	/// Checks if the entity has a associated component of type T.
 	template <typename T>
-	bool has_component() const;
+	bool has_component() const {
+		return has_component(component_type_id_manager::id<T>());
+	}
 
 	/// \brief Returns the component object with the given type id associated with this entity if it has such
 	/// a component or nullptr otherwise.
@@ -73,6 +85,17 @@ public:
 	components() const {
 		return components_;
 	}
+
+	/// \brief Stores the current state of the entity (position, orientation, attached components and their
+	/// property values) to the given bstream.
+	void store_to_bstream(bstream::obstream& ostr) const;
+	/// Loads the state of the entity (as stored by store_to_bstream) from the given bstream.
+	/**
+	 * The given entity_manager is used to resolve component_types.
+	 * The given engine reference is forwarded to component constructors.
+	 */
+	void load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine* engine);
+
 	/// Returns the id of the entity.
 	entity_id_t id() const {
 		return id_;

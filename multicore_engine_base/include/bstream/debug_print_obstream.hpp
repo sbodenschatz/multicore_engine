@@ -7,7 +7,8 @@
 #ifndef BSTREAM_DEBUG_PRINT_OBSTREAM_HPP_
 #define BSTREAM_DEBUG_PRINT_OBSTREAM_HPP_
 
-#include "obstream.hpp"
+#include <bstream/obstream.hpp>
+#include <cstdint>
 #include <ostream>
 
 namespace mce {

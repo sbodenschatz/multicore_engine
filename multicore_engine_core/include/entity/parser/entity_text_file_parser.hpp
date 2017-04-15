@@ -7,39 +7,18 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_HPP_
 
-#include "../ecs_types.hpp"
-#include "entity_text_file_ast.hpp"
 #include <asset/asset_defs.hpp>
+#include <boost/variant/static_visitor.hpp>
+#include <entity/ecs_types.hpp>
+#include <entity/parser/entity_text_file_ast.hpp>
+#include <entity/parser/entity_text_file_parser_frontend.hpp>
 #include <memory>
+#include <string>
 
 namespace mce {
 namespace entity {
 class entity_manager;
 namespace parser {
-
-struct entity_text_file_grammar;
-struct entity_text_file_skipper;
-
-/// Implements the front-end of the entity text file parser.
-/**
- * Parses the text file into an AST.
- */
-class entity_text_file_parser_frontend {
-	/// Stores the grammar of the parsers.
-	std::unique_ptr<entity_text_file_grammar> grammar;
-	/// Stores the skip parser of the parser.
-	std::unique_ptr<entity_text_file_skipper> skipper;
-
-public:
-	/// Constructs a parser front-end object.
-	entity_text_file_parser_frontend();
-	/// Destroys the parser front-end object.
-	~entity_text_file_parser_frontend();
-
-	/// \brief Parses the character sequence represented by first and last and uses the given filename for
-	/// error messages.
-	ast::ast_root parse(const std::string& filename, const char*& first, const char* last);
-};
 
 /// Implements the back-end of the entity text file parser.
 /**

@@ -7,7 +7,9 @@
 #ifndef ASSET_FILE_ASSET_LOADER_HPP_
 #define ASSET_FILE_ASSET_LOADER_HPP_
 
-#include "asset_loader.hpp"
+#include <asset/asset_defs.hpp>
+#include <asset/asset_loader.hpp>
+#include <memory>
 #include <shared_mutex>
 #include <string>
 #include <vector>
