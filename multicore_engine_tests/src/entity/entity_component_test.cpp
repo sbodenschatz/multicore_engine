@@ -198,6 +198,39 @@ TEST(entity_entity_component_test, entity_component_property_entity_reference) {
 	ASSERT_EQ(test_ent1, ent_ref);
 }
 
+TEST(entity_entity_component_test, entity_component_property_entity_reference_serialize_deserialize) {
+	bstream::vector_iobstream stream;
+	test_a_system tasys;
+	test_b_system tbsys;
+	{
+		entity_manager em(nullptr);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
+									   &tbsys);
+		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+				"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
+							"Test2_Ent_Conf{test_b_entref{ent_ref=entity test_ent1;}}"
+							"Test_Ent_Conf test_ent1 (0,0,0),();"
+							"Test2_Ent_Conf test_ent2 (0,0,0),();"));
+		em.store_entities_to_bstream(stream);
+	}
+	{
+		entity_manager em(nullptr);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_a_1, tasys.create_component_1(owner, config), &tasys);
+		REGISTER_COMPONENT_TYPE_SIMPLE(em, test_b_entref, tbsys.create_entref_component(owner, config),
+									   &tbsys);
+		em.load_entities_from_bstream(stream);
+		auto test_ent1 = em.find_entity("test_ent1");
+		auto test_ent2 = em.find_entity("test_ent2");
+		ASSERT_TRUE(test_ent2);
+		auto test_ent2_ent_ref_comp = test_ent2->component<test_b_entref_component>();
+		ASSERT_TRUE(test_ent2_ent_ref_comp);
+		auto ent_ref = test_ent2_ent_ref_comp->ent_ref().resolve();
+		ASSERT_TRUE(ent_ref);
+		ASSERT_EQ(test_ent1, ent_ref);
+	}
+}
+
 TEST(entity_entity_component_test, entity_component_property_quaternion) {
 	test_b_system tbsys;
 	entity_manager em(nullptr);
