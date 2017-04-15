@@ -4,6 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <bstream/ibstream.hpp>
+#include <bstream/obstream.hpp>
 #include <entity/entity_manager.hpp>
 #include <entity/entity_reference.hpp>
 
@@ -15,5 +17,14 @@ entity* entity_reference::resolve() const {
 	return entity_manager_->find_entity(referenced_entity_name_);
 }
 
+bstream::obstream& operator<<(bstream::obstream& stream, const entity_reference& value) {
+	stream << value.referenced_entity_name_;
+	return stream;
+}
+/// Deserializes the entity reference's referenced name, the entity_manager is not deserialized.
+bstream::ibstream& operator>>(bstream::ibstream& stream, entity_reference& value) {
+	stream >> value.referenced_entity_name_;
+	return stream;
+}
 } // namespace entity
 } // namespace mce

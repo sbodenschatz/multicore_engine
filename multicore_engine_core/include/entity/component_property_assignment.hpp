@@ -12,8 +12,8 @@
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <entity/parser/entity_text_file_ast_value_mapper.hpp>
 #include <exceptions.hpp>
-#include <reflection/property.hpp>
 #include <memory>
+#include <reflection/property.hpp>
 #include <string>
 
 namespace mce {
@@ -22,7 +22,8 @@ class engine;
 } // namespace core
 namespace reflection {
 
-template <typename Root_Type, template <typename> class AbstractAssignment, typename... Assignment_Param>
+template <typename Root_Type, template <typename> class AbstractAssignment,
+		  template <typename, typename> class Assignment, typename... Assignment_Param>
 class abstract_property;
 template <typename Root_Type, typename T, template <typename> class AbstractAssignment,
 		  template <typename, typename> class Assignment, typename... Assignment_Param>
@@ -32,6 +33,10 @@ class property;
 
 namespace entity {
 class entity_manager;
+
+template <typename Root_Type, typename T>
+class component_property_assignment;
+
 /// \brief Represents the abstract base class for component_property_assignment template instances to allow
 /// inserting them into a polymorphic container.
 template <typename Root_Type>
@@ -62,7 +67,8 @@ public:
 					   const std::string& component_context, entity_manager& entity_manager) = 0;
 	/// Returns the property to which this assignment assigns a value.
 	virtual const mce::reflection::abstract_property<
-			Root_Type, mce::entity::abstract_component_property_assignment, core::engine&>&
+			Root_Type, mce::entity::abstract_component_property_assignment,
+			mce::entity::component_property_assignment, core::engine&>&
 	abstract_property() noexcept = 0;
 	/// Returns a unique_ptr-managed copy of this assignment object.
 	virtual std::unique_ptr<abstract_component_property_assignment<Root_Type>> make_copy() const = 0;
@@ -98,8 +104,14 @@ class component_property_assignment : public abstract_component_property_assignm
 		template <typename U, typename V = T,
 				  void (*convert)(const U&, V&, entity_manager&) = ast::ast_value_mapper<U, V>::convert>
 		void operator()(const U& ast_value) {
-			convert(ast_value, pa.value_, entity_manager_);
-			pa.valid_ = true;
+			try {
+				ast::ast_value_mapper<U, V>::convert(ast_value, pa.value_, entity_manager_);
+				pa.valid_ = true;
+			} catch(value_type_exception& ex) {
+				using namespace std::literals;
+				throw value_type_exception("Error '"s + ex.what() + "' for "s + pa.property_.name() +
+										   " of "s + component_context + " in "s + entity_context + ".");
+			}
 		}
 	};
 
@@ -133,7 +145,8 @@ public:
 	}
 	/// Returns the property to which this assignment assigns a value.
 	virtual const mce::reflection::abstract_property<
-			Root_Type, mce::entity::abstract_component_property_assignment, core::engine&>&
+			Root_Type, mce::entity::abstract_component_property_assignment,
+			mce::entity::component_property_assignment, core::engine&>&
 	abstract_property() noexcept override {
 		return property_;
 	}

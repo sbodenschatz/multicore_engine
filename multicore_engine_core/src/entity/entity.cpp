@@ -54,9 +54,9 @@ void entity::add_component(component_pool_ptr&& comp) {
 void entity::store_to_bstream(bstream::obstream& ostr) const {
 	ostr << position_;
 	ostr << orientation_;
-	ostr << components_.size();
+	ostr << uint32_t(components_.size());
 	for(const auto& comp : components_) {
-		ostr << uint32_t(comp.first);
+		ostr << comp.first;
 	}
 	for(const auto& comp : components_) {
 		comp.second->store_to_bstream(ostr);
@@ -93,6 +93,9 @@ void entity::load_from_bstream(bstream::ibstream& istr, const entity_manager& en
 		if(!comp_type)
 			throw invalid_component_type_exception("Unknown component_type id " + std::to_string(id) + ".");
 		components_.insert(id, comp_type->create_component(*this, comp_type->empty_configuration(), engine));
+	}
+	for (auto& comp : components_) {
+		comp.second->load_from_bstream(istr);
 	}
 }
 

@@ -7,15 +7,15 @@
 #ifndef ENTITY_COMPONENT_TYPE_HPP_
 #define ENTITY_COMPONENT_TYPE_HPP_
 
+#include <algorithm>
 #include <core/engine.hpp>
 #include <entity/component.hpp>
 #include <entity/component_configuration.hpp>
 #include <entity/component_property_assignment.hpp>
 #include <entity/component_type_id_manager.hpp>
 #include <entity/ecs_types.hpp>
-#include <reflection/property.hpp>
-#include <algorithm>
 #include <memory>
+#include <reflection/property.hpp>
 #include <string>
 #include <vector>
 
@@ -33,7 +33,8 @@ class abstract_component_type {
 public:
 	/// Specifies the type of the list of properties.
 	typedef std::vector<std::unique_ptr<reflection::abstract_property<
-			component, abstract_component_property_assignment, core::engine&>>> property_list;
+			component, abstract_component_property_assignment, component_property_assignment, core::engine&>>>
+			property_list;
 
 private:
 	component_type_id_t id_;

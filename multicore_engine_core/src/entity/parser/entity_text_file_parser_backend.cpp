@@ -128,13 +128,14 @@ entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::int_list& node) {
 	if(node.empty()) return entity_orientation_t();
 	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
-	return glm::angleAxis(float(node[0]), glm::vec3(float(node[1]), float(node[2]), float(node[3])));
+	return glm::angleAxis(glm::radians(float(node[0])),
+						  glm::vec3(float(node[1]), float(node[2]), float(node[3])));
 }
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::float_list& node) {
 	if(node.empty()) return entity_orientation_t();
 	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
-	return glm::angleAxis(float(node[0]), glm::vec3(node[1], node[2], node[3]));
+	return glm::angleAxis(glm::radians(float(node[0])), glm::vec3(node[1], node[2], node[3]));
 }
 entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
 operator()(const ast::rotation_list& node) {
@@ -147,7 +148,7 @@ operator()(const ast::rotation_list& node) {
 		case ast::rotation_axis::z: axis.z = 1.0f; break;
 		default: throw std::logic_error("Invalid rotation axis in AST."); break;
 		}
-		orientation = orientation * glm::angleAxis(entry.angle, axis);
+		orientation = orientation * glm::angleAxis(glm::radians(entry.angle), axis);
 	}
 	return orientation;
 }

@@ -10,6 +10,10 @@
 #include <string>
 
 namespace mce {
+namespace bstream {
+class ibstream;
+class obstream;
+} // namespace bstream
 namespace entity {
 class entity_manager;
 class entity;
@@ -42,7 +46,15 @@ public:
 	const std::string& referenced_entity_name() const {
 		return referenced_entity_name_;
 	}
+
+	friend bstream::obstream& operator<<(bstream::obstream& stream, const entity_reference& value);
+	friend bstream::ibstream& operator>>(bstream::ibstream& stream, entity_reference& value);
 };
+
+/// Serializes the entity_reference by saving the referenced name.
+bstream::obstream& operator<<(bstream::obstream& stream, const entity_reference& value);
+/// Deserializes the entity reference's referenced name, the entity_manager is not deserialized.
+bstream::ibstream& operator>>(bstream::ibstream& stream, entity_reference& value);
 
 } // namespace entity
 } // namespace mce
