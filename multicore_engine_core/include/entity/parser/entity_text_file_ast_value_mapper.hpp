@@ -7,16 +7,16 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
 
+#include <cstdint>
 #include <entity/entity_reference.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
 #include <exceptions.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <limits>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <cstdint>
-#include <limits>
 
 namespace mce {
 namespace entity {
@@ -33,9 +33,9 @@ struct ast_value_mapper {
 
 template <typename T>
 T checked_numeric_conversion(long long val) {
-	if(intmax_t(val) < intmax_t(std::numeric_limits<T>::lowest())) {
+	if(val < std::numeric_limits<T>::lowest()) {
 		throw value_type_exception("Numeric underflow.");
-	} else if(intmax_t(std::numeric_limits<T>::max()) < intmax_t(val)) {
+	} else if(std::numeric_limits<T>::max() < val) {
 		throw value_type_exception("Numeric overflow.");
 	} else {
 		return T(val);
