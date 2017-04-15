@@ -40,7 +40,7 @@ struct ast_value_mapper<long long, T, std::enable_if_t<std::is_arithmetic<T>::va
 
 /// Maps floating point numbers from the AST (represented by float) to any floating point time.
 template <typename T>
-struct ast_value_mapper<float, T, std::enable_if_t<std::is_floating_point<T>::value>> {
+struct ast_value_mapper<float_node, T, std::enable_if_t<std::is_floating_point<T>::value>> {
 	/// Converts ast_val to T and stores it in val.
 	static void convert(const ast::float_node& ast_val, T& val, entity_manager&) {
 		val = T(ast_val);
