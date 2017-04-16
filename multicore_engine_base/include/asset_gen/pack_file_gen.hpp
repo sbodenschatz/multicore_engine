@@ -7,8 +7,13 @@
 #ifndef ASSET_GEN_PACK_FILE_GEN_HPP_
 #define ASSET_GEN_PACK_FILE_GEN_HPP_
 
-#include <asset/pack_file_meta_data.hpp>
+/**
+ * \file
+ * Declares the pack_file_gen class containing the main functionality for pack file baking.
+ */
+
 #include <algorithm>
+#include <asset/pack_file_meta_data.hpp>
 #include <cstdint>
 #include <iostream>
 #include <string>

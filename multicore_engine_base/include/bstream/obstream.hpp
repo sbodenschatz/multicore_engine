@@ -7,9 +7,14 @@
 #ifndef BSTREAM_OBSTREAM_HPP_
 #define BSTREAM_OBSTREAM_HPP_
 
-#include <glm/glm.hpp>
+/**
+ * \file
+ * Defines the writing interface for binary streams.
+ */
+
 #include <cstddef>
 #include <cstdint>
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
 
@@ -104,7 +109,7 @@ public:
 	obstream& operator<<(const std::string& value);
 	/// Allows writing fixed size arrays of other supported types to the stream.
 	template <typename T, size_t N>
-	obstream& operator<<(const T(&value)[N]) {
+	obstream& operator<<(const T (&value)[N]) {
 		for(size_t i = 0; i < N && *this; ++i) {
 			*this << value[i];
 		}

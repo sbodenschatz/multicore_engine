@@ -7,8 +7,13 @@
 #ifndef BSTREAM_ASSET_IBSTREAM_HPP_
 #define BSTREAM_ASSET_IBSTREAM_HPP_
 
-#include <bstream/ibstream.hpp>
+/**
+ * \file
+ * Defines the binary stream interface for assets.
+ */
+
 #include <algorithm>
+#include <bstream/ibstream.hpp>
 #include <cstdint>
 #include <memory>
 

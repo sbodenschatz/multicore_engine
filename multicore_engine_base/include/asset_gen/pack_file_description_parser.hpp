@@ -7,6 +7,11 @@
 #ifndef ASSET_GEN_PACK_FILE_DESCRIPTION_PARSER_HPP_
 #define ASSET_GEN_PACK_FILE_DESCRIPTION_PARSER_HPP_
 
+/**
+ * \file
+ * Defines the parser class for pack file descriptions.
+ */
+
 #include <asset_gen/pack_file_description_ast.hpp>
 #include <memory>
 #include <string>

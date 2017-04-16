@@ -7,14 +7,19 @@
 #ifndef UTIL_COMPRESSION_HPP_
 #define UTIL_COMPRESSION_HPP_
 
+/**
+ * \file
+ * Provides compression and decompression functions used by tools and the engine.
+ */
+
 #include <cerrno>
-#include <exceptions.hpp>
-#include <zconf.h>
-#include <zlib.h>
 #include <cstddef>
+#include <exceptions.hpp>
 #include <limits>
 #include <string>
 #include <vector>
+#include <zconf.h>
+#include <zlib.h>
 
 namespace mce {
 namespace util {

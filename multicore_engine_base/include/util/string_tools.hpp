@@ -7,6 +7,11 @@
 #ifndef UTIL_STRING_TOOLS_HPP_
 #define UTIL_STRING_TOOLS_HPP_
 
+/**
+ * \file
+ * Provides various string helper functions.
+ */
+
 #include <boost/utility/string_view.hpp>
 
 namespace mce {

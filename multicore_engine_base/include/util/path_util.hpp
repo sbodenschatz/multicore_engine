@@ -7,6 +7,11 @@
 #ifndef UTIL_PATH_UTIL_HPP_
 #define UTIL_PATH_UTIL_HPP_
 
+/**
+ * \file
+ * Defines helper functions to work with paths.
+ */
+
 #include <string>
 
 namespace mce {

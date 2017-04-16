@@ -7,6 +7,11 @@
 #ifndef BSTREAM_ISTREAM_BSTREAM_HPP_
 #define BSTREAM_ISTREAM_BSTREAM_HPP_
 
+/**
+ * \file
+ * Defines the binary stream to istream adapter.
+ */
+
 #include <bstream/ibstream.hpp>
 #include <cstdint>
 #include <istream>

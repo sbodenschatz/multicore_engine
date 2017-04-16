@@ -7,6 +7,11 @@
 #ifndef ASSET_GEN_BASE_AST_HPP_
 #define ASSET_GEN_BASE_AST_HPP_
 
+/**
+ * \file
+ * Specifies common types for various abstract syntax tree (AST) nodes in asset generators.
+ */
+
 #include <ostream>
 
 namespace mce {

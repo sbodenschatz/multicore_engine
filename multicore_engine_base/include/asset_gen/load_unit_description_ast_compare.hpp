@@ -7,6 +7,11 @@
 #ifndef ASSET_GEN_LOAD_UNIT_DESCRIPTION_AST_COMPARE_HPP_
 #define ASSET_GEN_LOAD_UNIT_DESCRIPTION_AST_COMPARE_HPP_
 
+/**
+ * \file
+ * Enables comparison for AST nodes for load units.
+ */
+
 #include <asset_gen/base_ast.hpp>
 #include <asset_gen/load_unit_description_ast.hpp>
 #include <string>

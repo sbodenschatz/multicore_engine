@@ -7,6 +7,11 @@
 #ifndef BSTREAM_DEBUG_PRINT_OBSTREAM_HPP_
 #define BSTREAM_DEBUG_PRINT_OBSTREAM_HPP_
 
+/**
+ * \file
+ * Defines a binary stream debugging implementation.
+ */
+
 #include <bstream/obstream.hpp>
 #include <cstdint>
 #include <ostream>
