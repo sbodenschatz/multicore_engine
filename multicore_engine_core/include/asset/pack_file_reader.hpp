@@ -7,18 +7,23 @@
 #ifndef ASSET_PACK_FILE_READER_HPP_
 #define ASSET_PACK_FILE_READER_HPP_
 
+/**
+ * \file
+ * Defines a file_reader that reads from pack files.
+ */
+
 #include <asset/asset_defs.hpp>
 #include <asset/file_reader.hpp>
 #include <asset/pack_file_meta_data.hpp>
+#include <atomic>
 #include <boost/container/flat_map.hpp>
 #include <bstream/istream_bstream.hpp>
 #include <exceptions.hpp>
-#include <util/lock_ptr_wrapper.hpp>
-#include <atomic>
 #include <fstream>
 #include <memory>
 #include <shared_mutex>
 #include <string>
+#include <util/lock_ptr_wrapper.hpp>
 #include <utility>
 #include <vector>
 

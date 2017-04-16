@@ -7,6 +7,11 @@
 #ifndef ENTITY_ENTITY_REFERENCE_HPP_
 #define ENTITY_ENTITY_REFERENCE_HPP_
 
+/**
+ * \file
+ * Defines a class representing a reference to a named entity.
+ */
+
 #include <string>
 
 namespace mce {

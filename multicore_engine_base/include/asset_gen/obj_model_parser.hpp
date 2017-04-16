@@ -7,16 +7,21 @@
 #ifndef ASSET_GEN_OBJ_MODEL_PARSER_HPP_
 #define ASSET_GEN_OBJ_MODEL_PARSER_HPP_
 
+/**
+ * \file
+ * Declares a parser class for wavefront OBJ model files.
+ */
+
+#include <array>
 #include <asset_gen/static_model.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/utility/string_view_fwd.hpp>
-#include <glm/glm.hpp>
-#include <model/model_format.hpp>
-#include <array>
 #include <cstddef>
+#include <glm/glm.hpp>
 #include <istream>
+#include <model/model_format.hpp>
 #include <string>
 #include <tuple>
 #include <vector>

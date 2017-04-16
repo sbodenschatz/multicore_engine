@@ -7,12 +7,17 @@
 #ifndef UTIL_FINALLY_HPP_
 #define UTIL_FINALLY_HPP_
 
+/**
+ * \file
+ * Provides scope-exit-guarding functionality.
+ */
+
 #include <utility>
 
 namespace mce {
 namespace util {
 
-/// Implements the scope-exit-guard logic for #mce::util::finally.
+/// Implements the scope-exit-guard logic for mce::util::finally.
 template <typename F>
 class finally_t {
 	F f;

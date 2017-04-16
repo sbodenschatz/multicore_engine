@@ -7,6 +7,11 @@
 #ifndef UTIL_FUNCTIONAL_HPP_
 #define UTIL_FUNCTIONAL_HPP_
 
+/**
+ * \file
+ * Provides various generic functional constructs.
+ */
+
 #include <type_traits>
 #include <utility>
 
@@ -22,8 +27,7 @@ class chain_functor {
 public:
 	/// Constructs the functor from two forwarded functor objects to be chained together.
 	template <typename T1, typename T2>
-	chain_functor(T1&& t1, T2&& t2)
-			: f1(std::forward<T1>(t1)), f2(std::forward<T2>(t2)) {}
+	chain_functor(T1&& t1, T2&& t2) : f1(std::forward<T1>(t1)), f2(std::forward<T2>(t2)) {}
 	/// Calls the first functor with forwarded args and then calls the second functor with the result.
 	template <typename... Args>
 	auto operator()(Args&&... args) {

@@ -7,6 +7,11 @@
 #ifndef UTIL_SPIN_LOCK_HPP_
 #define UTIL_SPIN_LOCK_HPP_
 
+/**
+ * \file
+ * Defines a spin lock class.
+ */
+
 #include <atomic>
 
 namespace mce {

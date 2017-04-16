@@ -7,6 +7,11 @@
 #ifndef ENTITY_COMPONENT_TYPE_HPP_
 #define ENTITY_COMPONENT_TYPE_HPP_
 
+/**
+ * \file
+ * Defines the component_type class.
+ */
+
 #include <algorithm>
 #include <core/engine.hpp>
 #include <entity/component.hpp>

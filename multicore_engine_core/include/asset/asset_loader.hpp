@@ -7,6 +7,11 @@
 #ifndef ASSET_ASSET_LOADER_HPP_
 #define ASSET_ASSET_LOADER_HPP_
 
+/**
+ * \file
+ * Defines the interface for asset loaders.
+ */
+
 #include <asset/asset_defs.hpp>
 #include <boost/asio/io_service.hpp>
 #include <exception>

@@ -7,10 +7,15 @@
 #ifndef UTIL_LOCAL_FUNCTION_HPP_
 #define UTIL_LOCAL_FUNCTION_HPP_
 
-#include <cstdint>
-#include <memory/align.hpp>
+/**
+ * \file
+ * Defines a generic function wrapper class with type erasure without heap allocations.
+ */
+
 #include <cassert>
+#include <cstdint>
 #include <functional>
+#include <memory/align.hpp>
 #include <memory>
 #include <new>
 #include <type_traits>
@@ -76,7 +81,8 @@ public:
 template <size_t Max_Size, typename R, typename... Args>
 class local_function<Max_Size, R(Args...)> {
 	typedef std::unique_ptr<detail::local_function::abstract_function_object<R, Args...>,
-							detail::local_function::deleter<R, Args...>> abstract_func_obj_ptr;
+							detail::local_function::deleter<R, Args...>>
+			abstract_func_obj_ptr;
 	template <typename F>
 	class function_object : public detail::local_function::abstract_function_object<R, Args...> {
 		F f;
@@ -100,8 +106,7 @@ class local_function<Max_Size, R(Args...)> {
 	public:
 		template <typename T>
 		// cppcheck-suppress noExplicitConstructor
-		function_object(T&& f)
-				: f(std::forward<T>(f)) {}
+		function_object(T&& f) : f(std::forward<T>(f)) {}
 		virtual ~function_object() = default;
 		virtual R operator()(Args... args) const override {
 			return const_call_helper<F>::call(f, std::forward<Args>(args)...);

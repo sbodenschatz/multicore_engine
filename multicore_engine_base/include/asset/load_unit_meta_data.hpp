@@ -7,6 +7,11 @@
 #ifndef ASSET_LOAD_UNIT_META_DATA_HPP_
 #define ASSET_LOAD_UNIT_META_DATA_HPP_
 
+/**
+ * \file
+ * Defines the serializable structure of the meta data of a load unit.
+ */
+
 #include <cstdint>
 #include <string>
 #include <vector>

@@ -7,15 +7,20 @@
 #ifndef UTIL_COPY_ON_WRITE_HPP_
 #define UTIL_COPY_ON_WRITE_HPP_
 
-#include <util/monitor.hpp>
+/**
+ * \file
+ * Defines a generic class implementing the copy on write pattern.
+ */
+
 #include <memory>
+#include <util/monitor.hpp>
 
 namespace mce {
 namespace util {
 
 /// Provides a generic implementation of copy-on-write semantics based transactions.
 /**
- * This class template uses #mce::util::monitor and std::shared_ptr to provide thread-save transactions using
+ * This class template uses mce::util::monitor and std::shared_ptr to provide thread-save transactions using
  * copy-on-write on an object of type T. It is especially suitable for cases with infrequent writes but
  * many readers, that potentially work with the data for a long time. Cases with high writing frequencies are
  * costly because each write transaction requires a heap allocation and at least one copy of the managed

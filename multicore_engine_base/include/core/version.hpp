@@ -7,6 +7,11 @@
 #ifndef CORE_VERSION_HPP_
 #define CORE_VERSION_HPP_
 
+/**
+ * \file
+ * Provides automatic version information for the engine and tools.
+ */
+
 #include <string>
 
 namespace mce {

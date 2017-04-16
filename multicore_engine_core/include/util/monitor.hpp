@@ -7,6 +7,11 @@
 #ifndef UTIL_MONITOR_HPP_
 #define UTIL_MONITOR_HPP_
 
+/**
+ * \file
+ * Defines a generic monitor class providing thread-safe access to a (not necessarily POD) typed object.
+ */
+
 #include <mutex>
 #include <type_traits>
 #include <util/spin_lock.hpp>

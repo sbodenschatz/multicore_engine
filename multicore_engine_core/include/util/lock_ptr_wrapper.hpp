@@ -7,6 +7,11 @@
 #ifndef UTIL_LOCK_PTR_WRAPPER_HPP_
 #define UTIL_LOCK_PTR_WRAPPER_HPP_
 
+/**
+ * \file
+ * Defines a generic class coupling smart-pointer-based ownership with locking.
+ */
+
 #include <memory>
 #include <mutex>
 

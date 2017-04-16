@@ -7,6 +7,11 @@
 #ifndef ASSET_PACK_FILE_META_DATA_HPP_
 #define ASSET_PACK_FILE_META_DATA_HPP_
 
+/**
+ * \file
+ * Defines the serializable structure of the meta data of a pack file.
+ */
+
 #include <cstdint>
 #include <string>
 #include <vector>

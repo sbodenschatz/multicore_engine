@@ -7,6 +7,11 @@
 #ifndef UTIL_PROGRAM_NAME_HPP_
 #define UTIL_PROGRAM_NAME_HPP_
 
+/**
+ * \file
+ * Defines helper functions to obtain the program name for tools.
+ */
+
 #include <string>
 
 namespace mce {

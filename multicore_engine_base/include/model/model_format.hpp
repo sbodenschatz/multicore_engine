@@ -7,14 +7,19 @@
 #ifndef MODEL_MODEL_FORMAT_HPP_
 #define MODEL_MODEL_FORMAT_HPP_
 
+/**
+ * \file
+ * Defines the meta data format for the engine specific model format.
+ */
+
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
+#include <cstdint>
 #include <exceptions.hpp>
 #include <glm/glm.hpp>
+#include <string>
 #include <util/composite_magic_number.hpp>
 #include <util/offset_range.hpp>
-#include <cstdint>
-#include <string>
 #include <vector>
 
 namespace mce {

@@ -7,6 +7,11 @@
 #ifndef ASSET_FILE_READER_HPP_
 #define ASSET_FILE_READER_HPP_
 
+/**
+ * \file
+ * Defines the interface for file readers used by asset loaders.
+ */
+
 #include <asset/asset_defs.hpp>
 #include <string>
 #include <utility>

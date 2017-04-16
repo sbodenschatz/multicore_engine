@@ -7,11 +7,16 @@
 #ifndef CONTAINERS_SMART_OBJECT_POOL_RANGE_HPP_
 #define CONTAINERS_SMART_OBJECT_POOL_RANGE_HPP_
 
+/**
+ * \file
+ * Provides a TBB-compatible (splittable) range type working on smart_object_pool.
+ */
+
+#include <cassert>
 #include <containers/smart_object_pool.hpp>
 #include <cstdint>
 #include <exceptions.hpp>
 #include <tbb/tbb_stddef.h>
-#include <cassert>
 
 namespace mce {
 namespace containers {

@@ -7,6 +7,11 @@
 #ifndef UTIL_OFFSET_RANGE_HPP_
 #define UTIL_OFFSET_RANGE_HPP_
 
+/**
+ * \file
+ * Defines a generic range of offsets used in file formats.
+ */
+
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
 #include <exceptions.hpp>

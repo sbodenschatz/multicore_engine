@@ -7,6 +7,11 @@
 #ifndef CONTAINERS_SCRATCH_PAD_POOL_HPP_
 #define CONTAINERS_SCRATCH_PAD_POOL_HPP_
 
+/**
+ * \file
+ * Defines a generic pool to handle temporary resources.
+ */
+
 #include <mutex>
 #include <stack>
 #include <type_traits>

@@ -7,6 +7,11 @@
 #ifndef ASSET_NATIVE_FILE_READER_HPP_
 #define ASSET_NATIVE_FILE_READER_HPP_
 
+/**
+ * \file
+ * Defines a file_reader that works directly from raw files.
+ */
+
 #include <asset/asset_defs.hpp>
 #include <asset/file_reader.hpp>
 #include <string>

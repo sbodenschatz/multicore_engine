@@ -7,10 +7,15 @@
 #ifndef ASSET_ASSET_DEFS_HPP_
 #define ASSET_ASSET_DEFS_HPP_
 
+/**
+ * \file
+ * Provides type definitions for the asset system.
+ */
+
 #include <cstdint>
-#include <util/local_function.hpp>
 #include <exception>
 #include <memory>
+#include <util/local_function.hpp>
 
 namespace mce {
 namespace asset {

@@ -7,6 +7,11 @@
 #ifndef ASSET_GEN_STATIC_MODEL_EXPORTER_HPP_
 #define ASSET_GEN_STATIC_MODEL_EXPORTER_HPP_
 
+/**
+ * \file
+ * Defines a class implementing an exporter for an engine specific static model format.
+ */
+
 #include <string>
 
 namespace mce {

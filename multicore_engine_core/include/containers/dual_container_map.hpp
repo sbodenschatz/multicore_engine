@@ -7,9 +7,14 @@
 #ifndef CONTAINERS_DUAL_CONTAINER_MAP_HPP_
 #define CONTAINERS_DUAL_CONTAINER_MAP_HPP_
 
-#include <cstdint>
+/**
+ * \file
+ * Defines generic map types using two containers with matching indices.
+ */
+
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <functional>
 #include <iterator>
 #include <stdexcept>
@@ -103,8 +108,7 @@ public:
 		T value; ///< The stored temporary value.
 		/// Constracts a member_access_wrapper with the given arguments forwarded to T's constructor.
 		template <typename... Args>
-		explicit member_access_wrapper(Args&&... args)
-				: value{std::forward<Args>(args)...} {}
+		explicit member_access_wrapper(Args&&... args) : value{std::forward<Args>(args)...} {}
 		/// Accesses the members of value.
 		T* operator->() noexcept {
 			return &value;
@@ -178,7 +182,7 @@ public:
 		}
 
 		/// Advances the iterator to the next element and returns the old iterator.
-		iterator_ operator++(int) noexcept {
+		iterator_ operator++(int)noexcept {
 			auto it = *this;
 			this->operator++();
 			return it;
@@ -190,7 +194,7 @@ public:
 			return *this;
 		}
 		/// Advances the iterator to the previous element and returns the old iterator.
-		iterator_ operator--(int) noexcept {
+		iterator_ operator--(int)noexcept {
 			auto it = *this;
 			this->operator--();
 			return it;
@@ -621,14 +625,16 @@ class dual_container_map : public dual_container_map_base<dual_container_map<Con
 														  Container, Key, Value, Compare> {
 
 	typedef dual_container_map_base<dual_container_map<Container, Key, Value, Compare>, Container, Key, Value,
-									Compare> Base;
+									Compare>
+			Base;
 
 public:
 	/// \brief Constructs a dual_container_map by forwarding the given parameters to both constructors of
 	/// the underlying container types and default-constructing the Compare object.
 	template <typename... Args>
-	explicit dual_container_map(Args&&... args) noexcept(std::is_nothrow_default_constructible<
-			Compare>::value&& std::is_nothrow_constructible<Base, Compare, Args...>::value)
+	explicit dual_container_map(Args&&... args) noexcept(
+			std::is_nothrow_default_constructible<Compare>::value&&
+					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: dual_container_map(Compare(), std::forward<Args>(args)...) {}
 	/// \brief Constructs a dual_container_map by forwarding the given parameters to both constructors of
 	/// the underlying container types and copying the Compare object.
@@ -860,14 +866,16 @@ class dual_container_multimap
 										 Key, Value, Compare> {
 
 	typedef dual_container_map_base<dual_container_multimap<Container, Key, Value, Compare>, Container, Key,
-									Value, Compare> Base;
+									Value, Compare>
+			Base;
 
 public:
 	/// \brief Constructs a dual_container_multimap by forwarding the given parameters to both constructors of
 	/// the underlying container types and default-constructing the Compare object.
 	template <typename... Args>
-	explicit dual_container_multimap(Args&&... args) noexcept(std::is_nothrow_default_constructible<
-			Compare>::value&& std::is_nothrow_constructible<Base, Compare, Args...>::value)
+	explicit dual_container_multimap(Args&&... args) noexcept(
+			std::is_nothrow_default_constructible<Compare>::value&&
+					std::is_nothrow_constructible<Base, Compare, Args...>::value)
 			: dual_container_multimap(Compare(), std::forward<Args>(args)...) {}
 	/// \brief Constructs a dual_container_multimap by forwarding the given parameters to both constructors of
 	/// the underlying container types and copying the Compare object.

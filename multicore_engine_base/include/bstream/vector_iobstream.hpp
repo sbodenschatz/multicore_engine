@@ -7,6 +7,11 @@
 #ifndef BSTREAM_VECTOR_IOBSTREAM_HPP_
 #define BSTREAM_VECTOR_IOBSTREAM_HPP_
 
+/**
+ * \file
+ * Defines a binary stream working on top of a vector in memory.
+ */
+
 #include <bstream/ibstream.hpp>
 #include <bstream/iobstream.hpp>
 #include <bstream/obstream.hpp>

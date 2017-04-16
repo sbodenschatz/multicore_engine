@@ -7,8 +7,13 @@
 #ifndef MODEL_MODEL_DEFS_HPP_
 #define MODEL_MODEL_DEFS_HPP_
 
-#include <util/local_function.hpp>
+/**
+ * \file
+ * Provides typedefs for the model loading system.
+ */
+
 #include <memory>
+#include <util/local_function.hpp>
 
 namespace mce {
 namespace model {

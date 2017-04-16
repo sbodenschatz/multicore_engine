@@ -7,8 +7,13 @@
 #ifndef CONTAINERS_SMART_POOL_PTR_HPP_
 #define CONTAINERS_SMART_POOL_PTR_HPP_
 
-#include <cstdint>
+/**
+ * \file
+ * Defines the smart pointers used for smart_object_pool.
+ */
+
 #include <cassert>
+#include <cstdint>
 #include <memory>
 #include <type_traits>
 #include <utility>
