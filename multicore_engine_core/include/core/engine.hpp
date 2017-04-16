@@ -7,6 +7,11 @@
 #ifndef CORE_ENGINE_HPP_
 #define CORE_ENGINE_HPP_
 
+/**
+ * \file
+ * Defines the central management class for the engine.
+ */
+
 #include <cassert>
 #include <memory>
 

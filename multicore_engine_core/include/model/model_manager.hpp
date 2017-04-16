@@ -7,11 +7,16 @@
 #ifndef MODEL_MODEL_MANAGER_HPP_
 #define MODEL_MODEL_MANAGER_HPP_
 
+/**
+ * \file
+ * Provides the functionality to load models into the engine.
+ */
+
 #include <boost/container/flat_map.hpp>
+#include <memory>
 #include <model/collision_model.hpp>
 #include <model/model_defs.hpp>
 #include <model/polygon_model.hpp>
-#include <memory>
 #include <shared_mutex>
 #include <string>
 

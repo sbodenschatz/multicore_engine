@@ -7,6 +7,11 @@
 #ifndef ENTITY_COMPONENT_TYPE_ID_MANAGER_HPP_
 #define ENTITY_COMPONENT_TYPE_ID_MANAGER_HPP_
 
+/**
+ * \file
+ * Provides type identification for component types.
+ */
+
 #include <atomic>
 #include <entity/ecs_types.hpp>
 

@@ -7,6 +7,11 @@
 #ifndef REFLECTION_PROPERTY_HPP_
 #define REFLECTION_PROPERTY_HPP_
 
+/**
+ * \file
+ * Defines the representation of reflected properties of objects.
+ */
+
 #include <algorithm>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>

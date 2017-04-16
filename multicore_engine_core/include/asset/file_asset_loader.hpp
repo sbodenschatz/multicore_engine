@@ -7,6 +7,11 @@
 #ifndef ASSET_FILE_ASSET_LOADER_HPP_
 #define ASSET_FILE_ASSET_LOADER_HPP_
 
+/**
+ * \file
+ * Defines an asset_loader that works a per file basis.
+ */
+
 #include <asset/asset_defs.hpp>
 #include <asset/asset_loader.hpp>
 #include <memory>

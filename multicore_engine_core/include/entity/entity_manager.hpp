@@ -9,7 +9,7 @@
 
 /**
  * \file
- * Definition of the entity_manager class.
+ * Defines the entity_manager class, the central class of the entity component system.
  */
 
 #include <asset/asset_defs.hpp>

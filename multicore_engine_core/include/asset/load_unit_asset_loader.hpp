@@ -7,6 +7,11 @@
 #ifndef ASSET_LOAD_UNIT_ASSET_LOADER_HPP_
 #define ASSET_LOAD_UNIT_ASSET_LOADER_HPP_
 
+/**
+ * \file
+ * Defines an asset_loader that works using load units.
+ */
+
 #include <asset/asset_defs.hpp>
 #include <asset/asset_loader.hpp>
 #include <containers/scratch_pad_pool.hpp>

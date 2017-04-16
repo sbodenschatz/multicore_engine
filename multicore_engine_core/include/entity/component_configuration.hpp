@@ -7,6 +7,11 @@
 #ifndef ENTITY_COMPONENT_CONFIGURATION_HPP_
 #define ENTITY_COMPONENT_CONFIGURATION_HPP_
 
+/**
+ * \file
+ * Defines the component_configuration class.
+ */
+
 #include <entity/component.hpp>
 #include <entity/component_property_assignment.hpp>
 #include <entity/ecs_types.hpp>

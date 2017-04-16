@@ -7,6 +7,11 @@
 #ifndef ENTITY_COMPONENT_PROPERTY_ASSIGNMENT_HPP_
 #define ENTITY_COMPONENT_PROPERTY_ASSIGNMENT_HPP_
 
+/**
+ * \file
+ * Defines the classes used for property assignments on components.
+ */
+
 #include <boost/variant/static_visitor.hpp>
 #include <core/engine.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>

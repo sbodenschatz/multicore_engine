@@ -7,6 +7,11 @@
 #ifndef UTIL_TYPE_ID_HPP_
 #define UTIL_TYPE_ID_HPP_
 
+/**
+ * \file
+ * Provides generic type identification.
+ */
+
 #include <atomic>
 
 namespace mce {

@@ -7,16 +7,21 @@
 #ifndef ASSET_ASSET_HPP_
 #define ASSET_ASSET_HPP_
 
+/**
+ * \file
+ * Defines the class representing assets in the engine.
+ */
+
 #include <asset/asset_defs.hpp>
-#include <cstdint>
-#include <exceptions.hpp>
-#include <util/local_function.hpp>
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
 #include <exception>
+#include <exceptions.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <util/local_function.hpp>
 #include <vector>
 
 namespace mce {
