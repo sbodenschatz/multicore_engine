@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/core/game_state.cpp
+ * File /multicore_engine_core/src/core/game_state.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
