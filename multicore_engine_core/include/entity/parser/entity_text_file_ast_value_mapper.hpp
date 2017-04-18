@@ -36,6 +36,7 @@ struct ast_value_mapper {
 	typedef void error;
 };
 
+/// Converts the given long long value to T while checking for numeric overflow and underflow.
 template <typename T>
 T checked_numeric_conversion(long long val) {
 	if(val < std::numeric_limits<T>::lowest()) {

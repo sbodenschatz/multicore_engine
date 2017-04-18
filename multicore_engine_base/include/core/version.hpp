@@ -13,6 +13,7 @@
  */
 
 #include <string>
+#include <ostream>
 
 namespace mce {
 namespace core {
@@ -23,6 +24,23 @@ std::string get_build_version_string();
 std::string get_build_version();
 /// Returns the branch from which this binary was built.
 std::string get_build_branch();
+
+/// Represents a version number of the engine.
+struct version {
+	int major;
+	int minor;
+	int patch;
+	int offset;
+	std::string commit;
+};
+
+/// Allows printing of version number structs.
+inline std::ostream& operator<<(std::ostream& str, const version& v) {
+	return str << v.major << "." << v.minor << "." << v.patch << "-" << v.offset << "-g" << v.commit;
+}
+
+/// Returns the version number of the code from which this binary was built.
+version get_build_version_number();
 
 } // namespace core
 } // namespace mce
