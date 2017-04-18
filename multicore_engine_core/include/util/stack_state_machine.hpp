@@ -48,8 +48,9 @@ struct stack_state_machine_default_policy {
 	void leave_state_pop(const ptr_t& state) {
 		state->leave_pop();
 	}
-	void reenter_state(const ptr_t& state) {
-		state->reenter();
+	template <typename... Args>
+	void reenter_state(const ptr_t& state, Args&&... args) {
+		state->reenter(std::forward<Args>(args)...);
 	}
 };
 
@@ -106,7 +107,7 @@ public:
 	template <typename State, typename... Args>
 	void enter_state(Args&&... args) {
 		if(current_state_) policy.leave_state_push(current_state_);
-		state_stack_.push_back(policy.enter_state<State>(*this, current_state_, std::forward<Args>(args)...));
+		state_stack_.push_back(policy.template enter_state<State>(*this, current_state_, std::forward<Args>(args)...));
 		current_state_ = policy.get_ptr(state_stack_.back());
 	}
 
@@ -116,7 +117,7 @@ public:
 		policy.leave_state_pop(current_state_);
 		state_stack_.pop_back();
 		auto state = policy.get_ptr(state_stack_.back());
-		policy.reenter_state(state);
+		policy.reenter_state(state,std::forward<Args>(args)...);
 		current_state_ = state;
 		return true;
 	}

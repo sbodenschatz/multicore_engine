@@ -25,7 +25,8 @@ struct custom_policy {
 	template <typename... Args>
 	void leave_state_push(const ptr_t&) {}
 	void leave_state_pop(const ptr_t&) {}
-	void reenter_state(const ptr_t&) {}
+        template <typename... Args>
+	void reenter_state(const ptr_t&,Args&&...) {}
 };
 
 struct test_context {
