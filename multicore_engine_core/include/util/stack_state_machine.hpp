@@ -179,10 +179,10 @@ public:
 #ifdef DOXYGEN
 	/// \brief Constructs a stack_state_machine with the given context (Doesn't exist if Context_Type
 	/// is void or a reference).
-	stack_state_machine(const Context_Type& context);
+	explicit stack_state_machine(const Context_Type& context);
 	/// \brief Constructs a stack_state_machine with the given context (Only exists if Context_Type is a
 	/// reference).
-	stack_state_machine(Context_Type context);
+	explicit stack_state_machine(Context_Type context);
 	/// \brief Constructs a stack_state_machine without context (Only exists if Context_Type is void).
 	stack_state_machine();
 
