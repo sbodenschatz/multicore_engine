@@ -7,11 +7,30 @@
 #ifndef UTIL_STACK_STATE_MACHINE_HPP_
 #define UTIL_STACK_STATE_MACHINE_HPP_
 
+#include <memory>
+#include <type_traits>
+#include <vector>
+
 namespace mce {
 namespace util {
 
+template <typename Base_State, typename Context_Type, typename State_Machine>
+struct stack_state_machine_default_policy;
+
 template <typename Base_State, typename Context_Type>
-struct default_stack_state_machine_policy {
+struct stack_state_machine_default_policy_binder {
+	template <typename State_Machine>
+	using policy = stack_state_machine_default_policy<Base_State, Context_Type, State_Machine>;
+};
+
+template <typename Base_State, typename Context_Type,
+		  template <typename...> class Stack_Container = std::vector,
+		  template <typename> class State_Policy =
+				  stack_state_machine_default_policy_binder<Base_State, Context_Type>::template policy>
+class stack_state_machine;
+
+template <typename Base_State, typename Context_Type, typename State_Machine>
+struct stack_state_machine_default_policy {
 	using owning_ptr_t = std::unique_ptr<Base_State>;
 	using ptr_t = Base_State*;
 	static constexpr ptr_t ptr_t_initial = nullptr;
@@ -19,11 +38,9 @@ struct default_stack_state_machine_policy {
 		return owning_ptr.get();
 	}
 	template <typename T, typename... Args>
-	owning_ptr_t enter_state(stack_state_machine<Base_State>& state_machine, Context_Type context,
+	owning_ptr_t enter_state(State_Machine& state_machine, std::add_lvalue_reference_t<Context_Type> context,
 							 const ptr_t& parent_state, Args&&... args) {
-		auto state = std::make_unique<T>(state_machine, context, parent_state);
-		state->enter(std::forward<Args>(args)...);
-		return state;
+		return std::make_unique<T>(state_machine, context, parent_state, std::forward<Args>(args)...);
 	}
 	template <typename... Args>
 	void leave_state_push(const ptr_t& state) {
@@ -37,27 +54,23 @@ struct default_stack_state_machine_policy {
 	}
 };
 
-template <typename Base_State, typename Context_Type,
-		  typename State_Policy = default_stack_state_machine_policy<Base_State, Context_Type>,
-		  typename Stack_Container = std::vector<typename State_Policy::owning_ptr_t>>
+template <typename Base_State, typename Context_Type, template <typename...> class Stack_Container,
+		  template <typename> class State_Policy>
 class stack_state_machine {
-	Stack_Container state_stack_;
-	typename State_Policy::ptr_t current_state_ = State_Policy::ptr_t_initial;
+	using state_policy = State_Policy<stack_state_machine>;
+	state_policy policy;
+	Stack_Container<typename state_policy::owning_ptr_t> state_stack_;
+	typename state_policy::ptr_t current_state_ = state_policy::ptr_t_initial;
 	Context_Type context_;
-	State_Policy policy;
 
 public:
-	template <typename Initial_State, typename... Enter_Args>
-	stack_state_machine(Context_Type context, Enter_Args&&... enter_args)
-			: context_(context) {
-		enter_state<Initial_State>(std::forward<Enter_Args>(enter_args)...);
-	}
+	stack_state_machine(Context_Type context) : context_(context) {}
 
 	template <typename State, typename... Args>
 	void enter_state(Args&&... args) {
 		if(current_state_) policy.leave_state_push(current_state_);
 		state_stack_.push_back(
-				policy.enter_state(*this, context_, current_state_, std::forward<Args>(args)...));
+				policy.enter_state<State>(*this, context_, current_state_, std::forward<Args>(args)...));
 		current_state_ = policy.get_ptr(state_stack_.back());
 	}
 
@@ -69,14 +82,15 @@ public:
 		auto state = policy.get_ptr(state_stack_.back());
 		policy.reenter_state(state);
 		current_state_ = state;
+		return true;
 	}
 
-	Context_Type context() {
+	std::add_lvalue_reference_t<Context_Type> context() {
 		return context_;
 	}
 
-	Base_State& current_state() {
-		return *current_state_;
+	typename state_policy::ptr_t current_state() {
+		return current_state_;
 	}
 };
 
