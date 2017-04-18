@@ -62,7 +62,7 @@ class stack_state_machine_context_wrapper {
 
 public:
 	typedef Context_Type context_type;
-	stack_state_machine_context_wrapper(const Context_Type& context) : context_(context) {}
+	explicit stack_state_machine_context_wrapper(const Context_Type& context) : context_(context) {}
 	const Context_Type& context() const {
 		return context_;
 	}
@@ -78,7 +78,7 @@ class stack_state_machine_context_wrapper<Context_Type,
 
 public:
 	typedef Context_Type context_type;
-	stack_state_machine_context_wrapper(const Context_Type& context) : context_(context) {}
+	explicit stack_state_machine_context_wrapper(const Context_Type& context) : context_(context) {}
 	Context_Type context() const {
 		return context_;
 	}
