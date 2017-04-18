@@ -14,7 +14,7 @@ template <typename Base_State, typename State_Machine>
 struct custom_policy {
 	using owning_ptr_t = std::unique_ptr<Base_State>;
 	using ptr_t = Base_State*;
-	static constexpr ptr_t ptr_t_initial = nullptr;
+	static constexpr ptr_t ptr_t_empty = nullptr;
 	ptr_t get_ptr(const owning_ptr_t& owning_ptr) {
 		return owning_ptr.get();
 	}
@@ -25,8 +25,8 @@ struct custom_policy {
 	template <typename... Args>
 	void leave_state_push(const ptr_t&) {}
 	void leave_state_pop(const ptr_t&) {}
-        template <typename... Args>
-	void reenter_state(const ptr_t&,Args&&...) {}
+	template <typename... Args>
+	void reenter_state(const ptr_t&, Args&&...) {}
 };
 
 struct test_context {
