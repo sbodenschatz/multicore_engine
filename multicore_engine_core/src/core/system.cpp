@@ -7,5 +7,10 @@
 #include <core/system.hpp>
 
 namespace mce {
-namespace core {} /* namespace core */
+namespace core {
+void system::preprocess(const mce::core::frame_time&) {}
+void system::postprocess(const mce::core::frame_time&) {}
+void system::prerender(const mce::core::frame_time&) {}
+void system::postrender(const mce::core::frame_time&) {}
+} /* namespace core */
 } /* namespace mce */

@@ -5,22 +5,22 @@
  */
 
 #include <core/game_state_machine.hpp>
-#include <util/unused.hpp>
+#include <core/game_state.hpp>
 
 namespace mce {
 namespace core {
 
-game_state_machine::game_state_machine(mce::core::engine* engine) : engine{engine} {}
+game_state_machine::game_state_machine(mce::core::engine* engine) : engine{engine}, state_machine(engine) {}
 
 game_state_machine::~game_state_machine() {}
 
 void game_state_machine::process(const mce::core::frame_time& frame_time) {
-	// TODO: Implement
-	UNUSED(frame_time);
+	auto s = state_machine.current_state();
+	if(s) s->process(frame_time);
 }
 void game_state_machine::render(const mce::core::frame_time& frame_time) {
-	// TODO: Implement
-	UNUSED(frame_time);
+	auto s = state_machine.current_state();
+	if(s) s->render(frame_time);
 }
 
 } /* namespace core */

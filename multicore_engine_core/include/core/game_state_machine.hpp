@@ -7,13 +7,17 @@
 #ifndef CORE_GAME_STATE_MACHINE_HPP_
 #define CORE_GAME_STATE_MACHINE_HPP_
 
+#include <util/stack_state_machine.hpp>
+
 namespace mce {
 namespace core {
 class engine;
 struct frame_time;
+class game_state;
 
 class game_state_machine {
 	mce::core::engine* engine;
+	util::stack_state_machine<game_state, mce::core::engine*> state_machine;
 
 public:
 	explicit game_state_machine(mce::core::engine* engine);

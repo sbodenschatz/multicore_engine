@@ -7,5 +7,8 @@
 #include <core/system_state.hpp>
 
 namespace mce {
-namespace core {} /* namespace core */
+namespace core {
+void system_state::process(const mce::core::frame_time&) {}
+void system_state::render(const mce::core::frame_time&) {}
+} /* namespace core */
 } /* namespace mce */
