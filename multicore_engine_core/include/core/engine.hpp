@@ -12,6 +12,7 @@
  * Defines the central management class for the engine.
  */
 
+#include <atomic>
 #include <cassert>
 #include <memory>
 #include <vector>
@@ -20,34 +21,28 @@ namespace mce {
 namespace asset {
 class asset_manager;
 } // namespace asset
-namespace entity {
-class entity_manager;
-} // namespace entity
 
 namespace core {
 class system;
 class game_state_machine;
+struct frame_time;
 
 /// Represents the central management class for the subsystems of the engine.
 class engine {
-	std::unique_ptr<entity::entity_manager> entity_manager_;
+	std::atomic<bool> running_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
 	std::vector<std::unique_ptr<mce::core::system>> systems_;
+	std::unique_ptr<mce::core::game_state_machine> game_state_machine_;
 
 public:
 	/// Constructs the engine.
 	engine();
+	~engine();
 
-	/// Allows access to the entity_manager.
-	const entity::entity_manager& entity_manager() const {
-		assert(entity_manager_);
-		return *entity_manager_;
-	}
-	/// Allows access to the entity_manager.
-	entity::entity_manager& entity_manager() {
-		assert(entity_manager_);
-		return *entity_manager_;
-	}
+	void run();
+	void process(const mce::core::frame_time& frame_time);
+	void render(const mce::core::frame_time& frame_time);
+
 	/// Allows access to the asset_manager.
 	const asset::asset_manager& asset_manager() const {
 		assert(asset_manager_);
@@ -57,6 +52,28 @@ public:
 	asset::asset_manager& asset_manager() {
 		assert(asset_manager_);
 		return *asset_manager_;
+	}
+
+	/// Allows access to the game_state_machine.
+	const mce::core::game_state_machine& game_state_machine() const {
+		assert(game_state_machine_);
+		return *game_state_machine_;
+	}
+	/// Allows access to the game_state_machine.
+	mce::core::game_state_machine& game_state_machine() {
+		assert(game_state_machine_);
+		return *game_state_machine_;
+	}
+
+	/// \brief Returns a bool indicating if the engine is flagged as running (false if the engine is marked to
+	/// stop and tear down at the next opportunity).
+	bool running() const {
+		return running_;
+	}
+
+	/// Marks the engine to stop at the next opportunity (usually the next frame).
+	void stop() {
+		running_ = false;
 	}
 };
 

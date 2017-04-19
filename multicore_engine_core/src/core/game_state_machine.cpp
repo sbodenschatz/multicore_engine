@@ -5,14 +5,22 @@
  */
 
 #include <core/game_state_machine.hpp>
+#include <util/unused.hpp>
 
 namespace mce {
 namespace core {
 
 game_state_machine::game_state_machine(mce::core::engine* engine) : engine{engine} {}
 
-game_state_machine::~game_state_machine() {
-	// TODO Auto-generated destructor stub
+game_state_machine::~game_state_machine() {}
+
+void game_state_machine::process(const mce::core::frame_time& frame_time) {
+	// TODO: Implement
+	UNUSED(frame_time);
+}
+void game_state_machine::render(const mce::core::frame_time& frame_time) {
+	// TODO: Implement
+	UNUSED(frame_time);
 }
 
 } /* namespace core */
