@@ -9,11 +9,18 @@
 
 namespace mce {
 namespace core {
+class engine;
+struct frame_time;
 
 class game_state_machine {
+	mce::core::engine* engine;
+
 public:
-	game_state_machine();
+	game_state_machine(mce::core::engine* engine);
 	~game_state_machine();
+
+	void process(const mce::core::frame_time& frame_time);
+	void render(const mce::core::frame_time& frame_time);
 };
 
 } /* namespace core */

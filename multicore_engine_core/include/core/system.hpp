@@ -9,11 +9,16 @@
 
 namespace mce {
 namespace core {
+struct frame_time;
 
 class system {
 public:
 	system();
 	virtual ~system();
+	virtual void preprocess(const mce::core::frame_time& frame_time);
+	virtual void postprocess(const mce::core::frame_time& frame_time);
+	virtual void prerender(const mce::core::frame_time& frame_time);
+	virtual void postrender(const mce::core::frame_time& frame_time);
 };
 
 } /* namespace core */

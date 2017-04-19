@@ -7,6 +7,7 @@
 #include <asset/asset_manager.hpp>
 #include <core/engine.hpp>
 #include <entity/entity_manager.hpp>
+#include <core/system.hpp>
 
 namespace mce {
 namespace core {

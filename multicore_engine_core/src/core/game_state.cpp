@@ -5,6 +5,7 @@
  */
 
 #include <core/game_state.hpp>
+#include <core/system_state.hpp>
 
 namespace mce {
 namespace core {

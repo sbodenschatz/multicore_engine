@@ -9,9 +9,7 @@
 namespace mce {
 namespace core {
 
-game_state_machine::game_state_machine() {
-	// TODO Auto-generated constructor stub
-}
+game_state_machine::game_state_machine(mce::core::engine* engine) : engine{engine} {}
 
 game_state_machine::~game_state_machine() {
 	// TODO Auto-generated destructor stub

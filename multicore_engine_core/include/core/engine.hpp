@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <memory>
+#include <vector>
 
 namespace mce {
 namespace asset {
@@ -24,11 +25,14 @@ class entity_manager;
 } // namespace entity
 
 namespace core {
+class system;
+class game_state_machine;
 
 /// Represents the central management class for the subsystems of the engine.
 class engine {
 	std::unique_ptr<entity::entity_manager> entity_manager_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
+	std::vector<std::unique_ptr<system>> systems_;
 
 public:
 	/// Constructs the engine.
