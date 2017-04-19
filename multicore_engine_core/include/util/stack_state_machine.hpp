@@ -71,6 +71,8 @@ struct stack_state_machine_default_policy {
 	void reenter_state(const ptr_t& state, Args&&... args) {
 		state->reenter(std::forward<Args>(args)...);
 	}
+	/// Defines if all remaining states on the stack should be popped on destruction of the state machine.
+	static constexpr bool pop_states_on_destruction = true;
 };
 
 namespace detail {
@@ -142,6 +144,18 @@ class stack_state_machine : public detail::stack_state_machine_context_wrapper<C
 
 public:
 	using detail::stack_state_machine_context_wrapper<Context_Type>::stack_state_machine_context_wrapper;
+
+	/// \brief Destroys the stack_state_machine by popping all remaining states from the stack if requested by
+	/// the policy and then releasing resources.
+	~stack_state_machine() {
+		if(state_policy::pop_states_on_destruction) {
+			while(current_state() != state_policy::ptr_t_empty) {
+				policy.leave_state_pop(current_state());
+				state_stack_.pop_back();
+			}
+		}
+	}
+
 	/// \brief Instructs the stack_state_machine to enter the new state defined by type State with the given
 	/// arguments.
 	template <typename State, typename... Args>

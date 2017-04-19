@@ -27,6 +27,7 @@ struct custom_policy {
 	void leave_state_pop(const ptr_t&) {}
 	template <typename... Args>
 	void reenter_state(const ptr_t&, Args&&...) {}
+	static constexpr bool pop_states_on_destruction = true;
 };
 
 struct test_context {
