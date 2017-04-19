@@ -7,15 +7,5 @@
 #include <core/system.hpp>
 
 namespace mce {
-namespace core {
-
-system::system() {
-	// TODO Auto-generated constructor stub
-}
-
-system::~system() {
-	// TODO Auto-generated destructor stub
-}
-
-} /* namespace core */
+namespace core {} /* namespace core */
 } /* namespace mce */

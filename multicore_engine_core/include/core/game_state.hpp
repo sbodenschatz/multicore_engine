@@ -20,7 +20,7 @@ protected:
 	std::vector<std::unique_ptr<system_state>> system_states_;
 
 public:
-	game_state();
+	game_state() = default;
 	virtual ~game_state();
 	virtual void preprocess(const mce::core::frame_time& frame_time);
 	virtual void postprocess(const mce::core::frame_time& frame_time);

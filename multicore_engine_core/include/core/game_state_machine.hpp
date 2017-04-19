@@ -16,7 +16,7 @@ class game_state_machine {
 	mce::core::engine* engine;
 
 public:
-	game_state_machine(mce::core::engine* engine);
+	explicit game_state_machine(mce::core::engine* engine);
 	~game_state_machine();
 
 	void process(const mce::core::frame_time& frame_time);

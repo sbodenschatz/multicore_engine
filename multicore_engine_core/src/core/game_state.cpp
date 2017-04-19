@@ -10,10 +10,6 @@
 namespace mce {
 namespace core {
 
-game_state::game_state() {
-	// TODO Auto-generated constructor stub
-}
-
 game_state::~game_state() {
 	// TODO Auto-generated destructor stub
 }

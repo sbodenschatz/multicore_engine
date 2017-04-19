@@ -13,8 +13,8 @@ struct frame_time;
 
 class system {
 public:
-	system();
-	virtual ~system();
+	system() = default;
+	virtual ~system() = default;
 	virtual void preprocess(const mce::core::frame_time& frame_time);
 	virtual void postprocess(const mce::core::frame_time& frame_time);
 	virtual void prerender(const mce::core::frame_time& frame_time);

@@ -32,7 +32,7 @@ class game_state_machine;
 class engine {
 	std::unique_ptr<entity::entity_manager> entity_manager_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
-	std::vector<std::unique_ptr<system>> systems_;
+	std::vector<std::unique_ptr<mce::core::system>> systems_;
 
 public:
 	/// Constructs the engine.

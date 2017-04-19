@@ -17,8 +17,8 @@ protected:
 	mce::core::system* system_;
 
 public:
-	system_state();
-	virtual ~system_state();
+	explicit system_state(mce::core::system* system) : system_{system} {}
+	virtual ~system_state() = default;
 	virtual void process(const mce::core::frame_time& frame_time);
 	virtual void render(const mce::core::frame_time& frame_time);
 };

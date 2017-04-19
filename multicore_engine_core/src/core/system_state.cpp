@@ -7,15 +7,5 @@
 #include <core/system_state.hpp>
 
 namespace mce {
-namespace core {
-
-system_state::system_state() {
-	// TODO Auto-generated constructor stub
-}
-
-system_state::~system_state() {
-	// TODO Auto-generated destructor stub
-}
-
-} /* namespace core */
+namespace core {} /* namespace core */
 } /* namespace mce */
