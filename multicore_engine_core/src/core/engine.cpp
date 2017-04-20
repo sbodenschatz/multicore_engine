@@ -54,9 +54,9 @@ void engine::render(const mce::core::frame_time& frame_time) {
 
 void engine::refresh_system_ordering() {
 	std::stable_sort(systems_pre_phase_ordered.begin(), systems_pre_phase_ordered.end(),
-					 [](auto& a, auto& b) { return a.first < b.first; });
+					 [](const auto& a, const auto& b) { return a.first < b.first; });
 	std::stable_sort(systems_post_phase_ordered.begin(), systems_post_phase_ordered.end(),
-					 [](auto& a, auto& b) { return a.first < b.first; });
+					 [](const auto& a, const auto& b) { return a.first < b.first; });
 }
 
 } // namespace core
