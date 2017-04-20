@@ -42,7 +42,7 @@ private:
 };
 
 template <typename ID_Namespace>
-std::atomic<type_id_t> type_id<ID_Namespace>::next_id{1};
+std::atomic<type_id_t> type_id<ID_Namespace>::next_id = {1};
 
 } // namespace util
 } // namespace mce
