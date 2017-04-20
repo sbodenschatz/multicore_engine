@@ -35,7 +35,7 @@ void game_state::postrender(const mce::core::frame_time&) {}
 
 void game_state::leave_pop() {}
 void game_state::leave_push() {}
-void game_state::reenter() {}
+void game_state::reenter(const boost::any&) {}
 
 } /* namespace core */
 } /* namespace mce */

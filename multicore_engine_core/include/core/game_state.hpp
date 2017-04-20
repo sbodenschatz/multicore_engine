@@ -11,6 +11,7 @@
 #include <util/type_id.hpp>
 #include <utility>
 #include <vector>
+#include <boost/any.hpp>
 
 namespace mce {
 namespace core {
@@ -93,7 +94,11 @@ public:
 	virtual void leave_push();
 	/// \brief Provides a hook for subclasses when the game_state is reentered because the game_state on top
 	/// of it was popped.
-	virtual void reenter();
+	/**
+	 * Arbitrary parameter data can be passed using an any object. What parameter types are expected /
+	 * accepted depends on the subclass.
+	 */
+	virtual void reenter(const boost::any& parameter);
 };
 
 } /* namespace core */
