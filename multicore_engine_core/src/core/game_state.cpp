@@ -15,7 +15,7 @@ game_state::~game_state() {}
 void game_state::process(const mce::core::frame_time& frame_time) {
 	preprocess(frame_time);
 	for(auto& sys_state : system_states_) {
-		sys_state->process(frame_time);
+		sys_state.second->process(frame_time);
 	}
 	postprocess(frame_time);
 }
@@ -23,7 +23,7 @@ void game_state::process(const mce::core::frame_time& frame_time) {
 void game_state::render(const mce::core::frame_time& frame_time) {
 	prerender(frame_time);
 	for(auto& sys_state : system_states_) {
-		sys_state->render(frame_time);
+		sys_state.second->render(frame_time);
 	}
 	postrender(frame_time);
 }
