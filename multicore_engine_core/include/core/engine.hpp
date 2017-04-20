@@ -35,27 +35,51 @@ class engine {
 	std::unique_ptr<asset::asset_manager> asset_manager_;
 	std::unique_ptr<mce::core::game_state_machine> game_state_machine_;
 	std::vector<std::pair<util::type_id_t, std::unique_ptr<mce::core::system>>> systems_;
+	std::vector<std::pair<int, mce::core::system*>> systems_pre_phase_ordered;
+	std::vector<std::pair<int, mce::core::system*>> systems_post_phase_ordered;
+
+	void refresh_system_ordering();
 
 public:
 	/// Constructs the engine.
 	engine();
+	/// Destroys the engine.
 	~engine();
 
+	/// Enters the core processing loop of the engine and returns only after the engine is stopped.
 	void run();
+	/// Runs the processing phase of a frame where logic and simulation is handled.
 	void process(const mce::core::frame_time& frame_time);
+	/// Runs the rendering phase of a frame where the graphics output is generated.
 	void render(const mce::core::frame_time& frame_time);
 
+	/// Adds the system implemented by the class supplied in T to the engine.
 	/**
-	 * May only be called when no other threads are using the systems collection.
-	 * Usually this is called in initialization code only.
+	 * An object of T is constructed using the given constructor arguments.
+	 * This member function may only be called when no other threads are using the systems collection.
+	 * Usually it is called in initialization code only.
+	 * Usually only one object of a given type should be added because a second one could not be looked-up
+	 * through get_system.
+	 *
+	 * For the phases of a frame (process and render) the member functions system::preprocess or
+	 * system::prerender are called before calling the game_state::process or game_state::render of the
+	 * current game_state. The systems are called sorted by pre_phase_ordering.
+	 * After the the game_state::process or game_state::render of the current game_state the member functions
+	 * system::postprocess or system::postrender are called sorted by post_phase_ordering.
 	 */
 	template <typename T, typename... Args>
-	T* add_system(Args&&... args) {
+	T* add_system(int pre_phase_ordering, int post_phase_ordering, Args&&... args) {
 		systems_.emplace_back(util::type_id<system>::id<T>(),
 							  std::make_unique<T>(std::forward<Args>(args)...));
-		return systems_.back().second.get();
+		auto sys = systems_.back().second.get();
+		systems_pre_phase_ordered.emplace_back(pre_phase_ordering, sys);
+		systems_post_phase_ordered.emplace_back(post_phase_ordering, sys);
+		refresh_system_ordering();
+		return sys;
 	}
 
+	/// \brief Looks up a system object of the given type and returns a pointer to it or nullptr if no such
+	/// system exists.
 	template <typename T>
 	T* get_system() const {
 		auto tid = util::type_id<system>::id<T>();
@@ -96,6 +120,11 @@ public:
 	/// Marks the engine to stop at the next opportunity (usually the next frame).
 	void stop() {
 		running_ = false;
+	}
+
+	/// Marks the engine as running.
+	void set_running() {
+		running_ = true;
 	}
 };
 
