@@ -12,14 +12,20 @@ namespace core {
 class system;
 struct frame_time;
 
+/// Provides the base class for system_states holding game state specific data and functionality for a system.
 class system_state {
 protected:
+	/// References the system for which data is held.
 	mce::core::system* system_;
 
 public:
+	/// Constructs a system_state for the given system.
 	explicit system_state(mce::core::system* system) : system_{system} {}
+	/// Enables polymorphic destruction for system_state subclasses.
 	virtual ~system_state() = default;
+	/// Hook function called for the processing phase of a frame.
 	virtual void process(const mce::core::frame_time& frame_time);
+	/// Hook function called for the rendering phase of a frame.
 	virtual void render(const mce::core::frame_time& frame_time);
 };
 
