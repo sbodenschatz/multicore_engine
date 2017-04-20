@@ -10,8 +10,9 @@
 namespace mce {
 namespace core {
 
+/// Represents timing information for a frame.
 struct frame_time {
-	float delta_t;
+	float delta_t; ///< The time step (duration of a frame).
 };
 
 } // namespace core
