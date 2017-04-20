@@ -21,8 +21,8 @@ namespace entity {
 /// Provides a way to assign unique ids to component types.
 /**
  * The ids generated are dependent on the order in which the id member function is first called for a given
- * type. This class is used rather than mce::util::type_id for component types to provide an isolated id
- * 'namespace' for them, so they can be made consistent by deterministic registration.
+ * type. This class is used rather than mce::util::type_id for component types to allow easier change to a
+ * system that generates stable ids across runs, builds and host later on.
  */
 class component_type_id_manager {
 	static std::atomic<component_type_id_t> next_id;
