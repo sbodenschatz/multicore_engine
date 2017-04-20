@@ -6,11 +6,11 @@
 
 #include <asset/asset_manager.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <chrono>
 #include <core/core_defs.hpp>
 #include <core/engine.hpp>
 #include <core/game_state_machine.hpp>
 #include <core/system.hpp>
-#include <chrono>
 
 namespace mce {
 namespace core {
@@ -34,20 +34,20 @@ void engine::run() {
 }
 void engine::process(const mce::core::frame_time& frame_time) {
 	for(auto& sys : systems_) {
-		sys->preprocess(frame_time);
+		sys.second->preprocess(frame_time);
 	}
 	game_state_machine_->process(frame_time);
 	for(auto& sys : boost::adaptors::reverse(systems_)) {
-		sys->postprocess(frame_time);
+		sys.second->postprocess(frame_time);
 	}
 }
 void engine::render(const mce::core::frame_time& frame_time) {
 	for(auto& sys : systems_) {
-		sys->prerender(frame_time);
+		sys.second->prerender(frame_time);
 	}
 	game_state_machine_->render(frame_time);
 	for(auto& sys : boost::adaptors::reverse(systems_)) {
-		sys->postrender(frame_time);
+		sys.second->postrender(frame_time);
 	}
 }
 

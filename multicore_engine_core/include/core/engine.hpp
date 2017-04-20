@@ -15,6 +15,8 @@
 #include <atomic>
 #include <cassert>
 #include <memory>
+#include <util/type_id.hpp>
+#include <utility>
 #include <vector>
 
 namespace mce {
@@ -31,8 +33,8 @@ struct frame_time;
 class engine {
 	std::atomic<bool> running_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
-	std::vector<std::unique_ptr<mce::core::system>> systems_;
 	std::unique_ptr<mce::core::game_state_machine> game_state_machine_;
+	std::vector<std::pair<util::type_id_t, std::unique_ptr<mce::core::system>>> systems_;
 
 public:
 	/// Constructs the engine.
@@ -42,6 +44,26 @@ public:
 	void run();
 	void process(const mce::core::frame_time& frame_time);
 	void render(const mce::core::frame_time& frame_time);
+
+	/**
+	 * May only be called when no other threads are using the systems collection.
+	 * Usually this is called in initialization code only.
+	 */
+	template <typename T, typename... Args>
+	T* add_system(Args&&... args) {
+		systems_.emplace_back(util::type_id<system>::id<T>(),
+							  std::make_unique<T>(std::forward<Args>(args)...));
+		return systems_.back().second.get();
+	}
+
+	template <typename T>
+	T* get_system() const {
+		auto tid = util::type_id<system>::id<T>();
+		for(auto& sys : systems_) {
+			if(sys.first == tid) return sys.second.get();
+		}
+		return nullptr;
+	}
 
 	/// Allows access to the asset_manager.
 	const asset::asset_manager& asset_manager() const {
