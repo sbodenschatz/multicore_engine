@@ -27,11 +27,11 @@ std::string get_build_branch();
 
 /// Represents a version number of the engine.
 struct version {
-	int major;
-	int minor;
-	int patch;
-	int offset;
-	std::string commit;
+	int major;			///< The major version number (X in VX.Y.Z).
+	int minor;			///< The minor version number (Y in VX.Y.Z).
+	int patch;			///< The patch version number (Z in VX.Y.Z).
+	int offset;			///< The number of commits after the tagged version.
+	std::string commit; ///< The id of the commit.
 };
 
 /// Allows printing of version number structs.
