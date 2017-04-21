@@ -7,14 +7,16 @@
 #ifndef CORE_GAME_STATE_HPP_
 #define CORE_GAME_STATE_HPP_
 
+#include <boost/any.hpp>
 #include <memory>
 #include <util/type_id.hpp>
 #include <utility>
 #include <vector>
-#include <boost/any.hpp>
 
 namespace mce {
 namespace core {
+class engine;
+class game_state_machine;
 class system_state;
 struct frame_time;
 
@@ -25,6 +27,9 @@ struct frame_time;
  */
 class game_state {
 	std::vector<std::pair<util::type_id_t, std::unique_ptr<system_state>>> system_states_;
+	mce::core::engine* engine_;
+	mce::core::game_state_machine* state_machine_;
+	mce::core::game_state* parent_state_;
 
 protected:
 	/// Adds the system_state implemented by the class supplied in T to the game_state.
@@ -45,8 +50,9 @@ protected:
 	}
 
 public:
-	/// Constructs the game_state.
-	game_state() = default;
+	/// Constructs the game_state with the given engine, state machine and parent state.
+	game_state(mce::core::engine* engine, mce::core::game_state_machine* state_machine,
+			   mce::core::game_state* parent_state);
 	/// Enables polymorphic destruction for game_state.
 	virtual ~game_state();
 
@@ -92,6 +98,7 @@ public:
 	virtual void leave_pop();
 	/// Provides a hook for subclasses when the game_state is left because it was popped.
 	virtual void leave_push();
+
 	/// \brief Provides a hook for subclasses when the game_state is reentered because the game_state on top
 	/// of it was popped.
 	/**
@@ -99,6 +106,21 @@ public:
 	 * accepted depends on the subclass.
 	 */
 	virtual void reenter(const boost::any& parameter);
+
+	/// Allows access to the engine object associated with this state object.
+	mce::core::engine* engine() const {
+		return engine_;
+	}
+
+	/// Allows access to the parent state object.
+	mce::core::game_state* parent_state() const {
+		return parent_state_;
+	}
+
+	/// Allows access to the state machine in which this state object is used.
+	mce::core::game_state_machine* state_machine() const {
+		return state_machine_;
+	}
 };
 
 } /* namespace core */

@@ -10,6 +10,10 @@
 namespace mce {
 namespace core {
 
+game_state::game_state(mce::core::engine* engine, mce::core::game_state_machine* state_machine,
+					   mce::core::game_state* parent_state)
+		: engine_{engine}, state_machine_{state_machine}, parent_state_{parent_state} {}
+
 game_state::~game_state() {}
 
 void game_state::process(const mce::core::frame_time& frame_time) {
