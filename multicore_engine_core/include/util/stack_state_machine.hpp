@@ -72,6 +72,7 @@ struct stack_state_machine_default_policy {
 		state->reenter(std::forward<Args>(args)...);
 	}
 	/// Defines if all remaining states on the stack should be popped on destruction of the state machine.
+	// cppcheck-suppress duplInheritedMember
 	static constexpr bool pop_states_on_destruction = true;
 };
 
