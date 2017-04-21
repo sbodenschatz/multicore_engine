@@ -27,6 +27,11 @@ public:
 	virtual void process(const mce::core::frame_time& frame_time);
 	/// Hook function called for the rendering phase of a frame.
 	virtual void render(const mce::core::frame_time& frame_time);
+
+	/// Allows access to the system to which this system state belongs.
+	mce::core::system* system() const {
+		return system_;
+	}
 };
 
 } /* namespace core */
