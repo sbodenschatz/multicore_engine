@@ -29,7 +29,6 @@ struct game_state_machine_policy
 		return std::make_unique<T>(state_machine.context().engine, state_machine.context().game_state_machine,
 								   parent_state, std::forward<Args>(args)...);
 	}
-	/// Defines if all remaining states on the stack should be popped on destruction of the state machine.
 	static constexpr bool pop_states_on_destruction = true;
 };
 
