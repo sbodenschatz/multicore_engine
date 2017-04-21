@@ -4,13 +4,14 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <core/game_state_machine.hpp>
 #include <core/game_state.hpp>
+#include <core/game_state_machine.hpp>
 
 namespace mce {
 namespace core {
 
-game_state_machine::game_state_machine(mce::core::engine* engine) : engine{engine}, state_machine(engine) {}
+game_state_machine::game_state_machine(mce::core::engine* engine)
+		: engine{engine}, state_machine({engine, this}) {}
 
 game_state_machine::~game_state_machine() {}
 
