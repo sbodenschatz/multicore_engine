@@ -4,13 +4,13 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <asset/asset_manager.hpp>
+#include <chrono>
 #include <core/core_defs.hpp>
 #include <core/engine.hpp>
 #include <core/game_state_machine.hpp>
 #include <core/system.hpp>
-#include <algorithm>
-#include <chrono>
 
 namespace mce {
 namespace core {
@@ -19,7 +19,9 @@ engine::engine() : running_{false}, asset_manager_{std::make_unique<asset::asset
 	game_state_machine_ = std::make_unique<mce::core::game_state_machine>(this);
 }
 
-engine::~engine() {}
+engine::~engine() {
+	game_state_machine_.reset(); // Ensure that the game_state_machine is cleaned up first.
+}
 
 void engine::run() {
 	auto old_t = std::chrono::high_resolution_clock::now();

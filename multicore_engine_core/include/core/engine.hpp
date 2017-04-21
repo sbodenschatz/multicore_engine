@@ -33,10 +33,10 @@ struct frame_time;
 class engine {
 	std::atomic<bool> running_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
-	std::unique_ptr<mce::core::game_state_machine> game_state_machine_;
 	std::vector<std::pair<util::type_id_t, std::unique_ptr<mce::core::system>>> systems_;
 	std::vector<std::pair<int, mce::core::system*>> systems_pre_phase_ordered;
 	std::vector<std::pair<int, mce::core::system*>> systems_post_phase_ordered;
+	std::unique_ptr<mce::core::game_state_machine> game_state_machine_;
 
 	void refresh_system_ordering();
 
