@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.7)
 project(multicore_engine_model_converter)
 file(GLOB_RECURSE MODEL_CONV_SRC "src/*.cpp")
 file(GLOB_RECURSE MODEL_CONV_HEADERS "include/*.hpp")

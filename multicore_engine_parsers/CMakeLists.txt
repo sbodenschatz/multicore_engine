@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.7)
 project(multicore_engine_parsers)
 file(GLOB_RECURSE PARSERS_SRC "src/*.cpp")
 file(GLOB_RECURSE PARSERS_HEADERS "src/*.hpp")

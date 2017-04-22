@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.7)
 project(multicore_engine_demo)
 file(GLOB_RECURSE DEMO_SRC "src/*.cpp")
 file(GLOB_RECURSE DEMO_HEADERS "include/*.hpp")
