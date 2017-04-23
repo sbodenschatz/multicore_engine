@@ -286,12 +286,11 @@ license-pack-linux:
     - mkdir -p licenses/linux
     - cd licenses/linux
     - mkdir Boost glfw gli glm TBB vulkan-hpp vulkan-sdk zlib libc++ libstdc++ libgcc llvm-runtime g++ gcc-base gtest gmock
-    - cp /usr/local/share/doc/local-boost/LICENSE_1_0.txt Boost
-    - cp /usr/local/share/doc/glfw/LICENSE.md glfw
+    - cp /usr/local/share/doc/boost/LICENSE_1_0.txt Boost
+    - cp /usr/share/doc/libglfw3/copyright glfw
     - cp /usr/share/doc/libgli-dev/copyright gli
     - cp /usr/share/doc/libglm-dev/copyright glm
     - cp /usr/share/doc/libtbb-dev/copyright TBB
-    - cp /usr/local/share/doc/Vulkan-Hpp/LICENSE.txt vulkan-hpp
     - cp /usr/local/share/doc/vulkan-sdk/LICENSE.txt vulkan-sdk
     - cp /usr/local/share/doc/vulkan-sdk/sdk_license.html vulkan-sdk
     - cp /usr/share/doc/zlib1g-dev/copyright zlib
