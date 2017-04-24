@@ -2,10 +2,6 @@ if(NOT MSVC)
 	if(NOT (CMAKE_BUILD_TYPE STREQUAL Debug) AND NOT (CMAKE_BUILD_TYPE STREQUAL Release))
 		set(CMAKE_BUILD_TYPE Release)
 	endif()
-	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
-	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DNDEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
 	string(TOLOWER ${CMAKE_BUILD_TYPE} CONFIG_LOWER)
 endif()
 
@@ -13,55 +9,36 @@ set(GIT_BINARY git CACHE FILEPATH "Git binary to use for version determination."
 set(VERSION "[unknown version]" CACHE STRING "Fallback version to use if auto-detection fails.")
 set(BRANCH "[unknown branch]" CACHE STRING "Fallback branch name to use if auto-detection fails.")
 
-MESSAGE(STATUS "Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wno-unused-private-field -fno-strict-aliasing -Wold-style-cast")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wall -Wextra -Werror -std=c++14 -Wno-unused-private-field -fno-strict-aliasing -Wold-style-cast")
-	MESSAGE(STATUS "Clang C_FLAGS: " ${CMAKE_C_FLAGS})
-	MESSAGE(STATUS "Clang CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-endif ()
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -std=c++14 -fno-strict-aliasing -Wold-style-cast")
-	MESSAGE(STATUS "GNU C_FLAGS: " ${CMAKE_C_FLAGS})
-	MESSAGE(STATUS "GNU CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-endif ()
 if (MSVC)
-	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /DDEBUG")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /DDEBUG")
-	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /DNDEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DNDEBUG")
-	set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} /DNDEBUG")
-	set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /DNDEBUG")
-	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} /DNDEBUG")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /DNDEBUG")
-
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /MP")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4221")
 	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /WX /ignore:4221")
 
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG:incremental /INCREMENTAL:NO /OPT:REF")
 	set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /LTCG:incremental")
 
-	set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /GL")
 	set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} /LTCG:incremental /INCREMENTAL:NO /OPT:REF")
 	set(CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL "${CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL} /LTCG:incremental")
 
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /GL")
 	set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LTCG:incremental /INCREMENTAL:NO /OPT:REF")
 	set(CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO} /LTCG:incremental")
-
-	add_definitions(-DGLM_FORCE_CXX11)
-	MESSAGE(STATUS "MSVC C_FLAGS: " ${CMAKE_C_FLAGS})
-	MESSAGE(STATUS "MSVC CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 endif ()
 
-add_definitions(-DGLM_FORCE_RADIANS -DGLM_FORCE_SIZE_T_LENGTH -DZLIB_CONST -DVKCPP_ENHANCED_MODE -DGLFW_INCLUDE_VULKAN)
-include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_base/include)
-include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_core/include)
-include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_parsers/include)
+add_library(multicore_engine_compiler_settings INTERFACE)
+target_compile_definitions(multicore_engine_compiler_settings INTERFACE
+		GLM_FORCE_RADIANS GLM_FORCE_SIZE_T_LENGTH ZLIB_CONST VKCPP_ENHANCED_MODE GLFW_INCLUDE_VULKAN 
+		$<$<CONFIG:Debug>:DEBUG>
+		$<$<NOT:$<CONFIG:Debug>>:NDEBUG>
+		$<$<CXX_COMPILER_ID:MSVC>:GLM_FORCE_CXX11>
+		$<$<PLATFORM_ID:Windows>:MULTICORE_ENGINE_WINDOWS _WIN32_WINNT=0x0601 WINVER=0x0601>
+		$<$<NOT:$<PLATFORM_ID:Windows>>:MULTICORE_ENGINE_NOT_WINDOWS>
+	)
+target_compile_options(multicore_engine_compiler_settings INTERFACE
+		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>: -std=c++14 -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast>
+		$<$<CXX_COMPILER_ID:Clang>: -Wno-unused-private-field>
+		$<$<CXX_COMPILER_ID:GNU>:>
+		$<$<CXX_COMPILER_ID:MSVC>: /W4 /WX /MP>
+		$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<NOT:$<CONFIG:DEBUG>>>: /GL>
+	)
 
 if (WIN32)
 	include_directories(SYSTEM C:/Libs/Boost/include)
@@ -73,10 +50,6 @@ if (WIN32)
 	include_directories(SYSTEM C:/Libs/TBB/include)
 	include_directories(SYSTEM C:/Libs/gtest/include)
 	
-	add_definitions(-DMULTICORE_ENGINE_WINDOWS) 
-	#Windos 7 and higher:
-	add_definitions(-D_WIN32_WINNT=0x0601)
-	add_definitions(-DWINVER=0x0601)
 	link_directories($ENV{VK_SDK_PATH}/Bin)
 	if(MINGW)
 		link_directories(C:/Libs/Boost/lib_x64_mingw_${CONFIG_LOWER})
@@ -94,8 +67,6 @@ if (WIN32)
 		set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
 	endif()
 elseif(UNIX)
-	add_definitions(-DMULTICORE_ENGINE_NOT_WINDOWS) 
-	add_definitions(-DBOOST_TEST_DYN_LINK)
 	include_directories(SYSTEM /usr/local/include/local-boost)
 	if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 		set(COMPILER_LOWER "gcc")

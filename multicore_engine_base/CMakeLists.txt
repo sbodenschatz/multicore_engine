@@ -5,7 +5,11 @@ file(GLOB_RECURSE BASE_SRC "src/*.cpp")
 file(GLOB_RECURSE BASE_HEADERS "include/*.hpp")
 add_library(multicore_engine_base STATIC ${BASE_SRC} ${BASE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/src/core/version.cpp src/core/version.cpp.in)
 make_src_groups()
-target_link_libraries(multicore_engine_base multicore_engine_parsers)
+target_include_directories(multicore_engine_base PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
+	)
+target_link_libraries(multicore_engine_base multicore_engine_compiler_settings multicore_engine_parsers)
 if(MSVC)
 	set_target_properties(multicore_engine_base PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
 	target_link_libraries(multicore_engine_base debug zlibstaticd)

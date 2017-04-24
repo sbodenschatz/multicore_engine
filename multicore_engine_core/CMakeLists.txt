@@ -4,8 +4,13 @@ file(GLOB_RECURSE CORE_SRC "src/*.cpp")
 file(GLOB_RECURSE CORE_HEADERS "include/*.hpp")
 add_library(multicore_engine_core STATIC ${CORE_SRC} ${CORE_HEADERS})
 make_src_groups()
-target_link_libraries(multicore_engine_core multicore_engine_parsers)
-target_link_libraries(multicore_engine_core multicore_engine_base)
+target_include_directories(multicore_engine_base PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
+	)
+target_link_libraries(multicore_engine_core 
+		multicore_engine_parsers multicore_engine_base
+	)
 if(WIN32)
 	target_link_libraries(multicore_engine_core debug tbb_debug)
 	target_link_libraries(multicore_engine_core debug tbbmalloc_debug)

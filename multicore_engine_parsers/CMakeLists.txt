@@ -3,6 +3,14 @@ project(multicore_engine_parsers)
 file(GLOB_RECURSE PARSERS_SRC "src/*.cpp")
 file(GLOB_RECURSE PARSERS_HEADERS "src/*.hpp")
 add_library(multicore_engine_parsers STATIC ${PARSERS_SRC} ${PARSERS_HEADERS})
+target_include_directories(multicore_engine_parsers PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
+		PRIVATE
+		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/multicore_engine_base/include>
+		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/multicore_engine_core/include>
+	)
+target_link_libraries(multicore_engine_parsers multicore_engine_compiler_settings)
 make_src_groups()
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 	set(CMAKE_CXX_FLAGS_DEBUG "")
