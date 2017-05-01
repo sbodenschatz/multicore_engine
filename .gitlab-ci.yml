@@ -39,7 +39,7 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+    - cmake -U* -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
     - cmake --build . -- -j ${BUILD_CONCURRENCY}
     - export LD_LIBRARY_PATH=/usr/local/lib/${BUILD_COMPILER_NAME}-${BUILD_TYPE,,}/
     - ctest --output-on-failure
@@ -60,7 +60,7 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+    - cmake -U* -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
     - cmake --build . -- -j %BUILD_CONCURRENCY%
     - ctest --output-on-failure
     - cd ..
@@ -80,7 +80,7 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -G "Visual Studio 14 2015 Win64" ..
+    - cmake -U* -G "Visual Studio 14 2015 Win64" ..
     - cmake --build . --config %BUILD_TYPE% -- /m:%BUILD_CONCURRENCY%
     - ctest -C %BUILD_TYPE% --output-on-failure
     - cd ..
@@ -212,7 +212,7 @@ scan-build:
     stage: auxiliary
     script:
     - mkdir -p build && cd build
-    - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
+    - cmake -U* -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
     - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
     tags:
     - cpp
