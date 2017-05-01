@@ -10,11 +10,16 @@ target_include_directories(multicore_engine_parsers PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/multicore_engine_base/include>
 		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/multicore_engine_core/include>
 	)
-target_link_libraries(multicore_engine_parsers multicore_engine_compiler_settings)
+target_link_libraries(multicore_engine_parsers 
+		multicore_engine_compiler_settings 
+		glm
+	)
 make_src_groups()
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 	set(CMAKE_CXX_FLAGS_DEBUG "")
 endif ()
 if(MSVC)
 	set_target_properties(multicore_engine_parsers PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
+	set_target_properties(multicore_engine_parsers PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
+	set_target_properties(multicore_engine_parsers PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/LTCG")
 endif()

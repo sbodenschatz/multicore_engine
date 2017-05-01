@@ -4,14 +4,28 @@ if(NOT MSVC)
 	endif()
 	string(TOLOWER ${CMAKE_BUILD_TYPE} CONFIG_LOWER)
 endif()
+if(WIN32)
+	if(MSVC)
+		set(COMPILER_LOWER "vc")
+	elseif(MINGW)
+		set(COMPILER_LOWER "mingw")
+	endif()
+elseif(UNIX)
+	if(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+		set(COMPILER_LOWER "gcc")
+	elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+		set(COMPILER_LOWER "clang")
+	endif()
+endif()
+
 
 set(GIT_BINARY git CACHE FILEPATH "Git binary to use for version determination.")
 set(VERSION "[unknown version]" CACHE STRING "Fallback version to use if auto-detection fails.")
 set(BRANCH "[unknown branch]" CACHE STRING "Fallback branch name to use if auto-detection fails.")
 
 if (MSVC)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4221")
-	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /WX /ignore:4221")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4221 notelemetry.obj")
+	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /WX /ignore:4221 notelemetry.obj")
 
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG:incremental /INCREMENTAL:NO /OPT:REF")
 	set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /LTCG:incremental")
@@ -25,10 +39,9 @@ endif ()
 
 add_library(multicore_engine_compiler_settings INTERFACE)
 target_compile_definitions(multicore_engine_compiler_settings INTERFACE
-		GLM_FORCE_RADIANS GLM_FORCE_SIZE_T_LENGTH ZLIB_CONST VKCPP_ENHANCED_MODE GLFW_INCLUDE_VULKAN 
+		VKCPP_ENHANCED_MODE GLFW_INCLUDE_VULKAN 
 		$<$<CONFIG:Debug>:DEBUG>
 		$<$<NOT:$<CONFIG:Debug>>:NDEBUG>
-		$<$<CXX_COMPILER_ID:MSVC>:GLM_FORCE_CXX11>
 		$<$<PLATFORM_ID:Windows>:MULTICORE_ENGINE_WINDOWS _WIN32_WINNT=0x0601 WINVER=0x0601>
 		$<$<NOT:$<PLATFORM_ID:Windows>>:MULTICORE_ENGINE_NOT_WINDOWS>
 	)
@@ -43,10 +56,62 @@ target_link_libraries(multicore_engine_compiler_settings INTERFACE
 		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++>
 	)
 
+list(APPEND PASS_TO_BOOTSTRAP 
+		LIBS_DIR
+		GLM_INCLUDE 
+		ZLIB_INCLUDE
+	)
+
+if (WIN32)
+	set(LIBS_DIR C:/Libs CACHE PATH "Custom library directory")
+	set(GLM_INCLUDE ${LIBS_DIR}/glm/include CACHE PATH "Include path for glm.")
+	set(ZLIB_INCLUDE ${LIBS_DIR}/zlib/include CACHE PATH "Include path for zlib.")
+	if(MINGW)
+		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for zlib.")		
+	elseif(MSVC)
+		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for zlib.")		
+	endif()
+elseif(UNIX)
+	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
+	set(GLM_INCLUDE /usr/include ${LIBS_DIR}/include CACHE PATH "Include path for GLM.")
+	set(ZLIB_INCLUDE /usr/include CACHE PATH "Include path for zlib.")
+	set(ZLIB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER} CACHE PATH "Library path for zlib.")		
+endif()
+
+print_list(GLM_INCLUDE ${GLM_INCLUDE})
+
+add_library(glm INTERFACE)
+target_compile_definitions(glm INTERFACE 
+		GLM_FORCE_RADIANS 
+		GLM_FORCE_SIZE_T_LENGTH
+		$<$<CXX_COMPILER_ID:MSVC>:GLM_FORCE_CXX11>
+	)
+target_include_directories(glm SYSTEM INTERFACE 
+		${GLM_INCLUDE}
+	)
+	
+add_library(zlib INTERFACE)
+target_compile_definitions(zlib INTERFACE
+		ZLIB_CONST
+	)
+target_include_directories(zlib SYSTEM INTERFACE
+		${ZLIB_INCLUDE}
+	)
+if(MSVC)
+	target_link_libraries(zlib INTERFACE
+			-LIBPATH:${ZLIB_LIBS}
+			debug zlibstaticd optimized zlibstatic
+		)
+else()
+	target_link_libraries(zlib INTERFACE
+			-L${ZLIB_LIBS}
+			$<$<AND:$<PLATFORM_ID:Windows>,$<CXX_COMPILER_ID:GNU>>:zstatic>
+			$<$<NOT:$<PLATFORM_ID:Windows>>:z>
+		)
+endif()
+
 if (WIN32)
 	include_directories(SYSTEM C:/Libs/Boost/include)
-	include_directories(SYSTEM C:/Libs/glm/include)
-	include_directories(SYSTEM C:/Libs/zlib/include)
 	include_directories(SYSTEM $ENV{VK_SDK_PATH}/Include)
 	include_directories(SYSTEM C:/Libs/vkcpp/include)
 	include_directories(SYSTEM C:/Libs/glfw/include)
@@ -56,18 +121,16 @@ if (WIN32)
 	link_directories($ENV{VK_SDK_PATH}/Bin)
 	if(MINGW)
 		link_directories(C:/Libs/Boost/lib_x64_mingw_${CONFIG_LOWER})
-		link_directories(C:/Libs/zlib/lib_x64_mingw_${CONFIG_LOWER})
 		link_directories(C:/Libs/glfw/lib_mingw_${CONFIG_LOWER})
 		link_directories(C:/Libs/TBB/lib/windows_intel64_gcc_mingw_${CONFIG_LOWER})
 		link_directories(C:/Libs/gtest/lib_mingw_${CONFIG_LOWER})
 	elseif(MSVC)
 		link_directories(C:/Libs/TBB/lib/windows_intel64_vc/)
 		link_directories(C:/Libs/Boost/lib_x64_vc)
-		link_directories(C:/Libs/zlib/lib_x64_vc)
-		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_DEBUG} /LIBPATH:C:/Libs/glfw/lib_vc_debug /LIBPATH:C:/Libs/gtest/lib_vc_debug")
-		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
-		set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
-		set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
+		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /LIBPATH:C:/Libs/glfw/lib_vc_debug /LIBPATH:C:/Libs/gtest/lib_vc_debug")
+		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
+		set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
+		set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
 	endif()
 elseif(UNIX)
 	include_directories(SYSTEM /usr/local/include/local-boost)

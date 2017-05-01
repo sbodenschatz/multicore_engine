@@ -9,18 +9,20 @@ target_include_directories(multicore_engine_base PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
 	)
-target_link_libraries(multicore_engine_base multicore_engine_compiler_settings multicore_engine_parsers)
+target_link_libraries(multicore_engine_base 
+		multicore_engine_compiler_settings 
+		multicore_engine_parsers
+		glm 
+		zlib
+	)
 if(MSVC)
 	set_target_properties(multicore_engine_base PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
-	target_link_libraries(multicore_engine_base debug zlibstaticd)
-	target_link_libraries(multicore_engine_base optimized zlibstatic)
+	set_target_properties(multicore_engine_base PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
+	set_target_properties(multicore_engine_base PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/LTCG")
 endif()
 if(WIN32 AND NOT MSVC)
 	target_link_libraries(multicore_engine_base ws2_32)
 	target_link_libraries(multicore_engine_base mswsock)
-	target_link_libraries(multicore_engine_base zstatic)
-elseif(UNIX)
-	target_link_libraries(multicore_engine_base z)
 endif()
 if(NOT MSVC)
 	target_link_libraries(multicore_engine_base pthread)
