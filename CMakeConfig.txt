@@ -55,6 +55,9 @@ target_compile_options(multicore_engine_compiler_settings INTERFACE
 target_link_libraries(multicore_engine_compiler_settings INTERFACE
 		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++>
 	)
+target_include_directories(multicore_engine_compiler_settings SYSTEM INTERFACE 
+		$<$<CXX_COMPILER_ID:Clang>: /usr/include/libcxxabi/>
+	)
 
 list(APPEND PASS_TO_BOOTSTRAP 
 		LIBS_DIR
@@ -78,7 +81,15 @@ elseif(UNIX)
 	set(ZLIB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for zlib.")		
 endif()
 
-print_list(GLM_INCLUDE ${GLM_INCLUDE})
+if(SANITIZER_INSTRUMENTATION AND UNIX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
+	if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-sanitize=null")
+	elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize-blacklist=${CMAKE_CURRENT_SOURCE_DIR}/sanitizer_blacklist.txt")
+	endif ()
+endif()
 
 add_library(glm INTERFACE)
 target_compile_definitions(glm INTERFACE 
@@ -133,18 +144,5 @@ if (WIN32)
 		set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
 	endif()
 elseif(UNIX)
-	include_directories(SYSTEM /usr/local/include/local-boost)
-	if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-		set(COMPILER_LOWER "gcc")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -fno-sanitize=null")
-		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined")
-		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-	elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-		set(COMPILER_LOWER "clang")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -fsanitize-blacklist=${CMAKE_CURRENT_SOURCE_DIR}/sanitizer_blacklist.txt")
-		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined")
-		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-		include_directories(SYSTEM /usr/include/libcxxabi/)
-	endif ()
 	link_directories(/usr/local/lib/${COMPILER_LOWER}-${CONFIG_LOWER}/)
 endif()
