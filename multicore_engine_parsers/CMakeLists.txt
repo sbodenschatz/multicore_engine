@@ -12,7 +12,7 @@ target_include_directories(multicore_engine_parsers PUBLIC
 	)
 target_link_libraries(multicore_engine_parsers 
 		multicore_engine_compiler_settings 
-		glm
+		deps.glm
 	)
 make_src_groups()
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")

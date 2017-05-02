@@ -11,6 +11,8 @@ target_include_directories(multicore_engine_core PUBLIC
 target_link_libraries(multicore_engine_core 
 		multicore_engine_parsers 
 		multicore_engine_base
+		deps.vulkan
+		deps.glfw
 	)
 if(WIN32)
 	target_link_libraries(multicore_engine_core debug tbb_debug optimized tbb)
@@ -29,7 +31,7 @@ if(WIN32 AND NOT MSVC)
 	target_link_libraries(multicore_engine_core mswsock)
 endif()
 if(NOT MSVC)
-	target_link_libraries(multicore_engine_core pthread)
+#	target_link_libraries(multicore_engine_core pthread)
 	target_link_libraries(multicore_engine_core boost_program_options.a)
 	target_link_libraries(multicore_engine_core boost_filesystem.a)
 	target_link_libraries(multicore_engine_core boost_system.a)

@@ -12,8 +12,8 @@ target_include_directories(multicore_engine_base PUBLIC
 target_link_libraries(multicore_engine_base 
 		multicore_engine_compiler_settings 
 		multicore_engine_parsers
-		glm 
-		zlib
+		deps.glm
+		deps.zlib
 	)
 if(MSVC)
 	set_target_properties(multicore_engine_base PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
