@@ -16,7 +16,7 @@ target_link_libraries(multicore_engine_parsers
 	)
 make_src_groups()
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-	set(CMAKE_CXX_FLAGS_DEBUG "")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -Wa,-mbig-obj")
 endif ()
 if(MSVC)
 	set_target_properties(multicore_engine_parsers PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
