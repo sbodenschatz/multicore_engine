@@ -72,21 +72,43 @@ list(APPEND PASS_TO_BOOTSTRAP
 
 if (WIN32)
 	set(LIBS_DIR C:/Libs CACHE PATH "Custom library directory")
+
 	set(GLM_INCLUDE ${LIBS_DIR}/glm/include CACHE PATH "Include path for glm.")
+
 	set(ZLIB_INCLUDE ${LIBS_DIR}/zlib/include CACHE PATH "Include path for zlib.")
-	if(MINGW)
-		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for zlib.")		
-	elseif(MSVC)
-		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for zlib.")		
+	if(MSVC)
+		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for zlib.")
+	else()
+		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for zlib.")
 	endif()
+
 	set(VULKAN_INCLUDE $ENV{VK_SDK_PATH}/Include CACHE PATH "Include path for vulkan.")
 	set(VULKAN_LIBS $ENV{VK_SDK_PATH}/Lib CACHE PATH "Library path for vulkan.")
+
 	set(GLFW_INCLUDE ${LIBS_DIR}/glfw/include CACHE PATH "Include path for glfw.")
 	if(MSVC)
 		set(GLFW_LIBS_DEBUG ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_debug CACHE PATH "Library path (debug) for glfw.")
 		set(GLFW_LIBS_RELEASE ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_release CACHE PATH "Library path (release) for glfw.")
 	else()
 		set(GLFW_LIBS ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
+	endif()
+
+	set(TBB_INCLUDE ${LIBS_DIR}/TBB/include CACHE PATH "Include path for TBB.")
+	if(MSVC)
+		set(TBB_LIBS_DEBUG ${LIBS_DIR}/TBB/lib/windows_intel64_vc/Debug CACHE PATH "Library path (debug) for TBB.")
+		set(TBB_LIBS_RELEASE ${LIBS_DIR}/TBB/lib/windows_intel64_vc/Release CACHE PATH "Library path (release) for TBB.")
+		set(TBB_LIBS_MINSIZEREL ${LIBS_DIR}/TBB/lib/windows_intel64_vc/MinSizeRel CACHE PATH "Library path (min-size release) for TBB.")
+		set(TBB_LIBS_RELWITHDEBINFO ${LIBS_DIR}/TBB/lib/windows_intel64_vc/RelWithDebInfo CACHE PATH "Library path (release) for TBB.")
+	else()
+		set(TBB_LIBS ${LIBS_DIR}/TBB/lib/windows_intel64_gcc_mingw_${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
+	endif()
+
+	set(GTEST_INCLUDE ${LIBS_DIR}/gtest/include CACHE PATH "Include path for gtest.")
+	if(MSVC)
+		set(GTEST_LIBS_DEBUG ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_debug CACHE PATH "Library path (debug) for gtest.")
+		set(GTEST_LIBS_RELEASE ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_release CACHE PATH "Library path (release) for gtest.")
+	else()
+		set(GTEST_LIBS ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
 	endif()
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
@@ -97,6 +119,10 @@ elseif(UNIX)
 	set(VULKAN_LIBS ${LIBS_DIR}/lib CACHE PATH "Library path for vulkan.")
 	set(GLFW_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for glfw.")
 	set(GLFW_LIBS ${LIBS_DIR}/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
+	set(TBB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for TBB.")
+	set(TBB_LIBS ${LIBS_DIR}/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
+	set(GTEST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for gtest.")
+	set(GTEST_LIBS ${LIBS_DIR}/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
 endif()
 
 if(SANITIZER_INSTRUMENTATION AND UNIX)
@@ -167,22 +193,41 @@ target_link_libraries(deps.glfw INTERFACE
 		$<$<NOT:$<PLATFORM_ID:Windows>>:glfw dl X11 Xrandr Xinerama Xcursor Xxf86vm>
 	)
 
+add_library(deps.TBB INTERFACE)
+target_include_directories(deps.TBB SYSTEM INTERFACE
+		${TBB_INCLUDE}
+	)
+if(WIN32)
+target_link_libraries(deps.TBB INTERFACE
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${TBB_LIBS}>
+		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${TBB_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${TBB_LIBS_RELWITHDEBINFO}>$<$<CONFIG:MINSIZEREL>:${TBB_LIBS_MINSIZEREL}>$<$<CONFIG:RELEASE>:${TBB_LIBS_RELEASE}>>
+		debug tbb_debug optimized tbb
+		debug tbbmalloc_debug optimized tbbmalloc
+	)
+else()
+target_link_libraries(deps.TBB INTERFACE
+		-L${TBB_LIBS}
+		tbb
+		tbbmalloc
+	)
+endif()
+
+add_library(deps.gtest INTERFACE)
+target_include_directories(deps.gtest SYSTEM INTERFACE
+		${GTEST_INCLUDE}
+	)
+target_link_libraries(deps.gtest INTERFACE
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${GTEST_LIBS}>
+		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${GTEST_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${GTEST_LIBS_RELEASE}>$<$<CONFIG:MINSIZEREL>:${GTEST_LIBS_RELEASE}>$<$<CONFIG:RELEASE>:${GTEST_LIBS_RELEASE}>>
+		gtest gtest_main
+	)
+
 if (WIN32)
 	include_directories(SYSTEM C:/Libs/Boost/include)
-	include_directories(SYSTEM C:/Libs/TBB/include)
-	include_directories(SYSTEM C:/Libs/gtest/include)
-	
 	if(MINGW)
 		link_directories(C:/Libs/Boost/lib_x64_mingw_${CONFIG_LOWER})
-		link_directories(C:/Libs/TBB/lib/windows_intel64_gcc_mingw_${CONFIG_LOWER})
-		link_directories(C:/Libs/gtest/lib_mingw_${CONFIG_LOWER})
 	elseif(MSVC)
-		link_directories(C:/Libs/TBB/lib/windows_intel64_vc/)
 		link_directories(C:/Libs/Boost/lib_x64_vc)
-		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /LIBPATH:C:/Libs/glfw/lib_vc_debug /LIBPATH:C:/Libs/gtest/lib_vc_debug")
-		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
-		set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
-		set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
 	endif()
 elseif(UNIX)
 	link_directories(/usr/local/lib/${COMPILER_LOWER}-${CONFIG_LOWER}/)

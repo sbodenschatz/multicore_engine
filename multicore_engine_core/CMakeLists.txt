@@ -13,14 +13,8 @@ target_link_libraries(multicore_engine_core
 		multicore_engine_base
 		deps.vulkan
 		deps.glfw
+		deps.TBB
 	)
-if(WIN32)
-	target_link_libraries(multicore_engine_core debug tbb_debug optimized tbb)
-	target_link_libraries(multicore_engine_core debug tbbmalloc_debug optimized tbbmalloc)
-elseif(UNIX)
-	target_link_libraries(multicore_engine_core tbb)
-	target_link_libraries(multicore_engine_core tbbmalloc)
-endif()
 if(MSVC)
 	set_target_properties(multicore_engine_core PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
 	set_target_properties(multicore_engine_core PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
@@ -31,7 +25,6 @@ if(WIN32 AND NOT MSVC)
 	target_link_libraries(multicore_engine_core mswsock)
 endif()
 if(NOT MSVC)
-#	target_link_libraries(multicore_engine_core pthread)
 	target_link_libraries(multicore_engine_core boost_program_options.a)
 	target_link_libraries(multicore_engine_core boost_filesystem.a)
 	target_link_libraries(multicore_engine_core boost_system.a)
