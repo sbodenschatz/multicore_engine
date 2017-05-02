@@ -1,28 +1,25 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.7)
 project(multicore_engine_base)
 configure_file(src/core/version.cpp.in src/core/version.cpp)
 file(GLOB_RECURSE BASE_SRC "src/*.cpp")
 file(GLOB_RECURSE BASE_HEADERS "include/*.hpp")
-add_library(multicore_engine_base STATIC ${BASE_SRC} ${BASE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/src/core/version.cpp src/core/version.cpp.in)
+add_library(mce_base STATIC ${BASE_SRC} ${BASE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/src/core/version.cpp src/core/version.cpp.in)
 make_src_groups()
-target_link_libraries(multicore_engine_base multicore_engine_parsers)
+target_include_directories(mce_base PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
+	)
+target_link_libraries(mce_base 
+		mce_compiler_settings 
+		mce_parsers
+		deps.glm
+		deps.zlib
+		deps.Boost
+		deps.Boost.Thread
+		deps.Boost.Filesystem
+	)
 if(MSVC)
-	set_target_properties(multicore_engine_base PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
-	target_link_libraries(multicore_engine_base debug zlibstaticd)
-	target_link_libraries(multicore_engine_base optimized zlibstatic)
+	set_target_properties(mce_base PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
+	set_target_properties(mce_base PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
+	set_target_properties(mce_base PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/LTCG")
 endif()
-if(WIN32 AND NOT MSVC)
-	target_link_libraries(multicore_engine_base ws2_32)
-	target_link_libraries(multicore_engine_base mswsock)
-	target_link_libraries(multicore_engine_base zstatic)
-elseif(UNIX)
-	target_link_libraries(multicore_engine_base z)
-endif()
-if(NOT MSVC)
-	target_link_libraries(multicore_engine_base pthread)
-	target_link_libraries(multicore_engine_base boost_program_options.a)
-	target_link_libraries(multicore_engine_base boost_filesystem.a)
-	target_link_libraries(multicore_engine_base boost_system.a)
-	target_link_libraries(multicore_engine_base boost_thread.a)
-endif()
-

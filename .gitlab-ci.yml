@@ -39,19 +39,19 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+    - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DSANITIZER_INSTRUMENTATION=${BUILD_SANITIZE} ..
     - cmake --build . -- -j ${BUILD_CONCURRENCY}
     - export LD_LIBRARY_PATH=/usr/local/lib/${BUILD_COMPILER_NAME}-${BUILD_TYPE,,}/
     - ctest --output-on-failure
     - cd ..
     - cmake -E make_directory ${BUILD_COMPILER_NAME}
-    - cmake -E copy build/multicore_engine_parsers/libmulticore_engine_parsers.a ${BUILD_COMPILER_NAME}/libmulticore_engine_parsers.a
-    - cmake -E copy build/multicore_engine_base/libmulticore_engine_base.a ${BUILD_COMPILER_NAME}/libmulticore_engine_base.a
-    - cmake -E copy build/multicore_engine_core/libmulticore_engine_core.a ${BUILD_COMPILER_NAME}/libmulticore_engine_core.a
-    - cmake -E copy build/multicore_engine_demo/multicore_engine_demo ${BUILD_COMPILER_NAME}/demo
-    - cmake -E copy build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
-    - cmake -E copy build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
-    - cmake -E copy build/multicore_engine_model_converter/multicore_engine_model_converter ${BUILD_COMPILER_NAME}/model_converter
+    - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a ${BUILD_COMPILER_NAME}/libmce_parsers.a
+    - cmake -E copy build/multicore_engine_base/libmce_base.a ${BUILD_COMPILER_NAME}/libmce_base.a
+    - cmake -E copy build/multicore_engine_core/libmce_core.a ${BUILD_COMPILER_NAME}/libmce_core.a
+    - cmake -E copy build/multicore_engine_demo/mce_demo ${BUILD_COMPILER_NAME}/demo
+    - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
+    - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
+    - cmake -E copy build/multicore_engine_model_converter/mce_model_converter ${BUILD_COMPILER_NAME}/model_converter
     - cmake -E copy build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
 
 .mingw-build-template: &mingw-build-task
@@ -60,18 +60,18 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+    - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
     - cmake --build . -- -j %BUILD_CONCURRENCY%
     - ctest --output-on-failure
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
-    - cmake -E copy build/multicore_engine_parsers/libmulticore_engine_parsers.a %BUILD_COMPILER_NAME%/libmulticore_engine_parsers.a
-    - cmake -E copy build/multicore_engine_base/libmulticore_engine_base.a %BUILD_COMPILER_NAME%/libmulticore_engine_base.a
-    - cmake -E copy build/multicore_engine_core/libmulticore_engine_core.a %BUILD_COMPILER_NAME%/libmulticore_engine_core.a
-    - cmake -E copy build/multicore_engine_demo/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
-    - cmake -E copy build/multicore_engine_load_unit_gen/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
-    - cmake -E copy build/multicore_engine_pack_file_gen/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
-    - cmake -E copy build/multicore_engine_model_converter/multicore_engine_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
+    - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a %BUILD_COMPILER_NAME%/libmce_parsers.a
+    - cmake -E copy build/multicore_engine_base/libmce_base.a %BUILD_COMPILER_NAME%/libmce_base.a
+    - cmake -E copy build/multicore_engine_core/libmce_core.a %BUILD_COMPILER_NAME%/libmulticore_engine_core.a
+    - cmake -E copy build/multicore_engine_demo/mce_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
+    - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
+    - cmake -E copy build/multicore_engine_model_converter/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
     - cmake -E copy build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
 
 .msbuild-build-template: &msbuild-build-task
@@ -80,19 +80,19 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -G "Visual Studio 14 2015 Win64" ..
+    - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Visual Studio 14 2015 Win64" ..
     - cmake --build . --config %BUILD_TYPE% -- /m:%BUILD_CONCURRENCY%
     - ctest -C %BUILD_TYPE% --output-on-failure
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
     # FIXME: These libraries are huge on release build due to LTCG and are therefore excluded for now.
-    #- cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/multicore_engine_parsers.lib %BUILD_COMPILER_NAME%/multicore_engine_parsers.lib
-    #- cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/multicore_engine_base.lib %BUILD_COMPILER_NAME%/multicore_engine_base.lib
-    #- cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/multicore_engine_core.lib %BUILD_COMPILER_NAME%/multicore_engine_core.lib
-    - cmake -E copy build/multicore_engine_demo/%BUILD_TYPE%/multicore_engine_demo.exe %BUILD_COMPILER_NAME%/demo.exe
-    - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/multicore_engine_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
-    - cmake -E copy build/multicore_engine_pack_file_gen/%BUILD_TYPE%/multicore_engine_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
-    - cmake -E copy build/multicore_engine_model_converter/%BUILD_TYPE%/multicore_engine_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
+    #- cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/mce_parsers.lib %BUILD_COMPILER_NAME%/mce_parsers.lib
+    #- cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/mce_base.lib %BUILD_COMPILER_NAME%/mce_base.lib
+    #- cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core.lib %BUILD_COMPILER_NAME%/mce_core.lib
+    - cmake -E copy build/multicore_engine_demo/%BUILD_TYPE%/mce_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
+    - cmake -E copy build/multicore_engine_pack_file_gen/%BUILD_TYPE%/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
+    - cmake -E copy build/multicore_engine_model_converter/%BUILD_TYPE%/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
     - cmake -E copy build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
     - cmake -E remove_directory build/multicore_engine_assets
 
@@ -125,6 +125,7 @@ gcc-debug-build:
         BUILD_C_COMPILER: "gcc"
         BUILD_TYPE: "Debug"
         BUILD_COMPILER_NAME: "gcc"
+        BUILD_SANITIZE: "YES"
     tags:
     - cpp
     <<: *linux-build-task
@@ -135,6 +136,7 @@ gcc-release-build:
         BUILD_C_COMPILER: "gcc"
         BUILD_TYPE: "Release"
         BUILD_COMPILER_NAME: "gcc"
+        BUILD_SANITIZE: "NO"
     tags:
     - cpp
     <<: *linux-build-task
@@ -146,6 +148,7 @@ clang-debug-build:
         BUILD_C_COMPILER: "clang"
         BUILD_TYPE: "Debug"
         BUILD_COMPILER_NAME: "clang"
+        BUILD_SANITIZE: "YES"
     tags:
     - cpp
     <<: *linux-build-task
@@ -156,6 +159,7 @@ clang-release-build:
         BUILD_C_COMPILER: "clang"
         BUILD_TYPE: "Release"
         BUILD_COMPILER_NAME: "clang"
+        BUILD_SANITIZE: "NO"
     tags:
     - cpp
     <<: *linux-build-task
@@ -212,7 +216,7 @@ scan-build:
     stage: auxiliary
     script:
     - mkdir -p build && cd build
-    - cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
+    - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
     - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
     tags:
     - cpp

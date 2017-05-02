@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/bstream/asset_ibstream.hpp
+ * File /multicore_engine_base/include/bstream/asset_ibstream.hpp
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
