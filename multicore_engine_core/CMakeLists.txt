@@ -14,20 +14,10 @@ target_link_libraries(multicore_engine_core
 		deps.vulkan
 		deps.glfw
 		deps.TBB
+		deps.Boost.ASIO
 	)
 if(MSVC)
 	set_target_properties(multicore_engine_core PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
 	set_target_properties(multicore_engine_core PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
 	set_target_properties(multicore_engine_core PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/LTCG")
 endif()
-if(WIN32 AND NOT MSVC)
-	target_link_libraries(multicore_engine_core ws2_32)
-	target_link_libraries(multicore_engine_core mswsock)
-endif()
-if(NOT MSVC)
-	target_link_libraries(multicore_engine_core boost_program_options.a)
-	target_link_libraries(multicore_engine_core boost_filesystem.a)
-	target_link_libraries(multicore_engine_core boost_system.a)
-	target_link_libraries(multicore_engine_core boost_thread.a)
-endif()
-

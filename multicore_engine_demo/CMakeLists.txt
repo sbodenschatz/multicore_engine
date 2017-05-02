@@ -5,6 +5,7 @@ file(GLOB_RECURSE DEMO_HEADERS "include/*.hpp")
 add_executable(multicore_engine_demo ${DEMO_SRC} ${DEMO_HEADERS})
 target_link_libraries(multicore_engine_demo 
 		multicore_engine_core
+		deps.Boost.ProgramOptions
 	)
 if(MSVC)
 	set_target_properties(multicore_engine_demo PROPERTIES LINK_FLAGS_RELEASE "/LTCG")

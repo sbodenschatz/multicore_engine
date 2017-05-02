@@ -68,6 +68,25 @@ list(APPEND PASS_TO_BOOTSTRAP
 		LIBS_DIR
 		GLM_INCLUDE 
 		ZLIB_INCLUDE
+		ZLIB_LIBS
+		VULKAN_INCLUDE
+		VULKAN_LIBS
+		GLFW_INCLUDE
+		GLFW_LIBS_DEBUG
+		GLFW_LIBS_RELEASE
+		GLFW_LIBS
+		TBB_INCLUDE
+		TBB_LIBS_DEBUG
+		TBB_LIBS_RELEASE
+		TBB_LIBS_MINSIZEREL
+		TBB_LIBS_RELWITHDEBINFO
+		TBB_LIBS
+		GTEST_INCLUDE
+		GTEST_LIBS_DEBUG
+		GTEST_LIBS_RELEASE
+		GTEST_LIBS
+		BOOST_INCLUDE
+		BOOST_LIBS
 	)
 
 if (WIN32)
@@ -110,6 +129,13 @@ if (WIN32)
 	else()
 		set(GTEST_LIBS ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
 	endif()
+
+	set(BOOST_INCLUDE ${LIBS_DIR}/Boost/include CACHE PATH "Include path for Boost.")
+	if(MSVC)
+		set(BOOST_LIBS ${LIBS_DIR}/Boost/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for Boost.")
+	else()
+		set(BOOST_LIBS ${LIBS_DIR}/Boost/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for Boost.")
+	endif()
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
 	set(GLM_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLM.")
@@ -118,11 +144,13 @@ elseif(UNIX)
 	set(VULKAN_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vulkan.")
 	set(VULKAN_LIBS ${LIBS_DIR}/lib CACHE PATH "Library path for vulkan.")
 	set(GLFW_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for glfw.")
-	set(GLFW_LIBS ${LIBS_DIR}/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
+	set(GLFW_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
 	set(TBB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for TBB.")
-	set(TBB_LIBS ${LIBS_DIR}/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
+	set(TBB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
 	set(GTEST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for gtest.")
-	set(GTEST_LIBS ${LIBS_DIR}/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
+	set(GTEST_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
+	set(BOOST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for Boost.")
+	set(BOOST_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for Boost.")
 endif()
 
 if(SANITIZER_INSTRUMENTATION AND UNIX)
@@ -198,18 +226,18 @@ target_include_directories(deps.TBB SYSTEM INTERFACE
 		${TBB_INCLUDE}
 	)
 if(WIN32)
-target_link_libraries(deps.TBB INTERFACE
-		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${TBB_LIBS}>
-		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${TBB_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${TBB_LIBS_RELWITHDEBINFO}>$<$<CONFIG:MINSIZEREL>:${TBB_LIBS_MINSIZEREL}>$<$<CONFIG:RELEASE>:${TBB_LIBS_RELEASE}>>
-		debug tbb_debug optimized tbb
-		debug tbbmalloc_debug optimized tbbmalloc
-	)
+	target_link_libraries(deps.TBB INTERFACE
+			$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${TBB_LIBS}>
+			$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${TBB_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${TBB_LIBS_RELWITHDEBINFO}>$<$<CONFIG:MINSIZEREL>:${TBB_LIBS_MINSIZEREL}>$<$<CONFIG:RELEASE>:${TBB_LIBS_RELEASE}>>
+			debug tbb_debug optimized tbb
+			debug tbbmalloc_debug optimized tbbmalloc
+		)
 else()
-target_link_libraries(deps.TBB INTERFACE
-		-L${TBB_LIBS}
-		tbb
-		tbbmalloc
-	)
+	target_link_libraries(deps.TBB INTERFACE
+			-L${TBB_LIBS}
+			tbb
+			tbbmalloc
+		)
 endif()
 
 add_library(deps.gtest INTERFACE)
@@ -222,13 +250,33 @@ target_link_libraries(deps.gtest INTERFACE
 		gtest gtest_main
 	)
 
-if (WIN32)
-	include_directories(SYSTEM C:/Libs/Boost/include)
-	if(MINGW)
-		link_directories(C:/Libs/Boost/lib_x64_mingw_${CONFIG_LOWER})
-	elseif(MSVC)
-		link_directories(C:/Libs/Boost/lib_x64_vc)
-	endif()
-elseif(UNIX)
-	link_directories(/usr/local/lib/${COMPILER_LOWER}-${CONFIG_LOWER}/)
+add_library(deps.Boost INTERFACE)
+target_include_directories(deps.Boost SYSTEM INTERFACE
+		${BOOST_INCLUDE}
+	)
+if(WIN32)
+	target_link_libraries(deps.Boost INTERFACE
+			$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${BOOST_LIBS}>
+			$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:${BOOST_LIBS}>
+		)
+else()
+	target_link_libraries(deps.Boost INTERFACE
+			-L${BOOST_LIBS}
+		)
 endif()
+
+add_library(deps.Boost.System INTERFACE)
+target_link_libraries(deps.Boost.System INTERFACE deps.Boost $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_system.a>)
+
+add_library(deps.Boost.ASIO INTERFACE)
+target_link_libraries(deps.Boost.ASIO INTERFACE deps.Boost deps.Boost.System $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<PLATFORM_ID:Windows>>:ws2_32 mswsock>)
+
+add_library(deps.Boost.Thread INTERFACE)
+target_link_libraries(deps.Boost.Thread INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_thread.a>)
+
+add_library(deps.Boost.Filesystem INTERFACE)
+target_link_libraries(deps.Boost.Filesystem INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_filesystem.a>)
+
+add_library(deps.Boost.ProgramOptions INTERFACE)
+target_link_libraries(deps.Boost.ProgramOptions INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_program_options.a>)
+
