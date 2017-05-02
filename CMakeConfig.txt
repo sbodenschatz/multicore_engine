@@ -82,7 +82,12 @@ if (WIN32)
 	set(VULKAN_INCLUDE $ENV{VK_SDK_PATH}/Include CACHE PATH "Include path for vulkan.")
 	set(VULKAN_LIBS $ENV{VK_SDK_PATH}/Lib CACHE PATH "Library path for vulkan.")
 	set(GLFW_INCLUDE ${LIBS_DIR}/glfw/include CACHE PATH "Include path for glfw.")
-	set(GLFW_LIBS ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
+	if(MSVC)
+		set(GLFW_LIBS_DEBUG ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_debug CACHE PATH "Library path (debug) for glfw.")
+		set(GLFW_LIBS_RELEASE ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_release CACHE PATH "Library path (release) for glfw.")
+	else()
+		set(GLFW_LIBS ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
+	endif()
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
 	set(GLM_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLM.")
@@ -156,13 +161,10 @@ target_include_directories(deps.glfw SYSTEM INTERFACE
 		${GLFW_INCLUDE}
 	)
 target_link_libraries(deps.glfw INTERFACE
-		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L>$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:>${GLFW_LIBS}
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${GLFW_LIBS}>
+		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${GLFW_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${GLFW_LIBS_RELEASE}>$<$<CONFIG:MINSIZEREL>:${GLFW_LIBS_RELEASE}>$<$<CONFIG:RELEASE>:${GLFW_LIBS_RELEASE}>>
 		$<$<PLATFORM_ID:Windows>:glfw3>
 		$<$<NOT:$<PLATFORM_ID:Windows>>:glfw dl X11 Xrandr Xinerama Xcursor Xxf86vm>
-	)
-set_target_properties(deps.glfw PROPERTIES
-		MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE
-		MAP_IMPORTED_CONFIG_MINSIZEREL RELEASE
 	)
 
 if (WIN32)
