@@ -16,7 +16,7 @@ stages:
 
 .windows-cache-spec-template: &windows-cache-spec
     cache:
-        #paths: *cache-paths
+        paths: *cache-paths
         key: "%CI_RUNNER_ID%/%CI_COMMIT_REF_NAME%/%CI_JOB_NAME%"
 
 .artifacts-spec-build-linux-template: &artifact-spec-build-linux
