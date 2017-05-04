@@ -80,7 +80,7 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Visual Studio 14 2015 Win64" ..
+    - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Visual Studio 15 2017 Win64" ..
     - cmake --build . --config %BUILD_TYPE% -- /m:%BUILD_CONCURRENCY%
     - ctest -C %BUILD_TYPE% --output-on-failure
     - cd ..
