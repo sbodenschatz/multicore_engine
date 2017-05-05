@@ -7,6 +7,11 @@
 #ifndef UTIL_ERROR_HELPER_HPP_
 #define UTIL_ERROR_HELPER_HPP_
 
+/**
+ * \file
+ * Provides error outputting helper functions for tools to format errors like IDEs expect them.
+ */
+
 #include <cstdint>
 #include <exceptions.hpp>
 #include <sstream>

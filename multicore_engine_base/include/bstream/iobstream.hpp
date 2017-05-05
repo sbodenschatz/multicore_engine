@@ -7,6 +7,11 @@
 #ifndef BSTREAM_IOBSTREAM_HPP_
 #define BSTREAM_IOBSTREAM_HPP_
 
+/**
+ * \file
+ * Defines a read and write interface for binary streams.
+ */
+
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
 

@@ -7,16 +7,21 @@
 #ifndef CONTAINERS_UNORDERED_OBJECT_POOL_HPP_
 #define CONTAINERS_UNORDERED_OBJECT_POOL_HPP_
 
-#include <cstdint>
-#include <util/unused.hpp>
+/**
+ * \file
+ * Defines a pool of objects with fixed memory locations and unspecified order.
+ */
+
+#include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <cstdint>
 #include <iterator>
 #include <memory>
 #include <mutex>
 #include <type_traits>
+#include <util/unused.hpp>
 #include <vector>
-#include <algorithm>
 
 namespace mce {
 namespace containers {
@@ -758,9 +763,9 @@ public:
 			}
 		}
 		if(reallocated_objects) {
-			blocks.erase(std::remove_if(blocks.begin(), blocks.end(), [](auto& b) {
-				return b->active_objects == 0;
-			}), blocks.end());
+			blocks.erase(std::remove_if(blocks.begin(), blocks.end(),
+										[](auto& b) { return b->active_objects == 0; }),
+						 blocks.end());
 			block_count = blocks.size();
 			if(blocks.empty()) {
 				first_block = nullptr;

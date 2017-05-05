@@ -1,14 +1,19 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/bstream/asset_ibstream.hpp
+ * File /multicore_engine_base/include/bstream/asset_ibstream.hpp
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
 #ifndef BSTREAM_ASSET_IBSTREAM_HPP_
 #define BSTREAM_ASSET_IBSTREAM_HPP_
 
-#include <bstream/ibstream.hpp>
+/**
+ * \file
+ * Defines the binary stream interface for assets.
+ */
+
 #include <algorithm>
+#include <bstream/ibstream.hpp>
 #include <cstdint>
 #include <memory>
 

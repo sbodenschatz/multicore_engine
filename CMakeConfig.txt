@@ -2,115 +2,281 @@ if(NOT MSVC)
 	if(NOT (CMAKE_BUILD_TYPE STREQUAL Debug) AND NOT (CMAKE_BUILD_TYPE STREQUAL Release))
 		set(CMAKE_BUILD_TYPE Release)
 	endif()
-	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
-	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DNDEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
 	string(TOLOWER ${CMAKE_BUILD_TYPE} CONFIG_LOWER)
 endif()
+if(WIN32)
+	if(MSVC)
+		set(COMPILER_LOWER "vc")
+	elseif(MINGW)
+		set(COMPILER_LOWER "mingw")
+	endif()
+elseif(UNIX)
+	if(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+		set(COMPILER_LOWER "gcc")
+	elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+		set(COMPILER_LOWER "clang")
+	endif()
+endif()
+
 
 set(GIT_BINARY git CACHE FILEPATH "Git binary to use for version determination.")
 set(VERSION "[unknown version]" CACHE STRING "Fallback version to use if auto-detection fails.")
 set(BRANCH "[unknown branch]" CACHE STRING "Fallback branch name to use if auto-detection fails.")
 
-MESSAGE(STATUS "Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wno-unused-private-field -fno-strict-aliasing -Wold-style-cast")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wall -Wextra -Werror -std=c++14 -Wno-unused-private-field -fno-strict-aliasing -Wold-style-cast")
-	MESSAGE(STATUS "Clang C_FLAGS: " ${CMAKE_C_FLAGS})
-	MESSAGE(STATUS "Clang CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-endif ()
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -std=c++14 -fno-strict-aliasing -Wold-style-cast")
-	MESSAGE(STATUS "GNU C_FLAGS: " ${CMAKE_C_FLAGS})
-	MESSAGE(STATUS "GNU CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-endif ()
 if (MSVC)
-	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /DDEBUG")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /DDEBUG")
-	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /DNDEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DNDEBUG")
-	set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} /DNDEBUG")
-	set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /DNDEBUG")
-	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} /DNDEBUG")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /DNDEBUG")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4221 notelemetry.obj")
+	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /WX /ignore:4221 notelemetry.obj")
 
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /MP")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4221")
-	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /WX /ignore:4221")
-
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG:incremental /INCREMENTAL:NO /OPT:REF")
 	set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /LTCG:incremental")
 
-	set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /GL")
 	set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} /LTCG:incremental /INCREMENTAL:NO /OPT:REF")
 	set(CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL "${CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL} /LTCG:incremental")
 
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /GL")
 	set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LTCG:incremental /INCREMENTAL:NO /OPT:REF")
 	set(CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO} /LTCG:incremental")
-
-	add_definitions(-DGLM_FORCE_CXX11)
-	MESSAGE(STATUS "MSVC C_FLAGS: " ${CMAKE_C_FLAGS})
-	MESSAGE(STATUS "MSVC CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 endif ()
 
-add_definitions(-DGLM_FORCE_RADIANS -DGLM_FORCE_SIZE_T_LENGTH -DZLIB_CONST -DVKCPP_ENHANCED_MODE -DGLFW_INCLUDE_VULKAN)
-include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_base/include)
-include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_core/include)
-include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_parsers/include)
+add_library(mce_compiler_settings INTERFACE)
+target_compile_definitions(mce_compiler_settings INTERFACE
+		$<$<CONFIG:Debug>:DEBUG>
+		$<$<NOT:$<CONFIG:Debug>>:NDEBUG>
+		$<$<PLATFORM_ID:Windows>:MULTICORE_ENGINE_WINDOWS _WIN32_WINNT=0x0601 WINVER=0x0601>
+		$<$<NOT:$<PLATFORM_ID:Windows>>:MULTICORE_ENGINE_NOT_WINDOWS>
+	)
+target_compile_options(mce_compiler_settings INTERFACE
+		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>: -std=c++14 -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast>
+		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++ -Wno-unused-private-field>
+		$<$<CXX_COMPILER_ID:GNU>:>
+		$<$<CXX_COMPILER_ID:MSVC>: /W4 /WX /MP>
+		$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<NOT:$<CONFIG:DEBUG>>>: /GL>
+	)
+if(NOT DEBUG_O0)
+	target_compile_options(mce_compiler_settings INTERFACE
+			$<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:DEBUG>>: -Og>
+		)
+endif()
+target_link_libraries(mce_compiler_settings INTERFACE
+		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++>
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>: pthread>
+	)
+target_include_directories(mce_compiler_settings SYSTEM INTERFACE 
+		$<$<CXX_COMPILER_ID:Clang>: /usr/include/libcxxabi/>
+	)
+
+list(APPEND PASS_TO_BOOTSTRAP 
+		LIBS_DIR
+		GLM_INCLUDE 
+		ZLIB_INCLUDE
+		ZLIB_LIBS
+		VULKAN_INCLUDE
+		VULKAN_LIBS
+		GLFW_INCLUDE
+		GLFW_LIBS_DEBUG
+		GLFW_LIBS_RELEASE
+		GLFW_LIBS
+		TBB_INCLUDE
+		TBB_LIBS_DEBUG
+		TBB_LIBS_RELEASE
+		TBB_LIBS_MINSIZEREL
+		TBB_LIBS_RELWITHDEBINFO
+		TBB_LIBS
+		GTEST_INCLUDE
+		GTEST_LIBS_DEBUG
+		GTEST_LIBS_RELEASE
+		GTEST_LIBS
+		BOOST_INCLUDE
+		BOOST_LIBS
+	)
 
 if (WIN32)
-	include_directories(SYSTEM C:/Libs/Boost/include)
-	include_directories(SYSTEM C:/Libs/glm/include)
-	include_directories(SYSTEM C:/Libs/zlib/include)
-	include_directories(SYSTEM $ENV{VK_SDK_PATH}/Include)
-	include_directories(SYSTEM C:/Libs/vkcpp/include)
-	include_directories(SYSTEM C:/Libs/glfw/include)
-	include_directories(SYSTEM C:/Libs/TBB/include)
-	include_directories(SYSTEM C:/Libs/gtest/include)
-	
-	add_definitions(-DMULTICORE_ENGINE_WINDOWS) 
-	#Windos 7 and higher:
-	add_definitions(-D_WIN32_WINNT=0x0601)
-	add_definitions(-DWINVER=0x0601)
-	link_directories($ENV{VK_SDK_PATH}/Bin)
-	if(MINGW)
-		link_directories(C:/Libs/Boost/lib_x64_mingw_${CONFIG_LOWER})
-		link_directories(C:/Libs/zlib/lib_x64_mingw_${CONFIG_LOWER})
-		link_directories(C:/Libs/glfw/lib_mingw_${CONFIG_LOWER})
-		link_directories(C:/Libs/TBB/lib/windows_intel64_gcc_mingw_${CONFIG_LOWER})
-		link_directories(C:/Libs/gtest/lib_mingw_${CONFIG_LOWER})
-	elseif(MSVC)
-		link_directories(C:/Libs/TBB/lib/windows_intel64_vc/)
-		link_directories(C:/Libs/Boost/lib_x64_vc)
-		link_directories(C:/Libs/zlib/lib_x64_vc)
-		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_DEBUG} /LIBPATH:C:/Libs/glfw/lib_vc_debug /LIBPATH:C:/Libs/gtest/lib_vc_debug")
-		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
-		set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
-		set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "notelemetry.obj ${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} /LIBPATH:C:/Libs/glfw/lib_vc_release /LIBPATH:C:/Libs/gtest/lib_vc_release")
+	set(LIBS_DIR C:/Libs CACHE PATH "Custom library directory")
+
+	set(GLM_INCLUDE ${LIBS_DIR}/glm/include CACHE PATH "Include path for glm.")
+
+	set(ZLIB_INCLUDE ${LIBS_DIR}/zlib/include CACHE PATH "Include path for zlib.")
+	if(MSVC)
+		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for zlib.")
+	else()
+		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for zlib.")
+	endif()
+
+	set(VULKAN_INCLUDE $ENV{VK_SDK_PATH}/Include CACHE PATH "Include path for vulkan.")
+	set(VULKAN_LIBS $ENV{VK_SDK_PATH}/Lib CACHE PATH "Library path for vulkan.")
+
+	set(GLFW_INCLUDE ${LIBS_DIR}/glfw/include CACHE PATH "Include path for glfw.")
+	if(MSVC)
+		set(GLFW_LIBS_DEBUG ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_debug CACHE PATH "Library path (debug) for glfw.")
+		set(GLFW_LIBS_RELEASE ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_release CACHE PATH "Library path (release) for glfw.")
+	else()
+		set(GLFW_LIBS ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
+	endif()
+
+	set(TBB_INCLUDE ${LIBS_DIR}/TBB/include CACHE PATH "Include path for TBB.")
+	if(MSVC)
+		set(TBB_LIBS_DEBUG ${LIBS_DIR}/TBB/lib/windows_intel64_vc/Debug CACHE PATH "Library path (debug) for TBB.")
+		set(TBB_LIBS_RELEASE ${LIBS_DIR}/TBB/lib/windows_intel64_vc/Release CACHE PATH "Library path (release) for TBB.")
+		set(TBB_LIBS_MINSIZEREL ${LIBS_DIR}/TBB/lib/windows_intel64_vc/MinSizeRel CACHE PATH "Library path (min-size release) for TBB.")
+		set(TBB_LIBS_RELWITHDEBINFO ${LIBS_DIR}/TBB/lib/windows_intel64_vc/RelWithDebInfo CACHE PATH "Library path (release) for TBB.")
+	else()
+		set(TBB_LIBS ${LIBS_DIR}/TBB/lib/windows_intel64_gcc_mingw_${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
+	endif()
+
+	set(GTEST_INCLUDE ${LIBS_DIR}/gtest/include CACHE PATH "Include path for gtest.")
+	if(MSVC)
+		set(GTEST_LIBS_DEBUG ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_debug CACHE PATH "Library path (debug) for gtest.")
+		set(GTEST_LIBS_RELEASE ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_release CACHE PATH "Library path (release) for gtest.")
+	else()
+		set(GTEST_LIBS ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
+	endif()
+
+	set(BOOST_INCLUDE ${LIBS_DIR}/Boost/include CACHE PATH "Include path for Boost.")
+	if(MSVC)
+		set(BOOST_LIBS ${LIBS_DIR}/Boost/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for Boost.")
+	else()
+		set(BOOST_LIBS ${LIBS_DIR}/Boost/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for Boost.")
 	endif()
 elseif(UNIX)
-	add_definitions(-DMULTICORE_ENGINE_NOT_WINDOWS) 
-	add_definitions(-DBOOST_TEST_DYN_LINK)
-	include_directories(SYSTEM /usr/local/include/local-boost)
-	if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-		set(COMPILER_LOWER "gcc")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -fno-sanitize=null")
-		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined")
-		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-		link_directories(/usr/local/lib/local-boost/lib-gcc-${CONFIG_LOWER})
-	elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-		set(COMPILER_LOWER "clang")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -fsanitize-blacklist=${CMAKE_CURRENT_SOURCE_DIR}/sanitizer_blacklist.txt")
-		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined")
-		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-		link_directories(/usr/local/lib/local-boost/lib-clang-${CONFIG_LOWER})
-		include_directories(SYSTEM /usr/include/libcxxabi/)
-	endif ()
-	include_directories(SYSTEM /usr/local/${COMPILER_LOWER}-${CONFIG_LOWER}/include/)
-	link_directories(/usr/local/${COMPILER_LOWER}-${CONFIG_LOWER}/lib/)
+	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
+	set(GLM_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLM.")
+	set(ZLIB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for zlib.")
+	set(ZLIB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for zlib.")
+	set(VULKAN_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vulkan.")
+	set(VULKAN_LIBS ${LIBS_DIR}/lib CACHE PATH "Library path for vulkan.")
+	set(GLFW_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for glfw.")
+	set(GLFW_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
+	set(TBB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for TBB.")
+	set(TBB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
+	set(GTEST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for gtest.")
+	set(GTEST_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
+	set(BOOST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for Boost.")
+	set(BOOST_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for Boost.")
 endif()
+
+if(SANITIZER_INSTRUMENTATION AND UNIX)
+	message(STATUS "Using sanitizer instrumentation.")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
+	if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-sanitize=null")
+	elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize-blacklist=${CMAKE_CURRENT_SOURCE_DIR}/sanitizer_blacklist.txt")
+	endif ()
+endif()
+
+add_library(deps.glm INTERFACE)
+target_compile_definitions(deps.glm INTERFACE
+		GLM_FORCE_RADIANS 
+		GLM_FORCE_SIZE_T_LENGTH
+		$<$<CXX_COMPILER_ID:MSVC>:GLM_FORCE_CXX11>
+	)
+target_include_directories(deps.glm SYSTEM INTERFACE
+		${GLM_INCLUDE}
+	)
+	
+add_library(deps.zlib INTERFACE)
+target_compile_definitions(deps.zlib INTERFACE
+		ZLIB_CONST
+	)
+target_include_directories(deps.zlib SYSTEM INTERFACE
+		${ZLIB_INCLUDE}
+	)
+if(MSVC)
+	target_link_libraries(deps.zlib INTERFACE
+			-LIBPATH:${ZLIB_LIBS}
+			debug zlibstaticd optimized zlibstatic
+		)
+else()
+	target_link_libraries(deps.zlib INTERFACE
+			-L${ZLIB_LIBS}
+			$<$<AND:$<PLATFORM_ID:Windows>,$<CXX_COMPILER_ID:GNU>>:zstatic>
+			$<$<NOT:$<PLATFORM_ID:Windows>>:z>
+		)
+endif()
+
+add_library(deps.vulkan INTERFACE)
+target_compile_definitions(deps.vulkan INTERFACE
+		VKCPP_ENHANCED_MODE
+	)
+target_include_directories(deps.vulkan SYSTEM INTERFACE
+		${VULKAN_INCLUDE}
+	)
+target_link_libraries(deps.vulkan INTERFACE
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L>$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:>${VULKAN_LIBS}
+		$<$<PLATFORM_ID:Windows>:vulkan-1>
+		$<$<NOT:$<PLATFORM_ID:Windows>>:vulkan>
+	)
+
+add_library(deps.glfw INTERFACE)
+target_compile_definitions(deps.glfw INTERFACE
+		GLFW_INCLUDE_VULKAN
+	)
+target_include_directories(deps.glfw SYSTEM INTERFACE
+		${GLFW_INCLUDE}
+	)
+target_link_libraries(deps.glfw INTERFACE
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${GLFW_LIBS}>
+		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${GLFW_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${GLFW_LIBS_RELEASE}>$<$<CONFIG:MINSIZEREL>:${GLFW_LIBS_RELEASE}>$<$<CONFIG:RELEASE>:${GLFW_LIBS_RELEASE}>>
+		$<$<PLATFORM_ID:Windows>:glfw3>
+		$<$<NOT:$<PLATFORM_ID:Windows>>:glfw dl X11 Xrandr Xinerama Xcursor Xxf86vm>
+	)
+
+add_library(deps.TBB INTERFACE)
+target_include_directories(deps.TBB SYSTEM INTERFACE
+		${TBB_INCLUDE}
+	)
+if(WIN32)
+	target_link_libraries(deps.TBB INTERFACE
+			$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${TBB_LIBS}>
+			$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${TBB_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${TBB_LIBS_RELWITHDEBINFO}>$<$<CONFIG:MINSIZEREL>:${TBB_LIBS_MINSIZEREL}>$<$<CONFIG:RELEASE>:${TBB_LIBS_RELEASE}>>
+			debug tbb_debug optimized tbb
+			debug tbbmalloc_debug optimized tbbmalloc
+		)
+else()
+	target_link_libraries(deps.TBB INTERFACE
+			-L${TBB_LIBS}
+			tbb
+			tbbmalloc
+		)
+endif()
+
+add_library(deps.gtest INTERFACE)
+target_include_directories(deps.gtest SYSTEM INTERFACE
+		${GTEST_INCLUDE}
+	)
+target_link_libraries(deps.gtest INTERFACE
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${GTEST_LIBS}>
+		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${GTEST_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${GTEST_LIBS_RELEASE}>$<$<CONFIG:MINSIZEREL>:${GTEST_LIBS_RELEASE}>$<$<CONFIG:RELEASE>:${GTEST_LIBS_RELEASE}>>
+		gtest gtest_main
+	)
+
+add_library(deps.Boost INTERFACE)
+target_include_directories(deps.Boost SYSTEM INTERFACE
+		${BOOST_INCLUDE}
+	)
+if(WIN32)
+	target_link_libraries(deps.Boost INTERFACE
+			$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${BOOST_LIBS}>
+			$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:${BOOST_LIBS}>
+		)
+else()
+	target_link_libraries(deps.Boost INTERFACE
+			-L${BOOST_LIBS}
+		)
+endif()
+
+add_library(deps.Boost.System INTERFACE)
+target_link_libraries(deps.Boost.System INTERFACE deps.Boost $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_system.a>)
+
+add_library(deps.Boost.ASIO INTERFACE)
+target_link_libraries(deps.Boost.ASIO INTERFACE deps.Boost deps.Boost.System $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<PLATFORM_ID:Windows>>:ws2_32 mswsock>)
+
+add_library(deps.Boost.Thread INTERFACE)
+target_link_libraries(deps.Boost.Thread INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_thread.a>)
+
+add_library(deps.Boost.Filesystem INTERFACE)
+target_link_libraries(deps.Boost.Filesystem INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_filesystem.a>)
+
+add_library(deps.Boost.ProgramOptions INTERFACE)
+target_link_libraries(deps.Boost.ProgramOptions INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_program_options.a>)
+

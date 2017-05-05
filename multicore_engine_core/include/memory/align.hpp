@@ -11,7 +11,7 @@
 
 /**
  * \file
- * Memory alignment functions.
+ * Defines memory alignment functions.
  */
 
 namespace mce {

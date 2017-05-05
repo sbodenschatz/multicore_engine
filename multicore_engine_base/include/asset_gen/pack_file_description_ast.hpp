@@ -7,8 +7,13 @@
 #ifndef ASSET_GEN_PACK_FILE_DESCRIPTION_AST_HPP_
 #define ASSET_GEN_PACK_FILE_DESCRIPTION_AST_HPP_
 
-#include <asset_gen/base_ast.hpp>
+/**
+ * \file
+ * Specifies the AST node types for pack file description files.
+ */
+
 #include <algorithm>
+#include <asset_gen/base_ast.hpp>
 #include <string>
 #include <vector>
 

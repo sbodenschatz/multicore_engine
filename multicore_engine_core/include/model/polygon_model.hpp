@@ -7,16 +7,21 @@
 #ifndef MODEL_POLYGON_MODEL_HPP_
 #define MODEL_POLYGON_MODEL_HPP_
 
+/**
+ * \file
+ * Defines the representation of polygon models in the engine.
+ */
+
 #include <asset/asset_defs.hpp>
-#include <exceptions.hpp>
-#include <model/model_defs.hpp>
-#include <model/model_format.hpp>
-#include <util/local_function.hpp>
 #include <atomic>
 #include <exception>
+#include <exceptions.hpp>
 #include <memory>
+#include <model/model_defs.hpp>
+#include <model/model_format.hpp>
 #include <mutex>
 #include <string>
+#include <util/local_function.hpp>
 #include <vector>
 
 namespace mce {

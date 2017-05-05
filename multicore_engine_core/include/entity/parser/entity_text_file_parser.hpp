@@ -7,6 +7,11 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_PARSER_HPP_
 
+/**
+ * \file
+ * Defines the parser class for entity text files.
+ */
+
 #include <asset/asset_defs.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <entity/ecs_types.hpp>

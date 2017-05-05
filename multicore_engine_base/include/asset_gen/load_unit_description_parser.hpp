@@ -7,6 +7,11 @@
 #ifndef ASSET_GEN_LOAD_UNIT_DESCRIPTION_PARSER_HPP_
 #define ASSET_GEN_LOAD_UNIT_DESCRIPTION_PARSER_HPP_
 
+/**
+ * \file
+ * Defines the parser class for load unit descriptions.
+ */
+
 #include <asset_gen/load_unit_description_ast.hpp>
 #include <memory>
 #include <string>

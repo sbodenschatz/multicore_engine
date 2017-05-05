@@ -1,15 +1,15 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/bstream/asset_ibstream.cpp
+ * File /multicore_engine_base/src/bstream/asset_ibstream.cpp
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <asset/asset.hpp>
 #include <bstream/asset_ibstream.hpp>
 #include <cstdint>
-#include <exceptions.hpp>
-#include <algorithm>
 #include <cstring>
+#include <exceptions.hpp>
 
 namespace mce {
 namespace bstream {

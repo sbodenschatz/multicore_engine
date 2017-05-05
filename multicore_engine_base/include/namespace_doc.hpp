@@ -7,6 +7,11 @@
 #ifndef NAMESPACE_DOC_HPP_
 #define NAMESPACE_DOC_HPP_
 
+/**
+ * \file
+ * Contains the API documentation for the namespaces.
+ */
+
 /// Represents the root namespace for the multicore engine (mce) project.
 namespace mce {
 

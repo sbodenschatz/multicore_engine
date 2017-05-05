@@ -4,4 +4,9 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-int main() {}
+#include <core/engine.hpp>
+
+int main() {
+	mce::core::engine e;
+	e.run();
+}

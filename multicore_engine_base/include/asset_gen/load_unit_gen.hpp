@@ -7,8 +7,13 @@
 #ifndef ASSET_GEN_LOAD_UNIT_GEN_HPP_
 #define ASSET_GEN_LOAD_UNIT_GEN_HPP_
 
-#include <asset/load_unit_meta_data.hpp>
+/**
+ * \file
+ * Declares the load_unit_gen class containing the main functionality for load unit baking.
+ */
+
 #include <algorithm>
+#include <asset/load_unit_meta_data.hpp>
 #include <cstdint>
 #include <iostream>
 #include <string>

@@ -7,6 +7,11 @@
 #ifndef UTIL_LOCKED_HPP_
 #define UTIL_LOCKED_HPP_
 
+/**
+ * \file
+ * Defines a generic automatic locking class.
+ */
+
 #include <mutex>
 #include <type_traits>
 

@@ -7,6 +7,11 @@
 #ifndef ASSET_DUMMY_ASSET_HPP_
 #define ASSET_DUMMY_ASSET_HPP_
 
+/**
+ * \file
+ * Provides a way for test code to create assets without depending on the asset system.
+ */
+
 #include <asset/asset.hpp>
 #include <asset/asset_defs.hpp>
 #include <string>

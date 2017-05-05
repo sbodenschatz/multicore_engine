@@ -7,6 +7,11 @@
 #ifndef UTIL_MESSAGE_QUEUE_HPP_
 #define UTIL_MESSAGE_QUEUE_HPP_
 
+/**
+ * \file
+ * Defines a generic thread-safe queue.
+ */
+
 #include <condition_variable>
 #include <mutex>
 #include <queue>

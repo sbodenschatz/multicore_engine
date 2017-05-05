@@ -7,6 +7,11 @@
 #ifndef ASSET_GEN_STATIC_MODEL_HPP_
 #define ASSET_GEN_STATIC_MODEL_HPP_
 
+/**
+ * \file
+ * Defines data structures to represent processed models in memory in a tooling context (not in the engine).
+ */
+
 #include <model/model_format.hpp>
 #include <string>
 #include <vector>

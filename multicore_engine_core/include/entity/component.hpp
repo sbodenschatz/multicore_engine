@@ -9,7 +9,7 @@
 
 /**
  * \file
- * Definition of the component class.
+ * Defines the component class.
  */
 
 #include <core/engine.hpp>

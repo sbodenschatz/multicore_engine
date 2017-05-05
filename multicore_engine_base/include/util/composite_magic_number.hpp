@@ -7,6 +7,12 @@
 #ifndef UTIL_COMPOSITE_MAGIC_NUMBER_HPP_
 #define UTIL_COMPOSITE_MAGIC_NUMBER_HPP_
 
+/**
+ * \file
+ * Defines a tool function to compose magic numbers (for file formats and protocols) from smaller constants
+ * (e.g. letters).
+ */
+
 namespace mce {
 namespace util {
 namespace detail {

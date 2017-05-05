@@ -7,6 +7,11 @@
 #ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
 #define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
 
+/**
+ * \file
+ * Maps value AST node types to component property type they can be used with.
+ */
+
 #include <cstdint>
 #include <entity/entity_reference.hpp>
 #include <entity/parser/entity_text_file_ast.hpp>
@@ -31,6 +36,7 @@ struct ast_value_mapper {
 	typedef void error;
 };
 
+/// Converts the given long long value to T while checking for numeric overflow and underflow.
 template <typename T>
 T checked_numeric_conversion(long long val) {
 	if(val < std::numeric_limits<T>::lowest()) {

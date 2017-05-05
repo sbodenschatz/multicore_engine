@@ -7,11 +7,16 @@
 #ifndef ENTITY_ECS_TYPES_HPP_
 #define ENTITY_ECS_TYPES_HPP_
 
+/**
+ * \file
+ * Provides basic typedefs for the entity component system.
+ */
+
 #include <containers/smart_pool_ptr.hpp>
+#include <cstdint>
 #include <entity/component.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <cstdint>
 
 namespace mce {
 namespace entity {

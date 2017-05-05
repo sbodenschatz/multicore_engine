@@ -7,6 +7,11 @@
 #ifndef MEMORY_ALIGNED_HPP_
 #define MEMORY_ALIGNED_HPP_
 
+/**
+ * \file
+ * Provides alignment tool functions.
+ */
+
 #include <cstdint>
 
 namespace mce {

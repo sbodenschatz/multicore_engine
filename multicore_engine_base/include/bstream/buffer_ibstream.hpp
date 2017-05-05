@@ -7,6 +7,11 @@
 #ifndef BSTREAM_BUFFER_IBSTREAM_HPP_
 #define BSTREAM_BUFFER_IBSTREAM_HPP_
 
+/**
+ * \file
+ * Defines binary streams reading from buffers.
+ */
+
 #include <bstream/ibstream.hpp>
 #include <cstdint>
 #include <memory>

@@ -4,6 +4,12 @@
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
+/**
+ * \file
+ * Provides a macro to document that a parameter or variable is intentionally unused and silence compiler
+ * warnings.
+ */
+
 #ifndef UTIL_UNUSED_HPP_
 #define UTIL_UNUSED_HPP_
 

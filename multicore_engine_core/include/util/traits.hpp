@@ -7,6 +7,11 @@
 #ifndef UTIL_TRAITS_HPP_
 #define UTIL_TRAITS_HPP_
 
+/**
+ * \file
+ * Provides custom type traits.
+ */
+
 #include <utility>
 
 namespace mce {

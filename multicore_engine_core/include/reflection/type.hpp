@@ -7,14 +7,19 @@
 #ifndef REFLECTION_TYPE_HPP_
 #define REFLECTION_TYPE_HPP_
 
+/**
+ * \file
+ * Defines type-related helper code for the property reflection system.
+ */
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <util/string_tools.hpp>
 #include <numeric>
+#include <sstream>
 #include <string>
 #include <type_traits>
+#include <util/string_tools.hpp>
 #include <vector>
-#include <sstream>
 
 namespace mce {
 namespace bstream {

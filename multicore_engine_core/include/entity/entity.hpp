@@ -7,6 +7,11 @@
 #ifndef ENTITY_ENTITY_HPP_
 #define ENTITY_ENTITY_HPP_
 
+/**
+ * \file
+ * Defines the entity class.
+ */
+
 #include <boost/container/small_vector.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
@@ -34,7 +39,8 @@ private:
 	template <typename T>
 	using component_container = boost::container::small_vector<T, 16>;
 	containers::generic_flat_map<component_container, component_type_id_t,
-								 containers::smart_pool_ptr<mce::entity::component>> components_;
+								 containers::smart_pool_ptr<mce::entity::component>>
+			components_;
 	bool marker_for_despawn = false;
 
 public:

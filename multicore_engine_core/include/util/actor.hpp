@@ -7,11 +7,16 @@
 #ifndef UTIL_ACTOR_HPP_
 #define UTIL_ACTOR_HPP_
 
+/**
+ * \file
+ * Defines a generic actor implementation.
+ */
+
 #include <cstdint>
-#include <util/local_function.hpp>
-#include <util/message_queue.hpp>
 #include <tuple>
 #include <type_traits>
+#include <util/local_function.hpp>
+#include <util/message_queue.hpp>
 #include <utility>
 
 namespace mce {

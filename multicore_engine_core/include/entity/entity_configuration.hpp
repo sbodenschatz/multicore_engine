@@ -7,6 +7,11 @@
 #ifndef ENTITY_ENTITY_CONFIGURATION_HPP_
 #define ENTITY_ENTITY_CONFIGURATION_HPP_
 
+/**
+ * \file
+ * Defines the entity_configuration class.
+ */
+
 #include <memory>
 #include <string>
 #include <vector>
