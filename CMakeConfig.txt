@@ -45,7 +45,7 @@ target_compile_definitions(mce_compiler_settings INTERFACE
 		$<$<NOT:$<PLATFORM_ID:Windows>>:MULTICORE_ENGINE_NOT_WINDOWS>
 	)
 target_compile_options(mce_compiler_settings INTERFACE
-		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>: -std=c++17 -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast>
+		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>: -std=c++14 -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast>
 		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++ -Wno-unused-private-field>
 		$<$<CXX_COMPILER_ID:GNU>:>
 		$<$<CXX_COMPILER_ID:MSVC>: /W4 /WX /MP>
