@@ -36,14 +36,15 @@ public:
 
 	void create_subgroup(const std::string& name) {
 		using namespace std::literals;
-		subgroups_.emplace(name, variable_group(*store_, full_name_ + "."s + name));
+		subgroups_.emplace(name,
+						   variable_group(*store_, (full_name_.empty() ? ""s : (full_name_ + "."s)) + name));
 	}
 
 	template <typename T>
 	std::shared_ptr<variable<T>> create_variable(const std::string& name) {
 		using namespace std::literals;
-		auto var = std::make_shared<variable<T>>(full_name_ + "."s + name);
-		// TODO Load value from store.
+		auto var = std::make_shared<variable<T>>((full_name_.empty() ? ""s : (full_name_ + "."s)) + name);
+		var->load_value_from_store(*store_);
 		return var;
 	}
 };

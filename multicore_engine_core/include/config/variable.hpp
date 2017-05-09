@@ -17,10 +17,14 @@ namespace mce {
 namespace config {
 template <typename T>
 class variable;
+class config_store;
 
 class abstract_variable : public std::enable_shared_from_this<abstract_variable> {
 	std::string full_name_;
 	util::type_id_t type_id_;
+
+	friend class variable_group;
+	void load_value_from_store(config_store& store);
 
 protected:
 	std::unique_ptr<reflection::abstract_property<abstract_variable>> property_;
