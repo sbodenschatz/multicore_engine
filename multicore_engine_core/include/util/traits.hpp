@@ -74,6 +74,14 @@ struct is_nothrow_swappable {
 template <typename T>
 constexpr bool is_nothrow_swappable<T>::value;
 
+template <typename T>
+struct accessor_value_type {
+	using type = typename std::conditional<std::is_fundamental<T>::value, T, const T&>::type;
+};
+
+template <typename T>
+using accessor_value_type_t = typename accessor_value_type<T>::type;
+
 } // namespace util
 } // namespace mce
 

@@ -20,6 +20,7 @@
 #include <reflection/type.hpp>
 #include <string>
 #include <type_traits>
+#include <util/traits.hpp>
 #include <util/type_id.hpp>
 #include <utility>
 
@@ -127,14 +128,14 @@ namespace detail {
 
 template <typename T, typename Object_Type = void>
 struct property_type_helper {
-	typedef typename std::conditional<std::is_fundamental<T>::value, T, const T&>::type accessor_value;
+	typedef util::accessor_value_type_t<T> accessor_value;
 	typedef accessor_value (Object_Type::*getter)() const;
 	typedef void (Object_Type::*setter)(accessor_value value);
 };
 
 template <typename T>
 struct property_type_helper<T, void> {
-	typedef typename std::conditional<std::is_fundamental<T>::value, T, const T&>::type accessor_value;
+	typedef util::accessor_value_type_t<T> accessor_value;
 };
 
 template <typename T, typename known_type>
