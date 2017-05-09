@@ -7,7 +7,10 @@
 #ifndef CONFIG_VARIABLE_HPP_
 #define CONFIG_VARIABLE_HPP_
 
+#include <boost/utility/string_view.hpp>
+#include <cassert>
 #include <memory>
+#include <mutex>
 #include <reflection/property.hpp>
 #include <string>
 #include <util/traits.hpp>
@@ -17,19 +20,17 @@ namespace mce {
 namespace config {
 template <typename T>
 class variable;
-class config_store;
 
 class abstract_variable : public std::enable_shared_from_this<abstract_variable> {
 	std::string full_name_;
 	util::type_id_t type_id_;
 
-	friend class variable_group;
-	void load_value_from_store(config_store& store);
-
 protected:
+	std::atomic<bool> dirty_;
+
 	std::unique_ptr<reflection::abstract_property<abstract_variable>> property_;
 	abstract_variable(const std::string& full_name, util::type_id_t type_id)
-			: full_name_{full_name}, type_id_{type_id} {}
+			: full_name_{full_name}, type_id_{type_id}, dirty_{false} {}
 
 public:
 	template <typename U>
@@ -43,27 +44,47 @@ public:
 		return full_name_;
 	}
 
-	reflection::abstract_property<abstract_variable>* property() const {
+	const reflection::abstract_property<abstract_variable>* property() const {
 		return property_.get();
+	}
+
+	void parse_value_from_string(const boost::string_view& value_string) {
+		assert(property_);
+		property_->from_string(*this, value_string);
+	}
+	std::string format_value_to_string() const {
+		return property_->to_string(*this);
+	}
+
+	bool dirty() const {
+		return dirty_;
 	}
 };
 
 template <typename T>
 class variable : public abstract_variable {
 	T value_;
+	mutable std::mutex value_mtx;
 
-public:
+	friend class config_store;
+
 	explicit variable(const std::string& full_name)
 			: abstract_variable(full_name, util::type_id<abstract_variable>::id<T>()) {
-		property_ = reflection::make_property("value", &value_);
+		property_ = reflection::make_property(
+				"value", static_cast<util::accessor_value_type_t<T> (variable<T>::*)()>(value),
+				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(value));
 	}
 
+public:
 	util::accessor_value_type_t<T> value() const {
+		std::lock_guard<std::mutex> lock(value_mtx);
 		return value_;
 	}
 
 	void value(util::accessor_value_type_t<T> value) {
+		std::lock_guard<std::mutex> lock(value_mtx);
 		value_ = value;
+		dirty_ = true;
 	}
 };
 
