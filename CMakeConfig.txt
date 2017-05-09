@@ -48,7 +48,7 @@ target_compile_options(mce_compiler_settings INTERFACE
 		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>: -std=c++1z -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast>
 		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++ -Wno-unused-private-field>
 		$<$<CXX_COMPILER_ID:GNU>:>
-		$<$<CXX_COMPILER_ID:MSVC>: /W4 /WX /MP>
+		$<$<CXX_COMPILER_ID:MSVC>: /W4 /WX /MP /std:c++latest>
 		$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<NOT:$<CONFIG:DEBUG>>>: /GL>
 	)
 if(NOT DEBUG_O0)
@@ -244,6 +244,9 @@ add_library(deps.gtest INTERFACE)
 target_include_directories(deps.gtest SYSTEM INTERFACE
 		${GTEST_INCLUDE}
 	)
+target_compile_definitions(deps.gtest INTERFACE 
+		GTEST_LANG_CXX11
+	)
 target_link_libraries(deps.gtest INTERFACE
 		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${GTEST_LIBS}>
 		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${GTEST_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${GTEST_LIBS_RELEASE}>$<$<CONFIG:MINSIZEREL>:${GTEST_LIBS_RELEASE}>$<$<CONFIG:RELEASE>:${GTEST_LIBS_RELEASE}>>
@@ -251,6 +254,9 @@ target_link_libraries(deps.gtest INTERFACE
 	)
 
 add_library(deps.Boost INTERFACE)
+target_compile_definitions(deps.Boost INTERFACE
+		$<$<CXX_COMPILER_ID:MSVC>:_HAS_AUTO_PTR_ETC>
+	)
 target_include_directories(deps.Boost SYSTEM INTERFACE
 		${BOOST_INCLUDE}
 	)
