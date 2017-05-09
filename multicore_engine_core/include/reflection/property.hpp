@@ -13,6 +13,7 @@
  */
 
 #include <algorithm>
+#include <boost/utility/string_view.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
 #include <exceptions.hpp>
@@ -96,7 +97,7 @@ public:
 		return name_;
 	}
 	/// Parses a value from a string and assigns it to the property on the given object.
-	virtual bool from_string(Root_Type& object, const std::string& str) const = 0;
+	virtual bool from_string(Root_Type& object, const boost::string_view& str) const = 0;
 	/// Retrieves the property value from the given object, formats it to a string and returns it.
 	virtual std::string to_string(const Root_Type& object) const = 0;
 	/// Writes the value of the property on the given object to the given binary stream.
@@ -140,7 +141,7 @@ struct property_type_helper<T, void> {
 
 template <typename T, typename known_type>
 struct property_type_parser_helper {
-	static auto from_string(const std::string& s) {
+	static auto from_string(const boost::string_view& s) {
 		T t;
 		auto res = type_parser<T>::from_string(s, t);
 		return std::make_pair(t, res);
@@ -206,7 +207,7 @@ public:
 	 */
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
 	/// Parses a value from a string and assigns it to the property on the given object.
-	virtual bool from_string(Root_Type& object, const std::string& str) const override {
+	virtual bool from_string(Root_Type& object, const boost::string_view& str) const override {
 		using helper = detail::property_type_parser_helper<T, typename type_info<T>::known_type>;
 		auto r = helper::from_string(str);
 		if(r.second) set_value(object, r.first);
