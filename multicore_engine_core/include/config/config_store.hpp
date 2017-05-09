@@ -40,19 +40,20 @@ private:
 
 	// Internal methods called under lock or during construction/destruction (i.e. single threaded):
 	void store(std::ostream& user_config);
-	void read_config_file_data(std::istream& input);
+	void read_config_file_data(std::istream& input, bool user_config);
 	void parse_data();
 	void to_string_data();
-	void load(std::istream& user_config, std::istream& default_config);
+	void load_internal(std::istream& user_config, std::istream& default_config);
 
 public:
 	template <typename F>
 	config_store(std::istream& user_config, std::istream& default_config, F&& save_callback)
 			: save_callback_{save_callback} {
-		load(user_config, default_config);
+		load_internal(user_config, default_config);
 	}
 	~config_store() noexcept;
 	void save();
+	void reload(std::istream& user_config, std::istream& default_config);
 };
 
 } // namespace config
