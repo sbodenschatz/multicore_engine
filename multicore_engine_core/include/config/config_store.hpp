@@ -54,6 +54,23 @@ public:
 	~config_store() noexcept;
 	void save();
 	void reload(std::istream& user_config, std::istream& default_config);
+	template <typename T>
+	std::shared_ptr<variable<T>> resolve(const std::string& name) {
+		std::lock_guard<std::mutex> lock(config_mutex);
+		auto it = variables_.find(name);
+		if(it == variables_.end()) {
+			auto var = it->second->as_type<T>();
+			if(!var) {
+				throw std::runtime_error("Redefinition of variable '" + name + "' with different type.");
+			}
+			return var;
+		} else {
+			std::shared_ptr<variable<T>> var = std::make_shared<variable<T>>(name);
+			var->parse_value_from_string(config_file_data_[name]);
+			variables_.emplace(name, var);
+			return var;
+		}
+	}
 };
 
 } // namespace config
