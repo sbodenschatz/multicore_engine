@@ -24,7 +24,7 @@ protected:
 template <typename T>
 class variable_impl : public abstract_variable {
 public:
-	variable_impl(const std::string& name)
+	explicit variable_impl(const std::string& name)
 			: abstract_variable(name, util::type_id<abstract_variable>::id<T>()) {}
 };
 
