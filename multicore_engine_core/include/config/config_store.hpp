@@ -21,7 +21,7 @@ class config_store {
 public:
 	class config_storer {
 		config_store& store_;
-		config_storer(config_store& owner) : store_{owner} {}
+		explicit config_storer(config_store& owner) : store_{owner} {}
 
 		friend class config_store;
 
