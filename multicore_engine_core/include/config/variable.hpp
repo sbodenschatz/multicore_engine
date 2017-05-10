@@ -27,10 +27,20 @@ class abstract_variable : public std::enable_shared_from_this<abstract_variable>
 
 protected:
 	std::atomic<bool> dirty_;
-
 	std::unique_ptr<reflection::abstract_property<abstract_variable>> property_;
+	std::unique_ptr<reflection::abstract_property<abstract_variable>> property_for_store_;
+
 	abstract_variable(const std::string& full_name, util::type_id_t type_id)
 			: full_name_{full_name}, type_id_{type_id}, dirty_{false} {}
+
+	friend class config_store;
+	const reflection::abstract_property<abstract_variable>* property_for_store() const {
+		return property_for_store_.get();
+	}
+	void parse_value_from_string_from_store(const boost::string_view& value_string) {
+		assert(property_);
+		property_for_store_->from_string(*this, value_string);
+	}
 
 public:
 	template <typename U>
@@ -68,6 +78,12 @@ class variable : public abstract_variable {
 	struct construction_key_token {};
 	friend class config_store;
 
+	void value_from_store(util::accessor_value_type_t<T> value) {
+		std::lock_guard<std::mutex> lock(value_mtx);
+		value_ = value;
+		dirty_ = false;
+	}
+
 public:
 	explicit variable(const std::string& full_name, construction_key_token)
 			: abstract_variable(full_name, util::type_id<abstract_variable>::id<T>()) {
@@ -75,6 +91,11 @@ public:
 				"value",
 				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
 				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(&variable<T>::value));
+		property_for_store_ = reflection::make_property<abstract_variable, T, variable<T>>(
+				"value_from_store",
+				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
+				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(
+						&variable<T>::value_from_store));
 	}
 
 	util::accessor_value_type_t<T> value() const {

@@ -67,7 +67,7 @@ public:
 		} else {
 			std::shared_ptr<variable<T>> var =
 					std::make_shared<variable<T>>(name, typename variable<T>::construction_key_token());
-			var->parse_value_from_string(config_file_data_[name]);
+			var->parse_value_from_string_from_store(config_file_data_[name]);
 			variables_.emplace(name, var);
 			return var;
 		}
