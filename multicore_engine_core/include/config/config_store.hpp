@@ -51,6 +51,14 @@ public:
 			: save_callback_{save_callback} {
 		load_internal(user_config, default_config);
 	}
+	template <typename F>
+	config_store(std::istream& user_config, F&& save_callback) : save_callback_{save_callback} {
+		read_config_file_data(user_config, true);
+		parse_data();
+	}
+	template <typename F>
+	config_store(F&& save_callback) : save_callback_{save_callback} {}
+
 	~config_store() noexcept;
 	void save();
 	void reload(std::istream& user_config, std::istream& default_config);
