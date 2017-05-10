@@ -65,17 +65,17 @@ template <typename T>
 class variable : public abstract_variable {
 	T value_;
 	mutable std::mutex value_mtx;
-
+	struct construction_key_token {};
 	friend class config_store;
 
-	explicit variable(const std::string& full_name)
+public:
+	explicit variable(const std::string& full_name, construction_key_token)
 			: abstract_variable(full_name, util::type_id<abstract_variable>::id<T>()) {
 		property_ = reflection::make_property(
 				"value", static_cast<util::accessor_value_type_t<T> (variable<T>::*)()>(value),
 				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(value));
 	}
 
-public:
 	util::accessor_value_type_t<T> value() const {
 		std::lock_guard<std::mutex> lock(value_mtx);
 		return value_;
