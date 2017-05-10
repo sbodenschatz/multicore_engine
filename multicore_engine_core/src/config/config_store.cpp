@@ -16,7 +16,7 @@ void config_store::store(std::ostream& user_config) {
 	for(const auto& key : key_order) {
 		auto it = config_file_data_.find(key);
 		if(it != config_file_data_.end()) {
-			user_config << it->first << "=" << it->second;
+			user_config << it->first << "=" << it->second << "\n";
 		} else {
 			user_config << "\n";
 		}
