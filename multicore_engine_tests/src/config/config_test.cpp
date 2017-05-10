@@ -109,5 +109,26 @@ TEST(config_config_store, load_config_vec3) {
 	ASSERT_FALSE(test_name2->dirty());
 }
 
+TEST(config_config_store, load_config_vec4) {
+	std::stringstream dstr;
+	dstr.str("test.name1=123.45 234.56 345.67 456.78\n"
+			 "test.name2=67.89 78.90 89.01 90.12\n");
+	std::stringstream ustr;
+	ustr.str("test.name1=135.79 246.80 357.91 468.02\n");
+	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
+	auto test_name1 = cs.resolve<glm::vec4>("test.name1");
+	ASSERT_FLOAT_EQ(135.79f, test_name1->value().x);
+	ASSERT_FLOAT_EQ(246.80f, test_name1->value().y);
+	ASSERT_FLOAT_EQ(357.91f, test_name1->value().z);
+	ASSERT_FLOAT_EQ(468.02f, test_name1->value().w);
+	ASSERT_FALSE(test_name1->dirty());
+	auto test_name2 = cs.resolve<glm::vec4>("test.name2");
+	ASSERT_FLOAT_EQ(67.89f, test_name2->value().x);
+	ASSERT_FLOAT_EQ(78.90f, test_name2->value().y);
+	ASSERT_FLOAT_EQ(89.01f, test_name2->value().z);
+	ASSERT_FLOAT_EQ(90.12f, test_name2->value().w);
+	ASSERT_FALSE(test_name2->dirty());
+}
+
 } // namespace config
 } // namespace mce
