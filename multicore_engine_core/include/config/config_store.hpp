@@ -58,7 +58,7 @@ public:
 	std::shared_ptr<variable<T>> resolve(const std::string& name) {
 		std::lock_guard<std::mutex> lock(config_mutex);
 		auto it = variables_.find(name);
-		if(it == variables_.end()) {
+		if(it != variables_.end()) {
 			auto var = it->second->as_type<T>();
 			if(!var) {
 				throw std::runtime_error("Redefinition of variable '" + name + "' with different type.");
