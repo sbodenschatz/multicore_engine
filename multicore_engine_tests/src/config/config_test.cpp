@@ -56,5 +56,22 @@ TEST(config_config_store, load_config_float) {
 	ASSERT_FALSE(test_name2->dirty());
 }
 
+TEST(config_config_store, load_config_string_list) {
+	std::stringstream dstr;
+	dstr.str("test.name1=Hello;World\n"
+			 "test.name2=Test1;Test2;Test3\n");
+	std::stringstream ustr;
+	ustr.str("test.name1=Testing;String;Lists\n");
+	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
+	auto test_name1 = cs.resolve<std::vector<std::string>>("test.name1");
+	auto test_name1_expected = std::vector<std::string>{"Testing", "String", "Lists"};
+	ASSERT_EQ(test_name1_expected, test_name1->value());
+	ASSERT_FALSE(test_name1->dirty());
+	auto test_name2 = cs.resolve<std::vector<std::string>>("test.name2");
+	auto test_name2_expected = std::vector<std::string>{"Test1", "Test2", "Test3"};
+	ASSERT_EQ(test_name2_expected, test_name2->value());
+	ASSERT_FALSE(test_name2->dirty());
+}
+
 } // namespace config
 } // namespace mce
