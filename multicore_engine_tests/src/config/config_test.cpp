@@ -187,5 +187,40 @@ TEST(config_config_store, load_config_ivec4) {
 	ASSERT_FALSE(test_name2->dirty());
 }
 
+TEST(config_config_store, load_save_unmodified_load) {
+	std::stringstream dstr;
+	dstr.str("test1=123\n"
+			 "number=12345\n"
+			 "text=Hello World\n"
+			 "test123=987.65 43.21\n"
+			 "test=Test Test Test\n"
+			 "vector=123 456 789\n"
+			 "list=Hello;World\n");
+	std::stringstream ustr;
+	ustr.str("number=345\n"
+			 "text=Hello Test\n"
+			 "vector=12 45 78\n"
+			 "list=Hello;Test;World\n");
+	std::stringstream ostr;
+	{
+		config_store cs(ustr, dstr, [&](config_store::config_storer& s) { s.store(ostr); });
+		auto text = cs.resolve<std::string>("text");
+		ASSERT_EQ("Hello Test", text->value());
+	}
+	ASSERT_EQ(ustr.str(), ostr.str());
+	config_store cs(ustr, ostr, [&](config_store::config_storer&) {});
+	auto text = cs.resolve<std::string>("text");
+	ASSERT_EQ("Hello Test", text->value());
+	auto number = cs.resolve<int>("number");
+	ASSERT_EQ(345, number->value());
+	auto vector = cs.resolve<glm::ivec3>("vector");
+	ASSERT_EQ(12, vector->value().x);
+	ASSERT_EQ(45, vector->value().y);
+	ASSERT_EQ(78, vector->value().z);
+	auto list = cs.resolve<std::vector<std::string>>("list");
+	auto list_expected = std::vector<std::string>{"Hello", "Test", "World"};
+	ASSERT_EQ(list_expected, list->value());
+}
+
 } // namespace config
 } // namespace mce
