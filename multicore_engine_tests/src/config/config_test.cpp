@@ -130,5 +130,62 @@ TEST(config_config_store, load_config_vec4) {
 	ASSERT_FALSE(test_name2->dirty());
 }
 
+TEST(config_config_store, load_config_ivec2) {
+	std::stringstream dstr;
+	dstr.str("test.name1=12345 23456\n"
+			 "test.name2=6789 7890\n");
+	std::stringstream ustr;
+	ustr.str("test.name1=13579 24680\n");
+	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
+	auto test_name1 = cs.resolve<glm::ivec2>("test.name1");
+	ASSERT_EQ(13579, test_name1->value().x);
+	ASSERT_EQ(24680, test_name1->value().y);
+	ASSERT_FALSE(test_name1->dirty());
+	auto test_name2 = cs.resolve<glm::ivec2>("test.name2");
+	ASSERT_EQ(6789, test_name2->value().x);
+	ASSERT_EQ(7890, test_name2->value().y);
+	ASSERT_FALSE(test_name2->dirty());
+}
+
+TEST(config_config_store, load_config_ivec3) {
+	std::stringstream dstr;
+	dstr.str("test.name1=12345 23456 34567\n"
+			 "test.name2=6789 7890 8901\n");
+	std::stringstream ustr;
+	ustr.str("test.name1=13579 24680 35791\n");
+	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
+	auto test_name1 = cs.resolve<glm::ivec3>("test.name1");
+	ASSERT_EQ(13579f, test_name1->value().x);
+	ASSERT_EQ(24680f, test_name1->value().y);
+	ASSERT_EQ(35791f, test_name1->value().z);
+	ASSERT_FALSE(test_name1->dirty());
+	auto test_name2 = cs.resolve<glm::ivec3>("test.name2");
+	ASSERT_EQ(6789f, test_name2->value().x);
+	ASSERT_EQ(7890f, test_name2->value().y);
+	ASSERT_EQ(8901f, test_name2->value().z);
+	ASSERT_FALSE(test_name2->dirty());
+}
+
+TEST(config_config_store, load_config_ivec4) {
+	std::stringstream dstr;
+	dstr.str("test.name1=12345 23456 34567 45678\n"
+			 "test.name2=6789 7890 8901 9012\n");
+	std::stringstream ustr;
+	ustr.str("test.name1=13579 24680 35791 46802\n");
+	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
+	auto test_name1 = cs.resolve<glm::ivec4>("test.name1");
+	ASSERT_EQ(13579f, test_name1->value().x);
+	ASSERT_EQ(24680f, test_name1->value().y);
+	ASSERT_EQ(35791f, test_name1->value().z);
+	ASSERT_EQ(46802f, test_name1->value().w);
+	ASSERT_FALSE(test_name1->dirty());
+	auto test_name2 = cs.resolve<glm::ivec4>("test.name2");
+	ASSERT_EQ(6789f, test_name2->value().x);
+	ASSERT_EQ(7890f, test_name2->value().y);
+	ASSERT_EQ(8901f, test_name2->value().z);
+	ASSERT_EQ(9012f, test_name2->value().w);
+	ASSERT_FALSE(test_name2->dirty());
+}
+
 } // namespace config
 } // namespace mce
