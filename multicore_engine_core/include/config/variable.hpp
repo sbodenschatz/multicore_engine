@@ -71,9 +71,10 @@ class variable : public abstract_variable {
 public:
 	explicit variable(const std::string& full_name, construction_key_token)
 			: abstract_variable(full_name, util::type_id<abstract_variable>::id<T>()) {
-		property_ = reflection::make_property(
-				"value", static_cast<util::accessor_value_type_t<T> (variable<T>::*)()>(value),
-				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(value));
+		property_ = reflection::make_property<abstract_variable, T, variable<T>>(
+				"value",
+				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
+				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(&variable<T>::value));
 	}
 
 	util::accessor_value_type_t<T> value() const {
