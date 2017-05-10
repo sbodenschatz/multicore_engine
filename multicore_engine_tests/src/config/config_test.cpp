@@ -11,10 +11,10 @@
 namespace mce {
 namespace config {
 
-TEST(config_config_store, load_config) {
+TEST(config_config_store, load_config_strings) {
 	std::stringstream dstr;
 	dstr.str("test.name1=Default Value\n"
-			 "test.name2=Default 2");
+			 "test.name2=Default 2\n");
 	std::stringstream ustr;
 	ustr.str("test.name1=Test String\n");
 	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
@@ -23,6 +23,21 @@ TEST(config_config_store, load_config) {
 	ASSERT_FALSE(test_name1->dirty());
 	auto test_name2 = cs.resolve<std::string>("test.name2");
 	ASSERT_EQ("Default 2", test_name2->value());
+	ASSERT_FALSE(test_name2->dirty());
+}
+
+TEST(config_config_store, load_config_int) {
+	std::stringstream dstr;
+	dstr.str("test.name1=12345\n"
+			 "test.name2=6789\n");
+	std::stringstream ustr;
+	ustr.str("test.name1=13579\n");
+	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
+	auto test_name1 = cs.resolve<int>("test.name1");
+	ASSERT_EQ(13579, test_name1->value());
+	ASSERT_FALSE(test_name1->dirty());
+	auto test_name2 = cs.resolve<int>("test.name2");
+	ASSERT_EQ(6789, test_name2->value());
 	ASSERT_FALSE(test_name2->dirty());
 }
 
