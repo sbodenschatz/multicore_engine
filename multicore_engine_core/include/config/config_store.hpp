@@ -57,7 +57,7 @@ public:
 		parse_data();
 	}
 	template <typename F>
-	config_store(F&& save_callback) : save_callback_{save_callback} {}
+	explicit config_store(F&& save_callback) : save_callback_{save_callback} {}
 
 	~config_store() noexcept;
 	void save();
