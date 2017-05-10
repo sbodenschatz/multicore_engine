@@ -30,7 +30,7 @@ void config_store::read_config_file_data(std::istream& input, bool user_config) 
 		if(eq_pos != line.npos) {
 			auto name = line.substr(0, eq_pos);
 			auto value = line.substr(eq_pos + 1);
-			config_file_data_.emplace(name, value);
+			config_file_data_.insert_or_assign(name.to_string(), value.to_string());
 			if(user_config) {
 				key_order.emplace_back(name);
 			}
