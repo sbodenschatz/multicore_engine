@@ -49,10 +49,10 @@ TEST(config_config_store, load_config_float) {
 	ustr.str("test.name1=135.79\n");
 	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
 	auto test_name1 = cs.resolve<float>("test.name1");
-	ASSERT_FLOAT_EQ(135.79, test_name1->value());
+	ASSERT_FLOAT_EQ(135.79f, test_name1->value());
 	ASSERT_FALSE(test_name1->dirty());
 	auto test_name2 = cs.resolve<float>("test.name2");
-	ASSERT_FLOAT_EQ(67.89, test_name2->value());
+	ASSERT_FLOAT_EQ(67.89f, test_name2->value());
 	ASSERT_FALSE(test_name2->dirty());
 }
 
@@ -81,12 +81,12 @@ TEST(config_config_store, load_config_vec2) {
 	ustr.str("test.name1=135.79 246.80\n");
 	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
 	auto test_name1 = cs.resolve<glm::vec2>("test.name1");
-	ASSERT_FLOAT_EQ(135.79, test_name1->value().x);
-	ASSERT_FLOAT_EQ(246.80, test_name1->value().y);
+	ASSERT_FLOAT_EQ(135.79f, test_name1->value().x);
+	ASSERT_FLOAT_EQ(246.80f, test_name1->value().y);
 	ASSERT_FALSE(test_name1->dirty());
 	auto test_name2 = cs.resolve<glm::vec2>("test.name2");
-	ASSERT_FLOAT_EQ(67.89, test_name2->value().x);
-	ASSERT_FLOAT_EQ(78.90, test_name2->value().y);
+	ASSERT_FLOAT_EQ(67.89f, test_name2->value().x);
+	ASSERT_FLOAT_EQ(78.90f, test_name2->value().y);
 	ASSERT_FALSE(test_name2->dirty());
 }
 
@@ -98,14 +98,14 @@ TEST(config_config_store, load_config_vec3) {
 	ustr.str("test.name1=135.79 246.80 357.91\n");
 	config_store cs(ustr, dstr, [](config_store::config_storer&) {});
 	auto test_name1 = cs.resolve<glm::vec2>("test.name1");
-	ASSERT_FLOAT_EQ(135.79, test_name1->value().x);
-	ASSERT_FLOAT_EQ(246.80, test_name1->value().y);
-	ASSERT_FLOAT_EQ(357.91, test_name1->value().z);
+	ASSERT_FLOAT_EQ(135.79f, test_name1->value().x);
+	ASSERT_FLOAT_EQ(246.80f, test_name1->value().y);
+	ASSERT_FLOAT_EQ(357.91f, test_name1->value().z);
 	ASSERT_FALSE(test_name1->dirty());
 	auto test_name2 = cs.resolve<glm::vec2>("test.name2");
-	ASSERT_FLOAT_EQ(67.89, test_name2->value().x);
-	ASSERT_FLOAT_EQ(78.90, test_name2->value().y);
-	ASSERT_FLOAT_EQ(89.01, test_name2->value().z);
+	ASSERT_FLOAT_EQ(67.89f, test_name2->value().x);
+	ASSERT_FLOAT_EQ(78.90f, test_name2->value().y);
+	ASSERT_FLOAT_EQ(89.01f, test_name2->value().z);
 	ASSERT_FALSE(test_name2->dirty());
 }
 
