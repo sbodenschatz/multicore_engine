@@ -339,5 +339,54 @@ TEST(config_config_store, create_save_load) {
 	ASSERT_FLOAT_EQ(new_vec4.w, vec4->value().w);
 }
 
+TEST(config_config_store, create_defaultval_save_load) {
+	std::stringstream ostr;
+	int new_number = 54321;
+	std::string new_text = "New Text";
+	glm::ivec3 new_vector{1234, 5678, 9123};
+	std::vector<std::string> new_list{"New", "List", "Value"};
+	std::string new_newvalue = "This is the newly set text.";
+	glm::vec4 new_vec4{123.4f, 567.8f, 912.3f, 456.7f};
+	{
+		config_store cs([&](config_store::config_storer& s) { s.store(ostr); });
+		auto number = cs.resolve<int>("number", new_number);
+		auto text = cs.resolve<std::string>("text", new_text);
+		auto vector = cs.resolve<glm::ivec3>("vector", new_vector);
+		auto list = cs.resolve<std::vector<std::string>>("list", new_list);
+		auto newvalue = cs.resolve<std::string>("new.value", new_newvalue);
+		auto vec4 = cs.resolve<glm::vec4>("vec4", new_vec4);
+		ASSERT_EQ(new_text, text->value());
+		ASSERT_EQ(new_number, number->value());
+		ASSERT_EQ(new_vector.x, vector->value().x);
+		ASSERT_EQ(new_vector.y, vector->value().y);
+		ASSERT_EQ(new_vector.z, vector->value().z);
+		ASSERT_EQ(new_list, list->value());
+		ASSERT_EQ(new_newvalue, newvalue->value());
+		ASSERT_FLOAT_EQ(new_vec4.x, vec4->value().x);
+		ASSERT_FLOAT_EQ(new_vec4.y, vec4->value().y);
+		ASSERT_FLOAT_EQ(new_vec4.z, vec4->value().z);
+		ASSERT_FLOAT_EQ(new_vec4.w, vec4->value().w);
+	}
+	ASSERT_EQ("", ostr.str());
+	config_store cs(ostr, [&](config_store::config_storer&) {});
+	auto number = cs.resolve<int>("number", new_number);
+	auto text = cs.resolve<std::string>("text", new_text);
+	auto vector = cs.resolve<glm::ivec3>("vector", new_vector);
+	auto list = cs.resolve<std::vector<std::string>>("list", new_list);
+	auto newvalue = cs.resolve<std::string>("new.value", new_newvalue);
+	auto vec4 = cs.resolve<glm::vec4>("vec4", new_vec4);
+	ASSERT_EQ(new_text, text->value());
+	ASSERT_EQ(new_number, number->value());
+	ASSERT_EQ(new_vector.x, vector->value().x);
+	ASSERT_EQ(new_vector.y, vector->value().y);
+	ASSERT_EQ(new_vector.z, vector->value().z);
+	ASSERT_EQ(new_list, list->value());
+	ASSERT_EQ(new_newvalue, newvalue->value());
+	ASSERT_FLOAT_EQ(new_vec4.x, vec4->value().x);
+	ASSERT_FLOAT_EQ(new_vec4.y, vec4->value().y);
+	ASSERT_FLOAT_EQ(new_vec4.z, vec4->value().z);
+	ASSERT_FLOAT_EQ(new_vec4.w, vec4->value().w);
+}
+
 } // namespace config
 } // namespace mce
