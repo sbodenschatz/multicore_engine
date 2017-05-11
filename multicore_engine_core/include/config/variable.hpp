@@ -160,6 +160,21 @@ public:
 		}
 	}
 
+	/// \brief Calls the given transaction function object with a modifiable reference to to the variable
+	/// value under mutex and notifies the modification listeners (after dropping the mutex).
+	template <typename F>
+	void do_transaction(F&& transaction) {
+		std::unique_lock<std::mutex> lock(mutex_);
+		transaction(value_);
+		if(!modification_listeners.empty()) {
+			T value = value_;
+			lock.unlock();
+			for(auto& listener : modification_listeners) {
+				listener.second(value);
+			}
+		}
+	}
+
 	/// \brief Adds a function object callable for <code>void(const T&)</code> as a modification listener to
 	/// be called when the config variable value has changed.
 	template <typename F>
