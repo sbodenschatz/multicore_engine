@@ -52,18 +52,20 @@ public:
 		load_internal(user_config, default_config);
 	}
 	template <typename F>
-	config_store(std::istream& user_config, F&& save_callback) : save_callback_{save_callback} {
+	config_store(std::istream& user_config, F&& save_callback)
+			: save_callback_{save_callback} {
 		read_config_file_data(user_config, true);
 		parse_data();
 	}
 	template <typename F>
-	explicit config_store(F&& save_callback) : save_callback_{save_callback} {}
+	explicit config_store(F&& save_callback)
+			: save_callback_{save_callback} {}
 
 	~config_store() noexcept;
 	void save();
 	void reload(std::istream& user_config, std::istream& default_config);
 	template <typename T>
-	std::shared_ptr<variable<T>> resolve(const std::string& name) {
+	std::shared_ptr<variable<T>> resolve(const std::string& name, const T& default_value = T()) {
 		std::lock_guard<std::mutex> lock(config_mutex);
 		auto it = variables_.find(name);
 		if(it != variables_.end()) {
@@ -75,7 +77,14 @@ public:
 		} else {
 			std::shared_ptr<variable<T>> var =
 					std::make_shared<variable<T>>(name, typename variable<T>::construction_key_token());
-			var->parse_value_from_string_from_store(config_file_data_[name]);
+			auto it_cfg = config_file_data_.find(name);
+			if(it_cfg == config_file_data_.end()) {
+				var->value_from_store(default_value);
+			} else {
+				if(!var->parse_value_from_string_from_store(it_cfg->second)) {
+					var->value_from_store(default_value);
+				}
+			}
 			variables_.emplace(name, var);
 			return var;
 		}

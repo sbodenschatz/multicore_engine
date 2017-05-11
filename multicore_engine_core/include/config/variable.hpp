@@ -37,9 +37,9 @@ protected:
 	const reflection::abstract_property<abstract_variable>* property_for_store() const {
 		return property_for_store_.get();
 	}
-	void parse_value_from_string_from_store(const boost::string_view& value_string) {
+	bool parse_value_from_string_from_store(const boost::string_view& value_string) {
 		assert(property_);
-		property_for_store_->from_string(*this, value_string);
+		return property_for_store_->from_string(*this, value_string);
 	}
 
 public:
@@ -58,9 +58,9 @@ public:
 		return property_.get();
 	}
 
-	void parse_value_from_string(const boost::string_view& value_string) {
+	bool parse_value_from_string(const boost::string_view& value_string) {
 		assert(property_);
-		property_->from_string(*this, value_string);
+		return property_->from_string(*this, value_string);
 	}
 	std::string format_value_to_string() const {
 		return property_->to_string(*this);
@@ -89,11 +89,11 @@ public:
 			: abstract_variable(full_name, util::type_id<abstract_variable>::id<T>()) {
 		property_ = reflection::make_property<abstract_variable, T, variable<T>>(
 				"value",
-				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
+				static_cast<util::accessor_value_type_t<T>(variable<T>::*)() const>(&variable<T>::value),
 				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(&variable<T>::value));
 		property_for_store_ = reflection::make_property<abstract_variable, T, variable<T>>(
 				"value_from_store",
-				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
+				static_cast<util::accessor_value_type_t<T>(variable<T>::*)() const>(&variable<T>::value),
 				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(
 						&variable<T>::value_from_store));
 	}
