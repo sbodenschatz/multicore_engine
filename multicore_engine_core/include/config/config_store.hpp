@@ -22,8 +22,18 @@
 namespace mce {
 namespace config {
 
+/// Implements the storage for global configuration variables in the engine.
+/**
+ * The configuration can be loaded from a default config file and a user specific config file and can be
+ * automatically saved on destruction using a callback.
+ * The configuration variables are looked up by name, providing a variable type and optionally a default
+ * variable, are shared between independent lookups and can be used for read and write access.
+ * The configuration system provides thread-safe access to variables as well as the config_store.
+ */
 class config_store {
 public:
+	/// \brief Access token class to allow save callbacks to store the user configuration data in
+	/// callback-provided streams.
 	class config_storer {
 		config_store& store_;
 		explicit config_storer(config_store& owner) : store_{owner} {}
@@ -31,6 +41,7 @@ public:
 		friend class config_store;
 
 	public:
+		/// Stores the user configuration data in the provided ostream.
 		void store(std::ostream& user_config) {
 			store_.store(user_config);
 		}
@@ -51,24 +62,50 @@ private:
 	void load_internal(std::istream& user_config, std::istream& default_config);
 
 public:
+	/// \brief Constructs a config_store from the given streams for the user and default config files and
+	/// using the given callback for saving.
+	/**
+	 * The save callback must be callable with the signature <code>void(config_storer&)</code>.
+	 */
 	template <typename F>
 	config_store(std::istream& user_config, std::istream& default_config, F&& save_callback)
 			: save_callback_{save_callback} {
 		load_internal(user_config, default_config);
 	}
+	/// \brief Constructs a config_store from the given stream for the user config file and using the given
+	/// callback for saving.
+	/**
+	 * The save callback must be callable with the signature <code>void(config_storer&)</code>.
+	 */
 	template <typename F>
 	config_store(std::istream& user_config, F&& save_callback)
 			: save_callback_{save_callback} {
 		read_config_file_data(user_config, true);
 		parse_data();
 	}
+	/// \brief Constructs an empty config_store using the given callback for saving.
+	/**
+	 * The save callback must be callable with the signature <code>void(config_storer&)</code>.
+	 */
 	template <typename F>
 	explicit config_store(F&& save_callback)
 			: save_callback_{save_callback} {}
 
+	/// Calls the save callback and then destroys the config_store.
 	~config_store() noexcept;
+	/// Calls the save callback.
 	void save();
+	/// \brief Discards the current configuration and replaces it with the configuration resulting from the
+	/// given streams for default and user config files.
 	void reload(std::istream& user_config, std::istream& default_config);
+	/// Looks up the variable of type T with the given name.
+	/**
+	 * If the variable was already looked up the variable is reused and shared.
+	 * Otherwise, if the config file data contains a valid value for the variable it is created with this
+	 * value. If the value in the file data is invalid or the variable is not given in the config file data,
+	 * the default_value parameter is used.
+	 * If the variable was already looked up with a different type, an exception is thrown.
+	 */
 	template <typename T>
 	std::shared_ptr<variable<T>> resolve(const std::string& name, const T& default_value = T()) {
 		std::lock_guard<std::mutex> lock(config_mutex);
