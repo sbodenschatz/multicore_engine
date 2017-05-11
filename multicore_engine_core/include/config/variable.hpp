@@ -16,6 +16,11 @@
 #include <util/traits.hpp>
 #include <util/type_id.hpp>
 
+/**
+ * \file
+ * Defines the classes that represent configuration variables.
+ */
+
 namespace mce {
 namespace config {
 template <typename T>

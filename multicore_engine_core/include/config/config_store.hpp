@@ -14,6 +14,11 @@
 #include <mutex>
 #include <ostream>
 
+/**
+ * \file
+ * Defines the configuration storage class interface.
+ */
+
 namespace mce {
 namespace config {
 
