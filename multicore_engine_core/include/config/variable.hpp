@@ -13,6 +13,7 @@
 #include <mutex>
 #include <reflection/property.hpp>
 #include <string>
+#include <util/local_function.hpp>
 #include <util/traits.hpp>
 #include <util/type_id.hpp>
 
@@ -95,16 +96,30 @@ public:
 /// Implements a configuration variable of type T.
 template <typename T>
 class variable : public abstract_variable {
+public:
+	/// Handle type used to identify listeners.
+	typedef size_t listener_handle;
+
+private:
 	T value_;
-	mutable std::mutex value_mtx;
+	mutable std::mutex mutex_;
 	struct construction_key_token {};
 	friend class config_store;
 
 	void value_from_store(util::accessor_value_type_t<T> value) {
-		std::lock_guard<std::mutex> lock(value_mtx);
+		std::unique_lock<std::mutex> lock(mutex_);
 		value_ = value;
 		dirty_ = false;
+		if(!modification_listeners.empty()) {
+			lock.unlock();
+			for(auto& listener : modification_listeners) {
+				listener.second(value);
+			}
+		}
 	}
+
+	listener_handle next_listener_id = 0;
+	std::vector<std::pair<listener_handle, util::local_function<128, void(const T&)>>> modification_listeners;
 
 public:
 	/// Allows construction of variable objects by the config_store.
@@ -117,26 +132,51 @@ public:
 			: abstract_variable(full_name, util::type_id<abstract_variable>::id<T>()) {
 		property_ = reflection::make_property<abstract_variable, T, variable<T>>(
 				"value",
-				static_cast<util::accessor_value_type_t<T>(variable<T>::*)() const>(&variable<T>::value),
+				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
 				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(&variable<T>::value));
 		property_for_store_ = reflection::make_property<abstract_variable, T, variable<T>>(
 				"value_from_store",
-				static_cast<util::accessor_value_type_t<T>(variable<T>::*)() const>(&variable<T>::value),
+				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
 				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(
 						&variable<T>::value_from_store));
 	}
 
 	/// Returns the value of the variable.
 	util::accessor_value_type_t<T> value() const {
-		std::lock_guard<std::mutex> lock(value_mtx);
+		std::lock_guard<std::mutex> lock(mutex_);
 		return value_;
 	}
 
-	/// Sets the value of the variable to the given new value.
+	/// Sets the value of the variable to the given new value and notifies modification listeners.
 	void value(util::accessor_value_type_t<T> value) {
-		std::lock_guard<std::mutex> lock(value_mtx);
+		std::unique_lock<std::mutex> lock(mutex_);
 		value_ = value;
 		dirty_ = true;
+		if(!modification_listeners.empty()) {
+			lock.unlock();
+			for(auto& listener : modification_listeners) {
+				listener.second(value);
+			}
+		}
+	}
+
+	/// \brief Adds a function object callable for <code>void(const T&)</code> as a modification listener to
+	/// be called when the config variable value has changed.
+	template <typename F>
+	listener_handle add_modification_listener(F&& listener) {
+		std::lock_guard<std::mutex> lock(mutex_);
+		auto id = next_listener_id++;
+		modification_listeners.emplace_back(id, std::forward<F>(listener));
+		return id;
+	}
+
+	/// Removes the modification listener whose addition returned the given listener_handle.
+	void remove_modification_listener(listener_handle id) {
+		std::lock_guard<std::mutex> lock(mutex_);
+		modification_listeners.erase(std::remove_if(modification_listeners.begin(),
+													modification_listeners.end(),
+													[id](auto& e) { return e.first == id; }),
+									 modification_listeners.end());
 	}
 };
 
