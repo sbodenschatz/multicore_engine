@@ -74,6 +74,17 @@ struct is_nothrow_swappable {
 template <typename T>
 constexpr bool is_nothrow_swappable<T>::value;
 
+/// Type function to convert a type to the parameter / return value type for setters and getters.
+template <typename T>
+struct accessor_value_type {
+	/// Is <code>T</code> if <code>T</code> is a fundamental type or <code>const T&</code> otherwise.
+	using type = typename std::conditional<std::is_fundamental<T>::value, T, const T&>::type;
+};
+
+/// Provides a shorthand for <code>typename accessor_value_type<T>::type</code>.
+template <typename T>
+using accessor_value_type_t = typename accessor_value_type<T>::type;
+
 } // namespace util
 } // namespace mce
 

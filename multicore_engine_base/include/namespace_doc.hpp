@@ -45,8 +45,11 @@ namespace parser {}
 
 } // namespace asset_gen
 
-/// Contains the binary data stream used for (de-)serialization in mce.
+/// Contains the binary data streams used for (de-)serialization in mce.
 namespace bstream {}
+
+/// Contains the global runtime configuration system for mce.
+namespace config {}
 
 /// Contains container data structures used in mce.
 namespace containers {}
