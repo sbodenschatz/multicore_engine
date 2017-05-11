@@ -388,5 +388,20 @@ TEST(config_config_store, create_defaultval_save_load) {
 	ASSERT_FLOAT_EQ(new_vec4.w, vec4->value().w);
 }
 
+TEST(config_config_store, modification_listener_notification) {
+	config_store cs([](config_store::config_storer&) {});
+	auto var1 = cs.resolve<std::string>("var", "Test");
+	bool called = false;
+	bool correct = false;
+	var1->add_modification_listener([&](const std::string& val) {
+		called = true;
+		correct = val == "Hello World";
+	});
+	auto var2 = cs.resolve<std::string>("var", "Test");
+	var2->value("Hello World");
+	ASSERT_TRUE(called);
+	ASSERT_TRUE(correct);
+}
+
 } // namespace config
 } // namespace mce
