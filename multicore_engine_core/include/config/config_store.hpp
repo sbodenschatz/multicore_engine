@@ -69,7 +69,7 @@ public:
 	 */
 	template <typename F>
 	config_store(std::istream& user_config, std::istream& default_config, F&& save_callback)
-			: save_callback_{save_callback} {
+			: save_callback_{std::forward<F>(save_callback)} {
 		load_internal(user_config, default_config);
 	}
 	/// \brief Constructs a config_store from the given stream for the user config file and using the given
@@ -79,7 +79,7 @@ public:
 	 */
 	template <typename F>
 	config_store(std::istream& user_config, F&& save_callback)
-			: save_callback_{save_callback} {
+			: save_callback_{std::forward<F>(save_callback)} {
 		read_config_file_data(user_config, true);
 		parse_data();
 	}
@@ -88,8 +88,7 @@ public:
 	 * The save callback must be callable with the signature <code>void(config_storer&)</code>.
 	 */
 	template <typename F>
-	explicit config_store(F&& save_callback)
-			: save_callback_{save_callback} {}
+	explicit config_store(F&& save_callback) : save_callback_{std::forward<F>(save_callback)} {}
 
 	/// Calls the save callback and then destroys the config_store.
 	~config_store() noexcept;
