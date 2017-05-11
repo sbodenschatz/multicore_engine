@@ -26,51 +26,67 @@ namespace config {
 template <typename T>
 class variable;
 
+/// Provides the base class for variable objects of any type.
 class abstract_variable : public std::enable_shared_from_this<abstract_variable> {
-	std::string full_name_;
+	std::string name_;
 	util::type_id_t type_id_;
 
 protected:
+	/// Flag indicating, if the variable was modified.
 	std::atomic<bool> dirty_;
+	/// Property used to access variable value for user side access.
 	std::unique_ptr<reflection::abstract_property<abstract_variable>> property_;
+	/// Property used to access variable value for the config_store (resets dirty flag).
 	std::unique_ptr<reflection::abstract_property<abstract_variable>> property_for_store_;
 
-	abstract_variable(const std::string& full_name, util::type_id_t type_id)
-			: full_name_{full_name}, type_id_{type_id}, dirty_{false} {}
+	/// Allows construction of variable objects by subclasses.
+	abstract_variable(const std::string& name, util::type_id_t type_id)
+			: name_{name}, type_id_{type_id}, dirty_{false} {}
 
 	friend class config_store;
+	/// Provides access to property_for_store_.
 	const reflection::abstract_property<abstract_variable>* property_for_store() const {
 		return property_for_store_.get();
 	}
+	/// Parses the variable value from the given string using property_for_store_.
 	bool parse_value_from_string_from_store(const boost::string_view& value_string) {
 		assert(property_);
 		return property_for_store_->from_string(*this, value_string);
 	}
 
 public:
+	/// \brief Attempts to downcast the variable to the given type U, or returns an empty shared_ptr if the
+	/// variable is not of type U.
 	template <typename U>
 	std::shared_ptr<variable<U>> as_type();
+	/// Checks if the variable is of type U.
 	template <typename U>
 	bool is_type() {
 		return util::type_id<abstract_variable>::id<U>() == type_id_;
 	}
 
-	const std::string& full_name() const {
-		return full_name_;
+	/// Returns the name of the variable.
+	const std::string& name() const {
+		return name_;
 	}
 
+	/// Provides access to a property object linked to the variables value.
 	const reflection::abstract_property<abstract_variable>* property() const {
 		return property_.get();
 	}
 
+	/// Parses the value of the variable from the given string.
 	bool parse_value_from_string(const boost::string_view& value_string) {
 		assert(property_);
 		return property_->from_string(*this, value_string);
 	}
+
+	/// Returns a string representation of the value of the variable.
 	std::string format_value_to_string() const {
 		return property_->to_string(*this);
 	}
 
+	/// Returns a bool indicating, if the variable was modified.
 	bool dirty() const {
 		return dirty_;
 	}
