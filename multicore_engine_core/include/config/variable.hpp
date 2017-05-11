@@ -92,6 +92,7 @@ public:
 	}
 };
 
+/// Implements a configuration variable of type T.
 template <typename T>
 class variable : public abstract_variable {
 	T value_;
@@ -106,6 +107,12 @@ class variable : public abstract_variable {
 	}
 
 public:
+	/// Allows construction of variable objects by the config_store.
+	/**
+	 * Usage by other code is prevented by requiring a construction_key_token that can only be constructed by
+	 * friend classes instead of making the constructor private because variables are created using
+	 * std::make_shared.
+	 */
 	explicit variable(const std::string& full_name, construction_key_token)
 			: abstract_variable(full_name, util::type_id<abstract_variable>::id<T>()) {
 		property_ = reflection::make_property<abstract_variable, T, variable<T>>(
@@ -119,11 +126,13 @@ public:
 						&variable<T>::value_from_store));
 	}
 
+	/// Returns the value of the variable.
 	util::accessor_value_type_t<T> value() const {
 		std::lock_guard<std::mutex> lock(value_mtx);
 		return value_;
 	}
 
+	/// Sets the value of the variable to the given new value.
 	void value(util::accessor_value_type_t<T> value) {
 		std::lock_guard<std::mutex> lock(value_mtx);
 		value_ = value;
