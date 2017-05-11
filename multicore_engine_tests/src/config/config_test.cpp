@@ -414,5 +414,26 @@ TEST(config_config_store, modification_listener_removal) {
 	ASSERT_FALSE(called);
 }
 
+TEST(config_config_store, do_transaction) {
+	config_store cs([](config_store::config_storer&) {});
+	auto var1 = cs.resolve<std::string>("var", "Test");
+	bool called = false;
+	bool correct = false;
+	var1->add_modification_listener([&](const std::string& val) {
+		called = true;
+		correct = val == "Hello World";
+	});
+	auto var2 = cs.resolve<std::string>("var", "Test");
+	bool valid_before = false;
+	var2->do_transaction([&](std::string& val) {
+		valid_before = val == "Test";
+		val = "Hello World";
+	});
+	ASSERT_TRUE(called);
+	ASSERT_TRUE(correct);
+	ASSERT_TRUE(valid_before);
+	ASSERT_EQ("Hello World", var1->value());
+}
+
 } // namespace config
 } // namespace mce
