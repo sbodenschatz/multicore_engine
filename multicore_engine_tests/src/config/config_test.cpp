@@ -403,5 +403,16 @@ TEST(config_config_store, modification_listener_notification) {
 	ASSERT_TRUE(correct);
 }
 
+TEST(config_config_store, modification_listener_removal) {
+	config_store cs([](config_store::config_storer&) {});
+	auto var1 = cs.resolve<std::string>("var", "Test");
+	bool called = false;
+	auto id = var1->add_modification_listener([&](const std::string&) { called = true; });
+	auto var2 = cs.resolve<std::string>("var", "Test");
+	var2->remove_modification_listener(id);
+	var2->value("Hello World");
+	ASSERT_FALSE(called);
+}
+
 } // namespace config
 } // namespace mce
