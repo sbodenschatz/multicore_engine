@@ -200,7 +200,8 @@ TEST(config_config_store, load_save_unmodified_load) {
 	ustr.str("number=345\n"
 			 "text=Hello Test\n"
 			 "vector=12 45 78\n"
-			 "list=Hello;Test;World\n");
+			 "list=Hello;Test;World\n"
+			 "new.value=This was not set in default config\n");
 	std::stringstream ostr;
 	{
 		config_store cs(ustr, dstr, [&](config_store::config_storer& s) { s.store(ostr); });
@@ -220,6 +221,8 @@ TEST(config_config_store, load_save_unmodified_load) {
 	auto list = cs.resolve<std::vector<std::string>>("list");
 	auto list_expected = std::vector<std::string>{"Hello", "Test", "World"};
 	ASSERT_EQ(list_expected, list->value());
+	auto newvalue = cs.resolve<std::string>("new.value");
+	ASSERT_EQ("This was not set in default config", newvalue->value());
 }
 
 } // namespace config
