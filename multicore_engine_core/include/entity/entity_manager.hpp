@@ -124,7 +124,7 @@ public:
 		decltype(component_types)::iterator it;
 		std::tie(it, success) =
 				component_types.emplace(name, make_component_type<T>(engine, name, factory_function));
-		if(!success) throw std::logic_error("Duplicate component type name.");
+		if(!success) throw duplicate_component_type_exception("Duplicate component type name.");
 		component_types_by_id.emplace(it->second->id(), it->second.get());
 	}
 };
