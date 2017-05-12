@@ -88,7 +88,8 @@ public:
 	 * The save callback must be callable with the signature <code>void(config_storer&)</code>.
 	 */
 	template <typename F>
-	explicit config_store(F&& save_callback) : save_callback_{std::forward<F>(save_callback)} {}
+	explicit config_store(F&& save_callback)
+			: save_callback_{std::forward<F>(save_callback)} {}
 
 	/// Calls the save callback and then destroys the config_store.
 	~config_store() noexcept;
@@ -103,7 +104,8 @@ public:
 	 * Otherwise, if the config file data contains a valid value for the variable it is created with this
 	 * value. If the value in the file data is invalid or the variable is not given in the config file data,
 	 * the default_value parameter is used.
-	 * If the variable was already looked up with a different type, an exception is thrown.
+	 * If the variable was already looked up with a different type, an exception of type
+	 * config_variable_conflict is thrown.
 	 */
 	template <typename T>
 	std::shared_ptr<variable<T>> resolve(const std::string& name, const T& default_value = T()) {
@@ -112,7 +114,8 @@ public:
 		if(it != variables_.end()) {
 			auto var = it->second->as_type<T>();
 			if(!var) {
-				throw std::runtime_error("Redefinition of variable '" + name + "' with different type.");
+				throw config_variable_conflict("Redefinition of variable '" + name +
+											   "' with different type.");
 			}
 			return var;
 		} else {
