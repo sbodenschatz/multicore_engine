@@ -60,7 +60,7 @@ struct logic_exception : std::logic_error {
 struct async_state_exception : std::logic_error {
 	using std::logic_error::logic_error;
 };
-/// Exception used to signal that a value of an invalid type was supplied.
+/// Exception used to signal that a value of an invalid type or an invalid literal was supplied.
 struct value_type_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
