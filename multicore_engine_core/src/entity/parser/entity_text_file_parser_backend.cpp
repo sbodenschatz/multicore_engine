@@ -149,7 +149,7 @@ operator()(const ast::rotation_list& node) {
 		case ast::rotation_axis::x: axis.x = 1.0f; break;
 		case ast::rotation_axis::y: axis.y = 1.0f; break;
 		case ast::rotation_axis::z: axis.z = 1.0f; break;
-		default: throw std::logic_error("Invalid rotation axis in AST."); break;
+		default: throw value_type_exception("Invalid rotation axis in AST."); break;
 		}
 		orientation = orientation * glm::angleAxis(glm::radians(entry.angle), axis);
 	}

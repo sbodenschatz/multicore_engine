@@ -228,7 +228,7 @@ struct ast_value_mapper<ast::rotation_list, glm::tquat<T, p>> {
 			case ast::rotation_axis::x: axis.x = T(1); break;
 			case ast::rotation_axis::y: axis.y = T(1); break;
 			case ast::rotation_axis::z: axis.z = T(1); break;
-			default: throw std::logic_error("Invalid rotation axis in AST."); break;
+			default: throw value_type_exception("Invalid rotation axis in AST."); break;
 			}
 			orientation = orientation * glm::angleAxis(glm::radians(entry.angle), axis);
 		}
