@@ -17,8 +17,14 @@ namespace glfw_wrapper {
 class instance;
 
 class window {
-	std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)> window_;
+	struct window_callbacks {
+		window_callbacks() = default;
+		window_callbacks(const window_callbacks&) = delete;
+		window_callbacks& operator=(const window_callbacks&) = delete;
+	};
 	std::unique_ptr<instance> instance_;
+	std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)> window_;
+	std::unique_ptr<window_callbacks> callbacks_;
 
 public:
 	window(const std::string& title, const glm::vec2& size);
