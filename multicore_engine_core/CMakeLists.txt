@@ -11,7 +11,6 @@ target_include_directories(mce_core PUBLIC
 target_link_libraries(mce_core 
 		mce_parsers 
 		mce_base
-		deps.vulkan
 		deps.glfw
 		deps.TBB
 		deps.Boost.ASIO
