@@ -88,8 +88,7 @@ public:
 	 * The save callback must be callable with the signature <code>void(config_storer&)</code>.
 	 */
 	template <typename F>
-	explicit config_store(F&& save_callback)
-			: save_callback_{std::forward<F>(save_callback)} {}
+	explicit config_store(F&& save_callback) : save_callback_{std::forward<F>(save_callback)} {}
 
 	/// Calls the save callback and then destroys the config_store.
 	~config_store() noexcept;
@@ -114,8 +113,8 @@ public:
 		if(it != variables_.end()) {
 			auto var = it->second->as_type<T>();
 			if(!var) {
-				throw config_variable_conflict("Redefinition of variable '" + name +
-											   "' with different type.");
+				throw config_variable_conflict_exception("Redefinition of variable '" + name +
+														 "' with different type.");
 			}
 			return var;
 		} else {

@@ -94,7 +94,7 @@ struct invalid_operation_exception : std::logic_error {
 };
 
 /// Exception used to signal a conflict between different resolutions of the same config variable.
-struct config_variable_conflict : std::logic_error {
+struct config_variable_conflict_exception : std::logic_error {
 	using std::logic_error::logic_error;
 };
 /// Exception used to signal errors on window creation.
