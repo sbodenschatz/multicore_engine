@@ -97,6 +97,10 @@ struct invalid_operation_exception : std::logic_error {
 struct config_variable_conflict : std::logic_error {
 	using std::logic_error::logic_error;
 };
+/// Exception used to signal errors on window creation.
+struct window_creation_exception : std::runtime_error {
+	using std::runtime_error::runtime_error;
+};
 
 } // namespace mce
 
