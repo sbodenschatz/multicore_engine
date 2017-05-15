@@ -11,7 +11,12 @@
 namespace mce {
 namespace glfw_wrapper {
 
-glfw_instance::glfw_instance() {
+std::mutex instance::init_mutex;
+size_t instance::init_refcount;
+std::atomic<instance::error_function_id> instance::next_error_function_id{0};
+util::copy_on_write<instance::error_function_container> instance::error_functions;
+
+instance::instance() {
 	std::lock_guard<std::mutex> lock(init_mutex);
 	if(init_refcount == 0) {
 		glfwInit();
@@ -20,7 +25,7 @@ glfw_instance::glfw_instance() {
 	init_refcount++;
 }
 
-glfw_instance::~glfw_instance() {
+instance::~instance() {
 	error_functions.do_transaction([&](error_function_container& efc) {
 		efc.erase(std::remove_if(efc.begin(), efc.end(), [&](auto& e) {
 			return std::find(error_ids.begin(), error_ids.end(), e.first) != error_ids.end();
@@ -33,14 +38,14 @@ glfw_instance::~glfw_instance() {
 	}
 }
 
-void glfw_instance::error_callback(int error_code, const char* description) {
+void instance::error_callback(int error_code, const char* description) {
 	auto efc = error_functions.get();
 	for(auto& e : *efc) {
 		e.second(error_code, description);
 	}
 }
 
-void glfw_instance::remove_error_callback(error_function_id id) {
+void instance::remove_error_callback(error_function_id id) {
 	error_functions.do_transaction([&](error_function_container& efc) {
 		efc.erase(std::remove_if(efc.begin(), efc.end(), [&](auto& e) { return e.first == id; }));
 	});

@@ -15,7 +15,7 @@
 namespace mce {
 namespace glfw_wrapper {
 
-class glfw_instance {
+class instance {
 	static std::mutex init_mutex;
 	static size_t init_refcount;
 	typedef size_t error_function_id;
@@ -31,10 +31,10 @@ class glfw_instance {
 	static void error_callback(int error_code, const char* description);
 
 public:
-	glfw_instance();
-	~glfw_instance();
-	glfw_instance(const glfw_instance&) = delete;
-	glfw_instance& operator=(const glfw_instance&) = delete;
+	instance();
+	~instance();
+	instance(const instance&) = delete;
+	instance& operator=(const instance&) = delete;
 
 	template <typename F>
 	error_function_id add_error_callback(const F& f) {
