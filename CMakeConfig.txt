@@ -208,6 +208,9 @@ target_link_libraries(deps.vulkan INTERFACE
 		$<$<PLATFORM_ID:Windows>:vulkan-1>
 		$<$<NOT:$<PLATFORM_ID:Windows>>:vulkan>
 	)
+target_compile_options(deps.vulkan INTERFACE
+		$<$<CXX_COMPILER_ID:MSVC>: /wd4714>
+	)
 
 add_library(deps.glfw INTERFACE)
 target_compile_definitions(deps.glfw INTERFACE
