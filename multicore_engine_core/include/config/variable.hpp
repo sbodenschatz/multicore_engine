@@ -131,18 +131,16 @@ public:
 	explicit variable(const std::string& full_name, construction_key_token)
 			: abstract_variable(full_name, util::type_id<abstract_variable>::id<T>()) {
 		property_ = reflection::make_property<abstract_variable, T, variable<T>>(
-				"value",
-				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
+				"value", static_cast<T (variable<T>::*)() const>(&variable<T>::value),
 				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(&variable<T>::value));
 		property_for_store_ = reflection::make_property<abstract_variable, T, variable<T>>(
-				"value_from_store",
-				static_cast<util::accessor_value_type_t<T> (variable<T>::*)() const>(&variable<T>::value),
+				"value_from_store", static_cast<T (variable<T>::*)() const>(&variable<T>::value),
 				static_cast<void (variable<T>::*)(util::accessor_value_type_t<T>)>(
 						&variable<T>::value_from_store));
 	}
 
 	/// Returns the value of the variable.
-	util::accessor_value_type_t<T> value() const {
+	T value() const {
 		std::lock_guard<std::mutex> lock(mutex_);
 		return value_;
 	}
