@@ -130,7 +130,7 @@ namespace detail {
 template <typename T, typename Object_Type = void>
 struct property_type_helper {
 	typedef util::accessor_value_type_t<T> accessor_value;
-	typedef accessor_value (Object_Type::*getter)() const;
+	typedef T (Object_Type::*getter)() const;
 	typedef void (Object_Type::*setter)(accessor_value value);
 };
 
@@ -198,9 +198,9 @@ public:
 	virtual ~property() = default;
 	/// Provides read access to the property value for the given object.
 	/**
-	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 * The return value type is T for all types to allow thread-safe getters.
 	 */
-	virtual accessor_value get_value(const Root_Type& object) const = 0;
+	virtual T get_value(const Root_Type& object) const = 0;
 	/// Provides write access to the property value for the given object.
 	/**
 	 * The value parameter type is T for primitive types and const T& for complex types (strings, vecN, etc.).
@@ -295,12 +295,12 @@ public:
 	virtual ~linked_property() = default;
 	/// Provides read access to the property value for the given object.
 	/**
-	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 * The return value type is T for all types to allow thread-safe getters.
 	 *
 	 * If no getter was supplied on construction of the property, this member function will throw an exception
 	 * of type invalid_property_access_exception.
 	 */
-	virtual accessor_value get_value(const Root_Type& object) const override {
+	virtual T get_value(const Root_Type& object) const override {
 		if(getter)
 			return (static_cast<const Object_Type&>(object).*getter)();
 		else
@@ -359,9 +359,9 @@ public:
 	virtual ~directly_linked_property() = default;
 	/// Provides read access to the property value for the given object.
 	/**
-	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 * The return value type is T for all types to allow thread-safe getters.
 	 */
-	virtual accessor_value get_value(const Root_Type& object) const noexcept override {
+	virtual T get_value(const Root_Type& object) const noexcept override {
 		return static_cast<const Object_Type&>(object).*variable;
 	}
 	/// Provides write access to the property value for the given object.
