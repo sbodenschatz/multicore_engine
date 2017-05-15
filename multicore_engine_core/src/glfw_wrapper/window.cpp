@@ -11,7 +11,7 @@
 namespace mce {
 namespace glfw_wrapper {
 
-window::window(const std::string& title, const glm::vec2& size)
+window::window(const std::string& title, const glm::ivec2& size)
 		: instance_{std::make_unique<instance>()},
 		  window_{std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
 		  callbacks_{std::make_unique<window_callbacks>()} {

@@ -27,7 +27,7 @@ class window {
 	std::unique_ptr<window_callbacks> callbacks_;
 
 public:
-	window(const std::string& title, const glm::vec2& size);
+	window(const std::string& title, const glm::ivec2& size);
 	~window();
 };
 
