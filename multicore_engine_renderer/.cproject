@@ -18,14 +18,14 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1830712584" name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.1309551844" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.169021340" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
-							<builder arguments="-j16" buildPath="${workspace_loc:}/eclipse_build_debug/multicore_engine_demo" command="make" id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1864019754" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_debug/multicore_engine_renderer" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1864019754" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.318561499" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.2103179112" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1459155580" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -36,7 +36,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1005330771" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -46,7 +46,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.906289021" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -85,14 +85,14 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.541781603" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.312912805" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
-							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_release/multicore_engine_demo" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="org.eclipse.cdt.build.core.settings.default.builder.964515743" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_release/multicore_engine_renderer" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="org.eclipse.cdt.build.core.settings.default.builder.964515743" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.832309887" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.567735645" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2072545442" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -103,7 +103,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033980625" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -113,7 +113,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.851904731" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -152,14 +152,14 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.704202571." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.82007975" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.1371813223" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
-							<builder arguments="-j16" buildPath="${workspace_loc:}/eclipse_build_debug/multicore_engine_demo" command="make" enabledIncrementalBuild="false" id="org.eclipse.cdt.build.core.settings.default.builder.1680536037" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_debug/multicore_engine_renderer" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="false" id="org.eclipse.cdt.build.core.settings.default.builder.1680536037" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.240754681" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.1705425198" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.365241325" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -170,7 +170,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.771757608" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -180,7 +180,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="C:/Libs/Boost/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2044758054" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -220,10 +220,13 @@
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1366386675;cdt.managedbuild.tool.gnu.cpp.compiler.input.1033980625">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1830712584;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1292740438;cdt.managedbuild.tool.gnu.cpp.compiler.input.1005330771">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.704202571;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.704202571.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1587603921;cdt.managedbuild.tool.gnu.c.compiler.input.2044758054">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1366386675;cdt.managedbuild.tool.gnu.cpp.compiler.input.1033980625">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1068879121;cdt.managedbuild.tool.gnu.c.compiler.input.851904731">
@@ -233,9 +236,6 @@
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.704202571;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.704202571.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.908474443;cdt.managedbuild.tool.gnu.cpp.compiler.input.771757608">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.545489244;cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1830712584;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1292740438;cdt.managedbuild.tool.gnu.cpp.compiler.input.1005330771">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 	</storageModule>

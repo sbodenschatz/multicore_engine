@@ -5,6 +5,7 @@ file(GLOB_RECURSE DEMO_HEADERS "include/*.hpp")
 add_executable(mce_demo ${DEMO_SRC} ${DEMO_HEADERS})
 target_link_libraries(mce_demo 
 		mce_core
+		mce_renderer
 		deps.Boost.ProgramOptions
 	)
 if(MSVC)
