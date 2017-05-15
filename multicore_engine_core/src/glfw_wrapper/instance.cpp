@@ -1,12 +1,12 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/glfw_wrapper/glfw_instance.cpp
+ * File /multicore_engine_core/src/glfw_wrapper/instance.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
-#include <glfw_wrapper/glfw_instance.hpp>
+#include <glfw_wrapper/instance.hpp>
 
 namespace mce {
 namespace glfw_wrapper {

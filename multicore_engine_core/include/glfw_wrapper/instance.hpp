@@ -1,11 +1,11 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/glfw_wrapper/glfw_instance.hpp
+ * File /multicore_engine_core/include/glfw_wrapper/instance.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef GLFW_WRAPPER_GLFW_INSTANCE_HPP_
-#define GLFW_WRAPPER_GLFW_INSTANCE_HPP_
+#ifndef GLFW_WRAPPER_INSTANCE_HPP_
+#define GLFW_WRAPPER_INSTANCE_HPP_
 
 #include <boost/container/small_vector.hpp>
 #include <functional>
@@ -53,4 +53,4 @@ public:
 } // namespace glfw_wrapper
 } // namespace mce
 
-#endif /* GLFW_WRAPPER_GLFW_INSTANCE_HPP_ */
+#endif /* GLFW_WRAPPER_INSTANCE_HPP_ */
