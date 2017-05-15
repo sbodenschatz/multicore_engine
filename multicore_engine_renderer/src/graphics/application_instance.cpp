@@ -122,7 +122,7 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 		PFN_vkDebugReportCallbackEXT cb = &validation_report_callback_static;
 		vk::DebugReportCallbackCreateInfoEXT debug_report_ci(validation_report_levels, cb,
 															 static_cast<void*>(this));
-		validation_report_cb = unique_handle<vk::DebugReportCallbackEXT, true>(
+		validation_report_cb = unique_handle<vk::DebugReportCallbackEXT>(
 				instance_->createDebugReportCallbackEXT(debug_report_ci),
 				[this](vk::DebugReportCallbackEXT& handle,
 					   const vk::Optional<const vk::AllocationCallbacks>& alloc) {
