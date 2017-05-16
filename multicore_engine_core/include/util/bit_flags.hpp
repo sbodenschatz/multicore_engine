@@ -39,6 +39,7 @@ public:
 	bit_flags() : value{0} {}
 	// cppcheck-suppress noExplicitConstructor
 	bit_flags(enum_t bit) : value{static_cast<value_t>(bit)} {}
+	// cppcheck-suppress passedByValue
 	explicit bit_flags(value_t value) : value{value} {}
 
 	bool operator==(const bit_flags<enum_t, mask_size>& other) const {

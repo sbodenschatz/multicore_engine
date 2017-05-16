@@ -12,6 +12,7 @@
 namespace mce {
 namespace glfw_wrapper {
 
+// cppcheck-suppress passedByValue
 window::window(const std::string& title, const glm::ivec2& size, window_hint_flags hints)
 		: instance_{std::make_unique<instance>()},
 		  window_{std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
@@ -45,6 +46,7 @@ void window::setup_callbacks() {
 	glfwSetWindowRefreshCallback(window_.get(), window_refresh_callback_s);
 }
 
+// cppcheck-suppress passedByValue
 void window::set_window_hints(window_hint_flags hints) {
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
