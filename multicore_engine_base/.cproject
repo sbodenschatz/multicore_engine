@@ -29,7 +29,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
@@ -43,7 +42,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
@@ -60,7 +58,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
@@ -112,7 +109,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
@@ -125,7 +121,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
@@ -141,7 +136,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\Boost\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
@@ -198,7 +192,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
@@ -212,7 +205,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
@@ -229,7 +221,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glm\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\zlib\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkcpp\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_base/include}&quot;"/>
