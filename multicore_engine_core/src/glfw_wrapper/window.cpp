@@ -38,6 +38,24 @@ void window::setup_callbacks() {
 	glfwSetScrollCallback(window_.get(), scroll_callback_s);
 }
 
+bool window::should_close() const {
+	return glfwWindowShouldClose(window_.get());
+}
+void window::poll_events() {
+	glfwPollEvents();
+}
+glm::dvec2 window::cursor_position() const {
+	glm::dvec2 pos;
+	glfwGetCursorPos(window_.get(), &pos.x, &pos.y);
+	return pos;
+}
+void window::cursor_position(glm::dvec2 pos) {
+	glfwSetCursorPos(window_.get(), pos.x, pos.y);
+}
+bool window::key(int key_code) const {
+	return glfwGetKey(window_.get(), key_code) == GLFW_PRESS;
+}
+
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->key;
 	if(cb) cb(key, scancode, action, mods);

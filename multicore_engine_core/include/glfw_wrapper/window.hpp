@@ -57,6 +57,12 @@ public:
 	window(const std::string& title, const glm::ivec2& size);
 	~window();
 
+	bool should_close() const;
+	static void poll_events();
+	glm::dvec2 cursor_position() const;
+	void cursor_position(glm::dvec2 pos);
+	bool key(int key_code) const; // TODO Change to typesafe keycode.
+
 	template <typename F>
 	void key_callback(F&& f) {
 		callbacks_->key = std::forward<F>(f);
