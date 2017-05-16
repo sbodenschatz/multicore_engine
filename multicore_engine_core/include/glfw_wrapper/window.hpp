@@ -7,10 +7,11 @@
 #ifndef GLFW_WRAPPER_WINDOW_HPP_
 #define GLFW_WRAPPER_WINDOW_HPP_
 
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
+
+struct GLFWwindow;
 
 namespace mce {
 namespace glfw_wrapper {
