@@ -65,6 +65,9 @@ void instance::wait_events(double timeout) {
 void instance::post_empty_event() {
 	glfwPostEmptyEvent();
 }
+std::string instance::key_name(key key, int scancode) const {
+	return glfwGetKeyName(static_cast<int>(key), scancode);
+}
 
 } // namespace glfw_wrapper
 } // namespace mce

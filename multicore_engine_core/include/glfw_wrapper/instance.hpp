@@ -9,6 +9,7 @@
 
 #include <boost/container/small_vector.hpp>
 #include <functional>
+#include <glfw_wrapper/glfw_defs.hpp>
 #include <mutex>
 #include <util/copy_on_write.hpp>
 
@@ -48,10 +49,12 @@ public:
 	}
 
 	void remove_error_callback(error_function_id id);
+
 	void poll_events();
 	void wait_events();
 	void wait_events(double timeout);
 	void post_empty_event();
+	std::string key_name(key key, int scancode) const;
 };
 
 } // namespace glfw_wrapper
