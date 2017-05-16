@@ -123,6 +123,12 @@ public:
 	std::string clipboard() const;
 	void clipboard(const std::string& content);
 
+	void iconify();
+	void restore();
+	void maximize();
+	void hide();
+	void focus();
+
 	template <typename F>
 	void key_callback(F&& f) {
 		callbacks_->key = std::forward<F>(f);

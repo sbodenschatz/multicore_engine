@@ -140,6 +140,22 @@ void window::aspect_ratio(int numerator, int denominator) {
 	glfwSetWindowAspectRatio(window_.get(), numerator, denominator);
 }
 
+void window::iconify() {
+	glfwIconifyWindow(window_.get());
+}
+void window::restore() {
+	glfwRestoreWindow(window_.get());
+}
+void window::maximize() {
+	glfwMaximizeWindow(window_.get());
+}
+void window::hide() {
+	glfwHideWindow(window_.get());
+}
+void window::focus() {
+	glfwFocusWindow(window_.get());
+}
+
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->key;
 	if(cb)
