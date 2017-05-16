@@ -12,6 +12,8 @@
  * Type declarations and enum definitions for the glfw wrapper.
  */
 
+#include <util/bit_flags.hpp>
+
 namespace mce {
 namespace glfw_wrapper {
 
@@ -143,6 +145,7 @@ enum class key {
 
 enum class action { release = 0, press = 1, repeat = 2 };
 enum class modifier_bits { shift = 0x0001, control = 0x0002, alt = 0x0004, super = 0x0008 };
+typedef util::bit_flags<modifier_bits, 4> modifier_flags;
 enum class cursor_mode { normal = 0x00034001, hidden = 0x00034002, disabled = 0x00034003 };
 
 enum class mouse_button {
@@ -169,6 +172,7 @@ enum class window_hint_bits {
 	floating = 0x0020,
 	maximized = 0x0040
 };
+typedef util::bit_flags<window_hint_bits, 7> window_hint_flags;
 
 } // namespace glfw_wrapper
 } // namespace mce
