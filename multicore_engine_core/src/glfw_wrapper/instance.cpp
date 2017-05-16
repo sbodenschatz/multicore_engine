@@ -53,5 +53,18 @@ void instance::remove_error_callback(error_function_id id) {
 	error_ids.erase(std::remove_if(error_ids.begin(), error_ids.end(), [&](auto& e) { return e == id; }));
 }
 
+void instance::poll_events() {
+	glfwPollEvents();
+}
+void instance::wait_events() {
+	glfwWaitEvents();
+}
+void instance::wait_events(double timeout) {
+	glfwWaitEventsTimeout(timeout);
+}
+void instance::post_empty_event() {
+	glfwPostEmptyEvent();
+}
+
 } // namespace glfw_wrapper
 } // namespace mce

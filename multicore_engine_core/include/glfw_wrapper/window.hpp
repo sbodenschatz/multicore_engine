@@ -93,7 +93,6 @@ public:
 	~window();
 
 	bool should_close() const;
-	static void poll_events();
 	glm::dvec2 cursor_position() const;
 	void cursor_position(glm::dvec2 pos);
 	bool key(key key_code) const;

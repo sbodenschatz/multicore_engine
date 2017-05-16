@@ -64,9 +64,6 @@ void window::set_window_hints(window_hint_flags hints) {
 bool window::should_close() const {
 	return glfwWindowShouldClose(window_.get());
 }
-void window::poll_events() {
-	glfwPollEvents();
-}
 glm::dvec2 window::cursor_position() const {
 	glm::dvec2 pos;
 	glfwGetCursorPos(window_.get(), &pos.x, &pos.y);

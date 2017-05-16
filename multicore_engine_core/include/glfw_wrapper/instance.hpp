@@ -48,6 +48,10 @@ public:
 	}
 
 	void remove_error_callback(error_function_id id);
+	void poll_events();
+	void wait_events();
+	void wait_events(double timeout);
+	void post_empty_event();
 };
 
 } // namespace glfw_wrapper
