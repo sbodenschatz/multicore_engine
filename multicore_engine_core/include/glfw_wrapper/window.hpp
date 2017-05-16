@@ -37,13 +37,13 @@ class window {
 	static void window_focus_callback_s(GLFWwindow* window, int focused);
 	static void window_refresh_callback_s(GLFWwindow* window);
 
-	// TODO Change signatures to typesafe parameters:
-	typedef std::function<void(int key, int scancode, int action, int mods)> key_callback_t;
+	typedef std::function<void(key key, int scancode, action action, modifier_flags mods)> key_callback_t;
 	typedef std::function<void(unsigned int codepoint)> character_callback_t;
-	typedef std::function<void(unsigned int codepoint, int mods)> charmods_callback_t;
+	typedef std::function<void(unsigned int codepoint, modifier_flags mods)> charmods_callback_t;
 	typedef std::function<void(double xpos, double ypos)> cursor_position_callback_t;
-	typedef std::function<void(int entered)> cursor_enter_callback_t;
-	typedef std::function<void(int button, int action, int mods)> mouse_button_callback_t;
+	typedef std::function<void(bool entered)> cursor_enter_callback_t;
+	typedef std::function<void(mouse_button button, action action, modifier_flags mods)>
+			mouse_button_callback_t;
 	typedef std::function<void(double xoffset, double yoffset)> scroll_callback_t;
 
 	typedef std::function<void()> window_close_callback_t;
@@ -92,7 +92,8 @@ public:
 	static void poll_events();
 	glm::dvec2 cursor_position() const;
 	void cursor_position(glm::dvec2 pos);
-	bool key(int key_code) const; // TODO Change to typesafe keycode.
+	bool key(key key_code) const;
+	bool mouse_button(mouse_button button) const;
 
 	template <typename F>
 	void key_callback(F&& f) {

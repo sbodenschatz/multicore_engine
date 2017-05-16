@@ -71,13 +71,18 @@ glm::dvec2 window::cursor_position() const {
 void window::cursor_position(glm::dvec2 pos) {
 	glfwSetCursorPos(window_.get(), pos.x, pos.y);
 }
-bool window::key(int key_code) const {
-	return glfwGetKey(window_.get(), key_code) == GLFW_PRESS;
+bool window::key(glfw_wrapper::key key_code) const {
+	return glfwGetKey(window_.get(), static_cast<int>(key_code)) == GLFW_PRESS;
+}
+bool window::mouse_button(glfw_wrapper::mouse_button button) const {
+	return glfwGetMouseButton(window_.get(), static_cast<int>(button)) == GLFW_PRESS;
 }
 
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->key;
-	if(cb) cb(key, scancode, action, mods);
+	if(cb)
+		cb(static_cast<glfw_wrapper::key>(key), scancode, static_cast<glfw_wrapper::action>(action),
+		   modifier_flags(mods));
 }
 void window::character_callback_s(GLFWwindow* window, unsigned int codepoint) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->character;
@@ -85,7 +90,7 @@ void window::character_callback_s(GLFWwindow* window, unsigned int codepoint) {
 }
 void window::charmods_callback_s(GLFWwindow* window, unsigned int codepoint, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->charmods;
-	if(cb) cb(codepoint, mods);
+	if(cb) cb(codepoint, modifier_flags(mods));
 }
 void window::cursor_position_callback_s(GLFWwindow* window, double xpos, double ypos) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->cursor_position;
@@ -93,11 +98,13 @@ void window::cursor_position_callback_s(GLFWwindow* window, double xpos, double 
 }
 void window::cursor_enter_callback_s(GLFWwindow* window, int entered) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->cursor_enter;
-	if(cb) cb(entered);
+	if(cb) cb(entered == GLFW_TRUE);
 }
 void window::mouse_button_callback_s(GLFWwindow* window, int button, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->mouse_button;
-	if(cb) cb(button, action, mods);
+	if(cb)
+		cb(static_cast<glfw_wrapper::mouse_button>(button), static_cast<glfw_wrapper::action>(action),
+		   modifier_flags(mods));
 }
 void window::scroll_callback_s(GLFWwindow* window, double xoffset, double yoffset) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->scroll;
