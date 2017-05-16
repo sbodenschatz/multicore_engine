@@ -12,12 +12,11 @@
 namespace mce {
 namespace glfw_wrapper {
 
-window::window(const std::string& title, const glm::ivec2& size)
+window::window(const std::string& title, const glm::ivec2& size, window_hint_flags hints)
 		: instance_{std::make_unique<instance>()},
 		  window_{std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
 		  callbacks_{std::make_unique<window_callbacks>()} {
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // TODO: Make configurable
+	set_window_hints(hints);
 	window_ = std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(
 			glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr),
 			[](GLFWwindow* win) { glfwDestroyWindow(win); });
@@ -44,6 +43,18 @@ void window::setup_callbacks() {
 	glfwSetWindowIconifyCallback(window_.get(), window_iconify_callback_s);
 	glfwSetWindowFocusCallback(window_.get(), window_focus_callback_s);
 	glfwSetWindowRefreshCallback(window_.get(), window_refresh_callback_s);
+}
+
+void window::set_window_hints(window_hint_flags hints) {
+	glfwDefaultWindowHints();
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	glfwWindowHint(GLFW_RESIZABLE, (hints & window_hint_bits::resizable) ? GLFW_TRUE : GLFW_FALSE);
+	glfwWindowHint(GLFW_VISIBLE, (hints & window_hint_bits::visible) ? GLFW_TRUE : GLFW_FALSE);
+	glfwWindowHint(GLFW_DECORATED, (hints & window_hint_bits::decorated) ? GLFW_TRUE : GLFW_FALSE);
+	glfwWindowHint(GLFW_FOCUSED, (hints & window_hint_bits::focused) ? GLFW_TRUE : GLFW_FALSE);
+	glfwWindowHint(GLFW_AUTO_ICONIFY, (hints & window_hint_bits::auto_iconify) ? GLFW_TRUE : GLFW_FALSE);
+	glfwWindowHint(GLFW_FLOATING, (hints & window_hint_bits::floating) ? GLFW_TRUE : GLFW_FALSE);
+	glfwWindowHint(GLFW_MAXIMIZED, (hints & window_hint_bits::maximized) ? GLFW_TRUE : GLFW_FALSE);
 }
 
 bool window::should_close() const {

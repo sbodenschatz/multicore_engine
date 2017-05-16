@@ -74,12 +74,18 @@ class window {
 		window_focus_callback_t window_focus;
 		window_refresh_callback_t window_refresh;
 	};
+
 	std::unique_ptr<instance> instance_;
 	std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)> window_;
 	std::unique_ptr<window_callbacks> callbacks_;
 
+	void set_window_hints(window_hint_flags hints);
+
 public:
-	window(const std::string& title, const glm::ivec2& size);
+	window(const std::string& title, const glm::ivec2& size,
+		   window_hint_flags hints = window_hint_flags() | window_hint_bits::visible |
+									 window_hint_bits::decorated | window_hint_bits::focused |
+									 window_hint_bits::auto_iconify);
 	~window();
 
 	bool should_close() const;
