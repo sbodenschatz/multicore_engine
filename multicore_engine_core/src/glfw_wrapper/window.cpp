@@ -5,9 +5,11 @@
  */
 
 #include <GLFW/glfw3.h>
+#include <algorithm>
 #include <exceptions.hpp>
 #include <glfw_wrapper/instance.hpp>
 #include <glfw_wrapper/window.hpp>
+#include <iterator>
 
 namespace mce {
 namespace glfw_wrapper {
@@ -80,6 +82,31 @@ bool window::mouse_button(glfw_wrapper::mouse_button button) const {
 	return glfwGetMouseButton(window_.get(), static_cast<int>(button)) == GLFW_PRESS;
 }
 
+glfw_wrapper::cursor_mode window::cursor_mode() const {
+	return static_cast<glfw_wrapper::cursor_mode>(glfwGetInputMode(window_.get(), GLFW_CURSOR));
+}
+void window::cursor_mode(glfw_wrapper::cursor_mode mode) {
+	glfwSetInputMode(window_.get(), GLFW_CURSOR, static_cast<int>(mode));
+}
+bool window::sticky_keys() const {
+	return glfwGetInputMode(window_.get(), GLFW_STICKY_KEYS) == GLFW_TRUE;
+}
+void window::sticky_keys(bool enabled) {
+	glfwSetInputMode(window_.get(), GLFW_STICKY_KEYS, enabled ? GLFW_TRUE : GLFW_FALSE);
+}
+bool window::sticky_mouse_buttons() const {
+	return glfwGetInputMode(window_.get(), GLFW_STICKY_MOUSE_BUTTONS) == GLFW_TRUE;
+}
+void window::sticky_mouse_buttons(bool enabled) {
+	glfwSetInputMode(window_.get(), GLFW_STICKY_MOUSE_BUTTONS, enabled ? GLFW_TRUE : GLFW_FALSE);
+}
+std::string window::clipboard() const {
+	return glfwGetClipboardString(window_.get());
+}
+void window::clipboard(const std::string& content) {
+	glfwSetClipboardString(window_.get(), content.c_str());
+}
+
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->key;
 	if(cb)
@@ -140,6 +167,15 @@ void window::window_focus_callback_s(GLFWwindow* window, int focused) {
 void window::window_refresh_callback_s(GLFWwindow* window) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->window_refresh;
 	if(cb) cb();
+}
+void window::window_drop_callback_s(GLFWwindow* window, int count, const char** paths) {
+	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->window_drop;
+	if(cb) {
+		std::vector<std::string> paths_buffer;
+		paths_buffer.reserve(count);
+		std::copy(paths, paths + count, std::back_inserter(paths_buffer));
+		cb(paths_buffer);
+	}
 }
 
 } /* namespace glfw_wrapper */

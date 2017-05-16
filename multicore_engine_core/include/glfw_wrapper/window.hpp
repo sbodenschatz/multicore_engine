@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
+#include <vector>
 
 struct GLFWwindow;
 
@@ -36,6 +37,7 @@ class window {
 	static void window_iconify_callback_s(GLFWwindow* window, int iconified);
 	static void window_focus_callback_s(GLFWwindow* window, int focused);
 	static void window_refresh_callback_s(GLFWwindow* window);
+	static void window_drop_callback_s(GLFWwindow* window, int count, const char** paths);
 
 	typedef std::function<void(key key, int scancode, action action, modifier_flags mods)> key_callback_t;
 	typedef std::function<void(unsigned int codepoint)> character_callback_t;
@@ -53,6 +55,7 @@ class window {
 	typedef std::function<void(bool iconified)> window_iconify_callback_t;
 	typedef std::function<void(bool focused)> window_focus_callback_t;
 	typedef std::function<void()> window_refresh_callback_t;
+	typedef std::function<void(const std::vector<std::string>& paths)> window_drop_callback_t;
 
 	struct window_callbacks {
 		window_callbacks() = default;
@@ -73,6 +76,7 @@ class window {
 		window_iconify_callback_t window_iconify;
 		window_focus_callback_t window_focus;
 		window_refresh_callback_t window_refresh;
+		window_drop_callback_t window_drop;
 	};
 
 	std::unique_ptr<instance> instance_;
@@ -94,6 +98,15 @@ public:
 	void cursor_position(glm::dvec2 pos);
 	bool key(key key_code) const;
 	bool mouse_button(mouse_button button) const;
+
+	glfw_wrapper::cursor_mode cursor_mode() const;
+	void cursor_mode(glfw_wrapper::cursor_mode mode);
+	bool sticky_keys() const;
+	void sticky_keys(bool enabled);
+	bool sticky_mouse_buttons() const;
+	void sticky_mouse_buttons(bool enabled);
+	std::string clipboard() const;
+	void clipboard(const std::string& content);
 
 	template <typename F>
 	void key_callback(F&& f) {
@@ -150,6 +163,10 @@ public:
 	template <typename F>
 	void window_refresh_callback(F&& f) {
 		callbacks_->window_refresh = std::forward<F>(f);
+	}
+	template <typename F>
+	void window_drop_callback(F&& f) {
+		callbacks_->window_drop = std::forward<F>(f);
 	}
 };
 
