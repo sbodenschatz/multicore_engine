@@ -99,6 +99,21 @@ public:
 	bool key(key key_code) const;
 	bool mouse_button(mouse_button button) const;
 
+	glm::ivec2 window_position() const;
+	void window_position(glm::ivec2 pos);
+	glm::ivec2 window_size() const;
+	void window_size(glm::ivec2 size);
+	glm::ivec2 framebuffer_size() const;
+	struct window_frame {
+		int left;
+		int top;
+		int right;
+		int bottom;
+	};
+	window_frame window_frame_size() const;
+	void window_size_limits(glm::ivec2 min = {dont_care, dont_care}, glm::ivec2 max = {dont_care, dont_care});
+	void aspect_ratio(int numerator = dont_care, int denominator = dont_care);
+
 	glfw_wrapper::cursor_mode cursor_mode() const;
 	void cursor_mode(glfw_wrapper::cursor_mode mode);
 	bool sticky_keys() const;

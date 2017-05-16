@@ -107,6 +107,39 @@ void window::clipboard(const std::string& content) {
 	glfwSetClipboardString(window_.get(), content.c_str());
 }
 
+glm::ivec2 window::window_position() const {
+	glm::ivec2 s;
+	glfwGetWindowPos(window_.get(), &s.x, &s.y);
+	return s;
+}
+void window::window_position(glm::ivec2 pos) {
+	glfwSetWindowPos(window_.get(), pos.x, pos.y);
+}
+glm::ivec2 window::window_size() const {
+	glm::ivec2 s;
+	glfwGetWindowSize(window_.get(), &s.x, &s.y);
+	return s;
+}
+void window::window_size(glm::ivec2 size) {
+	glfwSetWindowSize(window_.get(), size.x, size.y);
+}
+glm::ivec2 window::framebuffer_size() const {
+	glm::ivec2 s;
+	glfwGetFramebufferSize(window_.get(), &s.x, &s.y);
+	return s;
+}
+window::window_frame window::window_frame_size() const {
+	window_frame f;
+	glfwGetWindowFrameSize(window_.get(), &f.left, &f.top, &f.right, &f.bottom);
+	return f;
+}
+void window::window_size_limits(glm::ivec2 min, glm::ivec2 max) {
+	glfwSetWindowSizeLimits(window_.get(), min.x, min.y, max.x, max.y);
+}
+void window::aspect_ratio(int numerator, int denominator) {
+	glfwSetWindowAspectRatio(window_.get(), numerator, denominator);
+}
+
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->key;
 	if(cb)

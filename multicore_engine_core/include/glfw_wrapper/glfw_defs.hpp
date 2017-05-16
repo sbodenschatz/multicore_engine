@@ -174,6 +174,8 @@ enum class window_hint_bits {
 };
 typedef util::bit_flags<window_hint_bits, 7> window_hint_flags;
 
+constexpr int dont_care = -1;
+
 } // namespace glfw_wrapper
 } // namespace mce
 
