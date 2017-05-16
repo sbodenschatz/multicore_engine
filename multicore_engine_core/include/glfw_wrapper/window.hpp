@@ -7,10 +7,11 @@
 #ifndef GLFW_WRAPPER_WINDOW_HPP_
 #define GLFW_WRAPPER_WINDOW_HPP_
 
+#include <functional>
+#include <glfw_wrapper/glfw_defs.hpp>
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
-#include <functional>
 
 struct GLFWwindow;
 
@@ -28,6 +29,14 @@ class window {
 	static void mouse_button_callback_s(GLFWwindow* window, int button, int action, int mods);
 	static void scroll_callback_s(GLFWwindow* window, double xoffset, double yoffset);
 
+	static void window_close_callback_s(GLFWwindow* window);
+	static void window_size_callback_s(GLFWwindow* window, int width, int height);
+	static void framebuffer_size_callback_s(GLFWwindow* window, int width, int height);
+	static void window_pos_callback_s(GLFWwindow* window, int xpos, int ypos);
+	static void window_iconify_callback_s(GLFWwindow* window, int iconified);
+	static void window_focus_callback_s(GLFWwindow* window, int focused);
+	static void window_refresh_callback_s(GLFWwindow* window);
+
 	// TODO Change signatures to typesafe parameters:
 	typedef std::function<void(int key, int scancode, int action, int mods)> key_callback_t;
 	typedef std::function<void(unsigned int codepoint)> character_callback_t;
@@ -36,6 +45,14 @@ class window {
 	typedef std::function<void(int entered)> cursor_enter_callback_t;
 	typedef std::function<void(int button, int action, int mods)> mouse_button_callback_t;
 	typedef std::function<void(double xoffset, double yoffset)> scroll_callback_t;
+
+	typedef std::function<void()> window_close_callback_t;
+	typedef std::function<void(int width, int height)> window_size_callback_t;
+	typedef std::function<void(int width, int height)> framebuffer_size_callback_t;
+	typedef std::function<void(int xpos, int ypos)> window_pos_callback_t;
+	typedef std::function<void(bool iconified)> window_iconify_callback_t;
+	typedef std::function<void(bool focused)> window_focus_callback_t;
+	typedef std::function<void()> window_refresh_callback_t;
 
 	struct window_callbacks {
 		window_callbacks() = default;
@@ -48,6 +65,14 @@ class window {
 		cursor_enter_callback_t cursor_enter;
 		mouse_button_callback_t mouse_button;
 		scroll_callback_t scroll;
+
+		window_close_callback_t window_close;
+		window_size_callback_t window_size;
+		framebuffer_size_callback_t framebuffer_size;
+		window_pos_callback_t window_pos;
+		window_iconify_callback_t window_iconify;
+		window_focus_callback_t window_focus;
+		window_refresh_callback_t window_refresh;
 	};
 	std::unique_ptr<instance> instance_;
 	std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)> window_;
@@ -90,6 +115,34 @@ public:
 	template <typename F>
 	void scroll_callback(F&& f) {
 		callbacks_->scroll = std::forward<F>(f);
+	}
+	template <typename F>
+	void window_close_callback(F&& f) {
+		callbacks_->window_close = std::forward<F>(f);
+	}
+	template <typename F>
+	void window_size_callback(F&& f) {
+		callbacks_->window_size = std::forward<F>(f);
+	}
+	template <typename F>
+	void framebuffer_size_callback(F&& f) {
+		callbacks_->framebuffer_size = std::forward<F>(f);
+	}
+	template <typename F>
+	void window_position_callback(F&& f) {
+		callbacks_->window_pos = std::forward<F>(f);
+	}
+	template <typename F>
+	void window_iconify_callback(F&& f) {
+		callbacks_->window_iconify = std::forward<F>(f);
+	}
+	template <typename F>
+	void window_focus_callback(F&& f) {
+		callbacks_->window_focus = std::forward<F>(f);
+	}
+	template <typename F>
+	void window_refresh_callback(F&& f) {
+		callbacks_->window_refresh = std::forward<F>(f);
 	}
 };
 

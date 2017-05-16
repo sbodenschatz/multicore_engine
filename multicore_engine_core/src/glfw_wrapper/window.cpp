@@ -4,17 +4,17 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <GLFW/glfw3.h>
 #include <exceptions.hpp>
 #include <glfw_wrapper/instance.hpp>
 #include <glfw_wrapper/window.hpp>
-#include <GLFW/glfw3.h>
 
 namespace mce {
 namespace glfw_wrapper {
 
 window::window(const std::string& title, const glm::ivec2& size)
 		: instance_{std::make_unique<instance>()},
-		  window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
+		  window_{std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
 		  callbacks_{std::make_unique<window_callbacks>()} {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // TODO: Make configurable
@@ -36,6 +36,14 @@ void window::setup_callbacks() {
 	glfwSetCursorEnterCallback(window_.get(), cursor_enter_callback_s);
 	glfwSetMouseButtonCallback(window_.get(), mouse_button_callback_s);
 	glfwSetScrollCallback(window_.get(), scroll_callback_s);
+
+	glfwSetWindowCloseCallback(window_.get(), window_close_callback_s);
+	glfwSetWindowSizeCallback(window_.get(), window_size_callback_s);
+	glfwSetFramebufferSizeCallback(window_.get(), framebuffer_size_callback_s);
+	glfwSetWindowPosCallback(window_.get(), window_pos_callback_s);
+	glfwSetWindowIconifyCallback(window_.get(), window_iconify_callback_s);
+	glfwSetWindowFocusCallback(window_.get(), window_focus_callback_s);
+	glfwSetWindowRefreshCallback(window_.get(), window_refresh_callback_s);
 }
 
 bool window::should_close() const {
@@ -83,6 +91,35 @@ void window::mouse_button_callback_s(GLFWwindow* window, int button, int action,
 void window::scroll_callback_s(GLFWwindow* window, double xoffset, double yoffset) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->scroll;
 	if(cb) cb(xoffset, yoffset);
+}
+
+void window::window_close_callback_s(GLFWwindow* window) {
+	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->window_close;
+	if(cb) cb();
+}
+void window::window_size_callback_s(GLFWwindow* window, int width, int height) {
+	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->window_size;
+	if(cb) cb(width, height);
+}
+void window::framebuffer_size_callback_s(GLFWwindow* window, int width, int height) {
+	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->framebuffer_size;
+	if(cb) cb(width, height);
+}
+void window::window_pos_callback_s(GLFWwindow* window, int xpos, int ypos) {
+	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->window_pos;
+	if(cb) cb(xpos, ypos);
+}
+void window::window_iconify_callback_s(GLFWwindow* window, int iconified) {
+	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->window_iconify;
+	if(cb) cb(iconified == GLFW_TRUE);
+}
+void window::window_focus_callback_s(GLFWwindow* window, int focused) {
+	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->window_focus;
+	if(cb) cb(focused == GLFW_TRUE);
+}
+void window::window_refresh_callback_s(GLFWwindow* window) {
+	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->window_refresh;
+	if(cb) cb();
 }
 
 } /* namespace glfw_wrapper */
