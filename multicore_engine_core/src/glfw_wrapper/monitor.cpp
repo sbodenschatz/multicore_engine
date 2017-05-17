@@ -73,7 +73,7 @@ void monitor::gamma_ramp(const glfw_wrapper::gamma_ramp& ramp) {
 	std::vector<unsigned short> red(ramp.size());
 	std::vector<unsigned short> green(ramp.size());
 	std::vector<unsigned short> blue(ramp.size());
-	tmp.size = ramp.size();
+	tmp.size = unsigned int(ramp.size());
 	for(unsigned int i = 0; i < ramp.size(); ++i) {
 		red[i] = ramp[i].r;
 		green[i] = ramp[i].g;
