@@ -13,6 +13,7 @@
 #include <vector>
 
 struct GLFWmonitor;
+struct GLFWvidmode;
 
 namespace mce {
 namespace glfw_wrapper {
@@ -20,7 +21,10 @@ class instance;
 
 class monitor {
 	GLFWmonitor* monitor_;
+	// cppcheck-suppress noExplicitConstructor
 	monitor(GLFWmonitor* mon) : monitor_{mon} {}
+
+	static video_mode convert_video_mode(const GLFWvidmode* m);
 
 public:
 	static monitor primary_monitor(const instance& inst);
