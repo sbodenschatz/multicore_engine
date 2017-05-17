@@ -12,7 +12,9 @@
  * Type declarations and enum definitions for the glfw wrapper.
  */
 
+#include <glm/glm.hpp>
 #include <util/bit_flags.hpp>
+#include <vector>
 
 namespace mce {
 namespace glfw_wrapper {
@@ -175,6 +177,17 @@ enum class window_hint_bits {
 typedef util::bit_flags<window_hint_bits, 7> window_hint_flags;
 
 constexpr int dont_care = -1;
+
+struct video_mode {
+	int width;
+	int height;
+	int redBits;
+	int greenBits;
+	int blueBits;
+	int refreshRate;
+};
+
+typedef std::vector<glm::tvec3<unsigned short>> gamma_ramp;
 
 } // namespace glfw_wrapper
 } // namespace mce
