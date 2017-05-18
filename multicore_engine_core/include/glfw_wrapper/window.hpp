@@ -19,6 +19,7 @@ struct GLFWwindow;
 namespace mce {
 namespace glfw_wrapper {
 class instance;
+class monitor;
 
 class window {
 	void setup_callbacks();
@@ -86,10 +87,17 @@ class window {
 	void set_window_hints(window_hint_flags hints);
 
 public:
+	/// Windowed mode
 	window(const std::string& title, const glm::ivec2& size,
 		   window_hint_flags hints = window_hint_flags() | window_hint_bits::visible |
 									 window_hint_bits::decorated | window_hint_bits::focused |
 									 window_hint_bits::auto_iconify);
+	/// Full screen mode
+	window(const std::string& title, const monitor& monitor, const video_mode& mode,
+		   window_hint_flags hints = window_hint_flags() | window_hint_bits::auto_iconify);
+	/// Windowed full screen
+	window(const std::string& title, const monitor& monitor,
+		   window_hint_flags hints = window_hint_flags() | window_hint_bits::auto_iconify);
 	~window();
 
 	bool should_close() const;

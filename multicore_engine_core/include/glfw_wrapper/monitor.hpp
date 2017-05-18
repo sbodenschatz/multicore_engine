@@ -27,6 +27,7 @@ class monitor {
 	static video_mode convert_video_mode(const GLFWvidmode* m);
 
 	friend class instance;
+	friend class window;
 
 public:
 	static monitor primary_monitor(const instance& inst);

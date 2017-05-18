@@ -185,6 +185,11 @@ struct video_mode {
 	int greenBits;
 	int blueBits;
 	int refreshRate;
+	video_mode() : video_mode(0, 0) {}
+	video_mode(int width, int height, int redBits = dont_care, int greenBits = dont_care,
+			   int blueBits = dont_care, int refreshRate = dont_care)
+			: width{width}, height{height}, redBits{redBits}, greenBits{greenBits}, blueBits{blueBits},
+			  refreshRate{refreshRate} {}
 };
 
 typedef std::vector<glm::tvec3<unsigned short>> gamma_ramp;

@@ -10,6 +10,7 @@
 #include <glfw_wrapper/instance.hpp>
 #include <glfw_wrapper/window.hpp>
 #include <iterator>
+#include <glfw_wrapper/monitor.hpp>
 
 namespace mce {
 namespace glfw_wrapper {
@@ -17,7 +18,7 @@ namespace glfw_wrapper {
 // cppcheck-suppress passedByValue
 window::window(const std::string& title, const glm::ivec2& size, window_hint_flags hints)
 		: instance_{std::make_unique<instance>()},
-		  window_{std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
+		  window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
 		  callbacks_{std::make_unique<window_callbacks>()} {
 	set_window_hints(hints);
 	window_ = std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(
@@ -26,6 +27,23 @@ window::window(const std::string& title, const glm::ivec2& size, window_hint_fla
 	if(!window_) throw window_creation_exception("Failed to create window.");
 	setup_callbacks();
 }
+window::window(const std::string& title, const monitor& mon, const video_mode& mode, window_hint_flags hints)
+		: instance_{std::make_unique<instance>()},
+		  window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
+		  callbacks_{std::make_unique<window_callbacks>()} {
+	set_window_hints(hints);
+	glfwWindowHint(GLFW_RED_BITS, mode.redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode.greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode.blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode.refreshRate);
+	window_ = std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(
+			glfwCreateWindow(mode.width, mode.height, title.c_str(), mon.monitor_, nullptr),
+			[](GLFWwindow* win) { glfwDestroyWindow(win); });
+	if(!window_) throw window_creation_exception("Failed to create window.");
+	setup_callbacks();
+}
+window::window(const std::string& title, const monitor& mon, window_hint_flags hints)
+		: window(title, mon, mon.current_video_mode(), hints) {}
 
 window::~window() {}
 
