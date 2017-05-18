@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <glfw_wrapper/instance.hpp>
+#include <glfw_wrapper/monitor.hpp>
 
 namespace mce {
 namespace glfw_wrapper {
@@ -46,10 +47,11 @@ void instance::error_callback(int error_code, const char* description) {
 	}
 }
 
-void instance::monitor_callback(GLFWmonitor* monitor, int event) {
+void instance::monitor_callback(GLFWmonitor* m, int event) {
 	auto cb_container = monitor_callback_functions.get();
+	glfw_wrapper::monitor mon(m);
 	for(auto& e : *cb_container) {
-		e.second(monitor, event);
+		e.second(mon, static_cast<monitor_event>(event));
 	}
 }
 

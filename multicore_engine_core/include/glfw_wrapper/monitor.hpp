@@ -26,6 +26,8 @@ class monitor {
 
 	static video_mode convert_video_mode(const GLFWvidmode* m);
 
+	friend class instance;
+
 public:
 	static monitor primary_monitor(const instance& inst);
 	static std::vector<monitor> monitors(const instance& inst);

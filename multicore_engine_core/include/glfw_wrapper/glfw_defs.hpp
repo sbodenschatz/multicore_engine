@@ -189,6 +189,8 @@ struct video_mode {
 
 typedef std::vector<glm::tvec3<unsigned short>> gamma_ramp;
 
+enum class monitor_event { connected = 0x00040001, disconnected = 0x00040002 };
+
 } // namespace glfw_wrapper
 } // namespace mce
 

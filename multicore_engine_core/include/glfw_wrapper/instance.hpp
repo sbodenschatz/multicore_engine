@@ -17,6 +17,7 @@ struct GLFWmonitor;
 
 namespace mce {
 namespace glfw_wrapper {
+class monitor;
 
 class instance {
 	static std::mutex init_mutex;
@@ -30,8 +31,9 @@ class instance {
 	boost::container::small_vector<callback_id, 0x100> error_callback_ids;
 
 	typedef boost::container::small_vector<
-			std::pair<callback_id, std::function<void(GLFWmonitor* monitor, int event)>>, 0x100>
-			monitor_callback_container;
+			std::pair<callback_id,
+					  std::function<void(const glfw_wrapper::monitor& monitor, monitor_event event)>>,
+			0x100> monitor_callback_container;
 	static util::copy_on_write<monitor_callback_container> monitor_callback_functions;
 	std::mutex monitor_callback_id_mutex;
 	boost::container::small_vector<callback_id, 0x100> monitor_callback_ids;
