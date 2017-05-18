@@ -28,10 +28,10 @@ video_mode monitor::convert_video_mode(const GLFWvidmode* m) {
 	video_mode res;
 	res.width = m->width;
 	res.height = m->height;
-	res.redBits = m->redBits;
-	res.greenBits = m->greenBits;
-	res.blueBits = m->blueBits;
-	res.refreshRate = m->refreshRate;
+	res.red_bits = m->redBits;
+	res.green_bits = m->greenBits;
+	res.blue_bits = m->blueBits;
+	res.refresh_rate = m->refreshRate;
 	return res;
 }
 

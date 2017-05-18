@@ -181,15 +181,15 @@ constexpr int dont_care = -1;
 struct video_mode {
 	int width;
 	int height;
-	int redBits;
-	int greenBits;
-	int blueBits;
-	int refreshRate;
+	int red_bits;
+	int green_bits;
+	int blue_bits;
+	int refresh_rate;
 	video_mode() : video_mode(0, 0) {}
 	video_mode(int width, int height, int redBits = dont_care, int greenBits = dont_care,
 			   int blueBits = dont_care, int refreshRate = dont_care)
-			: width{width}, height{height}, redBits{redBits}, greenBits{greenBits}, blueBits{blueBits},
-			  refreshRate{refreshRate} {}
+			: width{width}, height{height}, red_bits{redBits}, green_bits{greenBits}, blue_bits{blueBits},
+			  refresh_rate{refreshRate} {}
 };
 
 typedef std::vector<glm::tvec3<unsigned short>> gamma_ramp;
