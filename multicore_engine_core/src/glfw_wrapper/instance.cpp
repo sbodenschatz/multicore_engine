@@ -13,8 +13,8 @@ namespace glfw_wrapper {
 
 std::mutex instance::init_mutex;
 size_t instance::init_refcount;
-std::atomic<instance::error_function_id> instance::next_error_function_id{0};
-util::copy_on_write<instance::error_function_container> instance::error_functions;
+std::atomic<instance::callback_id> instance::next_callback_id{0};
+util::copy_on_write<instance::error_callback_container> instance::error_callback_functions;
 
 instance::instance() {
 	std::lock_guard<std::mutex> lock(init_mutex);
@@ -26,9 +26,10 @@ instance::instance() {
 }
 
 instance::~instance() {
-	error_functions.do_transaction([&](error_function_container& efc) {
+	error_callback_functions.do_transaction([&](error_callback_container& efc) {
 		efc.erase(std::remove_if(efc.begin(), efc.end(), [&](auto& e) {
-			return std::find(error_ids.begin(), error_ids.end(), e.first) != error_ids.end();
+			return std::find(error_callback_ids.begin(), error_callback_ids.end(), e.first) !=
+				   error_callback_ids.end();
 		}));
 	});
 	std::lock_guard<std::mutex> lock(init_mutex);
@@ -39,18 +40,35 @@ instance::~instance() {
 }
 
 void instance::error_callback(int error_code, const char* description) {
-	auto efc = error_functions.get();
-	for(auto& e : *efc) {
+	auto cb_container = error_callback_functions.get();
+	for(auto& e : *cb_container) {
 		e.second(error_code, description);
 	}
 }
 
-void instance::remove_error_callback(error_function_id id) {
-	error_functions.do_transaction([&](error_function_container& efc) {
+void instance::monitor_callback(GLFWmonitor* monitor, int event) {
+	auto cb_container = monitor_callback_functions.get();
+	for(auto& e : *cb_container) {
+		e.second(monitor, event);
+	}
+}
+
+void instance::remove_error_callback(callback_id id) {
+	error_callback_functions.do_transaction([&](error_callback_container& efc) {
 		efc.erase(std::remove_if(efc.begin(), efc.end(), [&](auto& e) { return e.first == id; }));
 	});
-	std::lock_guard<std::mutex> lock(error_id_mutex);
-	error_ids.erase(std::remove_if(error_ids.begin(), error_ids.end(), [&](auto& e) { return e == id; }));
+	std::lock_guard<std::mutex> lock(error_callback_id_mutex);
+	error_callback_ids.erase(std::remove_if(error_callback_ids.begin(), error_callback_ids.end(),
+											[&](auto& e) { return e == id; }));
+}
+
+void instance::remove_monitor_callback(callback_id id) {
+	monitor_callback_functions.do_transaction([&](monitor_callback_container& efc) {
+		efc.erase(std::remove_if(efc.begin(), efc.end(), [&](auto& e) { return e.first == id; }));
+	});
+	std::lock_guard<std::mutex> lock(monitor_callback_id_mutex);
+	monitor_callback_ids.erase(std::remove_if(monitor_callback_ids.begin(), monitor_callback_ids.end(),
+											  [&](auto& e) { return e == id; }));
 }
 
 void instance::poll_events() {
