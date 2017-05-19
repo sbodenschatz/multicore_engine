@@ -81,21 +81,6 @@ class instance {
 	typedef size_t callback_id;
 	detail::observable<int, const char*> error_callbacks;
 	detail::observable<const glfw_wrapper::monitor&, monitor_event> monitor_callbacks;
-	typedef boost::container::small_vector<std::pair<callback_id, std::function<void(int, const char*)>>,
-										   0x100>
-			error_callback_container;
-	static util::copy_on_write<error_callback_container> error_callback_functions;
-	std::mutex error_callback_id_mutex;
-	boost::container::small_vector<callback_id, 0x100> error_callback_ids;
-
-	typedef boost::container::small_vector<
-			std::pair<callback_id,
-					  std::function<void(const glfw_wrapper::monitor& monitor, monitor_event event)>>,
-			0x100>
-			monitor_callback_container;
-	static util::copy_on_write<monitor_callback_container> monitor_callback_functions;
-	std::mutex monitor_callback_id_mutex;
-	boost::container::small_vector<callback_id, 0x100> monitor_callback_ids;
 
 	static void monitor_callback(GLFWmonitor* m, int event);
 
