@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <glfw_wrapper/instance.hpp>
+#include <glfw_wrapper/joystick.hpp>
 #include <glfw_wrapper/monitor.hpp>
 
 namespace mce {
@@ -87,6 +88,16 @@ void instance::post_empty_event() {
 }
 std::string instance::key_name(key key, int scancode) const {
 	return glfwGetKeyName(static_cast<int>(key), scancode);
+}
+std::vector<joystick> instance::query_joysticks() const {
+	std::vector<joystick> joysticks;
+	joysticks.reserve(GLFW_JOYSTICK_LAST + 1);
+	for(int id = GLFW_JOYSTICK_1; id < GLFW_JOYSTICK_LAST + 1; ++id) {
+		if(glfwJoystickPresent(id) == GLFW_TRUE) {
+			joysticks.push_back(id);
+		}
+	}
+	return joysticks;
 }
 
 } // namespace glfw_wrapper
