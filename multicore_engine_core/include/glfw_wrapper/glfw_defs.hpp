@@ -196,6 +196,15 @@ typedef std::vector<glm::tvec3<unsigned short>> gamma_ramp;
 
 enum class monitor_event { connected = 0x00040001, disconnected = 0x00040002 };
 
+enum class standard_cursor {
+	arrow = 0x00036001,
+	ibeam = 0x00036002,
+	crosshair = 0x00036003,
+	hand = 0x00036004,
+	h_resize = 0x00036005,
+	v_resize = 0x00036006
+};
+
 } // namespace glfw_wrapper
 } // namespace mce
 

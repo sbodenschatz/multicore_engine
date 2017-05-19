@@ -20,6 +20,7 @@ namespace mce {
 namespace glfw_wrapper {
 class instance;
 class monitor;
+class cursor;
 
 class window {
 	void setup_callbacks();
@@ -129,6 +130,7 @@ public:
 	void sticky_mouse_buttons(bool enabled);
 	std::string clipboard() const;
 	void clipboard(const std::string& content);
+	void cursor(const glfw_wrapper::cursor& cur);
 
 	void iconify();
 	void restore();

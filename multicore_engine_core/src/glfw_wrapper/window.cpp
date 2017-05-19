@@ -11,6 +11,7 @@
 #include <glfw_wrapper/window.hpp>
 #include <iterator>
 #include <glfw_wrapper/monitor.hpp>
+#include <glfw_wrapper/cursor.hpp>
 
 namespace mce {
 namespace glfw_wrapper {
@@ -169,6 +170,9 @@ void window::hide() {
 }
 void window::focus() {
 	glfwFocusWindow(window_.get());
+}
+void window::cursor(const glfw_wrapper::cursor& cur) {
+	glfwSetCursor(window_.get(), cur.cursor_.get());
 }
 
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
