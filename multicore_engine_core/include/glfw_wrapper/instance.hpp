@@ -7,6 +7,12 @@
 #ifndef GLFW_WRAPPER_INSTANCE_HPP_
 #define GLFW_WRAPPER_INSTANCE_HPP_
 
+/**
+ * \file
+ * Defines the glfw wrapper instance class providing support for initialization, termination and global
+ * functionality of glfw.
+ */
+
 #include <atomic>
 #include <boost/container/small_vector.hpp>
 #include <boost/utility/string_view.hpp>
@@ -76,6 +82,20 @@ util::copy_on_write<typename observable<Args...>::callback_container> observable
 
 } // namespace detail
 
+/// Handles initialization and termination of the glfw library and manages global functionality of it.
+/**
+ * Instances are not actually behaviorally separate from each other because glfw only handles this
+ * functionality globally. Creating the first instance initializes the glfw library. Instances with
+ * overlapping lifetimes are behaviorally equivalent. Destruction of the last instances terminates the glfw
+ * library.
+ *
+ * Global functionality is provided through instance instead of through global function to ensure that the
+ * library is initialized.
+ *
+ * Members of this class that map to glfw functionality may only be called on the main thread, except for
+ * post_empty_event(). Only the callback registration and deregistration member functions and
+ * post_empty_event() may be called form other threads.
+ */
 class instance {
 	static std::mutex init_mutex;
 	static size_t init_refcount;
@@ -89,43 +109,71 @@ class instance {
 	static void joystick_callback(int joy, int event);
 
 public:
+	/// Creates the instance.
 	instance();
+	/// Destroys the instance.
 	~instance();
+	/// Forbids copying.
 	instance(const instance&) = delete;
+	/// Forbids copying.
 	instance& operator=(const instance&) = delete;
 
+	/// Adds a callback function object to be called when glfw errors occur.
+	/**
+	 * The type F must be callable with the signature <code>void(error_code error, boost::string_view
+	 * description)</code>. The returned id can be used to remove it again.
+	 */
 	template <typename F>
 	callback_id add_error_callback(const F& f) {
 		return error_callbacks.add_callback(f);
 	}
 
+	/// Removes the error callback whose registration returned the given id.
 	void remove_error_callback(callback_id id) {
 		error_callbacks.remove_callback(id);
 	}
 
+	/// Adds a callback function object to be called when monitors are connected or disconnected.
+	/**
+	 * The type F must be callable with the signature <code>void(const monitor& monitor, event event)</code>.
+	 * The returned id can be used to remove it again.
+	 */
 	template <typename F>
 	callback_id add_monitor_callback(const F& f) {
 		return monitor_callbacks.add_callback(f);
 	}
 
+	/// Removes the monitor callback whose registration returned the given id.
 	void remove_monitor_callback(callback_id id) {
 		monitor_callbacks.remove_callback(id);
 	}
 
+	/// Adds a callback function object to be called when joysticks are connected or disconnected.
+	/**
+	 * The type F must be callable with the signature <code>void(const joystick& joystick, event
+	 * event)</code>. The returned id can be used to remove it again.
+	 */
 	template <typename F>
 	callback_id add_joystick_callback(const F& f) {
 		return joystick_callbacks.add_callback(f);
 	}
 
+	/// Removes the joystick callback whose registration returned the given id.
 	void remove_joystick_callback(callback_id id) {
 		joystick_callbacks.remove_callback(id);
 	}
 
+	/// Processes pending events in a non-blocking way.
 	void poll_events();
+	/// Waits for an event and processes it.
 	void wait_events();
+	/// Waits for an event and processes it with the given timeout for waiting.
 	void wait_events(double timeout);
+	/// Wakes up the main thread if it is waiting for events by posting an empty event into the event queue.
 	void post_empty_event();
+	/// Returns a descriptive name of the given key or scancode, see doc for glfwGetKeyName for details.
 	std::string key_name(key key, int scancode) const;
+	/// Returns the present joysticks.
 	std::vector<joystick> query_joysticks() const;
 };
 
