@@ -194,7 +194,7 @@ struct video_mode {
 
 typedef std::vector<glm::tvec3<unsigned short>> gamma_ramp;
 
-enum class monitor_event { connected = 0x00040001, disconnected = 0x00040002 };
+enum class event { connected = 0x00040001, disconnected = 0x00040002 };
 
 enum class standard_cursor {
 	arrow = 0x00036001,

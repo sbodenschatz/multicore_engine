@@ -81,10 +81,12 @@ class instance {
 	static size_t init_refcount;
 	typedef size_t callback_id;
 	detail::observable<error_code, boost::string_view> error_callbacks;
-	detail::observable<const glfw_wrapper::monitor&, monitor_event> monitor_callbacks;
+	detail::observable<const glfw_wrapper::monitor&, event> monitor_callbacks;
+	detail::observable<const glfw_wrapper::joystick&, event> joystick_callbacks;
 
 	static void error_callback(int error, const char* description);
 	static void monitor_callback(GLFWmonitor* m, int event);
+	static void joystick_callback(int joy, int event);
 
 public:
 	instance();
@@ -108,6 +110,15 @@ public:
 
 	void remove_monitor_callback(callback_id id) {
 		monitor_callbacks.remove_callback(id);
+	}
+
+	template <typename F>
+	callback_id add_joystick_callback(const F& f) {
+		return joystick_callbacks.add_callback(f);
+	}
+
+	void remove_joystick_callback(callback_id id) {
+		joystick_callbacks.remove_callback(id);
 	}
 
 	void poll_events();
