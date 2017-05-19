@@ -20,7 +20,7 @@ instance::instance() {
 	std::lock_guard<std::mutex> lock(init_mutex);
 	if(init_refcount == 0) {
 		glfwInit();
-		glfwSetErrorCallback(decltype(error_callbacks)::callback_s);
+		glfwSetErrorCallback(error_callback);
 		glfwSetMonitorCallback(monitor_callback);
 	}
 	init_refcount++;
@@ -34,6 +34,9 @@ instance::~instance() {
 	}
 }
 
+void instance::error_callback(int error, const char* description) {
+	decltype(error_callbacks)::callback_s(static_cast<error_code>(error), description);
+}
 void instance::monitor_callback(GLFWmonitor* m, int event) {
 	decltype(monitor_callbacks)::callback_s(m, static_cast<monitor_event>(event));
 }

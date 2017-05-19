@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include <boost/container/small_vector.hpp>
+#include <boost/utility/string_view.hpp>
 #include <functional>
 #include <glfw_wrapper/glfw_defs.hpp>
 #include <mutex>
@@ -79,9 +80,10 @@ class instance {
 	static std::mutex init_mutex;
 	static size_t init_refcount;
 	typedef size_t callback_id;
-	detail::observable<int, const char*> error_callbacks;
+	detail::observable<error_code, boost::string_view> error_callbacks;
 	detail::observable<const glfw_wrapper::monitor&, monitor_event> monitor_callbacks;
 
+	static void error_callback(int error, const char* description);
 	static void monitor_callback(GLFWmonitor* m, int event);
 
 public:
