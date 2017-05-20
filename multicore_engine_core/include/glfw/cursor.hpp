@@ -4,17 +4,17 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef GLFW_WRAPPER_CURSOR_HPP_
-#define GLFW_WRAPPER_CURSOR_HPP_
+#ifndef GLFW_CURSOR_HPP_
+#define GLFW_CURSOR_HPP_
 
-#include <glfw_wrapper/glfw_defs.hpp>
+#include <glfw/glfw_defs.hpp>
 #include <glm/glm.hpp>
 #include <memory>
 
 struct GLFWcursor;
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 class instance;
 
 /// Represents a (mouse) cursor object in glfw.
@@ -45,4 +45,4 @@ public:
 } /* namespace glfw_wrapper */
 } /* namespace mce */
 
-#endif /* GLFW_WRAPPER_CURSOR_HPP_ */
+#endif /* GLFW_CURSOR_HPP_ */

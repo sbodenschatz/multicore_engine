@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef GLFW_WRAPPER_GLFW_DEFS_HPP_
-#define GLFW_WRAPPER_GLFW_DEFS_HPP_
+#ifndef GLFW_GLFW_DEFS_HPP_
+#define GLFW_GLFW_DEFS_HPP_
 
 /**
  * \file
@@ -17,7 +17,7 @@
 #include <vector>
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 
 /// Defines key codes for glfw in a typesafe manner.
 enum class key {
@@ -239,4 +239,4 @@ enum class error_code {
 } // namespace glfw_wrapper
 } // namespace mce
 
-#endif /* GLFW_WRAPPER_GLFW_DEFS_HPP_ */
+#endif /* GLFW_GLFW_DEFS_HPP_ */
