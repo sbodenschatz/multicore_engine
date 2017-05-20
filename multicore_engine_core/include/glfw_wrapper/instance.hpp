@@ -101,8 +101,8 @@ class instance {
 	static size_t init_refcount;
 	typedef size_t callback_id;
 	detail::observable<error_code, boost::string_view> error_callbacks;
-	detail::observable<const glfw_wrapper::monitor&, event> monitor_callbacks;
-	detail::observable<const glfw_wrapper::joystick&, event> joystick_callbacks;
+	detail::observable<const glfw_wrapper::monitor&, device_event> monitor_callbacks;
+	detail::observable<const glfw_wrapper::joystick&, device_event> joystick_callbacks;
 
 	static void error_callback(int error, const char* description);
 	static void monitor_callback(GLFWmonitor* m, int event);

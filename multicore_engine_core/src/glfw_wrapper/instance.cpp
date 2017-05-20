@@ -38,10 +38,10 @@ void instance::error_callback(int error, const char* description) {
 	decltype(error_callbacks)::callback_s(static_cast<error_code>(error), description);
 }
 void instance::monitor_callback(GLFWmonitor* m, int event) {
-	decltype(monitor_callbacks)::callback_s(m, static_cast<glfw_wrapper::event>(event));
+	decltype(monitor_callbacks)::callback_s(m, static_cast<glfw_wrapper::device_event>(event));
 }
 void instance::joystick_callback(int joy, int event) {
-	decltype(joystick_callbacks)::callback_s(joy, static_cast<glfw_wrapper::event>(event));
+	decltype(joystick_callbacks)::callback_s(joy, static_cast<glfw_wrapper::device_event>(event));
 }
 
 void instance::poll_events() {
