@@ -77,6 +77,9 @@ namespace reflection {}
 /// Contains various utility functionalities used across the mce code base.
 namespace util {}
 
+/// Contains a wrapper around the glfw library to extend it with type-safety, RAII and object-based callbacks.
+namespace glfw_wrapper {}
+
 } // namespace mce
 
 #endif /* NAMESPACE_DOC_HPP_ */
