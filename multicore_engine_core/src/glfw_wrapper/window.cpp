@@ -179,6 +179,24 @@ void window::focus() {
 void window::cursor(const glfw_wrapper::cursor& cur) {
 	glfwSetCursor(window_.get(), cur.cursor_.get());
 }
+boost::optional<glfw_wrapper::monitor> window::fullscreen_monitor() const {
+	auto m = glfwGetWindowMonitor(window_.get());
+	if(m) {
+		return glfw_wrapper::monitor(m);
+	} else {
+		return boost::optional<glfw_wrapper::monitor>();
+	}
+}
+void window::fullscreen_mode(glfw_wrapper::monitor& mon, glm::ivec2 resolution, int refresh_rate) {
+	glfwSetWindowMonitor(window_.get(), mon.monitor_, 0, 0, resolution.x, resolution.y, refresh_rate);
+}
+void window::windowed_mode(glm::ivec2 pos, glm::ivec2 size) {
+	glfwSetWindowMonitor(window_.get(), nullptr, pos.x, pos.y, size.x, size.y, 0);
+}
+void window::windowed_fullscreen_mode(glfw_wrapper::monitor& mon) {
+	auto vm = mon.current_video_mode();
+	glfwSetWindowMonitor(window_.get(), mon.monitor_, 0, 0, vm.width, vm.height, vm.refresh_rate);
+}
 
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->key;

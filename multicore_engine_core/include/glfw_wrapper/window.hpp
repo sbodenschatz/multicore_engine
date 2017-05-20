@@ -193,7 +193,7 @@ public:
 
 	/// \brief Returns the monitor the window is fullscreened on, if it is in fullscreen mode, or an empty
 	/// optional if it is windowed.
-	boost::optional<glfw_wrapper::monitor> monitor() const;
+	boost::optional<glfw_wrapper::monitor> fullscreen_monitor() const;
 	/// Sets the window to fullscreen mode on the given monitor using the given resolution and refresh rate.
 	void fullscreen_mode(glfw_wrapper::monitor& mon, glm::ivec2 resolution, int refresh_rate);
 	/// Sets the window to windowed mode at the given position and with the given size.
