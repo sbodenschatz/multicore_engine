@@ -7,11 +7,11 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <exceptions.hpp>
-#include <glfw_wrapper/instance.hpp>
-#include <glfw_wrapper/window.hpp>
+#include <glfw/cursor.hpp>
+#include <glfw/instance.hpp>
+#include <glfw/monitor.hpp>
+#include <glfw/window.hpp>
 #include <iterator>
-#include <glfw_wrapper/monitor.hpp>
-#include <glfw_wrapper/cursor.hpp>
 
 namespace mce {
 namespace glfw {

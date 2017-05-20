@@ -4,9 +4,9 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <glfw/monitor.hpp>
 #include <GLFW/glfw3.h>
 #include <algorithm>
-#include <glfw_wrapper/monitor.hpp>
 #include <iterator>
 
 namespace mce {

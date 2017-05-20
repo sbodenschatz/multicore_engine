@@ -4,16 +4,16 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef GLFW_WRAPPER_WINDOW_HPP_
-#define GLFW_WRAPPER_WINDOW_HPP_
+#ifndef GLFW_WINDOW_HPP_
+#define GLFW_WINDOW_HPP_
 
 #include <functional>
-#include <glfw_wrapper/glfw_defs.hpp>
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 #include <boost/optional.hpp>
+#include <glfw/glfw_defs.hpp>
 
 struct GLFWwindow;
 
@@ -348,4 +348,4 @@ public:
 } /* namespace glfw_wrapper */
 } /* namespace mce */
 
-#endif /* GLFW_WRAPPER_WINDOW_HPP_ */
+#endif /* GLFW_WINDOW_HPP_ */

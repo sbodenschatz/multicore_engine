@@ -4,11 +4,11 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <glfw/instance.hpp>
+#include <glfw/joystick.hpp>
+#include <glfw/monitor.hpp>
 #include <GLFW/glfw3.h>
 #include <algorithm>
-#include <glfw_wrapper/instance.hpp>
-#include <glfw_wrapper/joystick.hpp>
-#include <glfw_wrapper/monitor.hpp>
 
 namespace mce {
 namespace glfw {

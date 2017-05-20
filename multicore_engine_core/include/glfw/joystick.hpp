@@ -4,10 +4,10 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef GLFW_WRAPPER_JOYSTICK_HPP_
-#define GLFW_WRAPPER_JOYSTICK_HPP_
+#ifndef GLFW_JOYSTICK_HPP_
+#define GLFW_JOYSTICK_HPP_
 
-#include <glfw_wrapper/glfw_defs.hpp>
+#include <glfw/glfw_defs.hpp>
 #include <string>
 #include <vector>
 
@@ -52,4 +52,4 @@ public:
 } /* namespace glfw_wrapper */
 } /* namespace mce */
 
-#endif /* GLFW_WRAPPER_JOYSTICK_HPP_ */
+#endif /* GLFW_JOYSTICK_HPP_ */

@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef GLFW_WRAPPER_INSTANCE_HPP_
-#define GLFW_WRAPPER_INSTANCE_HPP_
+#ifndef GLFW_INSTANCE_HPP_
+#define GLFW_INSTANCE_HPP_
 
 /**
  * \file
@@ -16,8 +16,8 @@
 #include <atomic>
 #include <boost/container/small_vector.hpp>
 #include <boost/utility/string_view.hpp>
+#include <glfw/glfw_defs.hpp>
 #include <functional>
-#include <glfw_wrapper/glfw_defs.hpp>
 #include <mutex>
 #include <util/copy_on_write.hpp>
 
@@ -180,4 +180,4 @@ public:
 } // namespace glfw_wrapper
 } // namespace mce
 
-#endif /* GLFW_WRAPPER_INSTANCE_HPP_ */
+#endif /* GLFW_INSTANCE_HPP_ */
