@@ -17,7 +17,7 @@ namespace glfw_wrapper {
 class joystick {
 	int id_;
 	std::vector<float> axis_;
-	std::vector<action> buttons_;
+	std::vector<button_action> buttons_;
 
 	// cppcheck-suppress noExplicitConstructor
 	joystick(int id) : id_{id} {}
@@ -30,7 +30,7 @@ public:
 	}
 	bool present() const;
 	const std::vector<float>& poll_axis();
-	const std::vector<action>& poll_buttons();
+	const std::vector<button_action>& poll_buttons();
 	std::string name() const;
 };
 

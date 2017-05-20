@@ -180,7 +180,7 @@ void window::cursor(const glfw_wrapper::cursor& cur) {
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->key;
 	if(cb)
-		cb(static_cast<glfw_wrapper::key>(key), scancode, static_cast<glfw_wrapper::action>(action),
+		cb(static_cast<glfw_wrapper::key>(key), scancode, static_cast<glfw_wrapper::button_action>(action),
 		   modifier_flags(mods));
 }
 void window::character_callback_s(GLFWwindow* window, unsigned int codepoint) {
@@ -202,7 +202,7 @@ void window::cursor_enter_callback_s(GLFWwindow* window, int entered) {
 void window::mouse_button_callback_s(GLFWwindow* window, int button, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->mouse_button;
 	if(cb)
-		cb(static_cast<glfw_wrapper::mouse_button>(button), static_cast<glfw_wrapper::action>(action),
+		cb(static_cast<glfw_wrapper::mouse_button>(button), static_cast<glfw_wrapper::button_action>(action),
 		   modifier_flags(mods));
 }
 void window::scroll_callback_s(GLFWwindow* window, double xoffset, double yoffset) {

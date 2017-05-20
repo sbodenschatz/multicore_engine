@@ -145,8 +145,8 @@ enum class key {
 	last = k_menu
 };
 
-/// Describes actions / states for key, mouse buttons and joystick buttons in event-handling and polling.
-enum class action { release = 0, press = 1, repeat = 2 };
+/// Describes actions for keys, mouse buttons and joystick buttons in event-handling.
+enum class button_action { release = 0, press = 1, repeat = 2 };
 /// Defines the bits used to represent the state of modifier keys in event handling.
 enum class modifier_bits { shift = 0x0001, control = 0x0002, alt = 0x0004, super = 0x0008 };
 /// Describes a combined state of the modifiers represented by the bits in modifier_bits.

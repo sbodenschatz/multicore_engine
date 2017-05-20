@@ -41,12 +41,12 @@ class window {
 	static void window_refresh_callback_s(GLFWwindow* window);
 	static void window_drop_callback_s(GLFWwindow* window, int count, const char** paths);
 
-	typedef std::function<void(key key, int scancode, action action, modifier_flags mods)> key_callback_t;
+	typedef std::function<void(key key, int scancode, button_action button_action, modifier_flags mods)> key_callback_t;
 	typedef std::function<void(unsigned int codepoint)> character_callback_t;
 	typedef std::function<void(unsigned int codepoint, modifier_flags mods)> charmods_callback_t;
 	typedef std::function<void(double xpos, double ypos)> cursor_position_callback_t;
 	typedef std::function<void(bool entered)> cursor_enter_callback_t;
-	typedef std::function<void(mouse_button button, action action, modifier_flags mods)>
+	typedef std::function<void(mouse_button button, button_action button_action, modifier_flags mods)>
 			mouse_button_callback_t;
 	typedef std::function<void(double xoffset, double yoffset)> scroll_callback_t;
 
