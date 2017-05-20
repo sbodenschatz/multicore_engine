@@ -12,7 +12,7 @@
 #include <vector>
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 
 /// Represents a joystick in glfw.
 /**

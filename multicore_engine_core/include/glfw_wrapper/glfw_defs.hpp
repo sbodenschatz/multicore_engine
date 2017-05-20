@@ -17,7 +17,7 @@
 #include <vector>
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 
 /// Defines key codes for glfw in a typesafe manner.
 enum class key {

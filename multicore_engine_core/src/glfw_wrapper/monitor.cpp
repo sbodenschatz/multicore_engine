@@ -10,7 +10,7 @@
 #include <iterator>
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 
 monitor monitor::primary_monitor(const instance&) {
 	return glfwGetPrimaryMonitor();
@@ -59,8 +59,8 @@ glm::ivec2 monitor::virtual_position() const {
 std::string monitor::name() const {
 	return glfwGetMonitorName(monitor_);
 }
-glfw_wrapper::gamma_ramp monitor::gamma_ramp() const {
-	glfw_wrapper::gamma_ramp res;
+glfw::gamma_ramp monitor::gamma_ramp() const {
+	glfw::gamma_ramp res;
 	auto ramp = glfwGetGammaRamp(monitor_);
 	res.reserve(ramp->size);
 	for(unsigned int i = 0; i < ramp->size; ++i) {
@@ -68,7 +68,7 @@ glfw_wrapper::gamma_ramp monitor::gamma_ramp() const {
 	}
 	return res;
 }
-void monitor::gamma_ramp(const glfw_wrapper::gamma_ramp& ramp) {
+void monitor::gamma_ramp(const glfw::gamma_ramp& ramp) {
 	GLFWgammaramp tmp;
 	std::vector<unsigned short> red(ramp.size());
 	std::vector<unsigned short> green(ramp.size());

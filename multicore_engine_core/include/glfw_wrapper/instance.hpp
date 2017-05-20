@@ -24,7 +24,7 @@
 struct GLFWmonitor;
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 class monitor;
 class joystick;
 
@@ -101,8 +101,8 @@ class instance {
 	static size_t init_refcount;
 	typedef size_t callback_id;
 	detail::observable<error_code, boost::string_view> error_callbacks;
-	detail::observable<const glfw_wrapper::monitor&, device_event> monitor_callbacks;
-	detail::observable<const glfw_wrapper::joystick&, device_event> joystick_callbacks;
+	detail::observable<const glfw::monitor&, device_event> monitor_callbacks;
+	detail::observable<const glfw::joystick&, device_event> joystick_callbacks;
 
 	static void error_callback(int error, const char* description);
 	static void monitor_callback(GLFWmonitor* m, int event);

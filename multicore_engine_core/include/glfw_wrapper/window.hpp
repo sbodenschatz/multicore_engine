@@ -18,7 +18,7 @@
 struct GLFWwindow;
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 class instance;
 class monitor;
 class cursor;
@@ -155,9 +155,9 @@ public:
 	void aspect_ratio();
 
 	/// Returns the current cursor mode, the window operates in.
-	glfw_wrapper::cursor_mode cursor_mode() const;
+	glfw::cursor_mode cursor_mode() const;
 	/// Sets the window to the given cursor mode.
-	void cursor_mode(glfw_wrapper::cursor_mode mode);
+	void cursor_mode(glfw::cursor_mode mode);
 	/// Returns a bool indicating, if sticky keys is enabled for the window.
 	bool sticky_keys() const;
 	/// Sets sticky keys to on or off.
@@ -178,7 +178,7 @@ public:
 	/// Sets the clipboard to the given content.
 	void clipboard(const std::string& content);
 	/// Sets the cursor to the given cursor object.
-	void cursor(const glfw_wrapper::cursor& cur);
+	void cursor(const glfw::cursor& cur);
 
 	/// Iconifies the window.
 	void iconify();
@@ -193,13 +193,13 @@ public:
 
 	/// \brief Returns the monitor the window is fullscreened on, if it is in fullscreen mode, or an empty
 	/// optional if it is windowed.
-	boost::optional<glfw_wrapper::monitor> fullscreen_monitor() const;
+	boost::optional<glfw::monitor> fullscreen_monitor() const;
 	/// Sets the window to fullscreen mode on the given monitor using the given resolution and refresh rate.
-	void fullscreen_mode(glfw_wrapper::monitor& mon, glm::ivec2 resolution, int refresh_rate);
+	void fullscreen_mode(glfw::monitor& mon, glm::ivec2 resolution, int refresh_rate);
 	/// Sets the window to windowed mode at the given position and with the given size.
 	void windowed_mode(glm::ivec2 pos, glm::ivec2 size);
 	/// Set the window to windowed fullscreen mode on the given monitor.
-	void windowed_fullscreen_mode(glfw_wrapper::monitor& mon);
+	void windowed_fullscreen_mode(glfw::monitor& mon);
 
 	/// Sets the callback function object to be called on key presses, releases and repetition.
 	/**

@@ -9,7 +9,7 @@
 #include <glfw_wrapper/joystick.hpp>
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 
 bool joystick::present() const {
 	return glfwJoystickPresent(id_) == GLFW_TRUE;

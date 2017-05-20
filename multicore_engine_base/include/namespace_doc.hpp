@@ -82,7 +82,7 @@ namespace util {}
  * For more detailed documentation on this namespace, see http://www.glfw.org/docs/latest/modules.html for
  * documentation on the respective wrapped glfw functions.
  */
-namespace glfw_wrapper {}
+namespace glfw {}
 
 } // namespace mce
 

@@ -8,7 +8,7 @@
 #include <glfw_wrapper/cursor.hpp>
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 
 cursor::cursor(instance&, glm::ivec2 size, unsigned char* pixels, glm::ivec2 hot_spot)
 		: cursor_{nullptr, [](GLFWcursor*) {}} {

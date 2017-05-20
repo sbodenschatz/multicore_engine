@@ -14,7 +14,7 @@
 struct GLFWcursor;
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 class instance;
 
 /// Represents a (mouse) cursor object in glfw.

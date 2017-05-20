@@ -16,7 +16,7 @@ struct GLFWmonitor;
 struct GLFWvidmode;
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 class instance;
 
 /// Represents a monitor with associated config data reported by glfw.
@@ -54,9 +54,9 @@ public:
 	/// Returns the name of the monitor device.
 	std::string name() const;
 	/// Returns the current gamma ramp of the monitor.
-	glfw_wrapper::gamma_ramp gamma_ramp() const;
+	glfw::gamma_ramp gamma_ramp() const;
 	/// Sets the monitors gamma ramp to the given value, should have 256 rgb points to be portable.
-	void gamma_ramp(const glfw_wrapper::gamma_ramp& ramp);
+	void gamma_ramp(const glfw::gamma_ramp& ramp);
 	/// Sets the gamma ramp based on the given gamma exponent.
 	void gamma(float gamma_exponent);
 };
