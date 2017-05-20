@@ -145,11 +145,16 @@ enum class key {
 	last = k_menu
 };
 
+/// Describes actions / states for key, mouse buttons and joystick buttons in event-handling and polling.
 enum class action { release = 0, press = 1, repeat = 2 };
+/// Defines the bits used to represent the state of modifier keys in event handling.
 enum class modifier_bits { shift = 0x0001, control = 0x0002, alt = 0x0004, super = 0x0008 };
+/// Describes a combined state of the modifiers represented by the bits in modifier_bits.
 typedef util::bit_flags<modifier_bits, 4> modifier_flags;
+/// Describes modes in which the (mouse) cursor in glfw can operate.
 enum class cursor_mode { normal = 0x00034001, hidden = 0x00034002, disabled = 0x00034003 };
 
+/// Describes possible mouse buttons.
 enum class mouse_button {
 	button_1 = 0,
 	button_2 = 1,
@@ -165,6 +170,7 @@ enum class mouse_button {
 	button_middle = button_3
 };
 
+/// Defines the available bit flags that can be used to influence window behavior.
 enum class window_hint_bits {
 	resizable = 0x0001,
 	visible = 0x0002,
@@ -174,28 +180,39 @@ enum class window_hint_bits {
 	floating = 0x0020,
 	maximized = 0x0040
 };
+/// Describes a window behavior hint state combined from the bits defined in window_hint_bits.
 typedef util::bit_flags<window_hint_bits, 7> window_hint_flags;
 
+/// Constant to indicate that glfw should choose the value for certain parameters.
 constexpr int dont_care = -1;
 
+/// Describes the parameters of a mode for a monitor.
+/**
+ * Parameters that are indicated to allow dont_care can be set to dont_care if this struct is supplied from
+ * user code on window creation, but can not be a result when listing monitor modes.
+ */
 struct video_mode {
-	int width;
-	int height;
-	int red_bits;
-	int green_bits;
-	int blue_bits;
-	int refresh_rate;
+	int width;		  ///< Horizontal size in virtual screen coordinates.
+	int height;		  ///< Vertical size in virtual screen coordinates.
+	int red_bits;	 ///< Red channel bit depth, can be dont_care.
+	int green_bits;   ///< Green channel bit depth, can be dont_care.
+	int blue_bits;	///< Blue channel bit depth, can be dont_care.
+	int refresh_rate; ///< Refresh rate in Hz, can be dont_care.
 	video_mode() : video_mode(0, 0) {}
+	/// Creates a video_mode with the given parameters.
 	video_mode(int width, int height, int redBits = dont_care, int greenBits = dont_care,
 			   int blueBits = dont_care, int refreshRate = dont_care)
 			: width{width}, height{height}, red_bits{redBits}, green_bits{greenBits}, blue_bits{blueBits},
 			  refresh_rate{refreshRate} {}
 };
 
+/// Describes gamma curve, discretized to rgb points, should consist of 256 points to be portable.
 typedef std::vector<glm::tvec3<unsigned short>> gamma_ramp;
 
+/// Describes possible events for devices reflected in callbacks for monitor and joystick config changes.
 enum class event { connected = 0x00040001, disconnected = 0x00040002 };
 
+/// Describes the available standard cursors.
 enum class standard_cursor {
 	arrow = 0x00036001,
 	ibeam = 0x00036002,
@@ -205,6 +222,7 @@ enum class standard_cursor {
 	v_resize = 0x00036006
 };
 
+/// Describes the error codes used in error callbacks.
 enum class error_code {
 	not_initialized = 0x00010001,
 	no_current_context = 0x00010002,
