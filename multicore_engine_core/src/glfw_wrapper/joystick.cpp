@@ -21,11 +21,11 @@ const std::vector<float>& joystick::poll_axis() {
 	std::copy(a, a + count, axis_.begin());
 	return axis_;
 }
-const std::vector<button_action>& joystick::poll_buttons() {
+const std::vector<bool>& joystick::poll_buttons() {
 	int count = 0;
 	auto b = glfwGetJoystickButtons(id_, &count);
 	buttons_.resize(count);
-	std::transform(b, b + count, buttons_.begin(), [](unsigned char c) { return static_cast<button_action>(c); });
+	std::transform(b, b + count, buttons_.begin(), [](unsigned char c) { return c == GLFW_PRESS; });
 	return buttons_;
 }
 std::string joystick::name() const {

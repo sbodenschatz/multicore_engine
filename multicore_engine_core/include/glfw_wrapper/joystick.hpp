@@ -18,7 +18,7 @@ namespace glfw_wrapper {
 class joystick {
 	int id_;
 	std::vector<float> axis_;
-	std::vector<button_action> buttons_;
+	std::vector<bool> buttons_;
 
 	// cppcheck-suppress noExplicitConstructor
 	joystick(int id) : id_{id} {}
@@ -41,7 +41,7 @@ public:
 	/**
 	 * The referenced vector is valid until the next call or until the object is destroyed.
 	 */
-	const std::vector<button_action>& poll_buttons();
+	const std::vector<bool>& poll_buttons();
 	/// Returns the name of the joystick device.
 	std::string name() const;
 };
