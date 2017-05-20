@@ -18,6 +18,9 @@ namespace glfw_wrapper {
 class instance;
 
 /// Represents a (mouse) cursor object in glfw.
+/**
+ * May only be constructed and destroyed on the main thread because of glfw limitations.
+ */
 class cursor {
 	std::unique_ptr<GLFWcursor, void (*)(GLFWcursor*)> cursor_;
 

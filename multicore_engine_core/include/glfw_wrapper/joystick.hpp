@@ -15,6 +15,9 @@ namespace mce {
 namespace glfw_wrapper {
 
 /// Represents a joystick in glfw.
+/**
+ * Because of glfw limitations all member functions except id() may only be called on the main thread.
+ */
 class joystick {
 	int id_;
 	std::vector<float> axis_;
