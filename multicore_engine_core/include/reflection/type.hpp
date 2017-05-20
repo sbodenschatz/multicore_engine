@@ -188,8 +188,8 @@ struct type_info<entity::entity_reference> {
 template <typename T>
 struct type_parser {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, T& t) {
-		std::istringstream stream(s);
+	static bool from_string(const boost::string_view& s, T& t) {
+		std::istringstream stream(s.to_string());
 		stream >> t;
 		return bool(stream);
 	}
@@ -205,8 +205,8 @@ struct type_parser {
 template <>
 struct type_parser<glm::vec2> {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, glm::vec2& t) {
-		std::istringstream stream(s);
+	static bool from_string(const boost::string_view& s, glm::vec2& t) {
+		std::istringstream stream(s.to_string());
 		float x, y;
 		x = y = 0.0f;
 		stream >> x >> y;
@@ -224,8 +224,8 @@ struct type_parser<glm::vec2> {
 template <>
 struct type_parser<glm::vec3> {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, glm::vec3& t) {
-		std::istringstream stream(s);
+	static bool from_string(const boost::string_view& s, glm::vec3& t) {
+		std::istringstream stream(s.to_string());
 		float x, y, z;
 		x = y = z = 0.0f;
 		stream >> x >> y >> z;
@@ -243,8 +243,8 @@ struct type_parser<glm::vec3> {
 template <>
 struct type_parser<glm::vec4> {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, glm::vec4& t) {
-		std::istringstream stream(s);
+	static bool from_string(const boost::string_view& s, glm::vec4& t) {
+		std::istringstream stream(s.to_string());
 		float x, y, z, w;
 		x = y = z = w = 0.0f;
 		stream >> x >> y >> z >> w;
@@ -263,8 +263,8 @@ struct type_parser<glm::vec4> {
 template <>
 struct type_parser<glm::quat> {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, glm::quat& t) {
-		std::istringstream stream(s);
+	static bool from_string(const boost::string_view& s, glm::quat& t) {
+		std::istringstream stream(s.to_string());
 		float x, y, z, w;
 		x = y = z = w = 0.0f;
 		stream >> x >> y >> z >> w;
@@ -283,8 +283,8 @@ struct type_parser<glm::quat> {
 template <>
 struct type_parser<glm::ivec2> {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, glm::ivec2& t) {
-		std::istringstream stream(s);
+	static bool from_string(const boost::string_view& s, glm::ivec2& t) {
+		std::istringstream stream(s.to_string());
 		int x, y;
 		x = y = 0;
 		stream >> x >> y;
@@ -302,8 +302,8 @@ struct type_parser<glm::ivec2> {
 template <>
 struct type_parser<glm::ivec3> {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, glm::ivec3& t) {
-		std::istringstream stream(s);
+	static bool from_string(const boost::string_view& s, glm::ivec3& t) {
+		std::istringstream stream(s.to_string());
 		int x, y, z;
 		x = y = z = 0;
 		stream >> x >> y >> z;
@@ -321,8 +321,8 @@ struct type_parser<glm::ivec3> {
 template <>
 struct type_parser<glm::ivec4> {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, glm::ivec4& t) {
-		std::istringstream stream(s);
+	static bool from_string(const boost::string_view& s, glm::ivec4& t) {
+		std::istringstream stream(s.to_string());
 		int x, y, z, w;
 		x = y = z = w = 0;
 		stream >> x >> y >> z >> w;
@@ -341,8 +341,8 @@ struct type_parser<glm::ivec4> {
 template <>
 struct type_parser<std::string> {
 	/// Parses s into t.
-	static bool from_string(const std::string& s, std::string& t) {
-		t = s;
+	static bool from_string(const boost::string_view& s, std::string& t) {
+		t = s.to_string();
 		return true;
 	}
 	/// Formats t into a string.
@@ -357,7 +357,7 @@ struct type_parser<std::vector<std::string>> {
 	/// The delimiter used to separate list elements (by default ";").
 	static std::string delimiter;
 	/// Parses s into t.
-	static bool from_string(const std::string& s, std::vector<std::string>& t) {
+	static bool from_string(const boost::string_view& s, std::vector<std::string>& t) {
 		t.clear();
 		util::split_iterate(s, delimiter, [&t](boost::string_view e) { t.emplace_back(e); });
 		return true;
@@ -383,7 +383,7 @@ namespace reflection {
 template <>
 struct type_parser<entity::entity_reference> {
 	/// Parses s into t.
-	static bool from_string(const std::string&, entity::entity_reference&) {
+	static bool from_string(const boost::string_view&, entity::entity_reference&) {
 		/// TODO: Check if this operation can be supported in the future (an entity_manager would be required
 		/// here, reducing generality of the property).
 		return false;

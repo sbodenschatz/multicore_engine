@@ -45,8 +45,11 @@ namespace parser {}
 
 } // namespace asset_gen
 
-/// Contains the binary data stream used for (de-)serialization in mce.
+/// Contains the binary data streams used for (de-)serialization in mce.
 namespace bstream {}
+
+/// Contains the global runtime configuration system for mce.
+namespace config {}
 
 /// Contains container data structures used in mce.
 namespace containers {}
@@ -73,6 +76,13 @@ namespace reflection {}
 
 /// Contains various utility functionalities used across the mce code base.
 namespace util {}
+
+/// Contains a wrapper around the glfw library to extend it with type-safety, RAII and object-based callbacks.
+/**
+ * For more detailed documentation on this namespace, see http://www.glfw.org/docs/latest/modules.html for
+ * documentation on the respective wrapped glfw functions.
+ */
+namespace glfw {}
 
 } // namespace mce
 

@@ -24,7 +24,7 @@ public:
 	test_a_1_component(entity& owner, const component_configuration& configuration) noexcept
 			: component(owner, configuration) {}
 
-	const std::string& name() const {
+	std::string name() const {
 		return name_;
 	}
 
@@ -32,7 +32,7 @@ public:
 		name_ = name;
 	}
 
-	const std::vector<std::string>& values() const {
+	std::vector<std::string> values() const {
 		return values_;
 	}
 
@@ -132,7 +132,7 @@ public:
 		REGISTER_COMPONENT_PROPERTY(prop, test_b_entref_component, entity_reference, ent_ref);
 	}
 
-	const entity_reference& ent_ref() const {
+	entity_reference ent_ref() const {
 		return ent_ref_;
 	}
 
@@ -153,7 +153,7 @@ public:
 		REGISTER_COMPONENT_PROPERTY(prop, test_b_quat_component, glm::quat, orientation);
 	}
 
-	const glm::quat& orientation() const {
+	glm::quat orientation() const {
 		return orientation_;
 	}
 
@@ -188,7 +188,7 @@ public:
 		scalar_ = scalar;
 	}
 
-	const glm::vec2& vec2() const {
+	glm::vec2 vec2() const {
 		return vec2_;
 	}
 
@@ -196,7 +196,7 @@ public:
 		vec2_ = vec2;
 	}
 
-	const glm::vec3& vec3() const {
+	glm::vec3 vec3() const {
 		return vec3_;
 	}
 
@@ -204,7 +204,7 @@ public:
 		vec3_ = vec3;
 	}
 
-	const glm::vec4& vec4() const {
+	glm::vec4 vec4() const {
 		return vec4_;
 	}
 
@@ -239,7 +239,7 @@ public:
 		scalar_ = scalar;
 	}
 
-	const glm::ivec2& vec2() const {
+	glm::ivec2 vec2() const {
 		return vec2_;
 	}
 
@@ -247,7 +247,7 @@ public:
 		vec2_ = vec2;
 	}
 
-	const glm::ivec3& vec3() const {
+	glm::ivec3 vec3() const {
 		return vec3_;
 	}
 
@@ -255,7 +255,7 @@ public:
 		vec3_ = vec3;
 	}
 
-	const glm::ivec4& vec4() const {
+	glm::ivec4 vec4() const {
 		return vec4_;
 	}
 

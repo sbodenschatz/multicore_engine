@@ -60,7 +60,7 @@ struct logic_exception : std::logic_error {
 struct async_state_exception : std::logic_error {
 	using std::logic_error::logic_error;
 };
-/// Exception used to signal that a value of an invalid type was supplied.
+/// Exception used to signal that a value of an invalid type or an invalid literal was supplied.
 struct value_type_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
@@ -80,6 +80,10 @@ struct missing_entity_config_exception : std::runtime_error {
 struct invalid_component_type_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
+/// Exception used to signal that duplicate component type was registered.
+struct duplicate_component_type_exception : std::runtime_error {
+	using std::runtime_error::runtime_error;
+};
 /// Exception used to signal that the desired access to a property is not supported.
 struct invalid_property_access_exception : std::logic_error {
 	using std::logic_error::logic_error;
@@ -87,6 +91,15 @@ struct invalid_property_access_exception : std::logic_error {
 /// Exception used to signal an operation that is not supported by an object in it's given configuration.
 struct invalid_operation_exception : std::logic_error {
 	using std::logic_error::logic_error;
+};
+
+/// Exception used to signal a conflict between different resolutions of the same config variable.
+struct config_variable_conflict_exception : std::logic_error {
+	using std::logic_error::logic_error;
+};
+/// Exception used to signal errors on window creation.
+struct window_creation_exception : std::runtime_error {
+	using std::runtime_error::runtime_error;
 };
 
 } // namespace mce

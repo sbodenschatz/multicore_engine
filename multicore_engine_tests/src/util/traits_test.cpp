@@ -4,8 +4,12 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
+#include <glm/glm.hpp>
 #include <gtest.hpp>
+#include <string>
+#include <type_traits>
 #include <util/traits.hpp>
+#include <vector>
 
 namespace mce {
 namespace util {
@@ -57,6 +61,16 @@ TEST(util_traits_test, nothrow_swappable_negative) {
 		}
 	};
 	ASSERT_TRUE(!is_nothrow_swappable<A>::value);
+}
+
+TEST(util_traits_test, accessor_value_type_test) {
+	ASSERT_TRUE((std::is_same<util::accessor_value_type_t<int>, int>::value));
+	ASSERT_TRUE((std::is_same<util::accessor_value_type_t<bool>, bool>::value));
+	ASSERT_TRUE((std::is_same<util::accessor_value_type_t<float>, float>::value));
+	ASSERT_TRUE((std::is_same<util::accessor_value_type_t<std::string>, const std::string&>::value));
+	ASSERT_TRUE((std::is_same<util::accessor_value_type_t<glm::vec2>, const glm::vec2&>::value));
+	ASSERT_TRUE(
+			(std::is_same<util::accessor_value_type_t<std::vector<int>>, const std::vector<int>&>::value));
 }
 
 } // namespace util

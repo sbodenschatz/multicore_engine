@@ -13,6 +13,7 @@
  */
 
 #include <algorithm>
+#include <boost/utility/string_view.hpp>
 #include <bstream/ibstream.hpp>
 #include <bstream/obstream.hpp>
 #include <exceptions.hpp>
@@ -20,6 +21,7 @@
 #include <reflection/type.hpp>
 #include <string>
 #include <type_traits>
+#include <util/traits.hpp>
 #include <util/type_id.hpp>
 #include <utility>
 
@@ -95,7 +97,7 @@ public:
 		return name_;
 	}
 	/// Parses a value from a string and assigns it to the property on the given object.
-	virtual bool from_string(Root_Type& object, const std::string& str) const = 0;
+	virtual bool from_string(Root_Type& object, const boost::string_view& str) const = 0;
 	/// Retrieves the property value from the given object, formats it to a string and returns it.
 	virtual std::string to_string(const Root_Type& object) const = 0;
 	/// Writes the value of the property on the given object to the given binary stream.
@@ -127,19 +129,19 @@ namespace detail {
 
 template <typename T, typename Object_Type = void>
 struct property_type_helper {
-	typedef typename std::conditional<std::is_fundamental<T>::value, T, const T&>::type accessor_value;
-	typedef accessor_value (Object_Type::*getter)() const;
+	typedef util::accessor_value_type_t<T> accessor_value;
+	typedef T (Object_Type::*getter)() const;
 	typedef void (Object_Type::*setter)(accessor_value value);
 };
 
 template <typename T>
 struct property_type_helper<T, void> {
-	typedef typename std::conditional<std::is_fundamental<T>::value, T, const T&>::type accessor_value;
+	typedef util::accessor_value_type_t<T> accessor_value;
 };
 
 template <typename T, typename known_type>
 struct property_type_parser_helper {
-	static auto from_string(const std::string& s) {
+	static auto from_string(const boost::string_view& s) {
 		T t;
 		auto res = type_parser<T>::from_string(s, t);
 		return std::make_pair(t, res);
@@ -196,16 +198,16 @@ public:
 	virtual ~property() = default;
 	/// Provides read access to the property value for the given object.
 	/**
-	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 * The return value type is T for all types to allow thread-safe getters.
 	 */
-	virtual accessor_value get_value(const Root_Type& object) const = 0;
+	virtual T get_value(const Root_Type& object) const = 0;
 	/// Provides write access to the property value for the given object.
 	/**
 	 * The value parameter type is T for primitive types and const T& for complex types (strings, vecN, etc.).
 	 */
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
 	/// Parses a value from a string and assigns it to the property on the given object.
-	virtual bool from_string(Root_Type& object, const std::string& str) const override {
+	virtual bool from_string(Root_Type& object, const boost::string_view& str) const override {
 		using helper = detail::property_type_parser_helper<T, typename type_info<T>::known_type>;
 		auto r = helper::from_string(str);
 		if(r.second) set_value(object, r.first);
@@ -293,12 +295,12 @@ public:
 	virtual ~linked_property() = default;
 	/// Provides read access to the property value for the given object.
 	/**
-	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 * The return value type is T for all types to allow thread-safe getters.
 	 *
 	 * If no getter was supplied on construction of the property, this member function will throw an exception
 	 * of type invalid_property_access_exception.
 	 */
-	virtual accessor_value get_value(const Root_Type& object) const override {
+	virtual T get_value(const Root_Type& object) const override {
 		if(getter)
 			return (static_cast<const Object_Type&>(object).*getter)();
 		else
@@ -357,9 +359,9 @@ public:
 	virtual ~directly_linked_property() = default;
 	/// Provides read access to the property value for the given object.
 	/**
-	 * The return value type is T for primitive types and const T& for complex types (strings, vecN, etc.).
+	 * The return value type is T for all types to allow thread-safe getters.
 	 */
-	virtual accessor_value get_value(const Root_Type& object) const noexcept override {
+	virtual T get_value(const Root_Type& object) const noexcept override {
 		return static_cast<const Object_Type&>(object).*variable;
 	}
 	/// Provides write access to the property value for the given object.
