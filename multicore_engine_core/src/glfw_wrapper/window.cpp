@@ -157,6 +157,9 @@ void window::window_size_limits(glm::ivec2 min, glm::ivec2 max) {
 void window::aspect_ratio(int numerator, int denominator) {
 	glfwSetWindowAspectRatio(window_.get(), numerator, denominator);
 }
+void window::aspect_ratio() {
+	glfwSetWindowAspectRatio(window_.get(), dont_care, dont_care);
+}
 
 void window::iconify() {
 	glfwIconifyWindow(window_.get());
