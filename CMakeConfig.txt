@@ -199,6 +199,7 @@ endif()
 add_library(deps.vulkan INTERFACE)
 target_compile_definitions(deps.vulkan INTERFACE
 		VKCPP_ENHANCED_MODE
+		GLFW_INCLUDE_VULKAN
 	)
 target_include_directories(deps.vulkan SYSTEM INTERFACE
 		${VULKAN_INCLUDE}
@@ -214,7 +215,6 @@ target_compile_options(deps.vulkan INTERFACE
 
 add_library(deps.glfw INTERFACE)
 target_compile_definitions(deps.glfw INTERFACE
-		GLFW_INCLUDE_VULKAN
 	)
 target_include_directories(deps.glfw SYSTEM INTERFACE
 		${GLFW_INCLUDE}
