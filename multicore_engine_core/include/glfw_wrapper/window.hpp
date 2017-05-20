@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <boost/optional.hpp>
 
 struct GLFWwindow;
 
@@ -189,6 +190,16 @@ public:
 	void hide();
 	/// Sets focus to this window.
 	void focus();
+
+	/// \brief Returns the monitor the window is fullscreened on, if it is in fullscreen mode, or an empty
+	/// optional if it is windowed.
+	boost::optional<glfw_wrapper::monitor> monitor() const;
+	/// Sets the window to fullscreen mode on the given monitor using the given resolution and refresh rate.
+	void fullscreen_mode(glfw_wrapper::monitor& mon, glm::ivec2 resolution, int refresh_rate);
+	/// Sets the window to windowed mode at the given position and with the given size.
+	void windowed_mode(glm::ivec2 pos, glm::ivec2 size);
+	/// Set the window to windowed fullscreen mode on the given monitor.
+	void windowed_fullscreen_mode(glfw_wrapper::monitor& mon);
 
 	/// Sets the callback function object to be called on key presses, releases and repetition.
 	/**
