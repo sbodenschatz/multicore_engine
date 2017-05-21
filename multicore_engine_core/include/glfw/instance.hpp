@@ -19,7 +19,9 @@
 #include <functional>
 #include <glfw/glfw_defs.hpp>
 #include <mutex>
+#include <string>
 #include <util/copy_on_write.hpp>
+#include <vector>
 
 struct GLFWmonitor;
 
@@ -178,6 +180,10 @@ public:
 
 	/// Returns a bool indicating if the vulkan loader is available.
 	bool vulkan_supported() const;
+
+	/// \brief Returns a vector containing the names of the vulkan instance extensions required to interact
+	/// with the window system glfw operates on.
+	std::vector<std::string> required_vulkan_instance_extensions() const;
 };
 
 } // namespace glfw_wrapper

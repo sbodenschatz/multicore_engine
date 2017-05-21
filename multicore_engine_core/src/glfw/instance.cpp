@@ -73,6 +73,18 @@ std::vector<joystick> instance::query_joysticks() const {
 bool instance::vulkan_supported() const {
 	return glfwVulkanSupported() == GLFW_TRUE;
 }
+std::vector<std::string> instance::required_vulkan_instance_extensions() const {
+	std::vector<std::string> res;
+	uint32_t count = 0;
+	auto e = glfwGetRequiredInstanceExtensions(&count);
+	if(!e) {
+		res.clear();
+		return res;
+	}
+	res.reserve(count);
+	std::copy(e, e + count, std::back_inserter(res));
+	return res;
+}
 
 } // namespace glfw_wrapper
 } // namespace mce
