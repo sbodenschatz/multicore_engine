@@ -16,8 +16,8 @@
 #include <atomic>
 #include <boost/container/small_vector.hpp>
 #include <boost/utility/string_view.hpp>
-#include <glfw/glfw_defs.hpp>
 #include <functional>
+#include <glfw/glfw_defs.hpp>
 #include <mutex>
 #include <util/copy_on_write.hpp>
 
@@ -93,8 +93,8 @@ util::copy_on_write<typename observable<Args...>::callback_container> observable
  * library is initialized.
  *
  * Members of this class that map to glfw functionality may only be called on the main thread, except for
- * post_empty_event(). Only the callback registration and deregistration member functions and
- * post_empty_event() may be called form other threads.
+ * post_empty_event(). Only the callback registration and deregistration member functions,
+ * post_empty_event() and vulkan_supported() may be called form other threads.
  */
 class instance {
 	static std::mutex init_mutex;
@@ -175,6 +175,9 @@ public:
 	std::string key_name(key key, int scancode) const;
 	/// Returns the present joysticks.
 	std::vector<joystick> query_joysticks() const;
+
+	/// Returns a bool indicating if the vulkan loader is available.
+	bool vulkan_supported() const;
 };
 
 } // namespace glfw_wrapper
