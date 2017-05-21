@@ -4,15 +4,11 @@
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
-#include <graphics/application_instance.hpp>
-#ifdef MULTICORE_ENGINE_WINDOWS
-#include <windows.h> //Fix macro redefinition error in glfw header
-#endif				 // MULTICORE_ENGINE_WINDOWS
-#include <GLFW/glfw3.h>
 #include <algorithm>
 #include <core/version.hpp>
 #include <cstdlib>
 #include <functional>
+#include <graphics/application_instance.hpp>
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -51,28 +47,14 @@ VKAPI_ATTR void VKAPI_CALL vkDebugReportMessageEXT(VkInstance instance, VkDebugR
 namespace mce {
 namespace graphics {
 
-std::mutex application_instance::glfw_init;
-int application_instance::glfw_refcount{0};
-
 application_instance::application_instance(const std::vector<std::string>& exts,
 										   unsigned int validation_level)
 		: validation_level(validation_level) {
-	{ // Initialize glfw if required:
-		std::lock_guard<std::mutex> lock(glfw_init);
-		if(glfw_refcount == 0) {
-			glfwInit();
-		}
-		glfw_refcount++;
-	}
 
-	if(!glfwVulkanSupported()) throw std::runtime_error("Vulkan not supported.");
+	if(!glfw_instance.vulkan_supported()) throw std::runtime_error("Vulkan not supported.");
 
-	unsigned int extensions_count;
-	const char** extensions_cstr = glfwGetRequiredInstanceExtensions(&extensions_count);
+	extensions = glfw_instance.required_vulkan_instance_extensions();
 
-	for(unsigned int i = 0; i < extensions_count; ++i) {
-		extensions.emplace_back(extensions_cstr[i]);
-	}
 	std::copy(exts.begin(), exts.end(), std::back_inserter(extensions));
 	if(validation_level > 0) {
 		layers.emplace_back("VK_LAYER_LUNARG_standard_validation");
@@ -131,14 +113,7 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 	}
 }
 
-application_instance::~application_instance() {
-	// Terminate glfw if we are the last user
-	std::lock_guard<std::mutex> lock(glfw_init);
-	glfw_refcount--;
-	if(glfw_refcount == 0) {
-		glfwTerminate();
-	}
-}
+application_instance::~application_instance() {}
 
 VkBool32 MCE_VK_CALLBACK application_instance::validation_report_callback_static(
 		VkDebugReportFlagsEXT flags_, VkDebugReportObjectTypeEXT objectType_, uint64_t object,

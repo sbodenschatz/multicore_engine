@@ -9,6 +9,7 @@
 
 #include "unique_handle.hpp"
 #include <atomic>
+#include <glfw/instance.hpp>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -24,8 +25,7 @@ namespace graphics {
 
 class application_instance {
 private:
-	static std::mutex glfw_init;
-	static int glfw_refcount;
+	glfw::instance glfw_instance;
 	std::vector<std::string> layers;
 	std::vector<std::string> extensions;
 	unique_handle<vk::Instance, false> instance_;
