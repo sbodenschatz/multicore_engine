@@ -7,6 +7,11 @@
 #ifndef GRAPHICS_APPLICATION_INSTANCE_HPP_
 #define GRAPHICS_APPLICATION_INSTANCE_HPP_
 
+/**
+ * \file
+ * Defines the instance level resource management of the application.
+ */
+
 #include "unique_handle.hpp"
 #include <atomic>
 #include <glfw/instance.hpp>
@@ -23,6 +28,7 @@
 namespace mce {
 namespace graphics {
 
+/// Encapsulates the vulkan instance ralated aspects of the application (extensions, layers, callbacks).
 class application_instance {
 private:
 	glfw::instance glfw_instance;
@@ -50,13 +56,23 @@ private:
 										const char* pLayerPrefix, const char* pMessage) const;
 
 public:
+	/// Constructs an application_instance with the given additional extensions and validation level.
+	/**
+	 * The given extensions are requested additionally to the ones required by glfw.
+	 * The validation level determines which debug callback messages are given to the debug output ranging
+	 * from 1 for error only to 5 for debug and above (all).
+	 */
 	application_instance(const std::vector<std::string>& extensions = {},
 						 unsigned int validation_level = default_validation_level);
+	/// Releases the instance resources.
 	~application_instance();
 
+	/// Returns the vulkan instance managed by the application instance.
 	const vk::Instance& instance() const {
 		return instance_.get();
 	}
+
+	/// Returns the vulkan instance managed by the application instance.
 	vk::Instance& instance() {
 		return instance_.get();
 	}
