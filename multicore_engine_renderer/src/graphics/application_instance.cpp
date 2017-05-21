@@ -4,6 +4,9 @@
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
+#ifdef _MSC_VER
+#include <windows.h> //Required for OutputDebugStringA
+#endif
 #include <algorithm>
 #include <core/version.hpp>
 #include <cstdlib>
