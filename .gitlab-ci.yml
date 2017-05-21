@@ -207,7 +207,7 @@ cpp-check:
     dependencies: []
     stage: auxiliary
     script:
-    - cppcheck -j 8 -v --inline-suppr --error-exitcode=2 --enable=all -U_MSC_VER -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
+    - cppcheck -j 8 -v --inline-suppr --error-exitcode=2 --enable=all -U_MSC_VER -UMULTICORE_ENGINE_WINDOWS -I multicore_engine_base/include/ -I multicore_engine_core/include/ .
     tags:
     - cpp
 
