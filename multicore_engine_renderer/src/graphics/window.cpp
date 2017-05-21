@@ -12,22 +12,15 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan.hpp>
+#include <GLFW/glfw3.h>
 
 namespace mce {
 namespace graphics {
 
-window::window(application_instance& app_instance)
-		: app_instance(app_instance),
-		  native_window_(std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})) {
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	resolution_ = vk::Extent2D(800, 600); // TODO: Make configurable
-	native_window_ = std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(
-			glfwCreateWindow(resolution_.width, resolution_.height, "Test", nullptr, nullptr),
-			[](GLFWwindow* win) { glfwDestroyWindow(win); });
-	if(!native_window_) throw std::runtime_error("Failed to create window.");
+window::window(application_instance& app_instance, glfw::window& win)
+		: app_instance(app_instance), window_{win} {
 	VkSurfaceKHR surface_tmp;
-	if(glfwCreateWindowSurface(app_instance.instance(), native_window_.get(), nullptr, &surface_tmp) !=
+	if(glfwCreateWindowSurface(app_instance.instance(), window_.window_.get(), nullptr, &surface_tmp) !=
 	   VK_SUCCESS) {
 		throw std::runtime_error("Failed to create window surface.");
 	}

@@ -11,7 +11,7 @@
 #include <windows.h> //Fix macro redefinition error in glfw header
 #endif				 // MULTICORE_ENGINE_WINDOWS
 #include "unique_handle.hpp"
-#include <GLFW/glfw3.h>
+#include <glfw/window.hpp>
 #include <memory>
 
 namespace mce {
@@ -21,19 +21,15 @@ class application_instance;
 class window {
 private:
 	application_instance& app_instance;
-	vk::Extent2D resolution_;
-	std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)> native_window_;
+	glfw::window& window_;
 	unique_handle<vk::SurfaceKHR> surface_;
 
 public:
-	explicit window(application_instance& app_instance);
+	explicit window(application_instance& app_instance, glfw::window& win);
 	~window();
 
 	const vk::SurfaceKHR& surface() const {
 		return *surface_;
-	}
-	const vk::Extent2D& resolution() const {
-		return resolution_;
 	}
 };
 

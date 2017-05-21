@@ -18,6 +18,9 @@
 struct GLFWwindow;
 
 namespace mce {
+namespace graphics {
+class window;
+} // namespace graphics
 namespace glfw {
 class instance;
 class monitor;
@@ -93,6 +96,8 @@ class window {
 	std::unique_ptr<window_callbacks> callbacks_;
 
 	void set_window_hints(window_hint_flags hints);
+
+	friend class graphics::window;
 
 public:
 	/// Constructs a window in windowed mode with the given title, size, and behavior hints.
