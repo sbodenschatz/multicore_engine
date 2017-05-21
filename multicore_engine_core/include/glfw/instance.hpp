@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef GLFW_WRAPPER_INSTANCE_HPP_
-#define GLFW_WRAPPER_INSTANCE_HPP_
+#ifndef GLFW_INSTANCE_HPP_
+#define GLFW_INSTANCE_HPP_
 
 /**
  * \file
@@ -16,15 +16,15 @@
 #include <atomic>
 #include <boost/container/small_vector.hpp>
 #include <boost/utility/string_view.hpp>
+#include <glfw/glfw_defs.hpp>
 #include <functional>
-#include <glfw_wrapper/glfw_defs.hpp>
 #include <mutex>
 #include <util/copy_on_write.hpp>
 
 struct GLFWmonitor;
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 class monitor;
 class joystick;
 
@@ -101,8 +101,8 @@ class instance {
 	static size_t init_refcount;
 	typedef size_t callback_id;
 	detail::observable<error_code, boost::string_view> error_callbacks;
-	detail::observable<const glfw_wrapper::monitor&, device_event> monitor_callbacks;
-	detail::observable<const glfw_wrapper::joystick&, device_event> joystick_callbacks;
+	detail::observable<const glfw::monitor&, device_event> monitor_callbacks;
+	detail::observable<const glfw::joystick&, device_event> joystick_callbacks;
 
 	static void error_callback(int error, const char* description);
 	static void monitor_callback(GLFWmonitor* m, int event);
@@ -180,4 +180,4 @@ public:
 } // namespace glfw_wrapper
 } // namespace mce
 
-#endif /* GLFW_WRAPPER_INSTANCE_HPP_ */
+#endif /* GLFW_INSTANCE_HPP_ */

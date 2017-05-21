@@ -4,14 +4,14 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <glfw/instance.hpp>
+#include <glfw/joystick.hpp>
+#include <glfw/monitor.hpp>
 #include <GLFW/glfw3.h>
 #include <algorithm>
-#include <glfw_wrapper/instance.hpp>
-#include <glfw_wrapper/joystick.hpp>
-#include <glfw_wrapper/monitor.hpp>
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 
 std::mutex instance::init_mutex;
 size_t instance::init_refcount;
@@ -38,10 +38,10 @@ void instance::error_callback(int error, const char* description) {
 	decltype(error_callbacks)::callback_s(static_cast<error_code>(error), description);
 }
 void instance::monitor_callback(GLFWmonitor* m, int event) {
-	decltype(monitor_callbacks)::callback_s(m, static_cast<glfw_wrapper::device_event>(event));
+	decltype(monitor_callbacks)::callback_s(m, static_cast<glfw::device_event>(event));
 }
 void instance::joystick_callback(int joy, int event) {
-	decltype(joystick_callbacks)::callback_s(joy, static_cast<glfw_wrapper::device_event>(event));
+	decltype(joystick_callbacks)::callback_s(joy, static_cast<glfw::device_event>(event));
 }
 
 void instance::poll_events() {

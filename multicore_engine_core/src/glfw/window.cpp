@@ -7,14 +7,14 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <exceptions.hpp>
-#include <glfw_wrapper/instance.hpp>
-#include <glfw_wrapper/window.hpp>
+#include <glfw/cursor.hpp>
+#include <glfw/instance.hpp>
+#include <glfw/monitor.hpp>
+#include <glfw/window.hpp>
 #include <iterator>
-#include <glfw_wrapper/monitor.hpp>
-#include <glfw_wrapper/cursor.hpp>
 
 namespace mce {
-namespace glfw_wrapper {
+namespace glfw {
 
 // cppcheck-suppress passedByValue
 window::window(const std::string& title, const glm::ivec2& size, window_hint_flags hints)
@@ -93,17 +93,17 @@ glm::dvec2 window::cursor_position() const {
 void window::cursor_position(glm::dvec2 pos) {
 	glfwSetCursorPos(window_.get(), pos.x, pos.y);
 }
-bool window::key(glfw_wrapper::key key_code) const {
+bool window::key(glfw::key key_code) const {
 	return glfwGetKey(window_.get(), static_cast<int>(key_code)) == GLFW_PRESS;
 }
-bool window::mouse_button(glfw_wrapper::mouse_button button) const {
+bool window::mouse_button(glfw::mouse_button button) const {
 	return glfwGetMouseButton(window_.get(), static_cast<int>(button)) == GLFW_PRESS;
 }
 
-glfw_wrapper::cursor_mode window::cursor_mode() const {
-	return static_cast<glfw_wrapper::cursor_mode>(glfwGetInputMode(window_.get(), GLFW_CURSOR));
+glfw::cursor_mode window::cursor_mode() const {
+	return static_cast<glfw::cursor_mode>(glfwGetInputMode(window_.get(), GLFW_CURSOR));
 }
-void window::cursor_mode(glfw_wrapper::cursor_mode mode) {
+void window::cursor_mode(glfw::cursor_mode mode) {
 	glfwSetInputMode(window_.get(), GLFW_CURSOR, static_cast<int>(mode));
 }
 bool window::sticky_keys() const {
@@ -176,24 +176,24 @@ void window::hide() {
 void window::focus() {
 	glfwFocusWindow(window_.get());
 }
-void window::cursor(const glfw_wrapper::cursor& cur) {
+void window::cursor(const glfw::cursor& cur) {
 	glfwSetCursor(window_.get(), cur.cursor_.get());
 }
-boost::optional<glfw_wrapper::monitor> window::fullscreen_monitor() const {
+boost::optional<glfw::monitor> window::fullscreen_monitor() const {
 	auto m = glfwGetWindowMonitor(window_.get());
 	if(m) {
-		return glfw_wrapper::monitor(m);
+		return glfw::monitor(m);
 	} else {
-		return boost::optional<glfw_wrapper::monitor>();
+		return boost::optional<glfw::monitor>();
 	}
 }
-void window::fullscreen_mode(glfw_wrapper::monitor& mon, glm::ivec2 resolution, int refresh_rate) {
+void window::fullscreen_mode(glfw::monitor& mon, glm::ivec2 resolution, int refresh_rate) {
 	glfwSetWindowMonitor(window_.get(), mon.monitor_, 0, 0, resolution.x, resolution.y, refresh_rate);
 }
 void window::windowed_mode(glm::ivec2 pos, glm::ivec2 size) {
 	glfwSetWindowMonitor(window_.get(), nullptr, pos.x, pos.y, size.x, size.y, 0);
 }
-void window::windowed_fullscreen_mode(glfw_wrapper::monitor& mon) {
+void window::windowed_fullscreen_mode(glfw::monitor& mon) {
 	auto vm = mon.current_video_mode();
 	glfwSetWindowMonitor(window_.get(), mon.monitor_, 0, 0, vm.width, vm.height, vm.refresh_rate);
 }
@@ -201,7 +201,7 @@ void window::windowed_fullscreen_mode(glfw_wrapper::monitor& mon) {
 void window::key_callback_s(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->key;
 	if(cb)
-		cb(static_cast<glfw_wrapper::key>(key), scancode, static_cast<glfw_wrapper::button_action>(action),
+		cb(static_cast<glfw::key>(key), scancode, static_cast<glfw::button_action>(action),
 		   modifier_flags(mods));
 }
 void window::character_callback_s(GLFWwindow* window, unsigned int codepoint) {
@@ -223,7 +223,7 @@ void window::cursor_enter_callback_s(GLFWwindow* window, int entered) {
 void window::mouse_button_callback_s(GLFWwindow* window, int button, int action, int mods) {
 	auto& cb = static_cast<window_callbacks*>(glfwGetWindowUserPointer(window))->mouse_button;
 	if(cb)
-		cb(static_cast<glfw_wrapper::mouse_button>(button), static_cast<glfw_wrapper::button_action>(action),
+		cb(static_cast<glfw::mouse_button>(button), static_cast<glfw::button_action>(action),
 		   modifier_flags(mods));
 }
 void window::scroll_callback_s(GLFWwindow* window, double xoffset, double yoffset) {
