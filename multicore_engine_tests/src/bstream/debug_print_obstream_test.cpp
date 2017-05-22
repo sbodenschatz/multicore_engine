@@ -4,7 +4,7 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <bstream/debug_print_obstream.hpp>
+#include <mce/bstream/debug_print_obstream.hpp>
 #include <gtest.hpp>
 #include <iomanip>
 #include <iostream>

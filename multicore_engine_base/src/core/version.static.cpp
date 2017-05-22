@@ -4,7 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <core/version.hpp>
+#include <mce/core/version.hpp>
 #include <sstream>
 
 namespace mce {

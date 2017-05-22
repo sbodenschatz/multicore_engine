@@ -1,10 +1,10 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/glfw_wrapper/joystick.cpp
+ * File /multicore_engine_core/include/mce/glfw/joystick.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <glfw/joystick.hpp>
+#include <mce/glfw/joystick.hpp>
 #include <GLFW/glfw3.h>
 #include <algorithm>
 

@@ -4,9 +4,9 @@
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
-#include <entity/component.hpp>
-#include <entity/component_configuration.hpp>
-#include <entity/component_type.hpp>
+#include <mce/entity/component.hpp>
+#include <mce/entity/component_configuration.hpp>
+#include <mce/entity/component_type.hpp>
 
 namespace mce {
 namespace entity {

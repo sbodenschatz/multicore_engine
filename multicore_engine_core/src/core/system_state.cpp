@@ -4,7 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <core/system_state.hpp>
+#include <mce/core/system_state.hpp>
 
 namespace mce {
 namespace core {

@@ -8,7 +8,7 @@
 #include <gtest.hpp>
 #include <string>
 #include <type_traits>
-#include <util/traits.hpp>
+#include <mce/util/traits.hpp>
 #include <vector>
 
 namespace mce {

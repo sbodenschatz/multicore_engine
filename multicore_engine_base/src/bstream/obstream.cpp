@@ -4,7 +4,7 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <bstream/obstream.hpp>
+#include <mce/bstream/obstream.hpp>
 
 namespace mce {
 namespace bstream {

@@ -6,9 +6,9 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
-#include <glfw/instance.hpp>
-#include <glfw/joystick.hpp>
-#include <glfw/monitor.hpp>
+#include <mce/glfw/instance.hpp>
+#include <mce/glfw/joystick.hpp>
+#include <mce/glfw/monitor.hpp>
 
 namespace mce {
 namespace glfw {

@@ -4,9 +4,9 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <asset/load_unit_meta_data.hpp>
-#include <bstream/ibstream.hpp>
-#include <bstream/obstream.hpp>
+#include <mce/asset/load_unit_meta_data.hpp>
+#include <mce/bstream/ibstream.hpp>
+#include <mce/bstream/obstream.hpp>
 
 namespace mce {
 namespace asset {

@@ -5,7 +5,7 @@
  */
 
 #include <gtest.hpp>
-#include <memory/align.hpp>
+#include <mce/memory/align.hpp>
 
 namespace mce {
 namespace memory {

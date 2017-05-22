@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/include/graphics/application_instance.cpp
+ * File /multicore_engine_renderer/src/graphics/application_instance.cpp
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
@@ -8,16 +8,17 @@
 #include <windows.h> //Required for OutputDebugStringA
 #endif
 #include <algorithm>
-#include <core/version.hpp>
+#include <mce/core/version.hpp>
 #include <cstdlib>
 #include <functional>
-#include <graphics/application_instance.hpp>
+#include <mce/graphics/application_instance.hpp>
 #include <iostream>
 #include <iterator>
 #include <sstream>
 #include <stdexcept>
-#include <util/unused.hpp>
+#include <mce/util/unused.hpp>
 #include <vulkan/vulkan.hpp>
+#include <mce/exceptions.hpp>
 
 // Provide wrapper functions to call into extension function pointers because extension functions aren't
 // provided by the loader library. To make the symbols available they are defined here.
@@ -54,7 +55,8 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 										   unsigned int validation_level)
 		: validation_level(validation_level) {
 
-	if(!glfw_instance.vulkan_supported()) throw std::runtime_error("Vulkan not supported.");
+	if(!glfw_instance.vulkan_supported())
+		throw vulkan_not_supported_exception("Vulkan API is not supported on this system.");
 
 	extensions = glfw_instance.required_vulkan_instance_extensions();
 
@@ -118,10 +120,12 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 
 application_instance::~application_instance() {}
 
-VkBool32 MCE_VK_CALLBACK application_instance::validation_report_callback_static(
-		VkDebugReportFlagsEXT flags_, VkDebugReportObjectTypeEXT objectType_, uint64_t object,
-		size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage,
-		void* pUserData) {
+VkBool32 MCE_VK_CALLBACK
+application_instance::validation_report_callback_static(VkDebugReportFlagsEXT flags_,
+														VkDebugReportObjectTypeEXT objectType_,
+														uint64_t object, size_t location, int32_t messageCode,
+														const char* pLayerPrefix, const char* pMessage,
+														void* pUserData) {
 	auto target = static_cast<const application_instance*>(pUserData);
 	return target->validation_report_callback(flags_, objectType_, object, location, messageCode,
 											  pLayerPrefix, pMessage);

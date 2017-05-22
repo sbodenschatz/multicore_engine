@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/graphics/device.cpp
+ * File /multicore_engine_core/src/graphics/device.cpp
  * Copyright 2016 by Stefan Bodenschatz
  */
 
@@ -10,12 +10,12 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
-#include <graphics/application_instance.hpp>
-#include <graphics/device.hpp>
-#include <graphics/window.hpp>
+#include <mce/graphics/application_instance.hpp>
+#include <mce/graphics/device.hpp>
+#include <mce/graphics/window.hpp>
 #include <iostream>
 #include <stdexcept>
-#include <util/unused.hpp>
+#include <mce/util/unused.hpp>
 #include <vector>
 
 namespace mce {

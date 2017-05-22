@@ -4,12 +4,12 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <containers/smart_pool_ptr.hpp>
-#include <entity/component_configuration.hpp>
-#include <entity/component_property_assignment.hpp>
-#include <entity/component_type.hpp>
-#include <exceptions.hpp>
-#include <reflection/property.hpp>
+#include <mce/containers/smart_pool_ptr.hpp>
+#include <mce/entity/component_configuration.hpp>
+#include <mce/entity/component_property_assignment.hpp>
+#include <mce/entity/component_type.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/reflection/property.hpp>
 #include <algorithm>
 #include <iterator>
 #include <memory>

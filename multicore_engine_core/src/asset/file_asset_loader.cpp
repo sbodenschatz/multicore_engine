@@ -4,10 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <asset/asset.hpp>
-#include <asset/file_asset_loader.hpp>
-#include <asset/file_reader.hpp>
-#include <util/local_function.hpp>
+#include <mce/asset/asset.hpp>
+#include <mce/asset/file_asset_loader.hpp>
+#include <mce/asset/file_reader.hpp>
+#include <mce/util/local_function.hpp>
 #include <algorithm>
 #include <iterator>
 #include <mutex>

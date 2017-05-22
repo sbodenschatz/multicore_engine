@@ -4,7 +4,7 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <memory/align.hpp>
+#include <mce/memory/align.hpp>
 #include <cstddef>
 #include <cstdint>
 

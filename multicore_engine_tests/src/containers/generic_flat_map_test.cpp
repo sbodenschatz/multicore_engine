@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <boost/container/small_vector.hpp>
-#include <containers/generic_flat_map.hpp>
+#include <mce/containers/generic_flat_map.hpp>
 #include <future>
 #include <gtest.hpp>
 #include <iostream>

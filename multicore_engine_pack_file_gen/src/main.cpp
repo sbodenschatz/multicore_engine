@@ -8,16 +8,16 @@
 #pragma warning(disable : 4505)
 #endif
 
-#include <asset_gen/pack_file_description_ast.hpp>
-#include <asset_gen/pack_file_description_parser.hpp>
-#include <asset_gen/pack_file_gen.hpp>
+#include <mce/asset_gen/pack_file_description_ast.hpp>
+#include <mce/asset_gen/pack_file_description_parser.hpp>
+#include <mce/asset_gen/pack_file_gen.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include <core/version.hpp>
-#include <exceptions.hpp>
+#include <mce/core/version.hpp>
+#include <mce/exceptions.hpp>
 #include <iostream>
 #include <string>
-#include <util/program_name.hpp>
+#include <mce/util/program_name.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

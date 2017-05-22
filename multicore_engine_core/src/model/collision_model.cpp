@@ -4,10 +4,10 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <bstream/asset_ibstream.hpp>
-#include <exceptions.hpp>
-#include <model/collision_model.hpp>
-#include <util/local_function.hpp>
+#include <mce/bstream/asset_ibstream.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/model/collision_model.hpp>
+#include <mce/util/local_function.hpp>
 #include <algorithm>
 #include <string>
 

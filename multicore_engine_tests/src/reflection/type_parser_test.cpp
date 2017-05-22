@@ -5,7 +5,7 @@
  */
 
 #include <gtest.hpp>
-#include <reflection/type.hpp>
+#include <mce/reflection/type.hpp>
 
 namespace mce {
 namespace reflection {

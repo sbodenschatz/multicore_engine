@@ -6,15 +6,15 @@
 
 #include <algorithm>
 #include <boost/container/vector.hpp>
-#include <bstream/ibstream.hpp>
-#include <bstream/obstream.hpp>
+#include <mce/bstream/ibstream.hpp>
+#include <mce/bstream/obstream.hpp>
 #include <cassert>
-#include <entity/entity_configuration.hpp>
-#include <entity/entity_manager.hpp>
-#include <entity/parser/entity_text_file_parser.hpp>
-#include <exceptions.hpp>
+#include <mce/entity/entity_configuration.hpp>
+#include <mce/entity/entity_manager.hpp>
+#include <mce/entity/parser/entity_text_file_parser.hpp>
+#include <mce/exceptions.hpp>
 #include <tuple>
-#include <util/finally.hpp>
+#include <mce/util/finally.hpp>
 #include <utility>
 
 namespace mce {

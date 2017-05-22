@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <boost/container/flat_set.hpp>
-#include <config/config_store.hpp>
+#include <mce/config/config_store.hpp>
 
 namespace mce {
 namespace config {

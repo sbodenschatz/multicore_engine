@@ -4,7 +4,7 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <entity/component_type_id_manager.hpp>
+#include <mce/entity/component_type_id_manager.hpp>
 
 namespace mce {
 namespace entity {

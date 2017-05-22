@@ -4,9 +4,9 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <asset/native_file_reader.hpp>
-#include <exceptions.hpp>
-#include <util/path_util.hpp>
+#include <mce/asset/native_file_reader.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/util/path_util.hpp>
 #include <fstream>
 #include <iostream>
 #include <memory>

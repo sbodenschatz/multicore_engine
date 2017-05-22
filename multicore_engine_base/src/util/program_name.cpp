@@ -4,7 +4,7 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <util/program_name.hpp>
+#include <mce/util/program_name.hpp>
 #include <algorithm>
 #include <cctype>
 #include <iterator>
