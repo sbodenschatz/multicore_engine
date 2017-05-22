@@ -117,6 +117,11 @@ struct window_surface_creation_exception : graphics_exception {
 	using graphics_exception::graphics_exception;
 };
 
+/// Exception indicating that no suitable device was found.
+struct no_suitable_device_found_exception : graphics_exception {
+	using graphics_exception::graphics_exception;
+};
+
 } // namespace mce
 
 #endif /* CORE_EXCEPTIONS_HPP_ */

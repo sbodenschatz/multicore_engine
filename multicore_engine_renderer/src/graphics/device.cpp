@@ -11,10 +11,10 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <iostream>
+#include <mce/exceptions.hpp>
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/util/unused.hpp>
-#include <stdexcept>
 #include <vector>
 
 namespace mce {
@@ -86,7 +86,8 @@ void device::find_physical_device() {
 		}
 	}
 	if(!physical_device_)
-		throw std::runtime_error("No vulkan device with required presentation capabilities found.");
+		throw no_suitable_device_found_exception(
+				"No vulkan device with required presentation capabilities found.");
 	physical_device_properties_ = physical_device_.getProperties();
 	std::cout << "Using render device \"" << physical_device_properties_.deviceName << "\"" << std::endl;
 }
