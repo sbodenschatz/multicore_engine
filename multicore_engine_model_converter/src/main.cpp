@@ -9,20 +9,20 @@
 #endif
 
 #include <algorithm>
-#include <asset_gen/obj_model_parser.hpp>
-#include <asset_gen/static_model.hpp>
-#include <asset_gen/static_model_exporter.hpp>
+#include <mce/asset_gen/obj_model_parser.hpp>
+#include <mce/asset_gen/static_model.hpp>
+#include <mce/asset_gen/static_model_exporter.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <cctype>
-#include <core/version.hpp>
-#include <exceptions.hpp>
+#include <mce/core/version.hpp>
+#include <mce/exceptions.hpp>
 #include <fstream>
 #include <iostream>
-#include <model/model_format.hpp>
+#include <mce/model/model_format.hpp>
 #include <string>
-#include <util/program_name.hpp>
-#include <util/string_tools.hpp>
+#include <mce/util/program_name.hpp>
+#include <mce/util/string_tools.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

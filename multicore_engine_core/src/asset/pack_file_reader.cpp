@@ -4,11 +4,11 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <asset/pack_file_reader.hpp>
+#include <mce/asset/pack_file_reader.hpp>
 #include <boost/container/vector.hpp>
-#include <exceptions.hpp>
+#include <mce/exceptions.hpp>
 #include <cstring>
-#include <util/compression.hpp>
+#include <mce/util/compression.hpp>
 #include <algorithm>
 #include <cassert>
 #include <iterator>

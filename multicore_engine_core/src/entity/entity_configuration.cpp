@@ -4,9 +4,9 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <entity/component_configuration.hpp>
-#include <entity/entity.hpp>
-#include <entity/entity_configuration.hpp>
+#include <mce/entity/component_configuration.hpp>
+#include <mce/entity/entity.hpp>
+#include <mce/entity/entity_configuration.hpp>
 #include <algorithm>
 #include <iterator>
 

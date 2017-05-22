@@ -5,7 +5,7 @@
  */
 
 #include <gtest.hpp>
-#include <util/stack_state_machine.hpp>
+#include <mce/util/stack_state_machine.hpp>
 
 namespace mce {
 namespace util {

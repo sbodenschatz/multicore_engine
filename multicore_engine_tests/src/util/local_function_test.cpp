@@ -5,8 +5,8 @@
  */
 
 #include <gtest.hpp>
-#include <util/local_function.hpp>
-#include <util/unused.hpp>
+#include <mce/util/local_function.hpp>
+#include <mce/util/unused.hpp>
 
 namespace mce {
 namespace util {

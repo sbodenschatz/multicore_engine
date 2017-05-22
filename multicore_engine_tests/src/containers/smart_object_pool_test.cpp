@@ -5,13 +5,13 @@
  */
 
 #include <algorithm>
-#include <containers/smart_object_pool.hpp>
+#include <mce/containers/smart_object_pool.hpp>
 #include <future>
 #include <gtest.hpp>
 #include <iterator>
 #include <string>
 #include <unordered_set>
-#include <util/unused.hpp>
+#include <mce/util/unused.hpp>
 
 namespace mce {
 namespace containers {

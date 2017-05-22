@@ -6,7 +6,7 @@
 
 //#define BOOST_SPIRIT_DEBUG
 
-#include <asset_gen/base_ast.hpp>
+#include <mce/asset_gen/base_ast.hpp>
 #include <boost/phoenix/core/actor.hpp>
 #include <boost/phoenix/fusion/at.hpp>
 #include <algorithm>
@@ -24,17 +24,17 @@
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4348)
 #endif
-#include <asset_gen/pack_file_description_ast.hpp>
-#include <asset_gen/pack_file_description_ast_fusion.hpp>
-#include <asset_gen/pack_file_description_parser.hpp>
+#include <mce/asset_gen/pack_file_description_ast.hpp>
+#include <mce/asset_gen/pack_file_description_ast_fusion.hpp>
+#include <mce/asset_gen/pack_file_description_parser.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <exceptions.hpp>
-#include <util/error_helper.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/util/error_helper.hpp>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;

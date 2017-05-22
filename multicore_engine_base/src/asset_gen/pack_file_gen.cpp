@@ -4,14 +4,14 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <asset_gen/pack_file_gen.hpp>
-#include <bstream/iostream_bstream.hpp>
-#include <bstream/vector_iobstream.hpp>
+#include <mce/asset_gen/pack_file_gen.hpp>
+#include <mce/bstream/iostream_bstream.hpp>
+#include <mce/bstream/vector_iobstream.hpp>
 #include <cstdint>
-#include <exceptions.hpp>
+#include <mce/exceptions.hpp>
 #include <fstream>
-#include <util/compression.hpp>
-#include <util/path_util.hpp>
+#include <mce/util/compression.hpp>
+#include <mce/util/path_util.hpp>
 #include <algorithm>
 #include <iostream>
 #include <iterator>

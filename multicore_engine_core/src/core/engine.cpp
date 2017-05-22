@@ -5,12 +5,12 @@
  */
 
 #include <algorithm>
-#include <asset/asset_manager.hpp>
+#include <mce/asset/asset_manager.hpp>
 #include <chrono>
-#include <core/core_defs.hpp>
-#include <core/engine.hpp>
-#include <core/game_state_machine.hpp>
-#include <core/system.hpp>
+#include <mce/core/core_defs.hpp>
+#include <mce/core/engine.hpp>
+#include <mce/core/game_state_machine.hpp>
+#include <mce/core/system.hpp>
 
 namespace mce {
 namespace core {

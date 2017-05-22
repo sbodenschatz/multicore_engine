@@ -14,7 +14,7 @@
 
 #include "unique_handle.hpp"
 #include <atomic>
-#include <glfw/instance.hpp>
+#include <mce/glfw/instance.hpp>
 #include <mutex>
 #include <string>
 #include <vector>

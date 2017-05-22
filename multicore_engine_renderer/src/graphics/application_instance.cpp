@@ -8,7 +8,7 @@
 #include <windows.h> //Required for OutputDebugStringA
 #endif
 #include <algorithm>
-#include <core/version.hpp>
+#include <mce/core/version.hpp>
 #include <cstdlib>
 #include <functional>
 #include <graphics/application_instance.hpp>
@@ -16,9 +16,9 @@
 #include <iterator>
 #include <sstream>
 #include <stdexcept>
-#include <util/unused.hpp>
+#include <mce/util/unused.hpp>
 #include <vulkan/vulkan.hpp>
-#include <exceptions.hpp>
+#include <mce/exceptions.hpp>
 
 // Provide wrapper functions to call into extension function pointers because extension functions aren't
 // provided by the loader library. To make the symbols available they are defined here.

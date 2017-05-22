@@ -4,7 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <glfw/monitor.hpp>
+#include <mce/glfw/monitor.hpp>
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <iterator>

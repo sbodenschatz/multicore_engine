@@ -16,7 +16,7 @@
 #include <windows.h> //Fix macro redefinition error in glfw header
 #endif				 // MULTICORE_ENGINE_WINDOWS
 #include "unique_handle.hpp"
-#include <glfw/window.hpp>
+#include <mce/glfw/window.hpp>
 #include <memory>
 
 namespace mce {

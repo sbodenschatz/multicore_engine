@@ -6,7 +6,7 @@
 
 #include <atomic>
 #include <gtest.hpp>
-#include <util/actor.hpp>
+#include <mce/util/actor.hpp>
 
 namespace mce {
 namespace util {

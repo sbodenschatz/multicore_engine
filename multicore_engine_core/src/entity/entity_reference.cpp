@@ -4,10 +4,10 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <bstream/ibstream.hpp>
-#include <bstream/obstream.hpp>
-#include <entity/entity_manager.hpp>
-#include <entity/entity_reference.hpp>
+#include <mce/bstream/ibstream.hpp>
+#include <mce/bstream/obstream.hpp>
+#include <mce/entity/entity_manager.hpp>
+#include <mce/entity/entity_reference.hpp>
 
 namespace mce {
 namespace entity {
