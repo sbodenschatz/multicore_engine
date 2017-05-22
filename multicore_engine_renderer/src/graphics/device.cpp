@@ -137,6 +137,33 @@ void device::find_queue_indexes() {
 	if(present_queue_index_ == no_queue_index) {
 		present_queue_index_ = find_queue(queue_families, vk::QueueFlags(), true);
 	}
+	// 4. Fall back to using graphics or compute queue for transfer
+	if(transfer_queue_index_ == no_queue_index) {
+		transfer_queue_index_ = find_queue(queue_families, vk::QueueFlagBits::eCompute, false,
+										   boost::container::flat_set<queue_family_index_t>(),
+										   {graphics_queue_index_, present_queue_index_});
+	}
+	if(transfer_queue_index_ == no_queue_index) {
+		transfer_queue_index_ = find_queue(queue_families, vk::QueueFlagBits::eGraphics, false,
+										   boost::container::flat_set<queue_family_index_t>(),
+										   {graphics_queue_index_, present_queue_index_});
+	}
+	if(transfer_queue_index_ == no_queue_index) {
+		transfer_queue_index_ =
+				find_queue(queue_families, vk::QueueFlagBits::eCompute, false,
+						   boost::container::flat_set<queue_family_index_t>(), {graphics_queue_index_});
+	}
+	if(transfer_queue_index_ == no_queue_index) {
+		transfer_queue_index_ =
+				find_queue(queue_families, vk::QueueFlagBits::eGraphics, false,
+						   boost::container::flat_set<queue_family_index_t>(), {graphics_queue_index_});
+	}
+	if(transfer_queue_index_ == no_queue_index) {
+		transfer_queue_index_ = find_queue(queue_families, vk::QueueFlagBits::eCompute, false);
+	}
+	if(transfer_queue_index_ == no_queue_index) {
+		transfer_queue_index_ = find_queue(queue_families, vk::QueueFlagBits::eGraphics, false);
+	}
 }
 
 void device::create_device() {
