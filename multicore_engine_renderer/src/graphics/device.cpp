@@ -10,12 +10,12 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <iostream>
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/window.hpp>
-#include <iostream>
-#include <stdexcept>
 #include <mce/util/unused.hpp>
+#include <stdexcept>
 #include <vector>
 
 namespace mce {
@@ -24,12 +24,10 @@ namespace graphics {
 const std::pair<uint32_t, uint32_t> device::no_queue_index{~0u, ~0u};
 const uint32_t device::no_queue_family_index{~0u};
 
-device::device(application_instance& app_inst, window& win)
-		: app_instance_(app_inst), connected_window_(win) {
+device::device(application_instance& app_inst) : app_instance_(app_inst) {
 	find_physical_device();
 	find_queue_indexes();
 	create_device();
-	create_swapchain(win);
 }
 
 queue_family_index_t
@@ -207,72 +205,6 @@ void device::create_device() {
 	graphics_queue_ = native_device_->getQueue(graphics_queue_index_.first, graphics_queue_index_.second);
 	transfer_queue_ = native_device_->getQueue(transfer_queue_index_.first, transfer_queue_index_.second);
 	present_queue_ = native_device_->getQueue(present_queue_index_.first, present_queue_index_.second);
-}
-
-void device::create_swapchain(const window& win) {
-	vk::PresentModeKHR present_mode = vk::PresentModeKHR::eFifo; // Fifo is required to be available by spec.
-	// Check if fifo relaxed mode is available
-	std::vector<vk::PresentModeKHR> present_modes = physical_device_.getSurfacePresentModesKHR(win.surface());
-	if(std::find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eFifoRelaxed) !=
-	   present_modes.end()) {
-		present_mode = vk::PresentModeKHR::eFifoRelaxed;
-	}
-	for(const auto& pm : present_modes) std::cout << vk::to_string(pm) << std::endl;
-
-	std::vector<vk::SurfaceFormatKHR> surface_formats = physical_device_.getSurfaceFormatsKHR(win.surface());
-	vk::ColorSpaceKHR color_space = vk::ColorSpaceKHR::eSrgbNonlinear;
-	surface_format_ = vk::Format::eB8G8R8A8Unorm;
-	if(surface_formats.size() != 1 || surface_formats[0].format != vk::Format::eUndefined) {
-		std::vector<vk::Format> format_preferences = {// TODO Place other preferred formats here
-													  vk::Format::eB8G8R8A8Unorm, vk::Format::eB8G8R8A8Srgb};
-		std::stable_sort(surface_formats.begin(), surface_formats.end(),
-						 [&format_preferences](const auto& v0, const auto& v1) {
-							 auto pref = [&format_preferences](auto x) {
-								 return std::find(format_preferences.begin(), format_preferences.end(), x);
-							 };
-							 return pref(v0.format) < pref(v1.format);
-						 });
-		color_space = surface_formats[0].colorSpace;
-		surface_format_ = surface_formats[0].format;
-	}
-	for(const auto& sf : surface_formats)
-		std::cout << vk::to_string(sf.colorSpace) << " " << vk::to_string(sf.format) << std::endl;
-
-	vk::SurfaceCapabilitiesKHR surface_caps = physical_device_.getSurfaceCapabilitiesKHR(win.surface());
-
-	if(!physical_device_.getSurfaceSupportKHR(present_queue_index_.first, win.surface())) {
-		throw std::runtime_error("Surface not supported by device.");
-	}
-
-	vk::SwapchainCreateInfoKHR swapchain_ci;
-	swapchain_ci.surface = win.surface();
-	uint32_t image_count = surface_caps.minImageCount + 2;
-
-	if(surface_caps.maxImageCount > 0 && image_count > surface_caps.maxImageCount)
-		image_count = surface_caps.maxImageCount;
-	swapchain_ci.minImageCount = image_count;
-	swapchain_ci.imageFormat = surface_format_;
-	swapchain_ci.imageColorSpace = color_space;
-
-	auto resolution = win.glfw_window().framebuffer_size();
-	vk::Extent2D swapchain_size = vk::Extent2D{uint32_t(resolution.x), uint32_t(resolution.y)};
-	if(surface_caps.currentExtent.width != ~0u) {
-		swapchain_size = surface_caps.currentExtent;
-	}
-	swapchain_ci.imageExtent = swapchain_size;
-	swapchain_ci.imageArrayLayers = 1;
-	swapchain_ci.imageSharingMode = vk::SharingMode::eExclusive;
-	swapchain_ci.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
-	swapchain_ci.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
-	swapchain_ci.preTransform = surface_caps.currentTransform;
-	swapchain_ci.clipped = true;
-	swapchain_ci.presentMode = present_mode;
-
-	swapchain_ = unique_handle<vk::SwapchainKHR, true>(
-			native_device_->createSwapchainKHR(swapchain_ci),
-			[this](vk::SwapchainKHR& swapchain, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
-				native_device_->destroySwapchainKHR(swapchain, alloc);
-			});
 }
 
 device::~device() {}

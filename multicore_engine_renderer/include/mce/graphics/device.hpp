@@ -11,9 +11,9 @@
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/graphics_defs.hpp>
 #include <mce/graphics/unique_handle.hpp>
-#include <vulkan/vulkan.hpp>
 #include <utility>
 #include <vector>
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
@@ -26,18 +26,15 @@ private:
 	static const queue_index_t no_queue_index;
 	static const queue_family_index_t no_queue_family_index;
 	application_instance& app_instance_;
-	window& connected_window_;
 	vk::PhysicalDevice physical_device_;
 	vk::PhysicalDeviceProperties physical_device_properties_;
 	queue_index_t graphics_queue_index_ = no_queue_index;
 	queue_index_t transfer_queue_index_ = no_queue_index;
 	queue_index_t present_queue_index_ = no_queue_index;
 	unique_handle<vk::Device, false> native_device_;
-	unique_handle<vk::SwapchainKHR> swapchain_;
 	vk::Queue graphics_queue_;
 	vk::Queue transfer_queue_;
 	vk::Queue present_queue_;
-	vk::Format surface_format_;
 
 	queue_family_index_t
 	find_queue_family(const std::vector<vk::QueueFamilyProperties>& queue_families,
@@ -54,11 +51,10 @@ private:
 	void find_physical_device();
 	void find_queue_indexes();
 	void create_device();
-	void create_swapchain(const window& win);
 
 public:
 	/// Creates a device object from the given application_instance.
-	device(application_instance& app_inst, window& win);
+	device(application_instance& app_inst);
 	/// Releases the resources associated with the device object.
 	~device();
 
@@ -70,10 +66,6 @@ public:
 	/// Returns the queue family index and queue index for the present queue.
 	const queue_index_t& present_queue_index() const {
 		return present_queue_index_;
-	}
-
-	vk::Format surface_format() const {
-		return surface_format_;
 	}
 
 	/// Returns the queue family index and queue index for the transfer queue.
@@ -95,18 +87,9 @@ public:
 	vk::Queue present_queue() const {
 		return present_queue_;
 	}
-
-	const vk::SwapchainKHR& swapchain() const {
-		return swapchain_.get();
-	}
-
 	/// Returns a handle for the transfer queue.
 	vk::Queue transfer_queue() const {
 		return transfer_queue_;
-	}
-
-	window& connected_window() const {
-		return connected_window_;
 	}
 
 	/// Returns a handle to the physical device used.
