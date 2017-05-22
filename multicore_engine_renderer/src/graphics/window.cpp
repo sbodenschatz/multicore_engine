@@ -35,6 +35,7 @@ window::window(application_instance& app_instance, glfw::window& win, device& de
 			[this](vk::SurfaceKHR& surface, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
 				this->app_instance.instance().destroySurfaceKHR(surface, alloc);
 			});
+	create_swapchain();
 }
 
 window::~window() {}
