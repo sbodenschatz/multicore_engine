@@ -13,7 +13,6 @@
 #include <iostream>
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/device.hpp>
-#include <mce/graphics/window.hpp>
 #include <mce/util/unused.hpp>
 #include <stdexcept>
 #include <vector>
