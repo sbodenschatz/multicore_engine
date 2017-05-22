@@ -32,9 +32,11 @@ private:
 	device& device_;
 	unique_handle<vk::SurfaceKHR> surface_;
 	unique_handle<vk::SwapchainKHR> swapchain_;
+	vk::ColorSpaceKHR color_space_;
 	vk::Format surface_format_;
 
 	void create_surface();
+	void configure_surface_format();
 	void create_swapchain();
 
 public:
