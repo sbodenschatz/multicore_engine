@@ -42,7 +42,7 @@ public:
 	}
 
 	/// Returns the glfw::window in which this graphics::window operates.
-	glfw::window& glfw_window() {
+	const glfw::window& glfw_window() const {
 		return window_;
 	}
 };
