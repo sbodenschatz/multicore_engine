@@ -4,6 +4,10 @@
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
+#ifdef MULTICORE_ENGINE_WINDOWS
+#include <windows.h> //Fix macro redefinition error in glfw header
+#endif
+
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <iostream>
