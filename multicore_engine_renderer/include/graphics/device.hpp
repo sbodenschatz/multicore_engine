@@ -18,6 +18,7 @@ namespace graphics {
 class window;
 class application_instance;
 
+/// Manages the vulkan device including associated queues.
 class device {
 private:
 	static const queue_index_t no_queue_index;
@@ -54,14 +55,18 @@ private:
 	void create_swapchain(const window& win);
 
 public:
+	/// Creates a device object from the given application_instance.
 	device(application_instance& app_inst, window& win);
+	/// Releases the resources associated with the device object.
 	~device();
 
-	const std::pair<uint32_t, uint32_t>& graphics_queue_index() const {
+	/// Returns the queue family index and queue index for the graphics queue.
+	const queue_index_t& graphics_queue_index() const {
 		return graphics_queue_index_;
 	}
 
-	const std::pair<uint32_t, uint32_t>& present_queue_index() const {
+	/// Returns the queue family index and queue index for the present queue.
+	const queue_index_t& present_queue_index() const {
 		return present_queue_index_;
 	}
 
@@ -69,18 +74,22 @@ public:
 		return surface_format_;
 	}
 
-	const std::pair<uint32_t, uint32_t>& transfer_queue_index() const {
+	/// Returns the queue family index and queue index for the transfer queue.
+	const queue_index_t& transfer_queue_index() const {
 		return transfer_queue_index_;
 	}
 
+	/// Returns a reference to the underlying vulkan device.
 	const vk::Device& native_device() const {
 		return native_device_.get();
 	}
 
+	/// Returns a handle for the graphics queue.
 	vk::Queue graphics_queue() const {
 		return graphics_queue_;
 	}
 
+	/// Returns a handle for the present queue.
 	vk::Queue present_queue() const {
 		return present_queue_;
 	}
@@ -89,6 +98,7 @@ public:
 		return swapchain_.get();
 	}
 
+	/// Returns a handle for the transfer queue.
 	vk::Queue transfer_queue() const {
 		return transfer_queue_;
 	}
@@ -97,10 +107,12 @@ public:
 		return connected_window_;
 	}
 
+	/// Returns a handle to the physical device used.
 	vk::PhysicalDevice physical_device() const {
 		return physical_device_;
 	}
 
+	/// Returns a reference to the properties struct for the physical device used.
 	const vk::PhysicalDeviceProperties& physical_device_properties() const {
 		return physical_device_properties_;
 	}
