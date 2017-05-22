@@ -102,6 +102,16 @@ struct window_creation_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
 
+/// Exception base class for graphics related errors.
+struct graphics_exception : std::runtime_error {
+	using std::runtime_error::runtime_error;
+};
+
+/// Exception indicating an initialization error because the vulkan API is not supported on the system.
+struct vulkan_not_supported_exception : graphics_exception {
+	using graphics_exception::graphics_exception;
+};
+
 } // namespace mce
 
 #endif /* CORE_EXCEPTIONS_HPP_ */
