@@ -1,12 +1,12 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/include/graphics/window.cpp
+ * File /multicore_engine_renderer/include/mce/graphics/window.cpp
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
 #include <cstdint>
-#include <graphics/application_instance.hpp>
-#include <graphics/window.hpp>
+#include <mce/graphics/application_instance.hpp>
+#include <mce/graphics/window.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <vector>

@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/include/graphics/application_instance.cpp
+ * File /multicore_engine_renderer/include/mce/graphics/application_instance.cpp
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
@@ -11,7 +11,7 @@
 #include <mce/core/version.hpp>
 #include <cstdlib>
 #include <functional>
-#include <graphics/application_instance.hpp>
+#include <mce/graphics/application_instance.hpp>
 #include <iostream>
 #include <iterator>
 #include <sstream>

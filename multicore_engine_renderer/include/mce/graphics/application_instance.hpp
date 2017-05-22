@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/include/graphics/application_instance.hpp
+ * File /multicore_engine_renderer/include/mce/graphics/application_instance.hpp
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
