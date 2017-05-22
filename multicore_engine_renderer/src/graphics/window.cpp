@@ -70,7 +70,7 @@ void window::create_swapchain() {
 			device_.physical_device().getSurfaceCapabilitiesKHR(surface_.get());
 
 	if(!device_.physical_device().getSurfaceSupportKHR(device_.present_queue_index().first, surface_.get())) {
-		throw std::runtime_error("Surface not supported by device.");
+		throw window_surface_creation_exception("Surface not supported by device.");
 	}
 
 	vk::SwapchainCreateInfoKHR swapchain_ci;
