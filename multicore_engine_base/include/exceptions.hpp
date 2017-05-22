@@ -112,6 +112,11 @@ struct vulkan_not_supported_exception : graphics_exception {
 	using graphics_exception::graphics_exception;
 };
 
+/// Exception indicating an initialization error the window surface could not be created.
+struct window_surface_creation_exception : graphics_exception {
+	using graphics_exception::graphics_exception;
+};
+
 } // namespace mce
 
 #endif /* CORE_EXCEPTIONS_HPP_ */
