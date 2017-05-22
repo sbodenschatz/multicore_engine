@@ -12,9 +12,9 @@
  * Defines the instance level resource management of the application.
  */
 
-#include "unique_handle.hpp"
 #include <atomic>
 #include <mce/glfw/instance.hpp>
+#include <mce/graphics/unique_handle.hpp>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -45,12 +45,10 @@ private:
 	mutable std::mutex validation_log_mtx;
 
 private:
-	static VkBool32 MCE_VK_CALLBACK validation_report_callback_static(VkDebugReportFlagsEXT flags,
-																	  VkDebugReportObjectTypeEXT objectType,
-																	  uint64_t object, size_t location,
-																	  int32_t messageCode,
-																	  const char* pLayerPrefix,
-																	  const char* pMessage, void* pUserData);
+	static VkBool32 MCE_VK_CALLBACK
+	validation_report_callback_static(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
+									  uint64_t object, size_t location, int32_t messageCode,
+									  const char* pLayerPrefix, const char* pMessage, void* pUserData);
 	VkBool32 validation_report_callback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
 										uint64_t object, size_t location, int32_t messageCode,
 										const char* pLayerPrefix, const char* pMessage) const;
