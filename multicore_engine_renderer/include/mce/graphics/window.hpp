@@ -24,7 +24,7 @@ namespace graphics {
 class application_instance;
 class device;
 
-/// Implements the window handling for the graphics subsystem (mainly surface creation).
+/// Implements the window handling for the graphics subsystem.
 class window {
 private:
 	application_instance& app_instance;
@@ -34,6 +34,7 @@ private:
 	unique_handle<vk::SwapchainKHR> swapchain_;
 	vk::Format surface_format_;
 
+	void create_surface();
 	void create_swapchain();
 
 public:

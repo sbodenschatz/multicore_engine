@@ -25,6 +25,13 @@ namespace graphics {
 
 window::window(application_instance& app_instance, glfw::window& win, device& dev)
 		: app_instance(app_instance), window_{win}, device_{dev}, surface_format_{vk::Format::eUndefined} {
+	create_surface();
+	create_swapchain();
+}
+
+window::~window() {}
+
+void window::create_surface() {
 	VkSurfaceKHR surface_tmp;
 	if(glfwCreateWindowSurface(app_instance.instance(), window_.window_.get(), nullptr, &surface_tmp) !=
 	   VK_SUCCESS) {
@@ -35,10 +42,10 @@ window::window(application_instance& app_instance, glfw::window& win, device& de
 			[this](vk::SurfaceKHR& surface, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
 				this->app_instance.instance().destroySurfaceKHR(surface, alloc);
 			});
-	create_swapchain();
+	if(!device_.physical_device().getSurfaceSupportKHR(device_.present_queue_index().first, surface_.get())) {
+		throw window_surface_creation_exception("Surface not supported by device.");
+	}
 }
-
-window::~window() {}
 
 void window::create_swapchain() {
 	vk::PresentModeKHR present_mode = vk::PresentModeKHR::eFifo; // Fifo is required to be available by spec.
@@ -73,10 +80,6 @@ void window::create_swapchain() {
 
 	vk::SurfaceCapabilitiesKHR surface_caps =
 			device_.physical_device().getSurfaceCapabilitiesKHR(surface_.get());
-
-	if(!device_.physical_device().getSurfaceSupportKHR(device_.present_queue_index().first, surface_.get())) {
-		throw window_surface_creation_exception("Surface not supported by device.");
-	}
 
 	vk::SwapchainCreateInfoKHR swapchain_ci;
 	swapchain_ci.surface = surface_.get();
