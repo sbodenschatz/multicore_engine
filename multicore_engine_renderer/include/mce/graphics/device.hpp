@@ -7,6 +7,11 @@
 #ifndef GRAPHICS_DEVICE_HPP_
 #define GRAPHICS_DEVICE_HPP_
 
+/**
+ * \file
+ * Provides the definition of the device and queue handling class.
+ */
+
 #include <boost/container/flat_set.hpp>
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/graphics_defs.hpp>

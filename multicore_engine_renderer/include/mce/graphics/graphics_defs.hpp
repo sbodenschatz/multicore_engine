@@ -7,6 +7,11 @@
 #ifndef GRAPHICS_GRAPHICS_DEFS_HPP_
 #define GRAPHICS_GRAPHICS_DEFS_HPP_
 
+/**
+ * \file
+ * Provides general definitions for the graphics subsystem.
+ */
+
 namespace mce {
 namespace graphics {
 

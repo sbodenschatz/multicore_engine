@@ -58,10 +58,12 @@ public:
 		return window_;
 	}
 
+	/// Returns the used surface format.
 	vk::Format surface_format() const {
 		return surface_format_;
 	}
 
+	/// Returns a handle to the swapchain created for the window.
 	const vk::SwapchainKHR& swapchain() const {
 		return swapchain_.get();
 	}
