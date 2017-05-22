@@ -25,8 +25,10 @@ namespace graphics {
 
 window::window(application_instance& app_instance, glfw::window& win, device& dev)
 		: app_instance(app_instance), window_{win}, device_{dev},
-		  color_space_{vk::ColorSpaceKHR::eSrgbNonlinear}, surface_format_{vk::Format::eUndefined} {
+		  color_space_{vk::ColorSpaceKHR::eSrgbNonlinear}, surface_format_{vk::Format::eUndefined},
+		  present_mode_{vk::PresentModeKHR::eFifo} {
 	create_surface();
+	select_present_mode();
 	configure_surface_format();
 	create_swapchain();
 }
@@ -71,16 +73,19 @@ void window::configure_surface_format() {
 		std::cout << vk::to_string(sf.colorSpace) << " " << vk::to_string(sf.format) << std::endl;
 }
 
-void window::create_swapchain() {
-	vk::PresentModeKHR present_mode = vk::PresentModeKHR::eFifo; // Fifo is required to be available by spec.
+void window::select_present_mode() {
+	present_mode_ = vk::PresentModeKHR::eFifo; // Fifo is required to be available by spec.
 	// Check if fifo relaxed mode is available
 	std::vector<vk::PresentModeKHR> present_modes =
 			device_.physical_device().getSurfacePresentModesKHR(surface_.get());
 	if(std::find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eFifoRelaxed) !=
 	   present_modes.end()) {
-		present_mode = vk::PresentModeKHR::eFifoRelaxed;
+		present_mode_ = vk::PresentModeKHR::eFifoRelaxed;
 	}
 	for(const auto& pm : present_modes) std::cout << vk::to_string(pm) << std::endl;
+}
+
+void window::create_swapchain() {
 
 	vk::SurfaceCapabilitiesKHR surface_caps =
 			device_.physical_device().getSurfaceCapabilitiesKHR(surface_.get());
@@ -107,7 +112,7 @@ void window::create_swapchain() {
 	swapchain_ci.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
 	swapchain_ci.preTransform = surface_caps.currentTransform;
 	swapchain_ci.clipped = true;
-	swapchain_ci.presentMode = present_mode;
+	swapchain_ci.presentMode = present_mode_;
 
 	swapchain_ = unique_handle<vk::SwapchainKHR, true>(
 			device_.native_device().createSwapchainKHR(swapchain_ci),

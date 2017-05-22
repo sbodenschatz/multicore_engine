@@ -34,8 +34,10 @@ private:
 	unique_handle<vk::SwapchainKHR> swapchain_;
 	vk::ColorSpaceKHR color_space_;
 	vk::Format surface_format_;
+	vk::PresentModeKHR present_mode_;
 
 	void create_surface();
+	void select_present_mode();
 	void configure_surface_format();
 	void create_swapchain();
 
