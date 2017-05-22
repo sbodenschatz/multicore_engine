@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <gtest.hpp>
-#include <util/algorithm.hpp>
+#include <mce/util/algorithm.hpp>
 #include <vector>
 
 namespace mce {

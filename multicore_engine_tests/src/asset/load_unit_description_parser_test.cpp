@@ -4,10 +4,10 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <asset_gen/load_unit_description_ast.hpp>
-#include <asset_gen/load_unit_description_ast_compare.hpp>
-#include <asset_gen/load_unit_description_parser.hpp>
-#include <exceptions.hpp>
+#include <mce/asset_gen/load_unit_description_ast.hpp>
+#include <mce/asset_gen/load_unit_description_ast_compare.hpp>
+#include <mce/asset_gen/load_unit_description_parser.hpp>
+#include <mce/exceptions.hpp>
 #include <gtest.hpp>
 
 namespace mce {

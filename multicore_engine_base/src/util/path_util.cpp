@@ -4,7 +4,7 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <util/path_util.hpp>
+#include <mce/util/path_util.hpp>
 #include <algorithm>
 #include <iterator>
 

@@ -8,8 +8,8 @@
 #include <gtest.hpp>
 #include <mutex>
 #include <thread>
-#include <util/message_queue.hpp>
-#include <util/spin_lock.hpp>
+#include <mce/util/message_queue.hpp>
+#include <mce/util/spin_lock.hpp>
 #include <utility>
 #include <vector>
 

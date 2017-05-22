@@ -9,7 +9,7 @@
 #include <gtest.hpp>
 #include <mutex>
 #include <thread>
-#include <util/spin_lock.hpp>
+#include <mce/util/spin_lock.hpp>
 #include <vector>
 
 namespace mce {

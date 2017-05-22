@@ -1,11 +1,11 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_base/include/util/string_tools.cpp
+ * File /multicore_engine_base/include/mce/util/string_tools.cpp
  * Copyright 2016 by Stefan Bodenschatz
  */
 
 #include <boost/utility/string_view_fwd.hpp>
-#include <util/string_tools.hpp>
+#include <mce/util/string_tools.hpp>
 #include <algorithm>
 #include <cctype>
 

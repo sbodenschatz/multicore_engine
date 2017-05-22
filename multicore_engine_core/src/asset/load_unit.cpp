@@ -4,9 +4,9 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <asset/load_unit.hpp>
-#include <bstream/buffer_ibstream.hpp>
-#include <exceptions.hpp>
+#include <mce/asset/load_unit.hpp>
+#include <mce/bstream/buffer_ibstream.hpp>
+#include <mce/exceptions.hpp>
 #include <algorithm>
 #include <iterator>
 

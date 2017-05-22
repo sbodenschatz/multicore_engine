@@ -4,11 +4,11 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <asset/asset.hpp>
-#include <asset/file_reader.hpp>
-#include <asset/load_unit.hpp>
-#include <asset/load_unit_asset_loader.hpp>
-#include <exceptions.hpp>
+#include <mce/asset/asset.hpp>
+#include <mce/asset/file_reader.hpp>
+#include <mce/asset/load_unit.hpp>
+#include <mce/asset/load_unit_asset_loader.hpp>
+#include <mce/exceptions.hpp>
 #include <algorithm>
 #include <exception>
 #include <iterator>

@@ -4,7 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <config/config_store.hpp>
+#include <mce/config/config_store.hpp>
 #include <gtest.hpp>
 #include <sstream>
 

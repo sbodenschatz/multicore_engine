@@ -6,8 +6,8 @@
 
 #include <algorithm>
 #include <gtest.hpp>
-#include <util/compression.hpp>
-#include <util/unused.hpp>
+#include <mce/util/compression.hpp>
+#include <mce/util/unused.hpp>
 
 namespace mce {
 namespace util {

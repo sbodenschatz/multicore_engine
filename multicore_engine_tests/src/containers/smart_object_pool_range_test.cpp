@@ -5,7 +5,7 @@
  */
 
 #include <atomic>
-#include <containers/smart_object_pool_range.hpp>
+#include <mce/containers/smart_object_pool_range.hpp>
 #include <gtest.hpp>
 
 namespace mce {

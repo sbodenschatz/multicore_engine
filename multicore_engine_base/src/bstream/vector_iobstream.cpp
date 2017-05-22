@@ -4,7 +4,7 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <bstream/vector_iobstream.hpp>
+#include <mce/bstream/vector_iobstream.hpp>
 #include <cstdint>
 
 namespace mce {

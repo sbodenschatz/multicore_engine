@@ -1,12 +1,12 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_base/include/bstream/debug_print_obstream.cpp
+ * File /multicore_engine_base/include/mce/bstream/debug_print_obstream.cpp
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <bstream/debug_print_obstream.hpp>
+#include <mce/bstream/debug_print_obstream.hpp>
 #include <cstddef>
-#include <memory/aligned.hpp>
+#include <mce/memory/aligned.hpp>
 #include <algorithm>
 #include <cstdint>
 #include <iomanip>

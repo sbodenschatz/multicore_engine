@@ -5,7 +5,7 @@
  */
 
 #include <cstdint>
-#include <util/compression.hpp>
+#include <mce/util/compression.hpp>
 #include <algorithm>
 #include <cstring>
 
