@@ -15,9 +15,7 @@
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/window.hpp>
-#include <stdexcept>
 #include <vector>
-#include <vulkan/vulkan.h>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
