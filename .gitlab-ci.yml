@@ -102,7 +102,7 @@ stages:
         GIT_STRATEGY: none
     script:
     - sha1sum -b cloc_report.txt refman.pdf gcc/* clang/* msvc/* mingw/* > checksums.txt
-    - cat checksums.txt
+    - cat checksums.txt | sort
     - cat cloc_report.txt
     tags:
     - package
