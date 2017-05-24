@@ -19,7 +19,7 @@ bool is_mocked() {
 
 unique_handle<vk::DeviceMemory, true> allocate_memory(mce::graphics::device* dev,
 													  vk::MemoryAllocateInfo& ai) {
-	if(!dev) throw std::runtime_error("device pointer null");
+	if(!dev) throw std::logic_error("device pointer null");
 	vk::DeviceMemory dev_mem;
 	vk::Result res = dev->native_device().allocateMemory(&ai, nullptr, &dev_mem);
 	if(res != vk::Result::eSuccess)
@@ -33,7 +33,7 @@ unique_handle<vk::DeviceMemory, true> allocate_memory(mce::graphics::device* dev
 }
 
 vk::PhysicalDeviceMemoryProperties get_physical_dev_mem_properties(mce::graphics::device* dev) {
-	if(!dev) throw std::runtime_error("device pointer null");
+	if(!dev) throw std::logic_error("device pointer null");
 	return dev->physical_device().getMemoryProperties();
 }
 
