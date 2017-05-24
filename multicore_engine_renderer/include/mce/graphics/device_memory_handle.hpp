@@ -7,25 +7,37 @@
 #ifndef GRAPHICS_MM_DEVICE_MEMORY_HANDLE_HPP_
 #define GRAPHICS_MM_DEVICE_MEMORY_HANDLE_HPP_
 
+/**
+ * \file
+ * Defines types for handling allocated units of device memory.
+ */
+
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
 
+/// Defines the data structure to represent an allocated unit of memory.
 struct device_memory_allocation {
-	int32_t block_id;
-	vk::DeviceMemory memory_object;
-	vk::DeviceSize internal_offset;
-	vk::DeviceSize internal_size;
+	int32_t block_id; ///< id of the block required for returning the allocation to it's managing pool.
+	vk::DeviceMemory memory_object; ///< The underlying memory object from which this allocation was made.
+	vk::DeviceSize internal_offset; ///< Internal start offset of the allocation (including padding).
+	vk::DeviceSize internal_size;   ///< Internal size of the allocation (including padding).
+	/// Start offset of the allocated space conforming to the alignment requirement.
 	vk::DeviceSize aligned_offset;
-	vk::DeviceSize aligned_size;
+	vk::DeviceSize aligned_size; ///< Size of the aligned memory unit.
+
+	/// Constructs an empty allocation, indicating a null-value.
 	device_memory_allocation()
 			: block_id(0), memory_object(), internal_offset(0), internal_size(0), aligned_offset(0),
 			  aligned_size(0) {}
+	/// \brief Constructs an allocation struct from the given block id, memory, offset and size, alignment is
+	/// done later on by the memory manager.
 	device_memory_allocation(int32_t block_id, vk::DeviceMemory memory_object, vk::DeviceSize offset,
 							 vk::DeviceSize size)
 			: block_id(block_id), memory_object(std::move(memory_object)), internal_offset(offset),
 			  internal_size(size), aligned_offset(offset), aligned_size(size) {}
+	/// Checks if the allocation is valid (not null).
 	bool valid() const {
 		return block_id != 0;
 	};
