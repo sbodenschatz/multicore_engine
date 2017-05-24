@@ -87,6 +87,12 @@ namespace util {}
  */
 namespace glfw {}
 
+/// Contains the general graphics subsystem, handling graphics resources.
+namespace graphics {}
+
+/// Contains the rendering subsystem, drawing the 3D scene and implementing effects.
+namespace renderer {}
+
 } // namespace mce
 
 #endif /* NAMESPACE_DOC_HPP_ */
