@@ -43,6 +43,11 @@ struct device_memory_allocation {
 	};
 };
 
+/// Provides a RAII wrapper for managing the lifetime of a device_memory_allocation and the associated memory.
+/**
+ * This class encapsulates an allocation and a pointer to the memory manager from which it came and returns
+ * the memory allocation to the manager when the handle goes out of scope.
+ */
 template <typename Manager_Type>
 class device_memory_handle {
 private:
@@ -50,14 +55,19 @@ private:
 	device_memory_allocation allocation_;
 
 public:
+	/// Constructs a handle for the given allocation.
 	device_memory_handle(Manager_Type* manager_ptr, device_memory_allocation allocation)
 			: manager_ptr_(manager_ptr), allocation_(std::move(allocation)) {}
+	/// Forbids copying because shared ownership is not supported.
 	device_memory_handle(const device_memory_handle&) = delete;
+	/// Forbids copying because shared ownership is not supported.
 	device_memory_handle& operator=(const device_memory_handle&) = delete;
+	/// Allows moving handles.
 	device_memory_handle(device_memory_handle&& other)
 			: manager_ptr_(other.manager_ptr_), allocation_(other.allocation_) {
 		other.manager_ptr_ = nullptr;
 	}
+	/// Allows moving handles.
 	device_memory_handle& operator=(device_memory_handle&& other) {
 		if(this == &other) return *this;
 		if(manager_ptr_) {
@@ -70,19 +80,24 @@ public:
 
 		return *this;
 	}
+	/// Destroys the handle and frees the allocated memory back to the manager.
 	~device_memory_handle() {
 		if(manager_ptr_) {
 			manager_ptr_->free(allocation_);
 		}
 	}
+	/// Allows access to the memory object.
 	vk::DeviceMemory memory() const {
 		return allocation_.memory_object;
 	}
+	/// Allows access to the offset of the allocation within the memory object.
 	vk::DeviceSize offset() const {
 		return allocation_.aligned_offset;
 	}
 };
 
+/// \brief Creates a device_memory_handle from the given allocation and manager using template argument
+/// deduction for the manager type.
 template <typename Manager_Type>
 device_memory_handle<Manager_Type> make_device_memory_handle(Manager_Type& manager,
 															 const device_memory_allocation& allocation) {
