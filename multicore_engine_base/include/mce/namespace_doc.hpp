@@ -63,6 +63,9 @@ namespace entity {
 /// Contains the parser code for entity description files to define entities in a data-driven way.
 namespace parser {}
 
+/// Contains the abstract syntax tree (AST) node structure definitions for parsing entity description files.
+namespace ast {}
+
 } // namespace entity
 
 /// Contains the memory management code of mce.
