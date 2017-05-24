@@ -88,7 +88,11 @@ namespace util {}
 namespace glfw {}
 
 /// Contains the general graphics subsystem, handling graphics resources.
-namespace graphics {}
+namespace graphics {
+
+/// Contains an internal interface of the graphics subsystem to mock out vulkan API calls in unit tests.
+namespace vk_mock_interface {}
+}
 
 /// Contains the rendering subsystem, drawing the 3D scene and implementing effects.
 namespace renderer {}
