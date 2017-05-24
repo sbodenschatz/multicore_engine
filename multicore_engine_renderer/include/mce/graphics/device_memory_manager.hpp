@@ -7,6 +7,11 @@
 #ifndef GRAPHICS_DEVICE_MEMORY_MANAGER_HPP_
 #define GRAPHICS_DEVICE_MEMORY_MANAGER_HPP_
 
+/**
+ * \file
+ * Defines a simple memory manager for device memory.
+ */
+
 #include <mce/graphics/device_memory_handle.hpp>
 #include <mce/graphics/unique_handle.hpp>
 #include <vector>
@@ -16,6 +21,12 @@ namespace mce {
 namespace graphics {
 class device;
 
+/// Provides a simple first-fit freelist-based memory manager for device memory.
+/**
+ * Organizes device memory in a pool per memory requirements set.
+ * Each pool consists of blocks with a fixed size, from which allocations of differing sizes are handed out.
+ * Objects bigger than the block size get their own block of device memory allocated.
+ */
 class device_memory_manager {
 private:
 	struct freelist_entry {
@@ -51,14 +62,22 @@ private:
 	int32_t next_separate_block_id = -1; // 0 is invalid
 
 public:
+	/// Constructs a memory manager for the given device using the given block size.
 	device_memory_manager(device* dev, vk::DeviceSize block_size);
+
+	/// \brief Releases all bound resources, user code must ensure, that device memory is not used after it's
+	/// memory manager is destroyed.
 	~device_memory_manager();
 
+	/// Requests memory satisfying the given requirements from the manager.
 	device_memory_allocation
 	allocate(const vk::MemoryRequirements& memory_requirements,
 			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal);
+	/// Returns the given memory allocation back to the manager.
 	void free(const device_memory_allocation& allocation);
+	/// Releases device memory by releasing empty blocks, keeping at most the given amount of blocks per pool.
 	void cleanup(unsigned int keep_per_memory_type = 0);
+	/// Determines the complete capacity of the memory managed by this memory manager.
 	vk::DeviceSize capacity() const;
 };
 
