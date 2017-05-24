@@ -122,6 +122,11 @@ struct no_suitable_device_found_exception : graphics_exception {
 	using graphics_exception::graphics_exception;
 };
 
+/// Exception indicating an error in allocating device memory.
+struct device_memory_allocation_exception : graphics_exception {
+	using graphics_exception::graphics_exception;
+};
+
 } // namespace mce
 
 #endif /* CORE_EXCEPTIONS_HPP_ */

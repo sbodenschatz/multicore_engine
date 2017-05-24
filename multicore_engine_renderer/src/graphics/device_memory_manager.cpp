@@ -5,6 +5,7 @@
  */
 
 #include <cassert>
+#include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
 #include <mce/graphics/vk_mock_interface.hpp>
@@ -143,10 +144,11 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 			}
 		}
 		if(type_found) {
-			throw std::runtime_error(
+			throw device_memory_allocation_exception(
 					"Not enough memory with the specified properties of the compatible types.");
 		} else {
-			throw std::runtime_error("No compatible memory type has the requested properties.");
+			throw device_memory_allocation_exception(
+					"No compatible memory type has the requested properties.");
 		}
 	} else {
 		for(auto& block : separate_blocks_) {
@@ -178,10 +180,11 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 			}
 		}
 		if(type_found) {
-			throw std::runtime_error(
+			throw device_memory_allocation_exception(
 					"Not enough memory with the specified properties of the compatible types.");
 		} else {
-			throw std::runtime_error("No compatible memory type has the requested properties.");
+			throw device_memory_allocation_exception(
+					"No compatible memory type has the requested properties.");
 		}
 	}
 }
