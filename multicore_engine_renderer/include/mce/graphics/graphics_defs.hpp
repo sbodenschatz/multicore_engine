@@ -15,7 +15,10 @@
 namespace mce {
 namespace graphics {
 
+/// \brief Type used to represent the index of a queue of a vulkan device (consisting of the family index and
+/// the index with the family).
 typedef std::pair<uint32_t, uint32_t> queue_index_t;
+/// Type used to represent the index of a queue family of a vulkan device.
 typedef uint32_t queue_family_index_t;
 
 } // namespace graphics
