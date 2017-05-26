@@ -112,7 +112,7 @@ void window::create_swapchain() {
 	swapchain_ci.clipped = true;
 	swapchain_ci.presentMode = present_mode_;
 
-	swapchain_ = unique_handle<vk::SwapchainKHR, true>(
+	swapchain_ = unique_handle<vk::SwapchainKHR>(
 			device_.native_device().createSwapchainKHR(swapchain_ci),
 			[this](vk::SwapchainKHR& swapchain, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
 				device_.native_device().destroySwapchainKHR(swapchain, alloc);

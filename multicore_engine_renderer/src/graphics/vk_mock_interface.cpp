@@ -17,15 +17,14 @@ bool is_mocked() {
 	return false;
 }
 
-unique_handle<vk::DeviceMemory, true> allocate_memory(mce::graphics::device* dev,
-													  vk::MemoryAllocateInfo& ai) {
+unique_handle<vk::DeviceMemory> allocate_memory(mce::graphics::device* dev, vk::MemoryAllocateInfo& ai) {
 	if(!dev) throw std::logic_error("device pointer null");
 	vk::DeviceMemory dev_mem;
 	vk::Result res = dev->native_device().allocateMemory(&ai, nullptr, &dev_mem);
 	if(res != vk::Result::eSuccess)
-		return unique_handle<vk::DeviceMemory, true>();
+		return unique_handle<vk::DeviceMemory>();
 	else
-		return unique_handle<vk::DeviceMemory, true>(
+		return unique_handle<vk::DeviceMemory>(
 				dev_mem,
 				[dev](vk::DeviceMemory& dev_mem, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
 					dev->native_device().freeMemory(dev_mem, alloc);
