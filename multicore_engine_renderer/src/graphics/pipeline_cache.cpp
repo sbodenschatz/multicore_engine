@@ -13,6 +13,8 @@
 namespace mce {
 namespace graphics {
 
+boost::filesystem::path pipeline_cache::cache_path_ = ".";
+
 std::vector<char> pipeline_cache::read_file(const std::string& filename) {
 	std::vector<char> res;
 	std::ifstream stream(filename, std::ios::binary);
@@ -38,7 +40,8 @@ void pipeline_cache::write_file(const std::string& filename, const std::vector<c
 	}
 }
 
-pipeline_cache::pipeline_cache(device& dev, bool file_read_only) : device_(dev), file_read_only_{file_read_only} {
+pipeline_cache::pipeline_cache(device& dev, bool file_read_only)
+		: device_(dev), file_read_only_{file_read_only} {
 	std::copy(dev.physical_device_properties().pipelineCacheUUID,
 			  dev.physical_device_properties().pipelineCacheUUID + VK_UUID_SIZE, uuid_);
 	uuid_str_.reserve(2 * VK_UUID_SIZE);
@@ -48,8 +51,8 @@ pipeline_cache::pipeline_cache(device& dev, bool file_read_only) : device_(dev),
 		uuid_str_ += hex_digit((uuid_[i] & 0xF0u) >> 4);
 		uuid_str_ += hex_digit(uuid_[i] & 0x0Fu);
 	}
-	cache_filename_ = "pipeline_cache_" + uuid_str_ + ".vkpc";
-	auto file = read_file(cache_filename_);
+	boost::filesystem::create_directories(cache_path_);
+	auto file = read_file(cache_filename().string());
 	vk::PipelineCacheCreateInfo pipeline_cache_ci;
 	if(!file.empty()) {
 		pipeline_cache_ci.pInitialData = file.data();
@@ -69,7 +72,8 @@ pipeline_cache::~pipeline_cache() {
 	device_.native_device().getPipelineCacheData(*native_pipeline_cache_, &data_size, nullptr);
 	std::vector<char> content(data_size);
 	device_.native_device().getPipelineCacheData(*native_pipeline_cache_, &data_size, content.data());
-	write_file(cache_filename_, content);
+	boost::filesystem::create_directories(cache_path_);
+	write_file(cache_filename().string(), content);
 }
 
 } /* namespace graphics */

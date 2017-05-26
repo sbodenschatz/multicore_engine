@@ -15,6 +15,7 @@
 #include <mce/graphics/unique_handle.hpp>
 #include <string>
 #include <vulkan/vulkan.hpp>
+#include <boost/filesystem.hpp>
 
 namespace mce {
 namespace graphics {
@@ -28,8 +29,8 @@ private:
 	unique_handle<vk::PipelineCache> native_pipeline_cache_;
 	uint8_t uuid_[VK_UUID_SIZE];
 	std::string uuid_str_;
-	std::string cache_filename_;
 	bool file_read_only_;
+	static boost::filesystem::path cache_path_;
 
 	std::vector<char> read_file(const std::string& filename);
 	void write_file(const std::string& filename, const std::vector<char>& content);
@@ -60,13 +61,23 @@ public:
 	}
 
 	/// Provides the full filename of the cache persistence file for the implementation.
-	const std::string& cache_filename() const {
-		return cache_filename_;
+	boost::filesystem::path cache_filename() const {
+		return cache_path_ / ("pipeline_cache_" + uuid_str_ + ".vkpc");
 	}
 
 	/// Indicates whether this cache is in read only mode for the persistence file.
 	bool file_read_only() const {
 		return file_read_only_;
+	}
+
+	/// Returns the path under which the pipeline cache file is stored.
+	static const boost::filesystem::path& cache_path() {
+		return cache_path_;
+	}
+
+	/// Sets the path under which the pipeline cache file is stored.
+	static void cache_path(const boost::filesystem::path& cache_path) {
+		cache_path_ = cache_path;
 	}
 };
 
