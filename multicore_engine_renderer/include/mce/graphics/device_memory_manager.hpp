@@ -40,13 +40,13 @@ private:
 	};
 	struct device_memory_block {
 		int32_t id;
-		unique_handle<vk::DeviceMemory, true> memory_object;
+		unique_handle<vk::DeviceMemory> memory_object;
 		vk::DeviceSize size;
 		vk::MemoryPropertyFlags flags;
 		uint32_t memory_type;
 		std::vector<freelist_entry> freelist;
-		device_memory_block(int32_t id, unique_handle<vk::DeviceMemory, true>&& memory_object,
-							vk::DeviceSize size, vk::MemoryPropertyFlags flags, uint32_t memory_type);
+		device_memory_block(int32_t id, unique_handle<vk::DeviceMemory>&& memory_object, vk::DeviceSize size,
+							vk::MemoryPropertyFlags flags, uint32_t memory_type);
 		device_memory_allocation try_allocate(const vk::MemoryRequirements& memory_requirements,
 											  vk::MemoryPropertyFlags required_flags);
 		void free(const device_memory_allocation& allocation);

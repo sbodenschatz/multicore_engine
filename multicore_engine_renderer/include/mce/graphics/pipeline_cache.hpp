@@ -19,7 +19,7 @@ class device;
 class pipeline_cache {
 private:
 	device& device_;
-	unique_handle<vk::PipelineCache, true> native_pipeline_cache_;
+	unique_handle<vk::PipelineCache> native_pipeline_cache_;
 	uint8_t uuid_[VK_UUID_SIZE];
 	std::string uuid_str_;
 	std::string cache_filename_;

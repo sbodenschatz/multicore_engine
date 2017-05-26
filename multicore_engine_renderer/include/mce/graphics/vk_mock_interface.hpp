@@ -23,7 +23,7 @@ namespace vk_mock_interface {
 /// Returns a bool indicating if the functions are replaced by the mocked version.
 bool is_mocked();
 /// Wraps allocating device memory using the given device and allocation info.
-unique_handle<vk::DeviceMemory, true> allocate_memory(mce::graphics::device* dev, vk::MemoryAllocateInfo& ai);
+unique_handle<vk::DeviceMemory> allocate_memory(mce::graphics::device* dev, vk::MemoryAllocateInfo& ai);
 /// Wraps obtaining the memory properties for the given device.
 vk::PhysicalDeviceMemoryProperties get_physical_dev_mem_properties(mce::graphics::device* dev);
 

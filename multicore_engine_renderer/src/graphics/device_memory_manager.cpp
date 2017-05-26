@@ -19,7 +19,7 @@ namespace mce {
 namespace graphics {
 
 device_memory_manager::device_memory_block::device_memory_block(
-		int32_t id, unique_handle<vk::DeviceMemory, true>&& memory_object, vk::DeviceSize size,
+		int32_t id, unique_handle<vk::DeviceMemory>&& memory_object, vk::DeviceSize size,
 		vk::MemoryPropertyFlags flags, uint32_t memory_type)
 		: id(id), memory_object(std::move(memory_object)), size(size), flags(flags), memory_type(memory_type),
 		  freelist({{0, size}}) {}
@@ -101,11 +101,10 @@ void device_memory_manager::cleanup(unsigned int keep_per_memory_type) {
 	auto divider = std::stable_partition(blocks_.begin(), blocks_.end(),
 										 [](const device_memory_block& blk) { return !blk.empty(); });
 	size_t div_pos = std::distance(blocks_.begin(), divider);
-	auto new_end = util::n_unique(divider, blocks_.end(),
-								  [](const device_memory_block& a, const device_memory_block& b) {
-									  return a.memory_type == b.memory_type;
-								  },
-								  keep_per_memory_type);
+	auto new_end = util::n_unique(
+			divider, blocks_.end(), [](const device_memory_block& a, const device_memory_block& b) {
+				return a.memory_type == b.memory_type;
+			}, keep_per_memory_type);
 	blocks_.erase(new_end, blocks_.end());
 	divider = blocks_.begin() + div_pos;
 	std::inplace_merge(blocks_.begin(), divider, blocks_.end(),
@@ -132,7 +131,7 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 				vk::MemoryAllocateInfo ai;
 				ai.allocationSize = block_size_;
 				ai.memoryTypeIndex = mem_type;
-				unique_handle<vk::DeviceMemory, true> mem = vk_mock_interface::allocate_memory(dev, ai);
+				unique_handle<vk::DeviceMemory> mem = vk_mock_interface::allocate_memory(dev, ai);
 				if(!mem) continue;
 				auto insert_pos = std::lower_bound(
 						blocks_.begin(), blocks_.end(), mem_type,
@@ -165,7 +164,7 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 				vk::MemoryAllocateInfo ai;
 				ai.allocationSize = memory_requirements.size;
 				ai.memoryTypeIndex = mem_type;
-				unique_handle<vk::DeviceMemory, true> mem = vk_mock_interface::allocate_memory(dev, ai);
+				unique_handle<vk::DeviceMemory> mem = vk_mock_interface::allocate_memory(dev, ai);
 				if(!mem) continue;
 				auto insert_pos = std::lower_bound(
 						separate_blocks_.begin(), separate_blocks_.end(), mem_type,
