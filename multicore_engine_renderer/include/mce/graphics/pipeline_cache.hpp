@@ -7,6 +7,11 @@
 #ifndef GRAPHICS_PIPELINE_CACHE_HPP_
 #define GRAPHICS_PIPELINE_CACHE_HPP_
 
+/**
+ * \file
+ * Defines the pipeline_cache class for handling pipeline cache persistence.
+ */
+
 #include <mce/graphics/unique_handle.hpp>
 #include <string>
 #include <vulkan/vulkan.hpp>
@@ -16,6 +21,7 @@ namespace graphics {
 class window;
 class device;
 
+/// Handles the lifetime and automatic persistence of a pipeline cache.
 class pipeline_cache {
 private:
 	device& device_;
@@ -29,21 +35,36 @@ private:
 	void write_file(const std::string& filename, const std::vector<char>& content);
 
 public:
+	/// \brief Attempts to load the pipeline cache from persistence storage or provides an empty cache if no
+	/// persisted cache is available.
+	/**
+	 * By specifying the file_read_only parameter to true persisting the cache on deconstruction can be
+	 * disabled. This is useful for loading multiple caches from the same persisted cache and using them in
+	 * parallel. Afterwards the read only copies can then be merged into the persisting one.
+	 *
+	 * Persisting is done using a file the name of which derives from the UUID of the vulkan implementation
+	 * used to prevent attempting to load incompatible caches.
+	 */
 	explicit pipeline_cache(device& dev, bool file_read_only = false);
+	/// Persists the pipeline cache unless it is read only and releases resources.
 	~pipeline_cache();
 
+	/// Provides access to the underlying pipeline cache.
 	const vk::PipelineCache& native_pipeline_cache() const {
 		return native_pipeline_cache_.get();
 	}
 
+	/// Provides the UUID string for the vulkan implementation (device and driver (version) specific).
 	const std::string& uuid_string() const {
 		return uuid_str_;
 	}
 
+	/// Provides the full filename of the cache persistence file for the implementation.
 	const std::string& cache_filename() const {
 		return cache_filename_;
 	}
 
+	/// Indicates whether this cache is in read only mode for the persistence file.
 	bool file_read_only() const {
 		return file_read_only_;
 	}
