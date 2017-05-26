@@ -63,6 +63,7 @@ pipeline_cache::pipeline_cache(device& dev) : device_(dev) {
 }
 
 pipeline_cache::~pipeline_cache() {
+	if(!native_pipeline_cache_) return;
 	size_t data_size = 0;
 	device_.native_device().getPipelineCacheData(*native_pipeline_cache_, &data_size, nullptr);
 	std::vector<char> content(data_size);
