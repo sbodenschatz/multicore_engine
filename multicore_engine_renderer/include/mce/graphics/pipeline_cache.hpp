@@ -23,12 +23,13 @@ private:
 	uint8_t uuid_[VK_UUID_SIZE];
 	std::string uuid_str_;
 	std::string cache_filename_;
+	bool file_read_only_;
 
 	std::vector<char> read_file(const std::string& filename);
 	void write_file(const std::string& filename, const std::vector<char>& content);
 
 public:
-	explicit pipeline_cache(device& dev);
+	explicit pipeline_cache(device& dev, bool file_read_only = false);
 	~pipeline_cache();
 
 	const vk::PipelineCache& native_pipeline_cache() const {
@@ -41,6 +42,10 @@ public:
 
 	const std::string& cache_filename() const {
 		return cache_filename_;
+	}
+
+	bool file_read_only() const {
+		return file_read_only_;
 	}
 };
 

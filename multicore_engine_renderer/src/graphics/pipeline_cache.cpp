@@ -38,7 +38,7 @@ void pipeline_cache::write_file(const std::string& filename, const std::vector<c
 	}
 }
 
-pipeline_cache::pipeline_cache(device& dev) : device_(dev) {
+pipeline_cache::pipeline_cache(device& dev, bool file_read_only) : device_(dev), file_read_only_{file_read_only} {
 	std::copy(dev.physical_device_properties().pipelineCacheUUID,
 			  dev.physical_device_properties().pipelineCacheUUID + VK_UUID_SIZE, uuid_);
 	uuid_str_.reserve(2 * VK_UUID_SIZE);
@@ -64,6 +64,7 @@ pipeline_cache::pipeline_cache(device& dev) : device_(dev) {
 
 pipeline_cache::~pipeline_cache() {
 	if(!native_pipeline_cache_) return;
+	if(file_read_only_) return;
 	size_t data_size = 0;
 	device_.native_device().getPipelineCacheData(*native_pipeline_cache_, &data_size, nullptr);
 	std::vector<char> content(data_size);
