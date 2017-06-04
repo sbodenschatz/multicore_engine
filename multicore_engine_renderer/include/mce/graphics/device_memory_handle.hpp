@@ -43,20 +43,25 @@ struct device_memory_allocation {
 	};
 };
 
+class device_memory_manager_interface {
+public:
+	virtual ~device_memory_manager_interface() noexcept = default;
+	virtual void free(const device_memory_allocation& allocation) = 0;
+};
+
 /// Provides a RAII wrapper for managing the lifetime of a device_memory_allocation and the associated memory.
 /**
  * This class encapsulates an allocation and a pointer to the memory manager from which it came and returns
  * the memory allocation to the manager when the handle goes out of scope.
  */
-template <typename Manager_Type>
 class device_memory_handle {
 private:
-	Manager_Type* manager_ptr_;
+	device_memory_manager_interface* manager_ptr_;
 	device_memory_allocation allocation_;
 
 public:
 	/// Constructs a handle for the given allocation.
-	device_memory_handle(Manager_Type* manager_ptr, device_memory_allocation allocation)
+	device_memory_handle(device_memory_manager_interface* manager_ptr, device_memory_allocation allocation)
 			: manager_ptr_(manager_ptr), allocation_(std::move(allocation)) {}
 	/// Forbids copying because shared ownership is not supported.
 	device_memory_handle(const device_memory_handle&) = delete;
@@ -96,12 +101,10 @@ public:
 	}
 };
 
-/// \brief Creates a device_memory_handle from the given allocation and manager using template argument
-/// deduction for the manager type.
-template <typename Manager_Type>
-device_memory_handle<Manager_Type> make_device_memory_handle(Manager_Type& manager,
-															 const device_memory_allocation& allocation) {
-	return device_memory_handle<Manager_Type>(&manager, allocation);
+/// \brief Creates a device_memory_handle from the given allocation and manager
+inline device_memory_handle make_device_memory_handle(device_memory_manager_interface& manager,
+													  const device_memory_allocation& allocation) {
+	return device_memory_handle(&manager, allocation);
 }
 
 } // namespace graphics
