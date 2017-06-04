@@ -14,7 +14,6 @@
 
 #include <atomic>
 #include <mce/glfw/instance.hpp>
-#include <mce/graphics/unique_handle.hpp>
 #include <mutex>
 #include <string>
 #include <vector>
