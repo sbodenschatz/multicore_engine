@@ -22,12 +22,11 @@ bool is_mocked() {
 static std::unordered_map<uint32_t, uint32_t> mock_alloc_ids;
 static std::mutex mock_alloc_id_mutex;
 
-unique_handle<vk::DeviceMemory> allocate_memory(mce::graphics::device*, vk::MemoryAllocateInfo& ai) {
+device_memory_wrapper allocate_memory(mce::graphics::device*, vk::MemoryAllocateInfo& ai) {
 	std::lock_guard<std::mutex> lock(mock_alloc_id_mutex);
-	return unique_handle<vk::DeviceMemory>(
+	return fake_unique_device_memory(
 			vk::DeviceMemory(VkDeviceMemory((1ull << 63) | (uint64_t(ai.memoryTypeIndex) << 30) |
-											uint64_t(mock_alloc_ids[ai.memoryTypeIndex]++))),
-			[](vk::DeviceMemory&, const vk::Optional<const vk::AllocationCallbacks>&) {});
+											uint64_t(mock_alloc_ids[ai.memoryTypeIndex]++))));
 }
 
 uint32_t get_memory_type_index(const vk::DeviceMemory& mem) {

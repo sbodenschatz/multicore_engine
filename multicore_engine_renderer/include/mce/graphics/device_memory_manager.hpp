@@ -13,7 +13,7 @@
  */
 
 #include <mce/graphics/device_memory_handle.hpp>
-#include <mce/graphics/unique_handle.hpp>
+#include <mce/graphics/vk_mock_interface.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
@@ -40,13 +40,13 @@ private:
 	};
 	struct device_memory_block {
 		int32_t id;
-		unique_handle<vk::DeviceMemory> memory_object;
+		vk_mock_interface::device_memory_wrapper memory_object;
 		vk::DeviceSize size;
 		vk::MemoryPropertyFlags flags;
 		uint32_t memory_type;
 		std::vector<freelist_entry> freelist;
-		device_memory_block(int32_t id, unique_handle<vk::DeviceMemory>&& memory_object, vk::DeviceSize size,
-							vk::MemoryPropertyFlags flags, uint32_t memory_type);
+		device_memory_block(int32_t id, vk_mock_interface::device_memory_wrapper&& memory_object,
+							vk::DeviceSize size, vk::MemoryPropertyFlags flags, uint32_t memory_type);
 		device_memory_allocation try_allocate(const vk::MemoryRequirements& memory_requirements,
 											  vk::MemoryPropertyFlags required_flags);
 		void free(const device_memory_allocation& allocation);

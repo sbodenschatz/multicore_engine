@@ -14,7 +14,9 @@
  */
 
 #include <boost/variant.hpp>
-#include <mce/graphics/device_memory_manager.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/graphics/device.hpp>
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
@@ -27,14 +29,23 @@ struct fake_device_memory_deleter {
 using fake_unique_device_memory = vk::UniqueHandle<vk::DeviceMemory, fake_device_memory_deleter>;
 
 class device_memory_wrapper {
-	boost::variant<vk::UniqueDeviceMemory, fake_unique_device_memory> handle_;
+	boost::variant<vk::UniqueDeviceMemory, fake_unique_device_memory, boost::blank> handle_;
 
 public:
 	device_memory_wrapper(vk::UniqueDeviceMemory&& m) : handle_(std::move(m)){};
 	device_memory_wrapper(fake_unique_device_memory&& m) : handle_(std::move(m)){};
 
+	device_memory_wrapper(device_memory_wrapper&& other) noexcept : handle_{std::move(other.handle_)} {}
+	device_memory_wrapper& operator=(device_memory_wrapper&& other) noexcept {
+		handle_ = std::move(other.handle_);
+		return *this;
+	}
+
 	const vk::DeviceMemory& get() const {
 		struct visitor : boost::static_visitor<const vk::DeviceMemory&> {
+			const vk::DeviceMemory& operator()(const boost::blank&) const {
+				throw device_memory_allocation_exception("Empty device_memory_wrapper.");
+			}
 			const vk::DeviceMemory& operator()(const vk::UniqueDeviceMemory& m) const {
 				return *m;
 			}
@@ -47,6 +58,9 @@ public:
 	}
 	vk::DeviceMemory get() {
 		struct visitor : boost::static_visitor<vk::DeviceMemory> {
+			vk::DeviceMemory operator()(const boost::blank&) const {
+				throw device_memory_allocation_exception("Empty device_memory_wrapper.");
+			}
 			vk::DeviceMemory operator()(const vk::UniqueDeviceMemory& m) const {
 				return m.get();
 			}
@@ -62,7 +76,7 @@ public:
 /// Returns a bool indicating if the functions are replaced by the mocked version.
 bool is_mocked();
 /// Wraps allocating device memory using the given device and allocation info.
-unique_handle<vk::DeviceMemory> allocate_memory(mce::graphics::device* dev, vk::MemoryAllocateInfo& ai);
+device_memory_wrapper allocate_memory(mce::graphics::device* dev, vk::MemoryAllocateInfo& ai);
 /// Wraps obtaining the memory properties for the given device.
 vk::PhysicalDeviceMemoryProperties get_physical_dev_mem_properties(mce::graphics::device* dev);
 
