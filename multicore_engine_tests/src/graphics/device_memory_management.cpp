@@ -6,6 +6,8 @@
 
 #include <gtest.hpp>
 #include <iostream>
+#include <mce/graphics/device_memory_handle.hpp>
+#include <mce/graphics/device_memory_manager.hpp>
 #include <mce/graphics/vk_mock_interface.hpp>
 
 namespace mce {

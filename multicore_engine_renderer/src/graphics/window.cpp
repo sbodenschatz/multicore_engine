@@ -39,11 +39,7 @@ void window::create_surface() {
 	   VK_SUCCESS) {
 		throw window_surface_creation_exception("Failed to create window surface.");
 	}
-	surface_ = unique_handle<vk::SurfaceKHR>(
-			vk::SurfaceKHR(surface_tmp),
-			[this](vk::SurfaceKHR& surface, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
-				this->app_instance.instance().destroySurfaceKHR(surface, alloc);
-			});
+	surface_ = vk::UniqueSurfaceKHR(surface_tmp, app_instance.instance());
 	if(!device_.physical_device().getSurfaceSupportKHR(device_.present_queue_index().first, surface_.get())) {
 		throw window_surface_creation_exception("Surface not supported by device.");
 	}
@@ -112,11 +108,7 @@ void window::create_swapchain() {
 	swapchain_ci.clipped = true;
 	swapchain_ci.presentMode = present_mode_;
 
-	swapchain_ = unique_handle<vk::SwapchainKHR>(
-			device_.native_device().createSwapchainKHR(swapchain_ci),
-			[this](vk::SwapchainKHR& swapchain, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
-				device_.native_device().destroySwapchainKHR(swapchain, alloc);
-			});
+	swapchain_ = device_.native_device().createSwapchainKHRUnique(swapchain_ci);
 }
 
 } /* namespace graphics */

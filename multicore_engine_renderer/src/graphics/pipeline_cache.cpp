@@ -58,11 +58,7 @@ pipeline_cache::pipeline_cache(device& dev, bool file_read_only)
 		pipeline_cache_ci.pInitialData = file.data();
 		pipeline_cache_ci.initialDataSize = file.size();
 	}
-	native_pipeline_cache_ = unique_handle<vk::PipelineCache>(
-			device_.native_device().createPipelineCache(pipeline_cache_ci),
-			[this](vk::PipelineCache& pc, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
-				device_.native_device().destroyPipelineCache(pc, alloc);
-			});
+	native_pipeline_cache_ = device_.native_device().createPipelineCacheUnique(pipeline_cache_ci);
 }
 
 pipeline_cache::~pipeline_cache() {

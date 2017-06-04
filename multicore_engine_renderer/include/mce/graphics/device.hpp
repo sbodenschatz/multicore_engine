@@ -15,7 +15,6 @@
 #include <boost/container/flat_set.hpp>
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/graphics_defs.hpp>
-#include <mce/graphics/unique_handle.hpp>
 #include <utility>
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -36,7 +35,7 @@ private:
 	queue_index_t graphics_queue_index_ = no_queue_index;
 	queue_index_t transfer_queue_index_ = no_queue_index;
 	queue_index_t present_queue_index_ = no_queue_index;
-	unique_handle<vk::Device, false> native_device_;
+	vk::UniqueDevice native_device_;
 	vk::Queue graphics_queue_;
 	vk::Queue transfer_queue_;
 	vk::Queue present_queue_;
@@ -80,6 +79,11 @@ public:
 
 	/// Returns a reference to the underlying vulkan device.
 	const vk::Device& native_device() const {
+		return *native_device_;
+	}
+
+	/// Allows access to the underlying vulkan device.
+	vk::Device native_device() {
 		return native_device_.get();
 	}
 

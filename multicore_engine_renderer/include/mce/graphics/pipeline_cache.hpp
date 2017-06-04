@@ -12,10 +12,9 @@
  * Defines the pipeline_cache class for handling pipeline cache persistence.
  */
 
-#include <mce/graphics/unique_handle.hpp>
+#include <boost/filesystem.hpp>
 #include <string>
 #include <vulkan/vulkan.hpp>
-#include <boost/filesystem.hpp>
 
 namespace mce {
 namespace graphics {
@@ -26,7 +25,7 @@ class device;
 class pipeline_cache {
 private:
 	device& device_;
-	unique_handle<vk::PipelineCache> native_pipeline_cache_;
+	vk::UniquePipelineCache native_pipeline_cache_;
 	uint8_t uuid_[VK_UUID_SIZE];
 	std::string uuid_str_;
 	bool file_read_only_;
@@ -52,6 +51,11 @@ public:
 
 	/// Provides access to the underlying pipeline cache.
 	const vk::PipelineCache& native_pipeline_cache() const {
+		return *native_pipeline_cache_;
+	}
+
+	/// Provides access to the underlying pipeline cache.
+	vk::PipelineCache native_pipeline_cache() {
 		return native_pipeline_cache_.get();
 	}
 

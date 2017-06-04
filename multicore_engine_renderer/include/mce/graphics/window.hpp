@@ -12,11 +12,7 @@
  * Defines the window handling for the graphics subsystem.
  */
 
-#ifdef MULTICORE_ENGINE_WINDOWS
-#include <windows.h> //Fix macro redefinition error in glfw header
-#endif				 // MULTICORE_ENGINE_WINDOWS
 #include <mce/glfw/window.hpp>
-#include <mce/graphics/unique_handle.hpp>
 #include <memory>
 
 namespace mce {
@@ -30,8 +26,8 @@ private:
 	application_instance& app_instance;
 	glfw::window& window_;
 	device& device_;
-	unique_handle<vk::SurfaceKHR> surface_;
-	unique_handle<vk::SwapchainKHR> swapchain_;
+	vk::UniqueSurfaceKHR surface_;
+	vk::UniqueSwapchainKHR swapchain_;
 	vk::ColorSpaceKHR color_space_;
 	vk::Format surface_format_;
 	vk::PresentModeKHR present_mode_;
@@ -65,7 +61,7 @@ public:
 
 	/// Returns a handle to the swapchain created for the window.
 	const vk::SwapchainKHR& swapchain() const {
-		return swapchain_.get();
+		return *swapchain_;
 	}
 };
 

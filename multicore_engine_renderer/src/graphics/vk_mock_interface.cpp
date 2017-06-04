@@ -5,7 +5,6 @@
  */
 
 #include <mce/graphics/device.hpp>
-#include <mce/graphics/unique_handle.hpp>
 #include <mce/graphics/vk_mock_interface.hpp>
 #include <mce/graphics/window.hpp>
 
@@ -17,18 +16,14 @@ bool is_mocked() {
 	return false;
 }
 
-unique_handle<vk::DeviceMemory> allocate_memory(mce::graphics::device* dev, vk::MemoryAllocateInfo& ai) {
+device_memory_wrapper allocate_memory(mce::graphics::device* dev, vk::MemoryAllocateInfo& ai) {
 	if(!dev) throw std::logic_error("device pointer null");
 	vk::DeviceMemory dev_mem;
 	vk::Result res = dev->native_device().allocateMemory(&ai, nullptr, &dev_mem);
 	if(res != vk::Result::eSuccess)
-		return unique_handle<vk::DeviceMemory>();
+		return vk::UniqueDeviceMemory(vk::DeviceMemory(), vk::DeviceMemoryDeleter(dev->native_device()));
 	else
-		return unique_handle<vk::DeviceMemory>(
-				dev_mem,
-				[dev](vk::DeviceMemory& dev_mem, const vk::Optional<const vk::AllocationCallbacks>& alloc) {
-					dev->native_device().freeMemory(dev_mem, alloc);
-				});
+		return vk::UniqueDeviceMemory(dev_mem, vk::DeviceMemoryDeleter(dev->native_device()));
 }
 
 vk::PhysicalDeviceMemoryProperties get_physical_dev_mem_properties(mce::graphics::device* dev) {

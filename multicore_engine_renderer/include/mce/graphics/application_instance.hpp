@@ -14,16 +14,10 @@
 
 #include <atomic>
 #include <mce/glfw/instance.hpp>
-#include <mce/graphics/unique_handle.hpp>
 #include <mutex>
 #include <string>
 #include <vector>
-
-#ifdef _MSC_VER
-#define MCE_VK_CALLBACK __stdcall
-#else
-#define MCE_VK_CALLBACK
-#endif
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
@@ -34,8 +28,8 @@ private:
 	glfw::instance glfw_instance;
 	std::vector<std::string> layers;
 	std::vector<std::string> extensions;
-	unique_handle<vk::Instance, false> instance_;
-	unique_handle<vk::DebugReportCallbackEXT> validation_report_cb;
+	vk::UniqueInstance instance_;
+	vk::UniqueDebugReportCallbackEXT validation_report_cb;
 #ifdef DEBUG
 	static const unsigned int default_validation_level = 5;
 #else
@@ -45,7 +39,7 @@ private:
 	mutable std::mutex validation_log_mtx;
 
 private:
-	static VkBool32 MCE_VK_CALLBACK
+	static VkBool32 VKAPI_CALL
 	validation_report_callback_static(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
 									  uint64_t object, size_t location, int32_t messageCode,
 									  const char* pLayerPrefix, const char* pMessage, void* pUserData);
@@ -67,11 +61,11 @@ public:
 
 	/// Returns the vulkan instance managed by the application instance.
 	const vk::Instance& instance() const {
-		return instance_.get();
+		return *instance_;
 	}
 
 	/// Returns the vulkan instance managed by the application instance.
-	vk::Instance& instance() {
+	vk::Instance instance() {
 		return instance_.get();
 	}
 };
