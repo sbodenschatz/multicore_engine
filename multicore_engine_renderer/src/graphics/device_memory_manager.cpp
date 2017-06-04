@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/graphics/device_memory_manager.cpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
 #include <cassert>

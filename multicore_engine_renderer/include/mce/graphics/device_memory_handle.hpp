@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/graphics/device_memory_handle.hpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
 #ifndef GRAPHICS_MM_DEVICE_MEMORY_HANDLE_HPP_
