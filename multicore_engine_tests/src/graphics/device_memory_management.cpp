@@ -136,7 +136,7 @@ TEST(graphics_device_memory_manager_test, device_memory_handle_test) {
 	int allocations = 0x500;
 	size_t alloc_size = 0x1000;
 	size_t alignment = 0x10;
-	std::vector<device_memory_handle<device_memory_manager>> allocs;
+	std::vector<device_memory_handle> allocs;
 	for(int i = 0; i < allocations; ++i) {
 		vk::MemoryRequirements mem_req;
 		mem_req.size = alloc_size;

@@ -43,22 +43,34 @@ struct device_memory_allocation {
 	};
 };
 
+/// Provides an interface for device memory managers to allocate and free allocations polymorphically.
+class device_memory_manager_interface {
+public:
+	/// Enables polymorphic destruction.
+	virtual ~device_memory_manager_interface() noexcept = default;
+	/// Interface function to free allocations from any device memory manager.
+	virtual void free(const device_memory_allocation& allocation) = 0;
+	/// Interface function to request memory satisfying the given requirements from the manager.
+	virtual device_memory_allocation
+	allocate(const vk::MemoryRequirements& memory_requirements,
+			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) = 0;
+};
+
 /// Provides a RAII wrapper for managing the lifetime of a device_memory_allocation and the associated memory.
 /**
  * This class encapsulates an allocation and a pointer to the memory manager from which it came and returns
  * the memory allocation to the manager when the handle goes out of scope.
  */
-template <typename Manager_Type>
 class device_memory_handle {
 private:
-	Manager_Type* manager_ptr_;
+	device_memory_manager_interface* manager_ptr_;
 	device_memory_allocation allocation_;
 
 public:
 	/// Constructs an empty handle.
 	device_memory_handle() : device_memory_handle(nullptr, device_memory_allocation()) {}
 	/// Constructs a handle for the given allocation.
-	device_memory_handle(Manager_Type* manager_ptr, device_memory_allocation allocation)
+	device_memory_handle(device_memory_manager_interface* manager_ptr, device_memory_allocation allocation)
 			: manager_ptr_(manager_ptr), allocation_(std::move(allocation)) {}
 	/// Forbids copying because shared ownership is not supported.
 	device_memory_handle(const device_memory_handle&) = delete;
@@ -98,12 +110,10 @@ public:
 	}
 };
 
-/// \brief Creates a device_memory_handle from the given allocation and manager using template argument
-/// deduction for the manager type.
-template <typename Manager_Type>
-device_memory_handle<Manager_Type> make_device_memory_handle(Manager_Type& manager,
-															 const device_memory_allocation& allocation) {
-	return device_memory_handle<Manager_Type>(&manager, allocation);
+/// \brief Creates a device_memory_handle from the given allocation and manager
+inline device_memory_handle make_device_memory_handle(device_memory_manager_interface& manager,
+													  const device_memory_allocation& allocation) {
+	return device_memory_handle(&manager, allocation);
 }
 
 } // namespace graphics
