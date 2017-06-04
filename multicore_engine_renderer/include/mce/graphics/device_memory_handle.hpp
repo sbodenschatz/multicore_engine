@@ -43,9 +43,12 @@ struct device_memory_allocation {
 	};
 };
 
+/// Provides an interface for device memory managers to free allocations polymorphically.
 class device_memory_manager_interface {
 public:
+	/// Enables polymorphic destruction.
 	virtual ~device_memory_manager_interface() noexcept = default;
+	/// Interface function to free allocations from any device memory manager.
 	virtual void free(const device_memory_allocation& allocation) = 0;
 };
 
