@@ -200,7 +200,7 @@ void device::create_device() {
 	dev_ci.pQueueCreateInfos = dev_queue_ci.data();
 	dev_ci.queueCreateInfoCount = uint32_t(dev_queue_ci.size());
 
-	native_device_ = physical_device_.createDevice(dev_ci);
+	native_device_ = physical_device_.createDeviceUnique(dev_ci);
 
 	graphics_queue_ = native_device_->getQueue(graphics_queue_index_.first, graphics_queue_index_.second);
 	transfer_queue_ = native_device_->getQueue(transfer_queue_index_.first, transfer_queue_index_.second);
