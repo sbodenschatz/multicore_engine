@@ -27,7 +27,7 @@ class device;
  * Each pool consists of blocks with a fixed size, from which allocations of differing sizes are handed out.
  * Objects bigger than the block size get their own block of device memory allocated.
  */
-class device_memory_manager {
+class device_memory_manager : public device_memory_manager_interface {
 private:
 	struct freelist_entry {
 		vk::DeviceSize offset;
@@ -72,9 +72,9 @@ public:
 	/// Requests memory satisfying the given requirements from the manager.
 	device_memory_allocation
 	allocate(const vk::MemoryRequirements& memory_requirements,
-			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal);
+			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) override;
 	/// Returns the given memory allocation back to the manager.
-	void free(const device_memory_allocation& allocation);
+	void free(const device_memory_allocation& allocation) override;
 	/// Releases device memory by releasing empty blocks, keeping at most the given amount of blocks per pool.
 	void cleanup(unsigned int keep_per_memory_type = 0);
 	/// Determines the complete capacity of the memory managed by this memory manager.
