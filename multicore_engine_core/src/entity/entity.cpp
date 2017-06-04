@@ -5,14 +5,14 @@
  */
 
 #include <boost/container/vector.hpp>
-#include <bstream/ibstream.hpp>
-#include <bstream/obstream.hpp>
-#include <entity/component.hpp>
-#include <entity/component_configuration.hpp>
-#include <entity/component_type.hpp>
-#include <entity/entity.hpp>
-#include <entity/entity_manager.hpp>
-#include <exceptions.hpp>
+#include <mce/bstream/ibstream.hpp>
+#include <mce/bstream/obstream.hpp>
+#include <mce/entity/component.hpp>
+#include <mce/entity/component_configuration.hpp>
+#include <mce/entity/component_type.hpp>
+#include <mce/entity/entity.hpp>
+#include <mce/entity/entity_manager.hpp>
+#include <mce/exceptions.hpp>
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>

@@ -6,11 +6,11 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
-#include <exceptions.hpp>
-#include <glfw/cursor.hpp>
-#include <glfw/instance.hpp>
-#include <glfw/monitor.hpp>
-#include <glfw/window.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/glfw/cursor.hpp>
+#include <mce/glfw/instance.hpp>
+#include <mce/glfw/monitor.hpp>
+#include <mce/glfw/window.hpp>
 #include <iterator>
 
 namespace mce {

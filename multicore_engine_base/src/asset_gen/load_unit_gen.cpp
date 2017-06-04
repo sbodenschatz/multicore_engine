@@ -4,11 +4,11 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <asset_gen/load_unit_gen.hpp>
-#include <bstream/iostream_bstream.hpp>
+#include <mce/asset_gen/load_unit_gen.hpp>
+#include <mce/bstream/iostream_bstream.hpp>
 #include <cstdint>
-#include <exceptions.hpp>
-#include <util/path_util.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/util/path_util.hpp>
 #include <algorithm>
 #include <iostream>
 #include <fstream>

@@ -4,11 +4,11 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <glfw/instance.hpp>
-#include <glfw/joystick.hpp>
-#include <glfw/monitor.hpp>
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <mce/glfw/instance.hpp>
+#include <mce/glfw/joystick.hpp>
+#include <mce/glfw/monitor.hpp>
 
 namespace mce {
 namespace glfw {
@@ -68,6 +68,22 @@ std::vector<joystick> instance::query_joysticks() const {
 		}
 	}
 	return joysticks;
+}
+
+bool instance::vulkan_supported() const {
+	return glfwVulkanSupported() == GLFW_TRUE;
+}
+std::vector<std::string> instance::required_vulkan_instance_extensions() const {
+	std::vector<std::string> res;
+	uint32_t count = 0;
+	auto e = glfwGetRequiredInstanceExtensions(&count);
+	if(!e) {
+		res.clear();
+		return res;
+	}
+	res.reserve(count);
+	std::copy(e, e + count, std::back_inserter(res));
+	return res;
 }
 
 } // namespace glfw_wrapper

@@ -4,9 +4,9 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <bstream/buffer_ibstream.hpp>
+#include <mce/bstream/buffer_ibstream.hpp>
 #include <cstdint>
-#include <exceptions.hpp>
+#include <mce/exceptions.hpp>
 #include <algorithm>
 #include <cstring>
 

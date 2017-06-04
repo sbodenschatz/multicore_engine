@@ -5,13 +5,13 @@
  */
 
 #include <algorithm>
-#include <asset/asset_manager.hpp>
-#include <asset/file_asset_loader.hpp>
-#include <asset/load_unit_asset_loader.hpp>
-#include <asset/native_file_reader.hpp>
-#include <asset/pack_file_reader.hpp>
-#include <asset_gen/load_unit_gen.hpp>
-#include <asset_gen/pack_file_gen.hpp>
+#include <mce/asset/asset_manager.hpp>
+#include <mce/asset/file_asset_loader.hpp>
+#include <mce/asset/load_unit_asset_loader.hpp>
+#include <mce/asset/native_file_reader.hpp>
+#include <mce/asset/pack_file_reader.hpp>
+#include <mce/asset_gen/load_unit_gen.hpp>
+#include <mce/asset_gen/pack_file_gen.hpp>
 #include <boost/filesystem.hpp>
 #include <cstring>
 #include <fstream>
@@ -22,7 +22,7 @@
 #include <random>
 #include <string>
 #include <thread>
-#include <util/finally.hpp>
+#include <mce/util/finally.hpp>
 #include <vector>
 
 namespace fs = boost::filesystem;

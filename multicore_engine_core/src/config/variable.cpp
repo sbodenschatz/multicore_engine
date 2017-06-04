@@ -4,7 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <config/variable.hpp>
+#include <mce/config/variable.hpp>
 
 namespace mce {
 namespace config {} // namespace config

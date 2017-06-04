@@ -4,7 +4,7 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <core/engine.hpp>
+#include <mce/core/engine.hpp>
 
 int main() {
 	mce::core::engine e;

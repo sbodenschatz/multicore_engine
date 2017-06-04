@@ -1,18 +1,18 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_base/include/asset_gen/model_exporter.cpp
+ * File /multicore_engine_base/include/mce/asset_gen/model_exporter.cpp
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <asset_gen/static_model.hpp>
-#include <asset_gen/static_model_exporter.hpp>
-#include <bstream/iostream_bstream.hpp>
-#include <bstream/vector_iobstream.hpp>
-#include <exceptions.hpp>
+#include <mce/asset_gen/static_model.hpp>
+#include <mce/asset_gen/static_model_exporter.hpp>
+#include <mce/bstream/iostream_bstream.hpp>
+#include <mce/bstream/vector_iobstream.hpp>
+#include <mce/exceptions.hpp>
 #include <fstream>
-#include <model/model_format.hpp>
-#include <util/offset_range.hpp>
-#include <util/unused.hpp>
+#include <mce/model/model_format.hpp>
+#include <mce/util/offset_range.hpp>
+#include <mce/util/unused.hpp>
 #include <algorithm>
 #include <cassert>
 #include <cstdint>

@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <core/game_state.hpp>
-#include <core/game_state_machine.hpp>
+#include <mce/core/game_state.hpp>
+#include <mce/core/game_state_machine.hpp>
 
 namespace mce {
 namespace core {

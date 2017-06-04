@@ -5,10 +5,10 @@
  */
 
 #include <boost/variant/get.hpp>
-#include <entity/parser/entity_text_file_ast.hpp>
-#include <entity/parser/entity_text_file_ast_compare.hpp>
-#include <entity/parser/entity_text_file_parser.hpp>
-#include <exceptions.hpp>
+#include <mce/entity/parser/entity_text_file_ast.hpp>
+#include <mce/entity/parser/entity_text_file_ast_compare.hpp>
+#include <mce/entity/parser/entity_text_file_parser.hpp>
+#include <mce/exceptions.hpp>
 #include <gtest.hpp>
 #include <string>
 

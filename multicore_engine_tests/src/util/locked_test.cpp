@@ -8,7 +8,7 @@
 #include <gtest.hpp>
 #include <mutex>
 #include <thread>
-#include <util/locked.hpp>
+#include <mce/util/locked.hpp>
 #include <utility>
 #include <vector>
 

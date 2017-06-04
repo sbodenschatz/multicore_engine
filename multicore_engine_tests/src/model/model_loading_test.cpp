@@ -4,12 +4,12 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <asset/asset_manager.hpp>
-#include <asset/load_unit_asset_loader.hpp>
-#include <asset/pack_file_reader.hpp>
+#include <mce/asset/asset_manager.hpp>
+#include <mce/asset/load_unit_asset_loader.hpp>
+#include <mce/asset/pack_file_reader.hpp>
 #include <atomic>
 #include <gtest.hpp>
-#include <model/model_manager.hpp>
+#include <mce/model/model_manager.hpp>
 #include <thread>
 #include <vector>
 

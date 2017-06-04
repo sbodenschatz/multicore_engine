@@ -1,17 +1,17 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_base/include/asset_gen/obj_model_parser.cpp
+ * File /multicore_engine_base/include/mce/asset_gen/obj_model_parser.cpp
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <asset_gen/obj_model_parser.hpp>
+#include <mce/asset_gen/obj_model_parser.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/utility/string_view.hpp>
-#include <exceptions.hpp>
+#include <mce/exceptions.hpp>
 #include <glm/glm.hpp>
-#include <util/string_tools.hpp>
-#include <util/unused.hpp>
+#include <mce/util/string_tools.hpp>
+#include <mce/util/unused.hpp>
 #include <algorithm>
 #include <array>
 #include <cmath>
