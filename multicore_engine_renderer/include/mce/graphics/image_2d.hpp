@@ -20,15 +20,18 @@ class image {
 	vk::Format format_;
 	glm::uvec2 size_;
 	vk::ImageUsageFlags usage_;
-	vk::ImageTiling tiling_;
 	vk::ImageLayout layout_;
+	bool mutable_format_;
+	vk::ImageTiling tiling_;
 	uint32_t mip_levels_;
 	uint32_t layers_;
 	vk::UniqueImage img_;
 	device_memory_handle<device_memory_manager> mem_handle_;
 
 public:
-	image();
+	image(vk::Format format, glm::uvec2 size, vk::ImageUsageFlags usage,
+		  vk::ImageLayout layout = vk::ImageLayout::eGeneral, bool mutable_format = false,
+		  vk::ImageTiling tiling = vk::ImageTiling::eOptimal, uint32_t mip_levels = 1, uint32_t layers = 1);
 };
 
 } /* namespace graphics */

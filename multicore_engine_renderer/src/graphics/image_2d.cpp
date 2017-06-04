@@ -9,7 +9,10 @@
 namespace mce {
 namespace graphics {
 
-image::image() {}
+image::image(vk::Format format, glm::uvec2 size, vk::ImageUsageFlags usage, vk::ImageLayout layout,
+			 bool mutable_format, vk::ImageTiling tiling, uint32_t mip_levels, uint32_t layers)
+		: format_{format}, size_{size}, usage_{usage}, layout_{layout}, mutable_format_{mutable_format},
+		  tiling_{tiling}, mip_levels_{mip_levels}, layers_{layers} {}
 
 } /* namespace graphics */
 } /* namespace mce */
