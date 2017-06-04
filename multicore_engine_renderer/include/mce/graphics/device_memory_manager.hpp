@@ -72,7 +72,7 @@ public:
 	/// Requests memory satisfying the given requirements from the manager.
 	device_memory_allocation
 	allocate(const vk::MemoryRequirements& memory_requirements,
-			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal);
+			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) override;
 	/// Returns the given memory allocation back to the manager.
 	void free(const device_memory_allocation& allocation) override;
 	/// Releases device memory by releasing empty blocks, keeping at most the given amount of blocks per pool.

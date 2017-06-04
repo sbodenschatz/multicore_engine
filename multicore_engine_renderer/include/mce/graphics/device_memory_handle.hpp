@@ -43,13 +43,17 @@ struct device_memory_allocation {
 	};
 };
 
-/// Provides an interface for device memory managers to free allocations polymorphically.
+/// Provides an interface for device memory managers to allocate and free allocations polymorphically.
 class device_memory_manager_interface {
 public:
 	/// Enables polymorphic destruction.
 	virtual ~device_memory_manager_interface() noexcept = default;
 	/// Interface function to free allocations from any device memory manager.
 	virtual void free(const device_memory_allocation& allocation) = 0;
+	/// Interface function to request memory satisfying the given requirements from the manager.
+	virtual device_memory_allocation
+	allocate(const vk::MemoryRequirements& memory_requirements,
+			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) = 0;
 };
 
 /// Provides a RAII wrapper for managing the lifetime of a device_memory_allocation and the associated memory.
