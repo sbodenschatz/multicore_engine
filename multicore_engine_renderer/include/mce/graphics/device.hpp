@@ -15,7 +15,6 @@
 #include <boost/container/flat_set.hpp>
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/graphics_defs.hpp>
-#include <mce/graphics/unique_handle.hpp>
 #include <utility>
 #include <vector>
 #include <vulkan/vulkan.hpp>
