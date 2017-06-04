@@ -15,6 +15,7 @@
 
 namespace mce {
 namespace graphics {
+class device;
 
 class image {
 	vk::Format format_;
@@ -25,13 +26,15 @@ class image {
 	vk::ImageTiling tiling_;
 	uint32_t mip_levels_;
 	uint32_t layers_;
-	vk::UniqueImage img_;
 	device_memory_handle<device_memory_manager> mem_handle_;
+	vk::UniqueImage img_;
 
 public:
-	image(vk::Format format, glm::uvec2 size, vk::ImageUsageFlags usage,
-		  vk::ImageLayout layout = vk::ImageLayout::eGeneral, bool mutable_format = false,
-		  vk::ImageTiling tiling = vk::ImageTiling::eOptimal, uint32_t mip_levels = 1, uint32_t layers = 1);
+	image(device& dev, device_memory_manager& mem_mgr, vk::Format format, glm::uvec2 size,
+		  vk::ImageUsageFlags usage, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
+		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
+		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+		  uint32_t mip_levels = 1, uint32_t layers = 1);
 };
 
 } /* namespace graphics */
