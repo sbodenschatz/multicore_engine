@@ -13,7 +13,6 @@
  */
 
 #include <boost/filesystem.hpp>
-#include <mce/graphics/unique_handle.hpp>
 #include <string>
 #include <vulkan/vulkan.hpp>
 
