@@ -133,7 +133,7 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 				ai.allocationSize = block_size_;
 				ai.memoryTypeIndex = mem_type;
 				vk_mock_interface::device_memory_wrapper mem = vk_mock_interface::allocate_memory(dev, ai);
-				if(!mem.get()) continue;
+				if(!mem) continue;
 				auto insert_pos = std::lower_bound(
 						blocks_.begin(), blocks_.end(), mem_type,
 						[](const device_memory_block& blk, uint32_t type) { return blk.memory_type < type; });
@@ -166,7 +166,7 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 				ai.allocationSize = memory_requirements.size;
 				ai.memoryTypeIndex = mem_type;
 				vk_mock_interface::device_memory_wrapper mem = vk_mock_interface::allocate_memory(dev, ai);
-				if(!mem.get()) continue;
+				if(!mem) continue;
 				auto insert_pos = std::lower_bound(
 						separate_blocks_.begin(), separate_blocks_.end(), mem_type,
 						[](const device_memory_block& blk, uint32_t type) { return blk.memory_type < type; });

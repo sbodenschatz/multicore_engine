@@ -29,18 +29,43 @@ struct fake_device_memory_deleter {
 using fake_unique_device_memory = vk::UniqueHandle<vk::DeviceMemory, fake_device_memory_deleter>;
 
 class device_memory_wrapper {
-	boost::variant<vk::UniqueDeviceMemory, fake_unique_device_memory, boost::blank> handle_;
+	boost::variant<boost::blank, vk::UniqueDeviceMemory, fake_unique_device_memory> handle_;
 
 public:
 	device_memory_wrapper(vk::UniqueDeviceMemory&& m) : handle_(std::move(m)){};
 	device_memory_wrapper(fake_unique_device_memory&& m) : handle_(std::move(m)){};
 
-	device_memory_wrapper(device_memory_wrapper&& other) noexcept : handle_{std::move(other.handle_)} {}
+	device_memory_wrapper(device_memory_wrapper&& other) noexcept {
+		try {
+			handle_ = std::move(other.handle_);
+		} catch(...) {
+			handle_ = boost::blank();
+		}
+	}
 	device_memory_wrapper& operator=(device_memory_wrapper&& other) noexcept {
-		handle_ = std::move(other.handle_);
+		try {
+			handle_ = std::move(other.handle_);
+		} catch(...) {
+			handle_ = boost::blank();
+		}
 		return *this;
 	}
 
+	explicit operator bool() const {
+		struct visitor : boost::static_visitor<bool> {
+			bool operator()(const boost::blank&) const {
+				return false;
+			}
+			bool operator()(const vk::UniqueDeviceMemory& m) const {
+				return bool(m);
+			}
+			bool operator()(const fake_unique_device_memory& m) const {
+				return bool(m);
+			}
+		};
+		visitor v;
+		return handle_.apply_visitor(v);
+	}
 	const vk::DeviceMemory& get() const {
 		struct visitor : boost::static_visitor<const vk::DeviceMemory&> {
 			const vk::DeviceMemory& operator()(const boost::blank&) const {
