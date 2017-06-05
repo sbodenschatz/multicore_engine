@@ -9,7 +9,7 @@
 namespace mce {
 namespace graphics {
 
-image::image(device& dev, device_memory_manager& mem_mgr, vk::Format format, glm::uvec2 size,
+image::image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format, glm::uvec2 size,
 			 vk::ImageUsageFlags usage, vk::ImageLayout layout, vk::MemoryPropertyFlags required_flags,
 			 bool mutable_format, vk::ImageTiling tiling, uint32_t mip_levels, uint32_t layers)
 		: format_{format}, size_{size}, usage_{usage}, layout_{layout}, mutable_format_{mutable_format},
