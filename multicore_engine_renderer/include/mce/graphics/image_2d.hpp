@@ -18,6 +18,7 @@ namespace graphics {
 class device;
 
 class image {
+	device& dev_;
 	vk::Format format_;
 	glm::uvec2 size_;
 	vk::ImageUsageFlags usage_;
@@ -35,6 +36,8 @@ public:
 		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 		  uint32_t mip_levels = 1, uint32_t layers = 1);
+
+	vk::UniqueImageView create_view(/*TODO: Add parameters */) const;
 };
 
 } /* namespace graphics */

@@ -12,8 +12,8 @@ namespace graphics {
 image::image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format, glm::uvec2 size,
 			 vk::ImageUsageFlags usage, vk::ImageLayout layout, vk::MemoryPropertyFlags required_flags,
 			 bool mutable_format, vk::ImageTiling tiling, uint32_t mip_levels, uint32_t layers)
-		: format_{format}, size_{size}, usage_{usage}, layout_{layout}, mutable_format_{mutable_format},
-		  tiling_{tiling}, mip_levels_{mip_levels}, layers_{layers} {
+		: dev_{dev}, format_{format}, size_{size}, usage_{usage}, layout_{layout},
+		  mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{mip_levels}, layers_{layers} {
 	vk::ImageCreateInfo ci(mutable_format ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags{},
 						   vk::ImageType::e2D, format, {size.x, size.y, 1}, mip_levels, layers,
 						   vk::SampleCountFlagBits::e1, tiling, usage, vk::SharingMode::eExclusive);
