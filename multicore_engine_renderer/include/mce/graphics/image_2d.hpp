@@ -17,7 +17,7 @@ namespace mce {
 namespace graphics {
 class device;
 
-class image {
+class image_2d {
 	device& dev_;
 	vk::Format format_;
 	glm::uvec2 size_;
@@ -31,11 +31,11 @@ class image {
 	vk::UniqueImage img_;
 
 public:
-	image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format, glm::uvec2 size,
-		  vk::ImageUsageFlags usage, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
-		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
-		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
-		  uint32_t mip_levels = 1, uint32_t layers = 1);
+	image_2d(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format, glm::uvec2 size,
+			 vk::ImageUsageFlags usage, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
+			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
+			 bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+			 uint32_t mip_levels = 1, uint32_t layers = 1);
 
 	vk::UniqueImageView create_view(/*TODO: Add parameters */) const;
 };
