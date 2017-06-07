@@ -21,7 +21,7 @@ namespace mce {
 namespace asset {
 
 /// Loads files directly from the operating system file system.
-class native_file_reader : public file_reader {
+class native_file_reader final : public file_reader {
 public:
 	/// Reads the given file from the given path prefix into memory.
 	virtual std::pair<file_content_ptr, file_size> read_file(const std::string& prefix,
