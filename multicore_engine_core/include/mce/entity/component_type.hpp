@@ -90,7 +90,7 @@ public:
 /// \brief Represents a concrete description of a component type with a specific type T of the component and
 /// function object type F that constructs an object of T.
 template <typename T, typename F>
-class component_type : public abstract_component_type {
+class component_type final : public abstract_component_type {
 	F factory_function_;
 
 public:
