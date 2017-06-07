@@ -215,7 +215,7 @@ private:
 		std::atomic<ref_count_t> weak;
 	};
 
-	struct block : public detail::smart_object_pool_block_interface {
+	struct block final : public detail::smart_object_pool_block_interface {
 		ALIGNED_NEW_AND_DELETE(block)
 		block_entry entries[block_size];
 		alignas(cacheline_alignment) ref_count_ ref_counts[block_size];
@@ -476,8 +476,7 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now."
-					  << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
 			std::terminate();
 		}
 	}

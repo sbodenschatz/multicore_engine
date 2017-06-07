@@ -262,7 +262,8 @@ std::unique_ptr<Abstract_Assignment<Root_Type>>
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
-class linked_property : public property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...> {
+class linked_property final
+		: public property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...> {
 public:
 	/// Defines the type of getter return value and setter value parameter as either T or const T&.
 	typedef typename detail::property_type_helper<T, Object_Type>::accessor_value accessor_value;
@@ -326,7 +327,7 @@ public:
 template <typename Root_Type, typename T, typename Object_Type,
 		  template <typename> class AbstractAssignment = abstract_null_assignment,
 		  template <typename, typename> class Assignment = null_assignment, typename... Assignment_Param>
-class directly_linked_property
+class directly_linked_property final
 		: public property<Root_Type, T, AbstractAssignment, Assignment, Assignment_Param...> {
 public:
 	/// Defines the type of getter return value and setter value parameter as either T or const T&.

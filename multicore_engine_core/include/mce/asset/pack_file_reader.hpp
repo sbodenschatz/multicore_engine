@@ -31,7 +31,7 @@ namespace mce {
 namespace asset {
 
 /// Loads files from within pack files that bundle together many asset files.
-class pack_file_reader : public file_reader {
+class pack_file_reader final : public file_reader {
 	struct pack_file_source {
 		std::atomic_flag lock_flag = ATOMIC_FLAG_INIT;
 		std::ifstream stream;
