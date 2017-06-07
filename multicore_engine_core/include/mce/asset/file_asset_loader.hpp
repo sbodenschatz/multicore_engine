@@ -23,7 +23,7 @@ namespace mce {
 namespace asset {
 
 /// Loads assets directly from the reader and models load units as additional path prefixes.
-class file_asset_loader : public asset_loader {
+class file_asset_loader final : public asset_loader {
 	std::shared_timed_mutex load_units_rw_lock;
 	std::vector<std::string> load_units;
 	const std::vector<path_prefix> prefixes;
