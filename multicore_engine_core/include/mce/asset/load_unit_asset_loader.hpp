@@ -26,7 +26,7 @@ namespace asset {
 class load_unit;
 
 /// Implements loading of assets through load units that are read into memory as a whole.
-class load_unit_asset_loader : public asset_loader {
+class load_unit_asset_loader final : public asset_loader {
 	std::shared_timed_mutex load_units_rw_lock;
 	std::vector<std::shared_ptr<load_unit>> load_units;
 	const std::vector<path_prefix> prefixes;
