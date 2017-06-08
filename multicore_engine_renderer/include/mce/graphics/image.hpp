@@ -109,6 +109,10 @@ protected:
 	}
 
 public:
+	~image() {
+		// TODO: Insert resources into deletion manager.
+	}
+
 	friend class single_image<Image_Type, Size_Type>;
 
 	vk::Format format() const {
