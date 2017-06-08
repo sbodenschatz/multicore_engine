@@ -11,9 +11,15 @@
 #include <glm/glm.hpp>
 #include <type_traits>
 
+/**
+ * \file
+ * Provides mathematical tool functions.
+ */
+
 namespace mce {
 namespace util {
 
+/// Determines the number of components in a glm vector.
 template <typename T, typename P, P p, template <typename, P> class Vector_Type>
 constexpr auto vector_size(const Vector_Type<T, p>& v) {
 #ifdef GLM_FORCE_SIZE_FUNC
@@ -23,6 +29,7 @@ constexpr auto vector_size(const Vector_Type<T, p>& v) {
 #endif
 }
 
+/// Returns the maximum value of all components a glm vector.
 template <typename T, typename P, P p, template <typename, P> class Vector_Type>
 T component_max(const Vector_Type<T, p>& v) {
 	T m = v[0];
@@ -31,11 +38,13 @@ T component_max(const Vector_Type<T, p>& v) {
 	}
 }
 
+/// Identity function to provide the overload for component_max for scalar numbers.
 template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
 T component_max(T v) {
 	return v;
 }
 
+/// Returns the minimum value of all components a glm vector.
 template <typename T, typename P, P p, template <typename, P> class Vector_Type>
 T component_min(const Vector_Type<T, p>& v) {
 	T m = v[0];
@@ -44,11 +53,13 @@ T component_min(const Vector_Type<T, p>& v) {
 	}
 }
 
+/// Identity function to provide the overload for component_min for scalar numbers.
 template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
 T component_min(T v) {
 	return v;
 }
 
+/// Returns the sum of all components a glm vector.
 template <typename T, typename P, P p, template <typename, P> class Vector_Type>
 T component_add(const Vector_Type<T, p>& v) {
 	T m = v[0];
@@ -57,11 +68,13 @@ T component_add(const Vector_Type<T, p>& v) {
 	}
 }
 
+/// Identity function to provide the overload for component_add for scalar numbers.
 template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
 T component_add(T v) {
 	return v;
 }
 
+/// Returns the product of all components a glm vector.
 template <typename T, typename P, P p, template <typename, P> class Vector_Type>
 T component_mul(const Vector_Type<T, p>& v) {
 	T m = v[0];
@@ -70,6 +83,7 @@ T component_mul(const Vector_Type<T, p>& v) {
 	}
 }
 
+/// Identity function to provide the overload for component_mul for scalar numbers.
 template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
 T component_mul(T v) {
 	return v;
