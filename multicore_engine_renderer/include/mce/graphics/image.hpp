@@ -25,6 +25,21 @@ namespace mce {
 namespace graphics {
 class device;
 
+class image_1d;
+class image_2d;
+class image_3d;
+class image_cube;
+class image_1d_layered;
+class image_2d_layered;
+
+class tag_1d {};
+class tag_2d {};
+class tag_3d {};
+class tag_cube {};
+
+template <typename Tag, bool layered = false>
+class image_view;
+
 namespace detail {
 
 template <int component_count>
@@ -58,6 +73,41 @@ vk::Extent3D to_extent_3d(const Vector_Type<T, p>& v) {
 	return extent_converter<util::vector_size(v)>::convert_to_extent_3d();
 }
 
+template <typename Img>
+struct view_types {};
+
+template <>
+struct view_types<image_1d> {
+	using flat_view = image_view<tag_1d>;
+};
+
+template <>
+struct view_types<image_2d> {
+	using flat_view = image_view<tag_2d>;
+};
+template <>
+struct view_types<image_3d> {
+	using flat_view = image_view<tag_3d>;
+};
+template <>
+struct view_types<image_cube> {
+	using cube_view = image_view<tag_cube>;
+	using layered_view = image_view<tag_2d, true>;
+	using side_view = image_view<tag_2d>;
+};
+
+template <>
+struct view_types<image_2d_layered> {
+	using layered_view = image_view<tag_2d, true>;
+	using flat_view = image_view<tag_2d>;
+};
+
+template <>
+struct view_types<image_1d_layered> {
+	using layered_view = image_view<tag_1d, true>;
+	using flat_view = image_view<tag_1d>;
+};
+
 } // namespace detail
 
 template <typename Image_Type, typename Size_Type>
@@ -87,7 +137,7 @@ public:
 protected:
 #endif
 	image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format, size_type size,
-		  vk::ImageUsageFlags usage, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
+		  vk::ImageUsageFlags usage, uint32_t layers, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
 		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 		  boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{})
@@ -95,9 +145,8 @@ protected:
 			  mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{mip_levels} {
 		vk::ImageCreateInfo ci(mutable_format ? vk::ImageCreateFlagBits::eMutableFormat
 											  : vk::ImageCreateFlags{},
-							   vk::ImageType::e2D, format, detail::to_extent_3d(size), 1,
-							   static_cast<Image_Type*>(this)->layers(), vk::SampleCountFlagBits::e1, tiling,
-							   usage, vk::SharingMode::eExclusive);
+							   vk::ImageType::e2D, format, detail::to_extent_3d(size), 1, layers,
+							   vk::SampleCountFlagBits::e1, tiling, usage, vk::SharingMode::eExclusive);
 		struct mip_visitor : boost::static_visitor<> {
 			uint32_t& mip_levels;
 			typename Image_Type::size_type size_;
@@ -160,15 +209,8 @@ public:
 
 template <typename Image_Type, typename Size_Type>
 class single_image : DOXYGEN_ONLY_PUBLIC(protected) image<Image_Type, Size_Type> {
-#ifdef DOXYGEN
 public:
-#else
-protected:
-#endif
 	typedef image<Image_Type, Size_Type> base_t;
-	using base_t::image;
-
-public:
 	friend class image_1d;
 	friend class image_2d;
 	friend class image_3d;
@@ -187,8 +229,61 @@ public:
 	using base_t::usage;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+
+#ifdef DOXYGEN
+public:
+#else
+protected:
+#endif
+	single_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
+				 typename base_t::size_type size, vk::ImageUsageFlags usage,
+				 vk::ImageLayout layout = vk::ImageLayout::eGeneral,
+				 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
+				 bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+				 boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{})
+			: base_t(dev, mem_mgr, format, size, usage, static_cast<Image_Type*>(this)->layers(), layout,
+					 required_flags, mutable_format, tiling, mip_levels) {}
 };
 
+template <typename Image_Type, typename Size_Type>
+class layered_image : DOXYGEN_ONLY_PUBLIC(protected) image<Image_Type, Size_Type> {
+	uint32_t layers_;
+
+public:
+	typedef image<Image_Type, Size_Type> base_t;
+	friend class image_1d;
+	friend class image_2d;
+
+	uint32_t layers() const {
+		return layers_;
+	}
+
+	using base_t::format;
+	using base_t::mip_levels;
+	using base_t::mutable_format;
+	using base_t::native_image;
+	using base_t::size;
+	using base_t::tiling;
+	using base_t::tracked_layout;
+	using base_t::usage;
+	using typename base_t::size_type;
+	using typename base_t::full_mip_chain;
+
+#ifdef DOXYGEN
+public:
+#else
+protected:
+#endif
+	layered_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
+				  typename base_t::size_type size, vk::ImageUsageFlags usage, uint32_t layers,
+				  vk::ImageLayout layout = vk::ImageLayout::eGeneral,
+				  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
+				  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+				  boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{})
+			: base_t(dev, mem_mgr, format, size, usage, layers, layout, required_flags, mutable_format,
+					 tiling, mip_levels),
+			  layers_{layers} {}
+};
 class image_1d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_1d, uint32_t> {
 	typedef single_image<image_1d, uint32_t> base_t;
 
@@ -262,6 +357,42 @@ public:
 	uint32_t layers() const {
 		return 6;
 	}
+};
+
+class image_1d_layered : DOXYGEN_ONLY_PUBLIC(private) single_image<image_1d_layered, uint32_t> {
+	typedef single_image<image_1d_layered, uint32_t> base_t;
+
+public:
+	using base_t::single_image;
+	using base_t::layers;
+	using base_t::format;
+	using base_t::mip_levels;
+	using base_t::mutable_format;
+	using base_t::native_image;
+	using base_t::size;
+	using base_t::tiling;
+	using base_t::tracked_layout;
+	using base_t::usage;
+	using typename base_t::size_type;
+	using typename base_t::full_mip_chain;
+};
+
+class image_2d_layered : DOXYGEN_ONLY_PUBLIC(private) single_image<image_2d_layered, glm::uvec2> {
+	typedef single_image<image_2d_layered, glm::uvec2> base_t;
+
+public:
+	using base_t::single_image;
+	using base_t::layers;
+	using base_t::format;
+	using base_t::mip_levels;
+	using base_t::mutable_format;
+	using base_t::native_image;
+	using base_t::size;
+	using base_t::tiling;
+	using base_t::tracked_layout;
+	using base_t::usage;
+	using typename base_t::size_type;
+	using typename base_t::full_mip_chain;
 };
 
 } /* namespace graphics */
