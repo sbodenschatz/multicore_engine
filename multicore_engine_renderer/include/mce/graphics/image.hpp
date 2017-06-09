@@ -54,7 +54,7 @@ vk::Extent3D to_extent_3d(const Vector_Type<T, p>& v) {
 
 } // namespace detail
 
-template <typename Size_Type>
+template <typename Image_Type, typename Size_Type>
 class single_image;
 
 template <typename Image_Type, typename Size_Type>
@@ -113,7 +113,7 @@ public:
 		// TODO: Insert resources into deletion manager.
 	}
 
-	friend class single_image<Size_Type>;
+	friend class single_image<Image_Type, Size_Type>;
 
 	vk::Format format() const {
 		return format_;
@@ -148,13 +148,17 @@ public:
 	}
 };
 
-template <typename Size_Type>
-class single_image : image<single_image<Size_Type>, Size_Type> {
+template <typename Image_Type, typename Size_Type>
+class single_image : image<Image_Type, Size_Type> {
 protected:
-	typedef image<single_image<Size_Type>, Size_Type> base_t;
+	typedef image<Image_Type, Size_Type> base_t;
 	using base_t::image;
 
 public:
+	friend class image_1d;
+	friend class image_2d;
+	friend class image_3d;
+
 	uint32_t layers() const {
 		return 1;
 	}
@@ -171,9 +175,59 @@ public:
 	using base_t::full_mip_chain;
 };
 
-using image_1d = single_image<uint32_t>;
-using image_2d = single_image<glm::uvec2>;
-using image_3d = single_image<glm::uvec3>;
+class image_1d : single_image<image_1d, uint32_t> {
+	typedef single_image<image_1d, uint32_t> base_t;
+
+public:
+	using base_t::single_image;
+	using base_t::layers;
+	using base_t::format;
+	using base_t::mip_levels;
+	using base_t::mutable_format;
+	using base_t::native_image;
+	using base_t::size;
+	using base_t::tiling;
+	using base_t::tracked_layout;
+	using base_t::usage;
+	using base_t::size_type;
+	using base_t::full_mip_chain;
+};
+
+class image_2d : public single_image<image_2d, glm::uvec2> {
+	typedef single_image<image_2d, glm::uvec2> base_t;
+
+public:
+	using base_t::single_image;
+	using base_t::layers;
+	using base_t::format;
+	using base_t::mip_levels;
+	using base_t::mutable_format;
+	using base_t::native_image;
+	using base_t::size;
+	using base_t::tiling;
+	using base_t::tracked_layout;
+	using base_t::usage;
+	using base_t::size_type;
+	using base_t::full_mip_chain;
+};
+
+class image_3d : public single_image<image_3d, glm::uvec3> {
+	typedef single_image<image_3d, glm::uvec3> base_t;
+
+public:
+	using base_t::single_image;
+	using base_t::layers;
+	using base_t::format;
+	using base_t::mip_levels;
+	using base_t::mutable_format;
+	using base_t::native_image;
+	using base_t::size;
+	using base_t::tiling;
+	using base_t::tracked_layout;
+	using base_t::usage;
+	using base_t::size_type;
+	using base_t::full_mip_chain;
+};
 
 } /* namespace graphics */
 } /* namespace mce */
