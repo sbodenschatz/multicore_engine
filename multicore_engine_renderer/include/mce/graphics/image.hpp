@@ -7,6 +7,12 @@
 #ifndef MCE_GRAPHICS_IMAGE_HPP_
 #define MCE_GRAPHICS_IMAGE_HPP_
 
+#ifdef DOXYGEN
+#define DOXYGEN_ONLY_PUBLIC(REAL) public
+#else
+#define DOXYGEN_ONLY_PUBLIC(REAL) REAL
+#endif
+
 #include <boost/variant.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/component_wise.hpp>
@@ -75,7 +81,11 @@ public:
 
 	struct full_mip_chain {};
 
+#ifdef DOXYGEN
+public:
+#else
 protected:
+#endif
 	image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format, size_type size,
 		  vk::ImageUsageFlags usage, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
 		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
@@ -149,8 +159,12 @@ public:
 };
 
 template <typename Image_Type, typename Size_Type>
-class single_image : image<Image_Type, Size_Type> {
+class single_image : DOXYGEN_ONLY_PUBLIC(protected) image<Image_Type, Size_Type> {
+#ifdef DOXYGEN
+public:
+#else
 protected:
+#endif
 	typedef image<Image_Type, Size_Type> base_t;
 	using base_t::image;
 
@@ -175,7 +189,7 @@ public:
 	using typename base_t::full_mip_chain;
 };
 
-class image_1d : single_image<image_1d, uint32_t> {
+class image_1d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_1d, uint32_t> {
 	typedef single_image<image_1d, uint32_t> base_t;
 
 public:
@@ -193,7 +207,7 @@ public:
 	using typename base_t::full_mip_chain;
 };
 
-class image_2d : public single_image<image_2d, glm::uvec2> {
+class image_2d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_2d, glm::uvec2> {
 	typedef single_image<image_2d, glm::uvec2> base_t;
 
 public:
@@ -211,7 +225,7 @@ public:
 	using typename base_t::full_mip_chain;
 };
 
-class image_3d : public single_image<image_3d, glm::uvec3> {
+class image_3d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_3d, glm::uvec3> {
 	typedef single_image<image_3d, glm::uvec3> base_t;
 
 public:
@@ -228,6 +242,7 @@ public:
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };
+
 
 } /* namespace graphics */
 } /* namespace mce */
