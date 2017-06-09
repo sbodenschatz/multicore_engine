@@ -171,8 +171,8 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
-	using base_t::size_type;
-	using base_t::full_mip_chain;
+	using typename base_t::size_type;
+	using typename base_t::full_mip_chain;
 };
 
 class image_1d : single_image<image_1d, uint32_t> {
@@ -189,8 +189,8 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
-	using base_t::size_type;
-	using base_t::full_mip_chain;
+	using typename base_t::size_type;
+	using typename base_t::full_mip_chain;
 };
 
 class image_2d : public single_image<image_2d, glm::uvec2> {
@@ -207,8 +207,8 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
-	using base_t::size_type;
-	using base_t::full_mip_chain;
+	using typename base_t::size_type;
+	using typename base_t::full_mip_chain;
 };
 
 class image_3d : public single_image<image_3d, glm::uvec3> {
@@ -225,8 +225,8 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
-	using base_t::size_type;
-	using base_t::full_mip_chain;
+	using typename base_t::size_type;
+	using typename base_t::full_mip_chain;
 };
 
 } /* namespace graphics */
