@@ -243,6 +243,26 @@ public:
 	using typename base_t::full_mip_chain;
 };
 
+class image_cube : DOXYGEN_ONLY_PUBLIC(private) single_image<image_cube, uint32_t> {
+	typedef single_image<image_cube, uint32_t> base_t;
+
+public:
+	using base_t::single_image;
+	using base_t::format;
+	using base_t::mip_levels;
+	using base_t::mutable_format;
+	using base_t::native_image;
+	using base_t::size;
+	using base_t::tiling;
+	using base_t::tracked_layout;
+	using base_t::usage;
+	using typename base_t::size_type;
+	using typename base_t::full_mip_chain;
+
+	uint32_t layers() const {
+		return 6;
+	}
+};
 
 } /* namespace graphics */
 } /* namespace mce */
