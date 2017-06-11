@@ -461,12 +461,12 @@ public:
 	}
 };
 
-class image_1d_layered : DOXYGEN_ONLY_PUBLIC(private) single_image<image_1d_layered, uint32_t> {
-	typedef single_image<image_1d_layered, uint32_t> base_t;
-	friend class single_image<image_1d_layered, uint32_t>;
+class image_1d_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_1d_layered, uint32_t> {
+	typedef layered_image<image_1d_layered, uint32_t> base_t;
+	friend class layered_image<image_1d_layered, uint32_t>;
 
 public:
-	using base_t::single_image;
+	using base_t::layered_image;
 	using base_t::layers;
 	using base_t::format;
 	using base_t::mip_levels;
@@ -477,16 +477,17 @@ public:
 	using base_t::tracked_layout;
 	using base_t::usage;
 	using base_t::create_view;
+	using base_t::create_single_layer_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };
 
-class image_2d_layered : DOXYGEN_ONLY_PUBLIC(private) single_image<image_2d_layered, glm::uvec2> {
-	typedef single_image<image_2d_layered, glm::uvec2> base_t;
-	friend class single_image<image_2d_layered, glm::uvec2>;
+class image_2d_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_2d_layered, glm::uvec2> {
+	typedef layered_image<image_2d_layered, glm::uvec2> base_t;
+	friend class layered_image<image_2d_layered, glm::uvec2>;
 
 public:
-	using base_t::single_image;
+	using base_t::layered_image;
 	using base_t::layers;
 	using base_t::format;
 	using base_t::mip_levels;
@@ -497,16 +498,17 @@ public:
 	using base_t::tracked_layout;
 	using base_t::usage;
 	using base_t::create_view;
+	using base_t::create_single_layer_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };
 
-class image_cube_layered : DOXYGEN_ONLY_PUBLIC(private) single_image<image_cube_layered, uint32_t> {
-	typedef single_image<image_cube_layered, uint32_t> base_t;
-	friend class single_image<image_cube_layered, uint32_t>;
+class image_cube_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_cube_layered, uint32_t> {
+	typedef layered_image<image_cube_layered, uint32_t> base_t;
+	friend class layered_image<image_cube_layered, uint32_t>;
 
 public:
-	using base_t::single_image;
+	using base_t::layered_image;
 	using base_t::layers;
 	using base_t::format;
 	using base_t::mip_levels;
