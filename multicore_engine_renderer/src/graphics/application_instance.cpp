@@ -8,17 +8,45 @@
 #include <windows.h> //Required for OutputDebugStringA
 #endif
 #include <algorithm>
-#include <mce/core/version.hpp>
 #include <cstdlib>
 #include <functional>
-#include <mce/graphics/application_instance.hpp>
 #include <iostream>
 #include <iterator>
+#include <mce/core/version.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/graphics/application_instance.hpp>
+#include <mce/util/unused.hpp>
 #include <sstream>
 #include <stdexcept>
-#include <mce/util/unused.hpp>
 #include <vulkan/vulkan.hpp>
-#include <mce/exceptions.hpp>
+
+// Provide wrapper functions to call into extension function pointers because extension functions aren't
+// provided by the loader library. To make the symbols available they are defined here.
+extern "C" {
+PFN_vkCreateDebugReportCallbackEXT fptr_vkCreateDebugReportCallbackEXT;
+PFN_vkDebugReportMessageEXT fptr_vkDebugReportMessageEXT;
+PFN_vkDestroyDebugReportCallbackEXT fptr_vkDestroyDebugReportCallbackEXT;
+
+VKAPI_ATTR VkResult VKAPI_CALL
+vkCreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
+							   const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback) {
+	return fptr_vkCreateDebugReportCallbackEXT(instance, pCreateInfo, pAllocator, pCallback);
+}
+
+VKAPI_ATTR void VKAPI_CALL vkDestroyDebugReportCallbackEXT(VkInstance instance,
+														   VkDebugReportCallbackEXT callback,
+														   const VkAllocationCallbacks* pAllocator) {
+	return fptr_vkDestroyDebugReportCallbackEXT(instance, callback, pAllocator);
+}
+
+VKAPI_ATTR void VKAPI_CALL vkDebugReportMessageEXT(VkInstance instance, VkDebugReportFlagsEXT flags,
+												   VkDebugReportObjectTypeEXT objectType, uint64_t object,
+												   size_t location, int32_t messageCode,
+												   const char* pLayerPrefix, const char* pMessage) {
+	return fptr_vkDebugReportMessageEXT(instance, flags, objectType, object, location, messageCode,
+										pLayerPrefix, pMessage);
+}
+}
 
 namespace mce {
 namespace graphics {
@@ -64,6 +92,12 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 	instance_ci.pApplicationInfo = &app_info;
 
 	instance_ = vk::createInstanceUnique(instance_ci);
+	fptr_vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(
+			instance_->getProcAddr("vkCreateDebugReportCallbackEXT"));
+	fptr_vkDebugReportMessageEXT =
+			reinterpret_cast<PFN_vkDebugReportMessageEXT>(instance_->getProcAddr("vkDebugReportMessageEXT"));
+	fptr_vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(
+			instance_->getProcAddr("vkDestroyDebugReportCallbackEXT"));
 
 	if(validation_level > 0) {
 		vk::DebugReportFlagsEXT validation_report_levels =
@@ -81,12 +115,10 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 
 application_instance::~application_instance() {}
 
-VkBool32 VKAPI_CALL
-application_instance::validation_report_callback_static(VkDebugReportFlagsEXT flags_,
-														VkDebugReportObjectTypeEXT objectType_,
-														uint64_t object, size_t location, int32_t messageCode,
-														const char* pLayerPrefix, const char* pMessage,
-														void* pUserData) {
+VkBool32 VKAPI_CALL application_instance::validation_report_callback_static(
+		VkDebugReportFlagsEXT flags_, VkDebugReportObjectTypeEXT objectType_, uint64_t object,
+		size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage,
+		void* pUserData) {
 	auto target = static_cast<const application_instance*>(pUserData);
 	return target->validation_report_callback(flags_, objectType_, object, location, messageCode,
 											  pLayerPrefix, pMessage);
