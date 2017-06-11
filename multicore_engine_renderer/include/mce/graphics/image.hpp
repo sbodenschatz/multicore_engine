@@ -294,6 +294,17 @@ public:
 	const device& dev() const {
 		return dev_;
 	}
+
+	vk::ImageMemoryBarrier generate_transition(vk::ImageLayout new_layout, vk::AccessFlags src_access,
+											   vk::AccessFlags dst_access) {
+		vk::ImageMemoryBarrier b(
+				src_access, dst_access, layout_, new_layout, VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+				*img_, vk::ImageSubresourceRange(default_aspect_flags(), 0, mip_levels_, 0,
+												 static_cast<Image_Type*>(this)->layers() *
+														 detail::type_mapper<Image_Type>::cube_layer_factor));
+		layout_ = new_layout;
+		return b;
+	}
 };
 
 template <typename Image_Type, typename Size_Type>
@@ -318,6 +329,7 @@ public:
 	using base_t::usage;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 
 protected:
 	using base_t::default_aspect_flags;
@@ -371,6 +383,7 @@ public:
 	using base_t::usage;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 
 protected:
 	using base_t::default_aspect_flags;
@@ -437,6 +450,7 @@ public:
 	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 };
 
 class image_2d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_2d, glm::uvec2> {
@@ -457,6 +471,7 @@ public:
 	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 };
 
 class image_3d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_3d, glm::uvec3> {
@@ -477,6 +492,7 @@ public:
 	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 };
 
 class image_cube : DOXYGEN_ONLY_PUBLIC(private) single_image<image_cube, uint32_t> {
@@ -497,6 +513,7 @@ public:
 	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 
 	typename detail::type_mapper<Image_Type>::side_view create_single_side_view(
 			uint32_t layer, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
@@ -544,6 +561,7 @@ public:
 	using base_t::create_single_layer_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 };
 
 class image_2d_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_2d_layered, glm::uvec2> {
@@ -565,6 +583,7 @@ public:
 	using base_t::create_single_layer_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 };
 
 class image_cube_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_cube_layered, uint32_t> {
@@ -586,6 +605,7 @@ public:
 	using base_t::create_single_layer_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
+	using base_t::generate_transition;
 };
 
 } /* namespace graphics */
