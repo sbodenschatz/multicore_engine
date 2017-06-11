@@ -20,22 +20,35 @@ namespace mce {
 namespace util {
 
 /// Determines the number of components in a glm vector.
-template <typename T, typename P, P p, template <typename, P> class Vector_Type>
-constexpr auto vector_size(const Vector_Type<T, p>& v) {
-#ifdef GLM_FORCE_SIZE_FUNC
-	return v.size();
-#else
-	return v.length();
-#endif
+template <typename T, glm::precision p>
+constexpr auto vector_size(const glm::tvec1<T, p>&) {
+	return 1;
+}
+/// Determines the number of components in a glm vector.
+template <typename T, glm::precision p>
+constexpr auto vector_size(const glm::tvec2<T, p>&) {
+	return 2;
+}
+/// Determines the number of components in a glm vector.
+template <typename T, glm::precision p>
+constexpr auto vector_size(const glm::tvec3<T, p>&) {
+	return 3;
+}
+/// Determines the number of components in a glm vector.
+template <typename T, glm::precision p>
+constexpr auto vector_size(const glm::tvec4<T, p>&) {
+	return 4;
 }
 
 /// Returns the maximum value of all components a glm vector.
-template <typename T, typename P, P p, template <typename, P> class Vector_Type>
+template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
 T component_max(const Vector_Type<T, p>& v) {
+	using std::max;
 	T m = v[0];
 	for(decltype(vector_size(v)) i = 1; i < vector_size(v); ++i) {
 		m = max(m, v[i]);
 	}
+	return m;
 }
 
 /// Identity function to provide the overload for component_max for scalar numbers.
@@ -45,12 +58,13 @@ T component_max(T v) {
 }
 
 /// Returns the minimum value of all components a glm vector.
-template <typename T, typename P, P p, template <typename, P> class Vector_Type>
+template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
 T component_min(const Vector_Type<T, p>& v) {
 	T m = v[0];
 	for(decltype(vector_size(v)) i = 1; i < vector_size(v); ++i) {
 		m = min(m, v[i]);
 	}
+	return m;
 }
 
 /// Identity function to provide the overload for component_min for scalar numbers.
@@ -60,12 +74,13 @@ T component_min(T v) {
 }
 
 /// Returns the sum of all components a glm vector.
-template <typename T, typename P, P p, template <typename, P> class Vector_Type>
+template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
 T component_add(const Vector_Type<T, p>& v) {
 	T m = v[0];
 	for(decltype(vector_size(v)) i = 1; i < vector_size(v); ++i) {
 		m = m + v[i];
 	}
+	return m;
 }
 
 /// Identity function to provide the overload for component_add for scalar numbers.
@@ -75,12 +90,13 @@ T component_add(T v) {
 }
 
 /// Returns the product of all components a glm vector.
-template <typename T, typename P, P p, template <typename, P> class Vector_Type>
+template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
 T component_mul(const Vector_Type<T, p>& v) {
 	T m = v[0];
 	for(decltype(vector_size(v)) i = 1; i < vector_size(v); ++i) {
 		m = m * v[i];
 	}
+	return m;
 }
 
 /// Identity function to provide the overload for component_mul for scalar numbers.
