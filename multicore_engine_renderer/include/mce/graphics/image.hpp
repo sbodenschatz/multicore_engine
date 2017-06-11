@@ -589,6 +589,7 @@ public:
 class image_cube_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_cube_layered, uint32_t> {
 	typedef layered_image<image_cube_layered, uint32_t> base_t;
 	friend class layered_image<image_cube_layered, uint32_t>;
+	using Image_Type = image_cube;
 
 public:
 	using base_t::layered_image;
