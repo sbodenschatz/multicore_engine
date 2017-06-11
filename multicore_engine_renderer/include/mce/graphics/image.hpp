@@ -339,6 +339,10 @@ public:
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 
+protected:
+	using base_t::default_aspect_flags;
+	using base_t::dev;
+
 public:
 	layered_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
 				  typename base_t::size_type size, vk::ImageUsageFlags usage, uint32_t layers,
@@ -350,6 +354,30 @@ public:
 			: base_t(dev, mem_mgr, format, size, usage, layers, layout, required_flags, mutable_format,
 					 tiling, mip_levels, aspect_mode),
 			  layers_{layers} {}
+
+	typename detail::type_mapper<Image_Type>::layered_view
+	create_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
+				uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		vk::ImageViewCreateInfo ci({}, native_image(), detail::type_mapper<Image_Type>::flat_view_type,
+								   view_format.value_or(format()), component_mapping,
+								   {default_aspect_flags(), base_mip_level, mip_levels, base_layer, layers});
+
+		return typename detail::type_mapper<Image_Type>::flat_view(
+				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
+				component_mapping, ci.format, base_layer, layers);
+	}
+	typename detail::type_mapper<Image_Type>::flat_view create_single_layer_view(
+			uint32_t layer, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		vk::ImageViewCreateInfo ci({}, native_image(), detail::type_mapper<Image_Type>::flat_view_type,
+								   view_format.value_or(format()), component_mapping,
+								   {default_aspect_flags(), base_mip_level, mip_levels, layer, 1});
+
+		return typename detail::type_mapper<Image_Type>::flat_view(
+				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
+				component_mapping, ci.format, layer);
+	}
 };
 class image_1d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_1d, uint32_t> {
 	typedef single_image<image_1d, uint32_t> base_t;
@@ -366,6 +394,7 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
+	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };
@@ -405,6 +434,7 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
+	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };
@@ -446,6 +476,7 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
+	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };
@@ -465,6 +496,7 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
+	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };

@@ -24,11 +24,15 @@ class image_view {
 	uint32_t mip_levels_;
 	vk::ComponentMapping component_mapping_;
 	vk::Format format_;
+	uint32_t base_layer_;
+	uint32_t layers_;
 
 	image_view(vk::UniqueImageView native_view, uint32_t base_mip_level, uint32_t mip_levels,
-			   vk::ComponentMapping component_mapping, vk::Format format)
+			   vk::ComponentMapping component_mapping, vk::Format format, uint32_t base_layer = 0,
+			   uint32_t layers = 1)
 			: native_view_{std::move(native_view)}, base_mip_level_{base_mip_level}, mip_levels_{mip_levels},
-			  component_mapping_{component_mapping}, format_{format} {}
+			  component_mapping_{component_mapping}, format_{format}, base_layer_{base_layer},
+			  layers_{layers} {}
 
 public:
 	image_view(image_view&& other) = default;
