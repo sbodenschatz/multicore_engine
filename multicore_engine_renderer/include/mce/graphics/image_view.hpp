@@ -20,16 +20,24 @@ class tag_cube {};
 template <typename Tag, bool layered = false>
 class image_view {
 	vk::UniqueImageView native_view_;
+	uint32_t base_mip_level_;
+	uint32_t mip_levels_;
+	vk::ComponentMapping component_mapping_;
 
-	image_view(vk::UniqueImageView native_view) : native_view_{std::move(native_view)} {}
+	image_view(vk::UniqueImageView native_view, uint32_t base_mip_level, uint32_t mip_levels,
+			   vk::ComponentMapping component_mapping)
+			: native_view_{std::move(native_view)}, base_mip_level_{base_mip_level}, mip_levels_{mip_levels},
+			  component_mapping_{component_mapping} {}
 
 public:
+	image_view(image_view&& other) = default;
+	image_view& operator=(image_view&& other) = default;
 	~image_view() {
 		// TODO: Insert resources into deletion manager.
 	}
 
 	template <typename, typename>
-	friend class image;
+	friend class single_image;
 };
 
 } // namespace graphics
