@@ -213,8 +213,9 @@ protected:
 		vk::ImageCreateInfo ci(
 				(mutable_format ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags{}) |
 						detail::type_mapper<Image_Type>::base_flags(),
-				detail::type_mapper<Image_Type>::img_type, format, detail::to_extent_3d(size), 1, layers,
-				vk::SampleCountFlagBits::e1, tiling, usage, vk::SharingMode::eExclusive);
+				detail::type_mapper<Image_Type>::img_type, format, detail::to_extent_3d(size), 1,
+				layers * detail::type_mapper<Image_Type>::cube_layer_factor, vk::SampleCountFlagBits::e1,
+				tiling, usage, vk::SharingMode::eExclusive);
 		struct mip_visitor : boost::static_visitor<> {
 			uint32_t& mip_levels;
 			typename Image_Type::size_type size_;
@@ -330,8 +331,8 @@ public:
 				 bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 				 boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{},
 				 image_aspect_mode aspect_mode = image_aspect_mode::color)
-			: base_t(dev, mem_mgr, format, size, usage, static_cast<Image_Type*>(this)->layers(), layout,
-					 required_flags, mutable_format, tiling, mip_levels, aspect_mode) {}
+			: base_t(dev, mem_mgr, format, size, usage, 1, layout, required_flags, mutable_format, tiling,
+					 mip_levels, aspect_mode) {}
 
 	typename detail::type_mapper<Image_Type>::flat_view
 	create_view(uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
@@ -496,10 +497,6 @@ public:
 	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
-
-	uint32_t layers() const {
-		return 6;
-	}
 
 	typename detail::type_mapper<Image_Type>::side_view create_single_side_view(
 			uint32_t layer, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
