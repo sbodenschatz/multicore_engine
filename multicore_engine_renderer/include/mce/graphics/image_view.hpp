@@ -43,6 +43,10 @@ public:
 
 	template <typename, typename>
 	friend class single_image;
+	template <typename, typename>
+	friend class layered_image;
+	friend class image_cube;
+	friend class image_cube_layered;
 };
 
 } // namespace graphics

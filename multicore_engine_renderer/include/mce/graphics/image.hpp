@@ -481,6 +481,7 @@ public:
 class image_cube : DOXYGEN_ONLY_PUBLIC(private) single_image<image_cube, uint32_t> {
 	typedef single_image<image_cube, uint32_t> base_t;
 	friend class single_image<image_cube, uint32_t>;
+	using Image_Type = image_cube;
 
 public:
 	using base_t::single_image;
@@ -498,6 +499,32 @@ public:
 
 	uint32_t layers() const {
 		return 6;
+	}
+
+	typename detail::type_mapper<Image_Type>::side_view create_single_side_view(
+			uint32_t layer, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		vk::ImageViewCreateInfo ci({}, native_image(), detail::type_mapper<Image_Type>::side_view_type,
+								   view_format.value_or(format()), component_mapping,
+								   {default_aspect_flags(), base_mip_level, mip_levels, layer, 1});
+
+		return typename detail::type_mapper<Image_Type>::side_view(
+				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
+				component_mapping, ci.format, layer);
+	}
+	typename detail::type_mapper<Image_Type>::layered_side_view
+	create_layered_side_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
+							 uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+							 vk::ComponentMapping component_mapping = {},
+							 boost::optional<vk::Format> view_format = {}) {
+		vk::ImageViewCreateInfo ci({}, native_image(),
+								   detail::type_mapper<Image_Type>::layered_side_view_type,
+								   view_format.value_or(format()), component_mapping,
+								   {default_aspect_flags(), base_mip_level, mip_levels, base_layer, layers});
+
+		return typename detail::type_mapper<Image_Type>::layered_side_view(
+				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
+				component_mapping, ci.format, base_layer, layers);
 	}
 };
 
