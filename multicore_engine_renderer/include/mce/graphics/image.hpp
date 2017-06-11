@@ -395,7 +395,10 @@ public:
 								   view_format.value_or(format()), component_mapping,
 								   {default_aspect_flags(), base_mip_level, mip_levels,
 									base_layer * detail::type_mapper<Image_Type>::cube_layer_factor,
-									layers * detail::type_mapper<Image_Type>::cube_layer_factor});
+									VK_REMAINING_ARRAY_LAYERS});
+		if(layers != VK_REMAINING_ARRAY_LAYERS) {
+			ci.subresourceRange.setLayerCount(layers * detail::type_mapper<Image_Type>::cube_layer_factor);
+		}
 
 		return typename detail::type_mapper<Image_Type>::flat_view(
 				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
