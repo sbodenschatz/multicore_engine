@@ -84,7 +84,7 @@ struct type_mapper<image_1d> {
 	using flat_view = image_view<tag_1d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
-	static constexpr int cube_layer_factor = 1;
+	static constexpr uint32_t cube_layer_factor = 1;
 	static vk::ImageCreateFlags base_flags() {
 		return {};
 	}
@@ -95,7 +95,7 @@ struct type_mapper<image_2d> {
 	using flat_view = image_view<tag_2d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
-	static constexpr int cube_layer_factor = 1;
+	static constexpr uint32_t cube_layer_factor = 1;
 	static vk::ImageCreateFlags base_flags() {
 		return {};
 	}
@@ -108,7 +108,7 @@ struct type_mapper<image_3d> {
 	static constexpr vk::ImageType img_type = vk::ImageType::e3D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e3D;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e2DArray;
-	static constexpr int cube_layer_factor = 1;
+	static constexpr uint32_t cube_layer_factor = 1;
 	static vk::ImageCreateFlags base_flags() {
 		return vk::ImageCreateFlagBits::e2DArrayCompatibleKHR;
 	}
@@ -123,7 +123,7 @@ struct type_mapper<image_cube> {
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::eCube;
 	static constexpr vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
 	static constexpr vk::ImageViewType side_view_type = vk::ImageViewType::e2D;
-	static constexpr int cube_layer_factor = 6;
+	static constexpr uint32_t cube_layer_factor = 6;
 	static vk::ImageCreateFlags base_flags() {
 		return vk::ImageCreateFlagBits::eCubeCompatible;
 	}
@@ -136,7 +136,7 @@ struct type_mapper<image_2d_layered> {
 	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e2DArray;
-	static constexpr int cube_layer_factor = 1;
+	static constexpr uint32_t cube_layer_factor = 1;
 	static vk::ImageCreateFlags base_flags() {
 		return {};
 	}
@@ -149,7 +149,7 @@ struct type_mapper<image_1d_layered> {
 	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e1DArray;
-	static constexpr int cube_layer_factor = 1;
+	static constexpr uint32_t cube_layer_factor = 1;
 	static vk::ImageCreateFlags base_flags() {
 		return {};
 	}
@@ -165,7 +165,7 @@ struct type_mapper<image_cube_layered> {
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::eCubeArray;
 	static constexpr vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
 	static constexpr vk::ImageViewType side_view_type = vk::ImageViewType::e2D;
-	static constexpr int cube_layer_factor = 6;
+	static constexpr uint32_t cube_layer_factor = 6;
 	static vk::ImageCreateFlags base_flags() {
 		return vk::ImageCreateFlagBits::eCubeCompatible;
 	}
