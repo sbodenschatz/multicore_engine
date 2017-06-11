@@ -41,6 +41,34 @@ public:
 		// TODO: Insert resources into deletion manager.
 	}
 
+	uint32_t base_layer() const {
+		return base_layer_;
+	}
+
+	uint32_t base_mip_level() const {
+		return base_mip_level_;
+	}
+
+	const vk::ComponentMapping& component_mapping() const {
+		return component_mapping_;
+	}
+
+	vk::Format format() const {
+		return format_;
+	}
+
+	uint32_t layers() const {
+		return layers_;
+	}
+
+	uint32_t mip_levels() const {
+		return mip_levels_;
+	}
+
+	const vk::ImageView& native_view() const {
+		return *native_view_;
+	}
+
 	template <typename, typename>
 	friend class single_image;
 	template <typename, typename>
