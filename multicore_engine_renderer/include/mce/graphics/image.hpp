@@ -18,6 +18,7 @@
 #include <glm/gtx/component_wise.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_handle.hpp>
+#include <mce/graphics/image_view.hpp>
 #include <mce/util/math_tools.hpp>
 #include <vulkan/vulkan.hpp>
 
@@ -38,7 +39,7 @@ class tag_2d;
 class tag_3d;
 class tag_cube;
 
-template <typename Tag, bool layered = false>
+template <typename Tag, bool layered>
 class image_view;
 
 namespace detail {
@@ -69,9 +70,9 @@ struct extent_converter<3> {
 	}
 };
 
-template <typename T, typename P, P p, template <typename, P> class Vector_Type>
+template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
 vk::Extent3D to_extent_3d(const Vector_Type<T, p>& v) {
-	return extent_converter<util::vector_size(v)>::convert_to_extent_3d();
+	return extent_converter<util::vector_size<Vector_Type<T, p>>::value>::convert_to_extent_3d(v);
 }
 
 template <typename Img>
@@ -80,22 +81,22 @@ struct type_mapper {};
 template <>
 struct type_mapper<image_1d> {
 	using flat_view = image_view<tag_1d>;
-	vk::ImageType img_type = vk::ImageType::e1D;
-	vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
+	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
+	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
 };
 
 template <>
 struct type_mapper<image_2d> {
 	using flat_view = image_view<tag_2d>;
-	vk::ImageType img_type = vk::ImageType::e2D;
-	vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
+	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
+	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
 };
 
 template <>
 struct type_mapper<image_3d> {
 	using flat_view = image_view<tag_3d>;
-	vk::ImageType img_type = vk::ImageType::e3D;
-	vk::ImageViewType flat_view_type = vk::ImageViewType::e3D;
+	static constexpr vk::ImageType img_type = vk::ImageType::e3D;
+	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e3D;
 };
 
 template <>
@@ -103,28 +104,28 @@ struct type_mapper<image_cube> {
 	using flat_view = image_view<tag_cube>;
 	using layered_side_view = image_view<tag_2d, true>;
 	using side_view = image_view<tag_2d>;
-	vk::ImageType img_type = vk::ImageType::e2D;
-	vk::ImageViewType flat_view_type = vk::ImageViewType::eCube;
-	vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
-	vk::ImageViewType side_view_type = vk::ImageViewType::e2D;
+	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
+	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::eCube;
+	static constexpr vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
+	static constexpr vk::ImageViewType side_view_type = vk::ImageViewType::e2D;
 };
 
 template <>
 struct type_mapper<image_2d_layered> {
 	using layered_view = image_view<tag_2d, true>;
 	using flat_view = image_view<tag_2d>;
-	vk::ImageType img_type = vk::ImageType::e2D;
-	vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
-	vk::ImageViewType layered_view_type = vk::ImageViewType::e2DArray;
+	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
+	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
+	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e2DArray;
 };
 
 template <>
 struct type_mapper<image_1d_layered> {
 	using layered_view = image_view<tag_1d, true>;
 	using flat_view = image_view<tag_1d>;
-	vk::ImageType img_type = vk::ImageType::e1D;
-	vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
-	vk::ImageViewType layered_view_type = vk::ImageViewType::e1DArray;
+	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
+	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
+	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e1DArray;
 };
 template <>
 struct type_mapper<image_cube_layered> {
@@ -132,11 +133,11 @@ struct type_mapper<image_cube_layered> {
 	using layered_view = image_view<tag_cube, true>;
 	using layered_side_view = image_view<tag_2d, true>;
 	using side_view = image_view<tag_2d>;
-	vk::ImageType img_type = vk::ImageType::e2D;
-	vk::ImageViewType flat_view_type = vk::ImageViewType::eCube;
-	vk::ImageViewType layered_view_type = vk::ImageViewType::eCubeArray;
-	vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
-	vk::ImageViewType side_view_type = vk::ImageViewType::e2D;
+	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
+	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::eCube;
+	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::eCubeArray;
+	static constexpr vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
+	static constexpr vk::ImageViewType side_view_type = vk::ImageViewType::e2D;
 };
 
 } // namespace detail
@@ -177,8 +178,7 @@ protected:
 		  boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{},
 		  image_aspect_mode aspect_mode = image_aspect_mode::color)
 			: dev_{dev}, format_{format}, size_{size}, usage_{usage}, layout_{layout},
-			  mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{mip_levels},
-			  aspect_mode_{aspect_mode} {
+			  mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{1}, aspect_mode_{aspect_mode} {
 		vk::ImageCreateInfo ci(
 				mutable_format ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags{},
 				detail::type_mapper<Image_Type>::img_type, format, detail::to_extent_3d(size), 1, layers,
@@ -186,11 +186,13 @@ protected:
 		struct mip_visitor : boost::static_visitor<> {
 			uint32_t& mip_levels;
 			typename Image_Type::size_type size_;
+			mip_visitor(uint32_t& mip_levels, typename Image_Type::size_type size)
+					: mip_levels{mip_levels}, size_{size} {}
 			void operator()(uint32_t mips) const {
 				mip_levels = mips;
 			}
 			void operator()(full_mip_chain) const {
-				mip_levels = 1 + floor(log2(util::component_max(size_)));
+				mip_levels = uint32_t(1 + floor(log2(util::component_max(size_))));
 			}
 		};
 		mip_visitor mv{mip_levels_, size};
@@ -288,11 +290,7 @@ protected:
 	using base_t::default_aspect_flags;
 	using base_t::dev;
 
-#ifdef DOXYGEN
 public:
-#else
-protected:
-#endif
 	single_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
 				 typename base_t::size_type size, vk::ImageUsageFlags usage,
 				 vk::ImageLayout layout = vk::ImageLayout::eGeneral,
@@ -311,7 +309,8 @@ protected:
 								   {default_aspect_flags(), base_mip_level, mip_levels, 0, 1});
 
 		return typename detail::type_mapper<Image_Type>::flat_view(
-				dev().native_device().createImageViewUnique(ci));
+				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
+				component_mapping);
 	}
 };
 
@@ -339,11 +338,7 @@ public:
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 
-#ifdef DOXYGEN
 public:
-#else
-protected:
-#endif
 	layered_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
 				  typename base_t::size_type size, vk::ImageUsageFlags usage, uint32_t layers,
 				  vk::ImageLayout layout = vk::ImageLayout::eGeneral,
@@ -357,6 +352,7 @@ protected:
 };
 class image_1d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_1d, uint32_t> {
 	typedef single_image<image_1d, uint32_t> base_t;
+	friend class single_image<image_1d, uint32_t>;
 
 public:
 	using base_t::single_image;
@@ -375,6 +371,7 @@ public:
 
 class image_2d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_2d, glm::uvec2> {
 	typedef single_image<image_2d, glm::uvec2> base_t;
+	friend class single_image<image_2d, glm::uvec2>;
 
 public:
 	using base_t::single_image;
@@ -387,12 +384,14 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
+	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };
 
 class image_3d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_3d, glm::uvec3> {
 	typedef single_image<image_3d, glm::uvec3> base_t;
+	friend class single_image<image_3d, glm::uvec3>;
 
 public:
 	using base_t::single_image;
@@ -411,6 +410,7 @@ public:
 
 class image_cube : DOXYGEN_ONLY_PUBLIC(private) single_image<image_cube, uint32_t> {
 	typedef single_image<image_cube, uint32_t> base_t;
+	friend class single_image<image_cube, uint32_t>;
 
 public:
 	using base_t::single_image;
@@ -432,6 +432,7 @@ public:
 
 class image_1d_layered : DOXYGEN_ONLY_PUBLIC(private) single_image<image_1d_layered, uint32_t> {
 	typedef single_image<image_1d_layered, uint32_t> base_t;
+	friend class single_image<image_1d_layered, uint32_t>;
 
 public:
 	using base_t::single_image;
@@ -450,6 +451,7 @@ public:
 
 class image_2d_layered : DOXYGEN_ONLY_PUBLIC(private) single_image<image_2d_layered, glm::uvec2> {
 	typedef single_image<image_2d_layered, glm::uvec2> base_t;
+	friend class single_image<image_2d_layered, glm::uvec2>;
 
 public:
 	using base_t::single_image;
@@ -468,6 +470,7 @@ public:
 
 class image_cube_layered : DOXYGEN_ONLY_PUBLIC(private) single_image<image_cube_layered, uint32_t> {
 	typedef single_image<image_cube_layered, uint32_t> base_t;
+	friend class single_image<image_cube_layered, uint32_t>;
 
 public:
 	using base_t::single_image;
