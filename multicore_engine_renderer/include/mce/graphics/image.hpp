@@ -84,6 +84,10 @@ struct type_mapper<image_1d> {
 	using flat_view = image_view<tag_1d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
+	static constexpr int cube_layer_factor = 1;
+	static vk::ImageCreateFlags base_flags() {
+		return {};
+	}
 };
 
 template <>
@@ -91,13 +95,23 @@ struct type_mapper<image_2d> {
 	using flat_view = image_view<tag_2d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
+	static constexpr int cube_layer_factor = 1;
+	static vk::ImageCreateFlags base_flags() {
+		return {};
+	}
 };
 
 template <>
 struct type_mapper<image_3d> {
 	using flat_view = image_view<tag_3d>;
+	using layered_side_view = image_view<tag_2d, true>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e3D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e3D;
+	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e2DArray;
+	static constexpr int cube_layer_factor = 1;
+	static vk::ImageCreateFlags base_flags() {
+		return vk::ImageCreateFlagBits::e2DArrayCompatibleKHR;
+	}
 };
 
 template <>
@@ -109,6 +123,10 @@ struct type_mapper<image_cube> {
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::eCube;
 	static constexpr vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
 	static constexpr vk::ImageViewType side_view_type = vk::ImageViewType::e2D;
+	static constexpr int cube_layer_factor = 6;
+	static vk::ImageCreateFlags base_flags() {
+		return vk::ImageCreateFlagBits::eCubeCompatible;
+	}
 };
 
 template <>
@@ -118,6 +136,10 @@ struct type_mapper<image_2d_layered> {
 	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e2DArray;
+	static constexpr int cube_layer_factor = 1;
+	static vk::ImageCreateFlags base_flags() {
+		return {};
+	}
 };
 
 template <>
@@ -127,6 +149,10 @@ struct type_mapper<image_1d_layered> {
 	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e1DArray;
+	static constexpr int cube_layer_factor = 1;
+	static vk::ImageCreateFlags base_flags() {
+		return {};
+	}
 };
 template <>
 struct type_mapper<image_cube_layered> {
@@ -139,6 +165,10 @@ struct type_mapper<image_cube_layered> {
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::eCubeArray;
 	static constexpr vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
 	static constexpr vk::ImageViewType side_view_type = vk::ImageViewType::e2D;
+	static constexpr int cube_layer_factor = 6;
+	static vk::ImageCreateFlags base_flags() {
+		return vk::ImageCreateFlagBits::eCubeCompatible;
+	}
 };
 
 } // namespace detail
@@ -181,7 +211,8 @@ protected:
 			: dev_{dev}, format_{format}, size_{size}, usage_{usage}, layout_{layout},
 			  mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{1}, aspect_mode_{aspect_mode} {
 		vk::ImageCreateInfo ci(
-				mutable_format ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags{},
+				(mutable_format ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags{}) |
+						detail::type_mapper<Image_Type>::base_flags(),
 				detail::type_mapper<Image_Type>::img_type, format, detail::to_extent_3d(size), 1, layers,
 				vk::SampleCountFlagBits::e1, tiling, usage, vk::SharingMode::eExclusive);
 		struct mip_visitor : boost::static_visitor<> {
@@ -307,7 +338,8 @@ public:
 				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
 		vk::ImageViewCreateInfo ci({}, native_image(), detail::type_mapper<Image_Type>::flat_view_type,
 								   view_format.value_or(format()), component_mapping,
-								   {default_aspect_flags(), base_mip_level, mip_levels, 0, 1});
+								   {default_aspect_flags(), base_mip_level, mip_levels, 0,
+									detail::type_mapper<Image_Type>::cube_layer_factor});
 
 		return typename detail::type_mapper<Image_Type>::flat_view(
 				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
@@ -361,7 +393,9 @@ public:
 				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
 		vk::ImageViewCreateInfo ci({}, native_image(), detail::type_mapper<Image_Type>::flat_view_type,
 								   view_format.value_or(format()), component_mapping,
-								   {default_aspect_flags(), base_mip_level, mip_levels, base_layer, layers});
+								   {default_aspect_flags(), base_mip_level, mip_levels,
+									base_layer * detail::type_mapper<Image_Type>::cube_layer_factor,
+									layers * detail::type_mapper<Image_Type>::cube_layer_factor});
 
 		return typename detail::type_mapper<Image_Type>::flat_view(
 				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
@@ -372,7 +406,9 @@ public:
 			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
 		vk::ImageViewCreateInfo ci({}, native_image(), detail::type_mapper<Image_Type>::flat_view_type,
 								   view_format.value_or(format()), component_mapping,
-								   {default_aspect_flags(), base_mip_level, mip_levels, layer, 1});
+								   {default_aspect_flags(), base_mip_level, mip_levels,
+									layer * detail::type_mapper<Image_Type>::cube_layer_factor,
+									detail::type_mapper<Image_Type>::cube_layer_factor});
 
 		return typename detail::type_mapper<Image_Type>::flat_view(
 				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
@@ -453,6 +489,7 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
+	using base_t::create_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 
@@ -518,6 +555,8 @@ public:
 	using base_t::tiling;
 	using base_t::tracked_layout;
 	using base_t::usage;
+	using base_t::create_view;
+	using base_t::create_single_layer_view;
 	using typename base_t::size_type;
 	using typename base_t::full_mip_chain;
 };
