@@ -13,6 +13,7 @@
 #define DOXYGEN_ONLY_PUBLIC(REAL) REAL
 #endif
 
+#include <boost/optional.hpp>
 #include <boost/variant.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/component_wise.hpp>
@@ -303,14 +304,14 @@ public:
 
 	typename detail::type_mapper<Image_Type>::flat_view
 	create_view(uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
-				vk::ComponentMapping component_mapping = {}) {
+				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
 		vk::ImageViewCreateInfo ci({}, native_image(), detail::type_mapper<Image_Type>::flat_view_type,
-								   format(), component_mapping,
+								   view_format.value_or(format()), component_mapping,
 								   {default_aspect_flags(), base_mip_level, mip_levels, 0, 1});
 
 		return typename detail::type_mapper<Image_Type>::flat_view(
 				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
-				component_mapping);
+				component_mapping, ci.format);
 	}
 };
 
