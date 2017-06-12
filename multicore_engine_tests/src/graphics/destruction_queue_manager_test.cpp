@@ -140,6 +140,7 @@ TEST(graphics_destruction_queue_manager_test, destruction_order_handle) {
 	ASSERT_EQ(7, mm.status().at(7));
 	ASSERT_EQ(8, mm.status().at(8));
 	ASSERT_EQ(9, mm.status().at(9));
+	ASSERT_EQ(10, mm.status().at(10));
 }
 
 } // namespace graphics
