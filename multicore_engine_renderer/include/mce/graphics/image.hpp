@@ -26,6 +26,7 @@
 #include <mce/graphics/device_memory_handle.hpp>
 #include <mce/graphics/image_view.hpp>
 #include <mce/util/math_tools.hpp>
+#include <type_traits>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
@@ -74,6 +75,10 @@ struct extent_converter<3> {
 template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
 vk::Extent3D to_extent_3d(const Vector_Type<T, p>& v) {
 	return extent_converter<util::vector_size<Vector_Type<T, p>>::value>::convert_to_extent_3d(v);
+}
+template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
+vk::Extent3D to_extent_3d(T v) {
+	return extent_converter<1>::convert_to_extent_3d(v);
 }
 
 template <typename Img>
