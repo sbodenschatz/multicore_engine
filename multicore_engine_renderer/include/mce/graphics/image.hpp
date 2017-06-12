@@ -456,6 +456,7 @@ protected:
 	using base_t::dev;
 
 public:
+	/// Constructs an image using the given parameters and associates it with memory from the given manager.
 	layered_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
 				  typename base_t::size_type size, vk::ImageUsageFlags usage, uint32_t layers,
 				  vk::ImageLayout layout = vk::ImageLayout::eGeneral,
@@ -467,6 +468,7 @@ public:
 					 tiling, mip_levels, aspect_mode),
 			  layers_{layers} {}
 
+	/// Creates and returns a layered image view for the image object using the given view parameters.
 	typename detail::type_mapper<Image_Type>::layered_view
 	create_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
 				uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
@@ -484,6 +486,8 @@ public:
 				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
 				component_mapping, ci.format, base_layer, layers);
 	}
+	/// \brief Creates and returns an image view of a single layer of the image object using the given view
+	/// parameters.
 	typename detail::type_mapper<Image_Type>::flat_view create_single_layer_view(
 			uint32_t layer, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
