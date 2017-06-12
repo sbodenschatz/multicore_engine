@@ -26,25 +26,25 @@ struct vector_size {};
 /// Determines the number of components in a glm vector.
 template <typename T, glm::precision p>
 struct vector_size<glm::tvec1<T, p>> {
-	static constexpr int value = 1;
+	static constexpr int value = 1; ///< Represents the size of a glm::tvec1 (=1).
 };
 
 /// Determines the number of components in a glm vector.
 template <typename T, glm::precision p>
 struct vector_size<glm::tvec2<T, p>> {
-	static constexpr int value = 2;
+	static constexpr int value = 2; ///< Represents the size of a glm::tvec2 (=2).
 };
 
 /// Determines the number of components in a glm vector.
 template <typename T, glm::precision p>
 struct vector_size<glm::tvec3<T, p>> {
-	static constexpr int value = 3;
+	static constexpr int value = 3; ///< Represents the size of a glm::tvec3 (=3).
 };
 
 /// Determines the number of components in a glm vector.
 template <typename T, glm::precision p>
 struct vector_size<glm::tvec4<T, p>> {
-	static constexpr int value = 4;
+	static constexpr int value = 4; ///< Represents the size of a glm::tvec4 (=4).
 };
 
 /// Returns the maximum value of all components a glm vector.
