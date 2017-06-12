@@ -15,14 +15,27 @@ destruction_queue_manager::~destruction_queue_manager() {
 		dev_.native_device().waitIdle();
 	} catch(...) {
 	}
-	// TODO: Ordering
+	reset_visitor v;
+	/// Ensure destruction in queue order.
+	for(uint32_t i = (current_ring_index + 1) % ring_slots; i != current_ring_index;
+		i = (i + 1) % ring_slots) {
+		for(auto& e : queues[i]) {
+			e.apply_visitor(v);
+		}
+	}
+	for(auto& e : queues[current_ring_index]) {
+		e.apply_visitor(v);
+	}
 	queues.clear();
 }
 
 void destruction_queue_manager::cleanup_and_set_current(uint32_t ring_index) {
 	std::lock_guard<std::mutex> lock(queue_mutex);
 	current_ring_index = ring_index;
-	/// TODO: Ordering
+	reset_visitor v;
+	for(auto& e : queues[current_ring_index]) {
+		e.apply_visitor(v);
+	}
 	queues[current_ring_index].clear();
 }
 

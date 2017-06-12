@@ -31,6 +31,14 @@ class destruction_queue_manager {
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
 
+	struct reset_visitor : boost::static_visitor<> {
+		void operator()(boost::blank&) {}
+		template <typename T>
+		void operator()(T& handle) {
+			handle.reset();
+		}
+	};
+
 public:
 	destruction_queue_manager(device& dev, uint32_t ring_slots) : dev_{dev}, ring_slots{ring_slots} {}
 	~destruction_queue_manager();
