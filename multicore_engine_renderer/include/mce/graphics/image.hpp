@@ -7,6 +7,11 @@
 #ifndef MCE_GRAPHICS_IMAGE_HPP_
 #define MCE_GRAPHICS_IMAGE_HPP_
 
+/**
+ * \file
+ * Defines the classes that manage images and their associated storage.
+ */
+
 #ifdef DOXYGEN
 #define DOXYGEN_ONLY_PUBLIC(REAL) public
 #else
@@ -171,8 +176,13 @@ struct type_mapper<image_cube_layered> {
 template <typename Image_Type, typename Size_Type>
 class single_image;
 
+/// Defines the aspect modes for an, specifying which aspect(s) it consists of.
 enum class image_aspect_mode { color, depth, stencil, depth_stencil };
 
+/// Implementation base for all image classes defining the common functionality for images.
+/**
+ * \warning Not to be used polymorphically.
+ */
 template <typename Image_Type, typename Size_Type>
 class image {
 	device& dev_;
@@ -188,8 +198,10 @@ class image {
 	image_aspect_mode aspect_mode_;
 
 public:
+	/// Defines the type used for the size of the image (unsigned integer, varies in dimensionality).
 	using size_type = Size_Type;
 
+	/// Tag type to signal to the constructor, that the image should use the full chain of mip map levels.
 	struct full_mip_chain {};
 
 #ifdef DOXYGEN
@@ -302,14 +314,23 @@ public:
 	}
 };
 
+/// Implementation base class for non-array images.
+/**
+ * \warning Not to be used polymorphically.
+ */
 template <typename Image_Type, typename Size_Type>
 class single_image : DOXYGEN_ONLY_PUBLIC(protected) image<Image_Type, Size_Type> {
 public:
+	/// Reflects the type of the base class.
 	typedef image<Image_Type, Size_Type> base_t;
 	friend class image_1d;
 	friend class image_2d;
 	friend class image_3d;
 
+	/// Returns the number of layers in the image (always 1 for single_image).
+	/**
+	 * A cube map also counts as one layer here even though it consists of multiple physical layers.
+	 */
 	uint32_t layers() const {
 		return 1;
 	}
@@ -355,15 +376,24 @@ public:
 	}
 };
 
+/// Implementation base class for array images.
+/**
+ * \warning Not to be used polymorphically.
+ */
 template <typename Image_Type, typename Size_Type>
 class layered_image : DOXYGEN_ONLY_PUBLIC(protected) image<Image_Type, Size_Type> {
 	uint32_t layers_;
 
 public:
+	/// Reflects the type of the base class.
 	typedef image<Image_Type, Size_Type> base_t;
 	friend class image_1d;
 	friend class image_2d;
 
+	/// Returns the number of array image layers in the image.
+	/**
+	 * A cube map also counts as one layer here even though it consists of multiple physical layers.
+	 */
 	uint32_t layers() const {
 		return layers_;
 	}
@@ -427,6 +457,8 @@ public:
 				component_mapping, ci.format, layer);
 	}
 };
+
+/// Represents a 1-dimensional non-array image object with the associated resources.
 class image_1d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_1d, uint32_t> {
 	typedef single_image<image_1d, uint32_t> base_t;
 	friend class single_image<image_1d, uint32_t>;
@@ -448,6 +480,7 @@ public:
 	using base_t::generate_transition;
 };
 
+/// Represents a 2-dimensional non-array image object with the associated resources.
 class image_2d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_2d, glm::uvec2> {
 	typedef single_image<image_2d, glm::uvec2> base_t;
 	friend class single_image<image_2d, glm::uvec2>;
@@ -469,6 +502,7 @@ public:
 	using base_t::generate_transition;
 };
 
+/// Represents a 3-dimensional non-array image object with the associated resources.
 class image_3d : DOXYGEN_ONLY_PUBLIC(private) single_image<image_3d, glm::uvec3> {
 	typedef single_image<image_3d, glm::uvec3> base_t;
 	friend class single_image<image_3d, glm::uvec3>;
@@ -490,6 +524,7 @@ public:
 	using base_t::generate_transition;
 };
 
+/// Represents a non-array cube map image object with the associated resources.
 class image_cube : DOXYGEN_ONLY_PUBLIC(private) single_image<image_cube, uint32_t> {
 	typedef single_image<image_cube, uint32_t> base_t;
 	friend class single_image<image_cube, uint32_t>;
@@ -537,6 +572,7 @@ public:
 	}
 };
 
+/// Represents a 1-dimensional array image object with the associated resources.
 class image_1d_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_1d_layered, uint32_t> {
 	typedef layered_image<image_1d_layered, uint32_t> base_t;
 	friend class layered_image<image_1d_layered, uint32_t>;
@@ -559,6 +595,7 @@ public:
 	using base_t::generate_transition;
 };
 
+/// Represents a 1-dimensional array image object with the associated resources.
 class image_2d_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_2d_layered, glm::uvec2> {
 	typedef layered_image<image_2d_layered, glm::uvec2> base_t;
 	friend class layered_image<image_2d_layered, glm::uvec2>;
@@ -581,6 +618,7 @@ public:
 	using base_t::generate_transition;
 };
 
+/// Represents an array cube map image object with the associated resources.
 class image_cube_layered : DOXYGEN_ONLY_PUBLIC(private) layered_image<image_cube_layered, uint32_t> {
 	typedef layered_image<image_cube_layered, uint32_t> base_t;
 	friend class layered_image<image_cube_layered, uint32_t>;
