@@ -13,6 +13,7 @@
  */
 
 #ifdef DOXYGEN
+/// Workaround for Doxygen not correctly handling using declarations.
 #define DOXYGEN_ONLY_PUBLIC(REAL) public
 #else
 #define DOXYGEN_ONLY_PUBLIC(REAL) REAL
