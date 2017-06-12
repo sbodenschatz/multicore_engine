@@ -68,27 +68,48 @@ public:
 	};
 
 private:
-	using element =
-			boost::variant<boost::blank, vk::UniqueBuffer, vk::UniqueBufferView, vk::UniqueCommandBuffer,
-						   vk::UniqueCommandPool, vk::UniqueDescriptorPool, vk::UniqueDescriptorSet,
-						   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
-						   vk::UniqueImageView, vk::UniquePipeline, vk::UniqueQueryPool, vk::UniqueRenderPass,
-						   vk::UniqueSampler, vk::UniqueSemaphore, vk::UniqueShaderModule,
-						   vk::UniqueSurfaceKHR, vk::UniqueSwapchainKHR, device_memory_handle,
-						   executor<std::function<void()>>>;
+	struct element {
+		struct reset_visitor : boost::static_visitor<> {
+			void operator()(boost::blank&) {}
+			template <typename T>
+			void operator()(T& handle) {
+				handle.reset();
+			}
+		};
+		boost::variant<boost::blank, vk::UniqueBuffer, vk::UniqueBufferView, vk::UniqueCommandBuffer,
+					   vk::UniqueCommandPool, vk::UniqueDescriptorPool, vk::UniqueDescriptorSet,
+					   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
+					   vk::UniqueImageView, vk::UniquePipeline, vk::UniqueQueryPool, vk::UniqueRenderPass,
+					   vk::UniqueSampler, vk::UniqueSemaphore, vk::UniqueShaderModule, vk::UniqueSurfaceKHR,
+					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>>
+				data;
+		template <typename T>
+		element(T&& data) : data{std::move(data)} {}
+		element(element&& other) noexcept {
+			try {
+				data = std::move(other.data);
+			} catch(...) {
+				data = boost::blank{};
+			}
+		}
+		element& operator=(element&& other) noexcept {
+			try {
+				data = std::move(other.data);
+			} catch(...) {
+				data = boost::blank{};
+			}
+			return *this;
+		}
+		void reset() {
+			reset_visitor v;
+			data.apply_visitor(v);
+		}
+	};
 	std::mutex queue_mutex;
 	device* dev_;
 	std::vector<std::vector<element>> queues;
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
-
-	struct reset_visitor : boost::static_visitor<> {
-		void operator()(boost::blank&) {}
-		template <typename T>
-		void operator()(T& handle) {
-			handle.reset();
-		}
-	};
 
 public:
 	/// Creates a destruction queue manager for the given device and with the given number of queues.
