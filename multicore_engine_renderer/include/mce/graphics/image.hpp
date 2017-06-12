@@ -590,6 +590,8 @@ public:
 	using typename base_t::full_mip_chain;
 	using base_t::generate_transition;
 
+	/// \brief Creates and returns an image view of a single side of the cube map image object using the given
+	/// view parameters.
 	typename detail::type_mapper<Image_Type>::side_view create_single_side_view(
 			uint32_t layer, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
@@ -601,6 +603,11 @@ public:
 				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
 				component_mapping, ci.format, layer);
 	}
+	/// \brief Creates and returns an image view of sides of the cube map image object using the given
+	/// view parameters.
+	/**
+	 * Each side forms a separate layer.
+	 */
 	typename detail::type_mapper<Image_Type>::layered_side_view
 	create_layered_side_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
 							 uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
