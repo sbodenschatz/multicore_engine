@@ -18,7 +18,4 @@ int main() {
 	mce::glfw::window w("Test", {800, 600});
 	mce::graphics::window win(ai, w, dev);
 	mce::graphics::device_memory_manager mm(&dev, 1u << 26);
-	mce::graphics::image_2d img(dev, mm, vk::Format::eA8B8G8R8UnormPack32, {1024, 1024},
-								vk::ImageUsageFlagBits::eSampled, vk::ImageLayout::eShaderReadOnlyOptimal);
-	auto iv = img.create_view();
 }
