@@ -487,7 +487,7 @@ public:
 			ci.subresourceRange.setLayerCount(layers * detail::type_mapper<Image_Type>::cube_layer_factor);
 		}
 
-		return typename detail::type_mapper<Image_Type>::flat_view(
+		return typename detail::type_mapper<Image_Type>::layered_view(
 				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
 				component_mapping, ci.format, base_layer, layers);
 	}
