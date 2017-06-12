@@ -12,7 +12,7 @@ namespace graphics {
 
 destruction_queue_manager::~destruction_queue_manager() {
 	try {
-		dev_.native_device().waitIdle();
+		if(dev_) dev_->native_device().waitIdle();
 	} catch(...) {
 	}
 	reset_visitor v;

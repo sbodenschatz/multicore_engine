@@ -77,7 +77,7 @@ private:
 						   vk::UniqueSurfaceKHR, vk::UniqueSwapchainKHR, device_memory_handle,
 						   executor<std::function<void()>>>;
 	std::mutex queue_mutex;
-	device& dev_;
+	device* dev_;
 	std::vector<std::vector<element>> queues;
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
@@ -92,7 +92,7 @@ private:
 
 public:
 	/// Creates a destruction queue manager for the given device and with the given number of queues.
-	destruction_queue_manager(device& dev, uint32_t ring_slots) : dev_{dev}, ring_slots{ring_slots} {}
+	destruction_queue_manager(device* dev, uint32_t ring_slots) : dev_{dev}, ring_slots{ring_slots} {}
 	/// \brief Destroys the destruction queue manager and all pending objects after ensuring completion by
 	/// waiting for the device to be idle.
 	~destruction_queue_manager();
