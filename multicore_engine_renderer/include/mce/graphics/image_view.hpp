@@ -12,10 +12,10 @@
 namespace mce {
 namespace graphics {
 
-class tag_1d {};
-class tag_2d {};
-class tag_3d {};
-class tag_cube {};
+class image_view_tag_1d {};
+class image_view_tag_2d {};
+class image_view_tag_3d {};
+class image_view_tag_cube {};
 
 template <typename Tag, bool layered = false>
 class image_view {
