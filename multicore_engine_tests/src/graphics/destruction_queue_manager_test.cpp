@@ -23,9 +23,8 @@ public:
 		EXPECT_GT(destroyed_map.size(), allocation.block_id);
 		destroyed_map[allocation.block_id] = deletion_index++;
 	}
-	device_memory_allocation
-	allocate(const vk::MemoryRequirements& ,
-			 vk::MemoryPropertyFlags  = vk::MemoryPropertyFlagBits::eDeviceLocal) {
+	device_memory_allocation allocate(const vk::MemoryRequirements&,
+									  vk::MemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal) {
 		device_memory_allocation a;
 		a.block_id = int32_t(destroyed_map.size());
 		destroyed_map.push_back(-1);
@@ -99,6 +98,48 @@ TEST(graphics_destruction_queue_manager_test, sufficient_retention_handle) {
 	ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), p2));
 	ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), p3));
 	ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), p4));
+}
+
+TEST(graphics_destruction_queue_manager_test, destruction_order_handle) {
+	destruction_queue_manager_test::test_memory_manager mm;
+	{
+		destruction_queue_manager dqm(nullptr, 3);
+		auto h0 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h1 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h2 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h3 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h4 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		dqm.enqueue(std::move(h4));
+		dqm.enqueue(std::move(h3));
+		dqm.enqueue(std::move(h2));
+		dqm.enqueue(std::move(h1));
+		dqm.enqueue(std::move(h0));
+		dqm.cleanup_and_set_current(1);
+		auto h5 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h6 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h7 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h8 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h9 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h10 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		dqm.enqueue(std::move(h5));
+		dqm.enqueue(std::move(h6));
+		dqm.enqueue(std::move(h7));
+		dqm.enqueue(std::move(h8));
+		dqm.enqueue(std::move(h9));
+		dqm.cleanup_and_set_current(2);
+		dqm.enqueue(std::move(h10));
+		dqm.cleanup_and_set_current(0);
+		ASSERT_EQ(4, mm.status().at(0));
+		ASSERT_EQ(3, mm.status().at(1));
+		ASSERT_EQ(2, mm.status().at(2));
+		ASSERT_EQ(1, mm.status().at(3));
+		ASSERT_EQ(0, mm.status().at(4));
+	}
+	ASSERT_EQ(5, mm.status().at(5));
+	ASSERT_EQ(6, mm.status().at(6));
+	ASSERT_EQ(7, mm.status().at(7));
+	ASSERT_EQ(8, mm.status().at(8));
+	ASSERT_EQ(9, mm.status().at(9));
 }
 
 } // namespace graphics
