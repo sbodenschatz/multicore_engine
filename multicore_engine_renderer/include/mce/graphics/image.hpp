@@ -130,6 +130,19 @@ struct type_mapper<image_cube> {
 };
 
 template <>
+struct type_mapper<image_1d_layered> {
+	using layered_view = image_view<image_view_dimension::dim_1d, true>;
+	using flat_view = image_view<image_view_dimension::dim_1d>;
+	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
+	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
+	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e1DArray;
+	static constexpr uint32_t cube_layer_factor = 1;
+	static vk::ImageCreateFlags base_flags() {
+		return {};
+	}
+};
+
+template <>
 struct type_mapper<image_2d_layered> {
 	using layered_view = image_view<image_view_dimension::dim_2d, true>;
 	using flat_view = image_view<image_view_dimension::dim_2d>;
@@ -142,18 +155,6 @@ struct type_mapper<image_2d_layered> {
 	}
 };
 
-template <>
-struct type_mapper<image_1d_layered> {
-	using layered_view = image_view<image_view_dimension::dim_1d, true>;
-	using flat_view = image_view<image_view_dimension::dim_1d>;
-	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
-	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
-	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e1DArray;
-	static constexpr uint32_t cube_layer_factor = 1;
-	static vk::ImageCreateFlags base_flags() {
-		return {};
-	}
-};
 template <>
 struct type_mapper<image_cube_layered> {
 	using flat_view = image_view<image_view_dimension::dim_cube>;
