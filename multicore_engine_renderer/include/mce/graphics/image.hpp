@@ -391,6 +391,7 @@ protected:
 	using base_t::dev;
 
 public:
+	/// Constructs an image using the given parameters and associates it with memory from the given manager.
 	single_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
 				 typename base_t::size_type size, vk::ImageUsageFlags usage,
 				 vk::ImageLayout layout = vk::ImageLayout::eGeneral,
@@ -401,6 +402,7 @@ public:
 			: base_t(dev, mem_mgr, format, size, usage, 1, layout, required_flags, mutable_format, tiling,
 					 mip_levels, aspect_mode) {}
 
+	/// Creates and returns an image view for the image object using the given view parameters.
 	typename detail::type_mapper<Image_Type>::flat_view
 	create_view(uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
