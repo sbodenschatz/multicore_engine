@@ -8,6 +8,7 @@
 #define MCE_GRAPHICS_DESTRUCTION_QUEUE_MANAGER_HPP_
 
 #include <boost/variant.hpp>
+#include <functional>
 #include <mce/graphics/device_memory_handle.hpp>
 #include <mutex>
 #include <vector>
@@ -18,13 +19,24 @@ namespace graphics {
 class device;
 
 class destruction_queue_manager {
+public:
+	template <typename F>
+	struct executor {
+		F f;
+		void reset() {
+			f();
+		}
+	};
+
+private:
 	using element =
 			boost::variant<boost::blank, vk::UniqueBuffer, vk::UniqueBufferView, vk::UniqueCommandBuffer,
 						   vk::UniqueCommandPool, vk::UniqueDescriptorPool, vk::UniqueDescriptorSet,
 						   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
 						   vk::UniqueImageView, vk::UniquePipeline, vk::UniqueQueryPool, vk::UniqueRenderPass,
 						   vk::UniqueSampler, vk::UniqueSemaphore, vk::UniqueShaderModule,
-						   vk::UniqueSurfaceKHR, vk::UniqueSwapchainKHR, device_memory_handle>;
+						   vk::UniqueSurfaceKHR, vk::UniqueSwapchainKHR, device_memory_handle,
+						   executor<std::function<void()>>>;
 	std::mutex queue_mutex;
 	device& dev_;
 	std::vector<std::vector<element>> queues;
