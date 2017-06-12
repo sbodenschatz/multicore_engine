@@ -35,12 +35,7 @@ class image_1d_layered;
 class image_2d_layered;
 class image_cube_layered;
 
-class image_view_tag_1d;
-class image_view_tag_2d;
-class image_view_tag_3d;
-class image_view_tag_cube;
-
-template <typename Tag, bool layered>
+template <image_view_dimension dimension, bool layered>
 class image_view;
 
 namespace detail {
@@ -81,7 +76,7 @@ struct type_mapper {};
 
 template <>
 struct type_mapper<image_1d> {
-	using flat_view = image_view<image_view_tag_1d>;
+	using flat_view = image_view<image_view_dimension::dim_1d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
 	static constexpr uint32_t cube_layer_factor = 1;
@@ -92,7 +87,7 @@ struct type_mapper<image_1d> {
 
 template <>
 struct type_mapper<image_2d> {
-	using flat_view = image_view<image_view_tag_2d>;
+	using flat_view = image_view<image_view_dimension::dim_2d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
 	static constexpr uint32_t cube_layer_factor = 1;
@@ -103,8 +98,8 @@ struct type_mapper<image_2d> {
 
 template <>
 struct type_mapper<image_3d> {
-	using flat_view = image_view<image_view_tag_3d>;
-	using layered_side_view = image_view<image_view_tag_2d, true>;
+	using flat_view = image_view<image_view_dimension::dim_3d>;
+	using layered_side_view = image_view<image_view_dimension::dim_2d, true>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e3D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e3D;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e2DArray;
@@ -116,9 +111,9 @@ struct type_mapper<image_3d> {
 
 template <>
 struct type_mapper<image_cube> {
-	using flat_view = image_view<image_view_tag_cube>;
-	using layered_side_view = image_view<image_view_tag_2d, true>;
-	using side_view = image_view<image_view_tag_2d>;
+	using flat_view = image_view<image_view_dimension::dim_cube>;
+	using layered_side_view = image_view<image_view_dimension::dim_2d, true>;
+	using side_view = image_view<image_view_dimension::dim_2d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::eCube;
 	static constexpr vk::ImageViewType layered_side_view_type = vk::ImageViewType::e2DArray;
@@ -131,8 +126,8 @@ struct type_mapper<image_cube> {
 
 template <>
 struct type_mapper<image_2d_layered> {
-	using layered_view = image_view<image_view_tag_2d, true>;
-	using flat_view = image_view<image_view_tag_2d>;
+	using layered_view = image_view<image_view_dimension::dim_2d, true>;
+	using flat_view = image_view<image_view_dimension::dim_2d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e2D;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e2DArray;
@@ -144,8 +139,8 @@ struct type_mapper<image_2d_layered> {
 
 template <>
 struct type_mapper<image_1d_layered> {
-	using layered_view = image_view<image_view_tag_1d, true>;
-	using flat_view = image_view<image_view_tag_1d>;
+	using layered_view = image_view<image_view_dimension::dim_1d, true>;
+	using flat_view = image_view<image_view_dimension::dim_1d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e1D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::e1D;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::e1DArray;
@@ -156,10 +151,10 @@ struct type_mapper<image_1d_layered> {
 };
 template <>
 struct type_mapper<image_cube_layered> {
-	using flat_view = image_view<image_view_tag_cube>;
-	using layered_view = image_view<image_view_tag_cube, true>;
-	using layered_side_view = image_view<image_view_tag_2d, true>;
-	using side_view = image_view<image_view_tag_2d>;
+	using flat_view = image_view<image_view_dimension::dim_cube>;
+	using layered_view = image_view<image_view_dimension::dim_cube, true>;
+	using layered_side_view = image_view<image_view_dimension::dim_2d, true>;
+	using side_view = image_view<image_view_dimension::dim_2d>;
 	static constexpr vk::ImageType img_type = vk::ImageType::e2D;
 	static constexpr vk::ImageViewType flat_view_type = vk::ImageViewType::eCube;
 	static constexpr vk::ImageViewType layered_view_type = vk::ImageViewType::eCubeArray;

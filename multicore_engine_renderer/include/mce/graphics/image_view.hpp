@@ -12,12 +12,9 @@
 namespace mce {
 namespace graphics {
 
-class image_view_tag_1d {};
-class image_view_tag_2d {};
-class image_view_tag_3d {};
-class image_view_tag_cube {};
+enum class image_view_dimension { dim_1d, dim_2d, dim_3d, dim_cube };
 
-template <typename Tag, bool layered = false>
+template <image_view_dimension dimension, bool layered = false>
 class image_view {
 	vk::UniqueImageView native_view_;
 	uint32_t base_mip_level_;
