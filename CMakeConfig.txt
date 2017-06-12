@@ -261,6 +261,9 @@ target_link_libraries(deps.gtest INTERFACE
 add_library(deps.Boost INTERFACE)
 target_compile_definitions(deps.Boost INTERFACE
 		$<$<CXX_COMPILER_ID:MSVC>:_HAS_AUTO_PTR_ETC>
+		#The following 2 defines are needed to extend the allowed parameter count for boost::variant to the required amount.
+		BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+		BOOST_MPL_LIMIT_LIST_SIZE=30
 	)
 target_include_directories(deps.Boost SYSTEM INTERFACE
 		${BOOST_INCLUDE}
