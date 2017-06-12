@@ -210,6 +210,7 @@ public:
 #else
 protected:
 #endif
+	/// Constructs an image using the given parameters and associates it with memory from the given manager.
 	image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format, size_type size,
 		  vk::ImageUsageFlags usage, uint32_t layers, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
 		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
@@ -247,44 +248,58 @@ protected:
 	}
 
 public:
+	/// Destroys the image object and releases it associated resources to the deletion queue.
 	~image() {
 		// TODO: Insert resources into deletion manager.
 	}
 
-	friend class single_image<Image_Type, Size_Type>;
-
+	/// Returns the format of the image data.
 	vk::Format format() const {
 		return format_;
 	}
 
+	/// Allows access to the handle for the underlying vulkan image object.
 	const vk::Image& native_image() const {
 		return *img_;
 	}
 
+	/// \brief Returns the current layout according to the tracking performed with generate_transition,
+	/// mark_layout_undefined, and set_layout_external.
 	vk::ImageLayout tracked_layout() const {
 		return layout_;
 	}
 
+	/// Returns the number of mip levels in the image.
 	uint32_t mip_levels() const {
 		return mip_levels_;
 	}
 
+	/// Returns true if the image was created with mutable format, allowing views with different formats.
 	bool mutable_format() const {
 		return mutable_format_;
 	}
 
+	/// Returns the size of the image.
 	Size_Type size() const {
 		return size_;
 	}
 
+	/// Returns the tiling of the image.
 	vk::ImageTiling tiling() const {
 		return tiling_;
 	}
 
+	/// Returns the allowed usage flags for the image.
 	vk::ImageUsageFlags usage() const {
 		return usage_;
 	}
 
+	/// Returns the aspect flags for the aspect mode of the image.
+	/**
+	 * For color, depth, and stencil only the respective flag is set.
+	 * For depth_stencil both the depth and stencil flag are set.
+	 * The returned aspect flags set is the usual value used for views into images of this aspect mode.
+	 */
 	vk::ImageAspectFlags default_aspect_flags() const {
 		if(aspect_mode_ == image_aspect_mode::color) {
 			return vk::ImageAspectFlagBits::eColor;
@@ -299,10 +314,17 @@ public:
 		}
 	}
 
+	/// Returns the parent device.
 	const device& dev() const {
 		return dev_;
 	}
 
+	/// Generates and returns a layout transition image memory barrier.
+	/**
+	 * It is assumed that the barriers returned from called to this member function are executed in the same
+	 * order as the calls and that none of them are dropped.
+	 * The tracked layout is updated immediately.
+	 */
 	vk::ImageMemoryBarrier generate_transition(vk::ImageLayout new_layout, vk::AccessFlags src_access,
 											   vk::AccessFlags dst_access) {
 		vk::ImageMemoryBarrier b(
@@ -312,6 +334,22 @@ public:
 														 detail::type_mapper<Image_Type>::cube_layer_factor));
 		layout_ = new_layout;
 		return b;
+	}
+
+	/// Resets the tracked layout into an undefined state.
+	/**
+	 * The tracked layout is updated immediately.
+	 */
+	void mark_layout_undefined() {
+		layout_ = vk::ImageLayout::eUndefined;
+	}
+
+	/// Sets the tracked layout to a new value to which the image was transitioned externally.
+	/**
+	 * The tracked layout is updated immediately.
+	 */
+	void set_layout_external(vk::ImageLayout layout) {
+		layout_ = layout;
 	}
 };
 
