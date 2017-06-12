@@ -92,7 +92,7 @@ private:
 
 public:
 	/// Creates a destruction queue manager for the given device and with the given number of queues.
-	destruction_queue_manager(device* dev, uint32_t ring_slots) : dev_{dev}, ring_slots{ring_slots} {}
+	destruction_queue_manager(device* dev, uint32_t ring_slots) : dev_{ dev }, queues{ring_slots}, ring_slots{ ring_slots } {}
 	/// \brief Destroys the destruction queue manager and all pending objects after ensuring completion by
 	/// waiting for the device to be idle.
 	~destruction_queue_manager();
