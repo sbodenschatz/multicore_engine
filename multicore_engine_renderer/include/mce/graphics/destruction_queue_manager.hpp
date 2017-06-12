@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/include/mce/graphics/destruction_queue.hpp
+ * File /multicore_engine_renderer/include/mce/graphics/destruction_queue_manager.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
