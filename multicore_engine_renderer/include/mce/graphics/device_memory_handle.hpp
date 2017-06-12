@@ -108,6 +108,9 @@ public:
 	vk::DeviceSize offset() const {
 		return allocation_.aligned_offset;
 	}
+	const device_memory_allocation& allocation() const {
+		return allocation_;
+	}
 	/// Frees the allocated memory back to the manager and leaves the handle empty.
 	void reset() {
 		if(manager_ptr_) {
