@@ -67,6 +67,8 @@ private:
 	device_memory_allocation allocation_;
 
 public:
+	/// Constructs an empty handle.
+	device_memory_handle() : device_memory_handle(nullptr, device_memory_allocation()) {}
 	/// Constructs a handle for the given allocation.
 	device_memory_handle(device_memory_manager_interface* manager_ptr, device_memory_allocation allocation)
 			: manager_ptr_(manager_ptr), allocation_(std::move(allocation)) {}
