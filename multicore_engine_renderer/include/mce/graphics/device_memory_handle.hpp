@@ -108,6 +108,7 @@ public:
 	vk::DeviceSize offset() const {
 		return allocation_.aligned_offset;
 	}
+	/// Allows access to the encapsulated allocation.
 	const device_memory_allocation& allocation() const {
 		return allocation_;
 	}
