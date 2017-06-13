@@ -355,5 +355,14 @@ TEST(graphics_destruction_queue_manager_test, destruction_order_executor_advance
 	ASSERT_EQ(4, d4);
 }
 
+TEST(graphics_destruction_queue_manager_test, destruction_locking) {
+	destruction_queue_manager dqm(nullptr, 3);
+	bool res = false;
+	dqm.enqueue(destruction_queue_manager::make_executor(
+			[&]() { dqm.enqueue(destruction_queue_manager::make_executor([&]() { res = true; })); }));
+	for(int i = 0; i < 9; ++i) dqm.advance();
+	ASSERT_TRUE(res);
+}
+
 } // namespace graphics
 } // namespace mce
