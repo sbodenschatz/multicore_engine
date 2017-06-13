@@ -29,12 +29,16 @@ destruction_queue_manager::~destruction_queue_manager() {
 }
 
 void destruction_queue_manager::cleanup_and_set_current(uint32_t ring_index) {
-	std::lock_guard<std::mutex> lock(queue_mutex);
-	current_ring_index = ring_index;
-	for(auto& e : queues[current_ring_index]) {
+	auto temp = temp_pool.get();
+	{
+		std::lock_guard<std::mutex> lock(queue_mutex);
+		current_ring_index = ring_index;
+		using std::swap;
+		swap(*temp, queues[current_ring_index]);
+	}
+	for(auto& e : *temp) {
 		e.reset();
 	}
-	queues[current_ring_index].clear();
 }
 
 } /* namespace graphics */

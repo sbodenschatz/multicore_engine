@@ -18,6 +18,7 @@
 #include <mutex>
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include <mce/containers/scratch_pad_pool.hpp>
 
 namespace mce {
 namespace graphics {
@@ -122,6 +123,7 @@ private:
 	std::vector<std::vector<element>> queues;
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
+	containers::scratch_pad_pool<std::vector<element>> temp_pool;
 
 public:
 	/// Creates a destruction queue manager for the given device and with the given number of queues.
