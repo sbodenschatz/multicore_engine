@@ -182,5 +182,31 @@ TEST(graphics_destruction_queue_manager_test, sufficient_retention_executor) {
 	ASSERT_TRUE(d4);
 }
 
+TEST(graphics_destruction_queue_manager_test, destruction_order_executor) {
+	int index = 0;
+	int d0 = -1;
+	int d1 = -1;
+	int d2 = -1;
+	int d3 = -1;
+	int d4 = -1;
+	{
+		destruction_queue_manager dqm(nullptr, 3);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d0 = index++; }));
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d1 = index++; }));
+		dqm.cleanup_and_set_current(1);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d2 = index++; }));
+		dqm.cleanup_and_set_current(2);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d3 = index++; }));
+		dqm.cleanup_and_set_current(0);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d4 = index++; }));
+		ASSERT_EQ(0, d0);
+		ASSERT_EQ(1, d1);
+		dqm.cleanup_and_set_current(1);
+		ASSERT_EQ(2, d2);
+	}
+	ASSERT_EQ(3, d3);
+	ASSERT_EQ(4, d4);
+}
+
 } // namespace graphics
 } // namespace mce
