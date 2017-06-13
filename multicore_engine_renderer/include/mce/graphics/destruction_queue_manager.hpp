@@ -73,7 +73,7 @@ public:
 	}
 
 private:
-	struct element {
+	class element {
 		struct reset_visitor : boost::static_visitor<> {
 			void operator()(boost::blank&) {}
 			template <typename T>
@@ -81,6 +81,8 @@ private:
 				handle.reset();
 			}
 		};
+
+	public:
 		boost::variant<boost::blank, vk::UniqueBuffer, vk::UniqueBufferView, vk::UniqueCommandBuffer,
 					   vk::UniqueCommandPool, vk::UniqueDescriptorPool, vk::UniqueDescriptorSet,
 					   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
