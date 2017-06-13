@@ -67,6 +67,11 @@ public:
 		}
 	};
 
+	/// Creates an executor from the given function object.
+	static executor<std::function<void()>> make_executor(std::function<void()> f) {
+		return executor<std::function<void()>>{std::move(f)};
+	}
+
 private:
 	struct element {
 		struct reset_visitor : boost::static_visitor<> {
@@ -81,10 +86,10 @@ private:
 					   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
 					   vk::UniqueImageView, vk::UniquePipeline, vk::UniqueQueryPool, vk::UniqueRenderPass,
 					   vk::UniqueSampler, vk::UniqueSemaphore, vk::UniqueShaderModule, vk::UniqueSurfaceKHR,
-					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>>
-				data;
+					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>> data;
 		template <typename T>
-		element(T&& data) : data{std::move(data)} {}
+		element(T&& data)
+				: data{std::move(data)} {}
 		element(element&& other) noexcept {
 			try {
 				data = std::move(other.data);
@@ -113,7 +118,8 @@ private:
 
 public:
 	/// Creates a destruction queue manager for the given device and with the given number of queues.
-	destruction_queue_manager(device* dev, uint32_t ring_slots) : dev_{ dev }, queues{ring_slots}, ring_slots{ ring_slots } {}
+	destruction_queue_manager(device* dev, uint32_t ring_slots)
+			: dev_{dev}, queues{ring_slots}, ring_slots{ring_slots} {}
 	/// \brief Destroys the destruction queue manager and all pending objects after ensuring completion by
 	/// waiting for the device to be idle.
 	~destruction_queue_manager();

@@ -143,5 +143,44 @@ TEST(graphics_destruction_queue_manager_test, destruction_order_handle) {
 	ASSERT_EQ(10, mm.status().at(10));
 }
 
+TEST(graphics_destruction_queue_manager_test, sufficient_retention_executor) {
+	bool d0 = false;
+	bool d1 = false;
+	bool d2 = false;
+	bool d3 = false;
+	bool d4 = false;
+	{
+		destruction_queue_manager dqm(nullptr, 3);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d0 = true; }));
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d1 = true; }));
+		ASSERT_FALSE(d0);
+		ASSERT_FALSE(d1);
+		dqm.cleanup_and_set_current(1);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d2 = true; }));
+		ASSERT_FALSE(d0);
+		ASSERT_FALSE(d1);
+		ASSERT_FALSE(d2);
+		dqm.cleanup_and_set_current(2);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d3 = true; }));
+		ASSERT_FALSE(d0);
+		ASSERT_FALSE(d1);
+		ASSERT_FALSE(d2);
+		ASSERT_FALSE(d3);
+		dqm.cleanup_and_set_current(0);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d4 = true; }));
+		ASSERT_TRUE(d0);
+		ASSERT_TRUE(d1);
+		ASSERT_FALSE(d2);
+		ASSERT_FALSE(d3);
+		ASSERT_FALSE(d4);
+		dqm.cleanup_and_set_current(1);
+		ASSERT_TRUE(d2);
+		ASSERT_FALSE(d3);
+		ASSERT_FALSE(d4);
+	}
+	ASSERT_TRUE(d3);
+	ASSERT_TRUE(d4);
+}
+
 } // namespace graphics
 } // namespace mce
