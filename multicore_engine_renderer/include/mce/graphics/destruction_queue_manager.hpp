@@ -142,9 +142,7 @@ public:
 	}
 
 	/// Advances the manager to the next queue and cleans it.
-	void advance() {
-		cleanup_and_set_current((current_ring_index + 1) % ring_slots);
-	}
+	void advance();
 
 	/// Cleans the given ring index and sets it as the new current ring index.
 	void cleanup_and_set_current(uint32_t ring_index);
