@@ -19,6 +19,7 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 #include <mce/containers/scratch_pad_pool.hpp>
+#include <condition_variable>
 
 namespace mce {
 namespace graphics {
@@ -124,6 +125,8 @@ private:
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
 	containers::scratch_pad_pool<std::vector<element>> temp_pool;
+	bool in_cleanup = false;
+	std::condition_variable in_cleanup_cv;
 
 public:
 	/// Creates a destruction queue manager for the given device and with the given number of queues.
