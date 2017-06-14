@@ -29,6 +29,7 @@
 #include <mce/util/math_tools.hpp>
 #include <type_traits>
 #include <vulkan/vulkan.hpp>
+#include <mce/graphics/destruction_queue_manager.hpp>
 
 namespace mce {
 namespace graphics {
@@ -193,6 +194,7 @@ enum class image_aspect_mode { color, depth, stencil, depth_stencil };
 template <typename Image_Type, typename Size_Type>
 class image {
 	device& dev_;
+	destruction_queue_manager* destruction_mgr_;
 	vk::Format format_;
 	Size_Type size_;
 	vk::ImageUsageFlags usage_;
@@ -217,14 +219,16 @@ public:
 protected:
 #endif
 	/// Constructs an image using the given parameters and associates it with memory from the given manager.
-	image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format, size_type size,
+	image(device& dev, device_memory_manager_interface& mem_mgr,
+		  destruction_queue_manager* destruction_manager, vk::Format format, size_type size,
 		  vk::ImageUsageFlags usage, uint32_t layers, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
 		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 		  boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{},
 		  image_aspect_mode aspect_mode = image_aspect_mode::color)
-			: dev_{dev}, format_{format}, size_{size}, usage_{usage}, layout_{layout},
-			  mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{1}, aspect_mode_{aspect_mode} {
+			: dev_{dev}, destruction_mgr_{destruction_manager}, format_{format}, size_{size}, usage_{usage},
+			  layout_{layout}, mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{1},
+			  aspect_mode_{aspect_mode} {
 		vk::ImageCreateInfo ci(
 				(mutable_format ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags{}) |
 						detail::type_mapper<Image_Type>::base_flags(),
@@ -256,7 +260,10 @@ protected:
 public:
 	/// Destroys the image object and releases it associated resources to the deletion queue.
 	~image() {
-		// TODO: Insert resources into deletion manager.
+		if(destruction_mgr_) {
+			destruction_mgr_->enqueue(std::move(img_));
+			destruction_mgr_->enqueue(std::move(mem_handle_));
+		}
 	}
 
 	/// Returns the format of the image data.
@@ -398,15 +405,16 @@ protected:
 
 public:
 	/// Constructs an image using the given parameters and associates it with memory from the given manager.
-	single_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
+	single_image(device& dev, device_memory_manager_interface& mem_mgr,
+				 destruction_queue_manager* destruction_manager, vk::Format format,
 				 typename base_t::size_type size, vk::ImageUsageFlags usage,
 				 vk::ImageLayout layout = vk::ImageLayout::eGeneral,
 				 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 				 bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 				 boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{},
 				 image_aspect_mode aspect_mode = image_aspect_mode::color)
-			: base_t(dev, mem_mgr, format, size, usage, 1, layout, required_flags, mutable_format, tiling,
-					 mip_levels, aspect_mode) {}
+			: base_t(dev, mem_mgr, destruction_manager, format, size, usage, 1, layout, required_flags,
+					 mutable_format, tiling, mip_levels, aspect_mode) {}
 
 	/// Creates and returns an image view for the image object using the given view parameters.
 	typename detail::type_mapper<Image_Type>::flat_view
@@ -463,15 +471,16 @@ protected:
 
 public:
 	/// Constructs an image using the given parameters and associates it with memory from the given manager.
-	layered_image(device& dev, device_memory_manager_interface& mem_mgr, vk::Format format,
+	layered_image(device& dev, device_memory_manager_interface& mem_mgr,
+				  destruction_queue_manager* destruction_manager, vk::Format format,
 				  typename base_t::size_type size, vk::ImageUsageFlags usage, uint32_t layers,
 				  vk::ImageLayout layout = vk::ImageLayout::eGeneral,
 				  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 				  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 				  boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{},
 				  image_aspect_mode aspect_mode = image_aspect_mode::color)
-			: base_t(dev, mem_mgr, format, size, usage, layers, layout, required_flags, mutable_format,
-					 tiling, mip_levels, aspect_mode),
+			: base_t(dev, mem_mgr, destruction_manager, format, size, usage, layers, layout, required_flags,
+					 mutable_format, tiling, mip_levels, aspect_mode),
 			  layers_{layers} {}
 
 	/// Creates and returns a layered image view for the image object using the given view parameters.
