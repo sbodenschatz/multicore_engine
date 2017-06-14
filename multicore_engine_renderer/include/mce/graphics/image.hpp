@@ -364,6 +364,10 @@ public:
 	void set_layout_external(vk::ImageLayout layout) {
 		layout_ = layout;
 	}
+
+	destruction_queue_manager* destruction_mgr() const {
+		return destruction_mgr_;
+	}
 };
 
 /// Implementation base class for non-array images.
@@ -402,6 +406,7 @@ public:
 protected:
 	using base_t::default_aspect_flags;
 	using base_t::dev;
+	using base_t::destruction_mgr;
 
 public:
 	/// Constructs an image using the given parameters and associates it with memory from the given manager.
@@ -426,8 +431,8 @@ public:
 									detail::type_mapper<Image_Type>::cube_layer_factor});
 
 		return typename detail::type_mapper<Image_Type>::flat_view(
-				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
-				component_mapping, ci.format);
+				dev().native_device().createImageViewUnique(ci), destruction_mgr(), base_mip_level,
+				mip_levels, component_mapping, ci.format);
 	}
 };
 
@@ -468,6 +473,7 @@ public:
 protected:
 	using base_t::default_aspect_flags;
 	using base_t::dev;
+	using base_t::destruction_mgr;
 
 public:
 	/// Constructs an image using the given parameters and associates it with memory from the given manager.
@@ -498,8 +504,8 @@ public:
 		}
 
 		return typename detail::type_mapper<Image_Type>::layered_view(
-				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
-				component_mapping, ci.format, base_layer, layers);
+				dev().native_device().createImageViewUnique(ci), destruction_mgr(), base_mip_level,
+				mip_levels, component_mapping, ci.format, base_layer, layers);
 	}
 	/// \brief Creates and returns an image view of a single layer of the image object using the given view
 	/// parameters.
@@ -513,8 +519,8 @@ public:
 									detail::type_mapper<Image_Type>::cube_layer_factor});
 
 		return typename detail::type_mapper<Image_Type>::flat_view(
-				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
-				component_mapping, ci.format, layer);
+				dev().native_device().createImageViewUnique(ci), destruction_mgr(), base_mip_level,
+				mip_levels, component_mapping, ci.format, layer);
 	}
 };
 
@@ -615,8 +621,8 @@ public:
 								   {default_aspect_flags(), base_mip_level, mip_levels, layer, 1});
 
 		return typename detail::type_mapper<Image_Type>::side_view(
-				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
-				component_mapping, ci.format, layer);
+				dev().native_device().createImageViewUnique(ci), destruction_mgr(), base_mip_level,
+				mip_levels, component_mapping, ci.format, layer);
 	}
 	/// \brief Creates and returns an image view of sides of the cube map image object using the given
 	/// view parameters.
@@ -634,8 +640,8 @@ public:
 								   {default_aspect_flags(), base_mip_level, mip_levels, base_layer, layers});
 
 		return typename detail::type_mapper<Image_Type>::layered_side_view(
-				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
-				component_mapping, ci.format, base_layer, layers);
+				dev().native_device().createImageViewUnique(ci), destruction_mgr(), base_mip_level,
+				mip_levels, component_mapping, ci.format, base_layer, layers);
 	}
 };
 
@@ -718,8 +724,8 @@ public:
 								   {default_aspect_flags(), base_mip_level, mip_levels, layer, 1});
 
 		return typename detail::type_mapper<Image_Type>::side_view(
-				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
-				component_mapping, ci.format, layer);
+				dev().native_device().createImageViewUnique(ci), destruction_mgr(), base_mip_level,
+				mip_levels, component_mapping, ci.format, layer);
 	}
 	/// \brief Creates and returns an image view of sides of the cube map image object using the given
 	/// view parameters.
@@ -737,8 +743,8 @@ public:
 								   {default_aspect_flags(), base_mip_level, mip_levels, base_layer, layers});
 
 		return typename detail::type_mapper<Image_Type>::layered_side_view(
-				dev().native_device().createImageViewUnique(ci), base_mip_level, mip_levels,
-				component_mapping, ci.format, base_layer, layers);
+				dev().native_device().createImageViewUnique(ci), destruction_mgr(), base_mip_level,
+				mip_levels, component_mapping, ci.format, base_layer, layers);
 	}
 };
 

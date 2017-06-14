@@ -13,6 +13,7 @@
  */
 
 #include <vulkan/vulkan.hpp>
+#include <mce/graphics/destruction_queue_manager.hpp>
 
 namespace mce {
 namespace graphics {
@@ -24,6 +25,7 @@ enum class image_view_dimension { dim_1d, dim_2d, dim_3d, dim_cube };
 template <image_view_dimension dimension, bool layered = false>
 class image_view {
 	vk::UniqueImageView native_view_;
+	destruction_queue_manager* destruction_mgr_;
 	uint32_t base_mip_level_;
 	uint32_t mip_levels_;
 	vk::ComponentMapping component_mapping_;
@@ -31,12 +33,12 @@ class image_view {
 	uint32_t base_layer_;
 	uint32_t layers_;
 
-	image_view(vk::UniqueImageView native_view, uint32_t base_mip_level, uint32_t mip_levels,
-			   vk::ComponentMapping component_mapping, vk::Format format, uint32_t base_layer = 0,
-			   uint32_t layers = 1)
-			: native_view_{std::move(native_view)}, base_mip_level_{base_mip_level}, mip_levels_{mip_levels},
-			  component_mapping_{component_mapping}, format_{format}, base_layer_{base_layer},
-			  layers_{layers} {}
+	image_view(vk::UniqueImageView native_view, destruction_queue_manager* destruction_manager,
+			   uint32_t base_mip_level, uint32_t mip_levels, vk::ComponentMapping component_mapping,
+			   vk::Format format, uint32_t base_layer = 0, uint32_t layers = 1)
+			: native_view_{std::move(native_view)}, destruction_mgr_{destruction_manager},
+			  base_mip_level_{base_mip_level}, mip_levels_{mip_levels}, component_mapping_{component_mapping},
+			  format_{format}, base_layer_{base_layer}, layers_{layers} {}
 
 public:
 	/// Allows move construction.
@@ -45,7 +47,9 @@ public:
 	image_view& operator=(image_view&& other) = default;
 	/// Destroys the image_view and releases the native resources used by it to the deletion_queue.
 	~image_view() {
-		// TODO: Insert resources into deletion manager.
+		if(destruction_mgr_) {
+			destruction_mgr_->enqueue(std::move(native_view_));
+		}
 	}
 
 	/// Returns the starting layer of the view supplied during construction.
