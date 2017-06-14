@@ -100,6 +100,45 @@ TEST(graphics_destruction_queue_manager_test, sufficient_retention_handle) {
 	ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), p4));
 }
 
+TEST(graphics_destruction_queue_manager_test, sufficient_retention_handle_advance) {
+	destruction_queue_manager_test::test_memory_manager mm;
+	std::pair<int32_t, int32_t> p2;
+	std::pair<int32_t, int32_t> p3;
+	std::pair<int32_t, int32_t> p4;
+	{
+		destruction_queue_manager dqm(nullptr, 3);
+		auto f0 = destruction_queue_manager_test::alloc_frame_data_handle(mm, dqm);
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f0));
+		dqm.advance();
+		auto f1 = destruction_queue_manager_test::alloc_frame_data_handle(mm, dqm);
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f0));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f1));
+		dqm.advance();
+		auto f2 = destruction_queue_manager_test::alloc_frame_data_handle(mm, dqm);
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f0));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f1));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f2));
+		dqm.advance();
+		auto f3 = destruction_queue_manager_test::alloc_frame_data_handle(mm, dqm);
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), f0));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f1));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f2));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f3));
+		dqm.advance();
+		auto f4 = destruction_queue_manager_test::alloc_frame_data_handle(mm, dqm);
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), f1));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f2));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f3));
+		ASSERT_TRUE(destruction_queue_manager_test::check_handle_none(mm.status(), f4));
+		p2 = f2;
+		p3 = f3;
+		p4 = f4;
+	}
+	ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), p2));
+	ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), p3));
+	ASSERT_TRUE(destruction_queue_manager_test::check_handle_all(mm.status(), p4));
+}
+
 TEST(graphics_destruction_queue_manager_test, destruction_order_handle) {
 	destruction_queue_manager_test::test_memory_manager mm;
 	{
@@ -129,6 +168,49 @@ TEST(graphics_destruction_queue_manager_test, destruction_order_handle) {
 		dqm.cleanup_and_set_current(2);
 		dqm.enqueue(std::move(h10));
 		dqm.cleanup_and_set_current(0);
+		ASSERT_EQ(4, mm.status().at(0));
+		ASSERT_EQ(3, mm.status().at(1));
+		ASSERT_EQ(2, mm.status().at(2));
+		ASSERT_EQ(1, mm.status().at(3));
+		ASSERT_EQ(0, mm.status().at(4));
+	}
+	ASSERT_EQ(5, mm.status().at(5));
+	ASSERT_EQ(6, mm.status().at(6));
+	ASSERT_EQ(7, mm.status().at(7));
+	ASSERT_EQ(8, mm.status().at(8));
+	ASSERT_EQ(9, mm.status().at(9));
+	ASSERT_EQ(10, mm.status().at(10));
+}
+
+TEST(graphics_destruction_queue_manager_test, destruction_order_handle_advance) {
+	destruction_queue_manager_test::test_memory_manager mm;
+	{
+		destruction_queue_manager dqm(nullptr, 3);
+		auto h0 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h1 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h2 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h3 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h4 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		dqm.enqueue(std::move(h4));
+		dqm.enqueue(std::move(h3));
+		dqm.enqueue(std::move(h2));
+		dqm.enqueue(std::move(h1));
+		dqm.enqueue(std::move(h0));
+		dqm.advance();
+		auto h5 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h6 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h7 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h8 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h9 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h10 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		dqm.enqueue(std::move(h5));
+		dqm.enqueue(std::move(h6));
+		dqm.enqueue(std::move(h7));
+		dqm.enqueue(std::move(h8));
+		dqm.enqueue(std::move(h9));
+		dqm.advance();
+		dqm.enqueue(std::move(h10));
+		dqm.advance();
 		ASSERT_EQ(4, mm.status().at(0));
 		ASSERT_EQ(3, mm.status().at(1));
 		ASSERT_EQ(2, mm.status().at(2));
@@ -182,6 +264,45 @@ TEST(graphics_destruction_queue_manager_test, sufficient_retention_executor) {
 	ASSERT_TRUE(d4);
 }
 
+TEST(graphics_destruction_queue_manager_test, sufficient_retention_executor_advance) {
+	bool d0 = false;
+	bool d1 = false;
+	bool d2 = false;
+	bool d3 = false;
+	bool d4 = false;
+	{
+		destruction_queue_manager dqm(nullptr, 3);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d0 = true; }));
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d1 = true; }));
+		ASSERT_FALSE(d0);
+		ASSERT_FALSE(d1);
+		dqm.advance();
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d2 = true; }));
+		ASSERT_FALSE(d0);
+		ASSERT_FALSE(d1);
+		ASSERT_FALSE(d2);
+		dqm.advance();
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d3 = true; }));
+		ASSERT_FALSE(d0);
+		ASSERT_FALSE(d1);
+		ASSERT_FALSE(d2);
+		ASSERT_FALSE(d3);
+		dqm.advance();
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d4 = true; }));
+		ASSERT_TRUE(d0);
+		ASSERT_TRUE(d1);
+		ASSERT_FALSE(d2);
+		ASSERT_FALSE(d3);
+		ASSERT_FALSE(d4);
+		dqm.advance();
+		ASSERT_TRUE(d2);
+		ASSERT_FALSE(d3);
+		ASSERT_FALSE(d4);
+	}
+	ASSERT_TRUE(d3);
+	ASSERT_TRUE(d4);
+}
+
 TEST(graphics_destruction_queue_manager_test, destruction_order_executor) {
 	int index = 0;
 	int d0 = -1;
@@ -206,6 +327,41 @@ TEST(graphics_destruction_queue_manager_test, destruction_order_executor) {
 	}
 	ASSERT_EQ(3, d3);
 	ASSERT_EQ(4, d4);
+}
+
+TEST(graphics_destruction_queue_manager_test, destruction_order_executor_advance) {
+	int index = 0;
+	int d0 = -1;
+	int d1 = -1;
+	int d2 = -1;
+	int d3 = -1;
+	int d4 = -1;
+	{
+		destruction_queue_manager dqm(nullptr, 3);
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d0 = index++; }));
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d1 = index++; }));
+		dqm.advance();
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d2 = index++; }));
+		dqm.advance();
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d3 = index++; }));
+		dqm.advance();
+		dqm.enqueue(destruction_queue_manager::make_executor([&]() { d4 = index++; }));
+		ASSERT_EQ(0, d0);
+		ASSERT_EQ(1, d1);
+		dqm.advance();
+		ASSERT_EQ(2, d2);
+	}
+	ASSERT_EQ(3, d3);
+	ASSERT_EQ(4, d4);
+}
+
+TEST(graphics_destruction_queue_manager_test, destruction_locking) {
+	destruction_queue_manager dqm(nullptr, 3);
+	bool res = false;
+	dqm.enqueue(destruction_queue_manager::make_executor(
+			[&]() { dqm.enqueue(destruction_queue_manager::make_executor([&]() { res = true; })); }));
+	for(int i = 0; i < 9; ++i) dqm.advance();
+	ASSERT_TRUE(res);
 }
 
 } // namespace graphics

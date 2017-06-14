@@ -18,6 +18,8 @@
 #include <mutex>
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include <mce/containers/scratch_pad_pool.hpp>
+#include <condition_variable>
 
 namespace mce {
 namespace graphics {
@@ -28,6 +30,11 @@ class device;
 /**
  * Destruction happens by calling the reset member function of the handle without parameters.
  * The destructions in a ring buffer slot happen in the order in which they were enqueued.
+ *
+ * The queues in the ring buffer can be used in order by switching between them using advance() or can be used
+ * in the order of explicitly specified indices using cleanup_and_set_current(). However in the latter case
+ * the handle destruction order on destruction of the manager after letting the device complete work on all
+ * pending objects deviates from the usage order because it always takes place in ring buffer order.
  *
  * The following types are supported for destruction:
  *   - vk::UniqueBuffer
@@ -117,6 +124,9 @@ private:
 	std::vector<std::vector<element>> queues;
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
+	containers::scratch_pad_pool<std::vector<element>> temp_pool;
+	bool in_cleanup = false;
+	std::condition_variable in_cleanup_cv;
 
 public:
 	/// Creates a destruction queue manager for the given device and with the given number of queues.
@@ -133,6 +143,9 @@ public:
 		std::lock_guard<std::mutex> lock(queue_mutex);
 		queues[current_ring_index].emplace_back(std::move(handle));
 	}
+
+	/// Advances the manager to the next queue and cleans it.
+	void advance();
 
 	/// Cleans the given ring index and sets it as the new current ring index.
 	void cleanup_and_set_current(uint32_t ring_index);
