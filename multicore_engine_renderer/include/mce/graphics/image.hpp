@@ -365,6 +365,7 @@ public:
 		layout_ = layout;
 	}
 
+	/// Provides access to the associated destruction queue manager for derived classes.
 	destruction_queue_manager* destruction_mgr() const {
 		return destruction_mgr_;
 	}
