@@ -21,7 +21,6 @@ private:
 public:
 	command_pool(device& dev, uint32_t queueFamilyIndex, bool transient = false,
 				 bool buffer_resettable = false);
-	~command_pool();
 
 	const vk::CommandPool& native_command_pool() {
 		return *native_command_pool_;

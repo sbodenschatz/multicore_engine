@@ -44,7 +44,5 @@ vk::UniqueCommandBuffer command_pool::allocate_secondary_command_buffer() {
 	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"));
 }
 
-command_pool::~command_pool() {}
-
 } /* namespace graphics */
 } /* namespace mce */
