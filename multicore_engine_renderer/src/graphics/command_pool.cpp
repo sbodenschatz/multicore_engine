@@ -10,10 +10,10 @@
 namespace mce {
 namespace graphics {
 
-command_pool::command_pool(device& dev, uint32_t queueFamilyIndex, bool transient, bool buffer_resettable)
+command_pool::command_pool(device& dev, uint32_t queue_family_index, bool transient, bool buffer_resettable)
 		: owner_device_(dev) {
 	vk::CommandPoolCreateInfo ci;
-	ci.queueFamilyIndex = queueFamilyIndex;
+	ci.queueFamilyIndex = queue_family_index;
 	if(transient) ci.flags = ci.flags | vk::CommandPoolCreateFlagBits::eTransient;
 	if(buffer_resettable) ci.flags = ci.flags | vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
 	native_command_pool_ = dev.native_device().createCommandPoolUnique(ci);

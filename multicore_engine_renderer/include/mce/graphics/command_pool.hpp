@@ -19,7 +19,7 @@ private:
 	vk::UniqueCommandPool native_command_pool_;
 
 public:
-	command_pool(device& dev, uint32_t queueFamilyIndex, bool transient = false,
+	command_pool(device& dev, uint32_t queue_family_index, bool transient = false,
 				 bool buffer_resettable = false);
 
 	const vk::CommandPool& native_command_pool() {
