@@ -41,9 +41,9 @@ public:
 	}
 	/// Resets all command buffers allocated from the pool, optionally releasing resources.
 	void reset(bool release_resources = false);
-	/// Allocates returns a primary command buffer from the pool.
+	/// Allocates and returns a primary command buffer from the pool.
 	vk::UniqueCommandBuffer allocate_primary_command_buffer();
-	/// Allocates returns a secondary command buffer from the pool.
+	/// Allocates and returns a secondary command buffer from the pool.
 	vk::UniqueCommandBuffer allocate_secondary_command_buffer();
 
 	template <uint32_t buffer_count>
