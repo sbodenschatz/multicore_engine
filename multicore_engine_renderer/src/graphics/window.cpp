@@ -52,7 +52,7 @@ void window::configure_surface_format() {
 	surface_format_ = vk::Format::eB8G8R8A8Unorm;
 	if(surface_formats.size() != 1 || surface_formats[0].format != vk::Format::eUndefined) {
 		std::vector<vk::Format> format_preferences = {// TODO Place other preferred formats here
-													  vk::Format::eB8G8R8A8Unorm, vk::Format::eB8G8R8A8Srgb};
+													  vk::Format::eB8G8R8A8Unorm};
 		std::stable_sort(surface_formats.begin(), surface_formats.end(),
 						 [&format_preferences](const auto& v0, const auto& v1) {
 							 auto pref = [&format_preferences](auto x) {
