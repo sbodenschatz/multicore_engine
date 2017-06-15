@@ -12,6 +12,8 @@
  * Defines the class encapsulating vulkan command pools.
  */
 
+#include <array>
+#include <mce/graphics/device.hpp>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
@@ -43,6 +45,39 @@ public:
 	vk::UniqueCommandBuffer allocate_primary_command_buffer();
 	/// Allocates returns a secondary command buffer from the pool.
 	vk::UniqueCommandBuffer allocate_secondary_command_buffer();
+
+	template <uint32_t buffer_count>
+	std::array<vk::UniqueCommandBuffer, buffer_count> allocate_primary_command_buffers() {
+		std::array<vk::UniqueCommandBuffer, buffer_count> ubuf;
+		vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::ePrimary,
+										 buffer_count);
+		std::array<vk::CommandBuffer, buffer_count> buf;
+		vk::Result res = owner_device_.native_device().allocateCommandBuffers(&ai, buf.data());
+		vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
+		if(res != vk::Result::eSuccess) {
+			throw std::system_error(res, "vk::Device::allocateCommandBuffers");
+		}
+		for(uint32_t i = 0; i < buffer_count; ++i) {
+			ubuf[i] = vk::UniqueCommandBuffer(buf[i], del);
+		}
+		return ubuf;
+	}
+	template <uint32_t buffer_count>
+	std::array<vk::UniqueCommandBuffer, buffer_count> allocate_secondary_command_buffers() {
+		std::array<vk::UniqueCommandBuffer, buffer_count> ubuf;
+		vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::eSecondary,
+										 buffer_count);
+		std::array<vk::CommandBuffer, buffer_count> buf;
+		vk::Result res = owner_device_.native_device().allocateCommandBuffers(&ai, buf.data());
+		vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
+		if(res != vk::Result::eSuccess) {
+			throw std::system_error(res, "vk::Device::allocateCommandBuffers");
+		}
+		for(uint32_t i = 0; i < buffer_count; ++i) {
+			ubuf[i] = vk::UniqueCommandBuffer(buf[i], del);
+		}
+		return ubuf;
+	}
 };
 
 } /* namespace graphics */
