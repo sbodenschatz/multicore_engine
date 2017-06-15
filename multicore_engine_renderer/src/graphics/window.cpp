@@ -76,6 +76,10 @@ void window::select_present_mode() {
 	   present_modes.end()) {
 		present_mode_ = vk::PresentModeKHR::eFifoRelaxed;
 	}
+	if(std::find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eMailbox) !=
+	   present_modes.end()) {
+		present_mode_ = vk::PresentModeKHR::eMailbox;
+	}
 	for(const auto& pm : present_modes) std::cout << vk::to_string(pm) << std::endl;
 }
 
