@@ -90,7 +90,7 @@ void window::create_swapchain() {
 
 	vk::SwapchainCreateInfoKHR swapchain_ci;
 	swapchain_ci.surface = surface_.get();
-	uint32_t image_count = surface_caps.minImageCount + 2;
+	uint32_t image_count = std::max(surface_caps.minImageCount, 3u);
 
 	if(surface_caps.maxImageCount > 0 && image_count > surface_caps.maxImageCount)
 		image_count = surface_caps.maxImageCount;
