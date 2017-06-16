@@ -100,6 +100,10 @@ void window::create_swapchain() {
 
 	auto resolution = window_.framebuffer_size();
 	vk::Extent2D swapchain_size = vk::Extent2D{uint32_t(resolution.x), uint32_t(resolution.y)};
+	swapchain_size.width = std::min(surface_caps.maxImageExtent.width,
+									std::max(surface_caps.minImageExtent.width, swapchain_size.width));
+	swapchain_size.height = std::min(surface_caps.maxImageExtent.height,
+									 std::max(surface_caps.minImageExtent.height, swapchain_size.height));
 	if(surface_caps.currentExtent.width != ~0u) {
 		swapchain_size = surface_caps.currentExtent;
 	}
