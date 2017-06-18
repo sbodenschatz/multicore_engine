@@ -170,6 +170,7 @@ add_library(deps.glm INTERFACE)
 target_compile_definitions(deps.glm INTERFACE
 		GLM_FORCE_RADIANS 
 		GLM_FORCE_SIZE_T_LENGTH
+		GLM_FORCE_DEPTH_ZERO_TO_ONE
 		$<$<CXX_COMPILER_ID:MSVC>:GLM_FORCE_CXX11>
 	)
 target_include_directories(deps.glm SYSTEM INTERFACE
