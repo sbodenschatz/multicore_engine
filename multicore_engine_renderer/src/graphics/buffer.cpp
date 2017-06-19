@@ -5,16 +5,28 @@
  */
 
 #include <mce/graphics/buffer.hpp>
+#include <mce/graphics/destruction_queue_manager.hpp>
+#include <mce/graphics/device.hpp>
 
 namespace mce {
 namespace graphics {
 
-buffer::buffer() {
-	// TODO Auto-generated constructor stub
+buffer::buffer(device& dev, device_memory_manager_interface& mem_mgr,
+			   destruction_queue_manager* destruction_manager, vk::DeviceSize size,
+			   vk::BufferUsageFlags usage, vk::MemoryPropertyFlags required_flags)
+		: destruction_mgr_{destruction_manager}, size_{size}, usage_{usage} {
+	vk::BufferCreateInfo ci({}, size, usage, vk::SharingMode::eExclusive);
+	buff_ = dev.native_device().createBufferUnique(ci);
+	memory_handle_ = make_device_memory_handle(
+			mem_mgr,
+			mem_mgr.allocate(dev.native_device().getBufferMemoryRequirements(*buff_), required_flags));
 }
 
 buffer::~buffer() {
-	// TODO Auto-generated destructor stub
+	if(destruction_mgr_) {
+		destruction_mgr_->enqueue(std::move(buff_));
+		destruction_mgr_->enqueue(std::move(memory_handle_));
+	}
 }
 
 } /* namespace graphics */
