@@ -43,6 +43,13 @@ public:
 	vk::BufferUsageFlags usage() const {
 		return usage_;
 	}
+
+	const void* mapped_pointer() const {
+		return memory_handle_.mapped_pointer();
+	}
+	void* mapped_pointer() {
+		return memory_handle_.mapped_pointer();
+	}
 };
 
 } /* namespace graphics */
