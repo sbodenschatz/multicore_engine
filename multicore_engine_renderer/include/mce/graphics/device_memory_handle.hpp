@@ -16,6 +16,7 @@
 
 namespace mce {
 namespace graphics {
+class device;
 
 /// Defines the data structure to represent an allocated unit of memory.
 struct device_memory_allocation {
@@ -56,6 +57,7 @@ public:
 	virtual device_memory_allocation
 	allocate(const vk::MemoryRequirements& memory_requirements,
 			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) = 0;
+	virtual device* associated_device() const = 0;
 };
 
 /// Provides a RAII wrapper for managing the lifetime of a device_memory_allocation and the associated memory.

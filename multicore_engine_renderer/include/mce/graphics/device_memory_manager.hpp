@@ -79,6 +79,10 @@ public:
 	void cleanup(unsigned int keep_per_memory_type = 0);
 	/// Determines the complete capacity of the memory managed by this memory manager.
 	vk::DeviceSize capacity() const;
+
+	virtual device* associated_device() const override {
+		return dev;
+	}
 };
 
 } /* namespace graphics */
