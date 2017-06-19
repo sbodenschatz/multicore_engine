@@ -27,10 +27,11 @@ device_memory_manager::device_memory_block::device_memory_block(
 device_memory_allocation
 device_memory_manager::freelist_entry::try_allocate(const vk::MemoryRequirements& memory_requirements,
 													int32_t block_id, const vk::DeviceMemory& memory_object,
-													void* base_mapped_pointer) {
+													void* base_mapped_pointer,
+													vk::MemoryPropertyFlags properties) {
 	if(memory_requirements.size > size) return device_memory_allocation();
 	device_memory_allocation allocation(block_id, memory_object, offset, memory_requirements.size,
-										base_mapped_pointer);
+										base_mapped_pointer, properties);
 	if(memory::align_offset(memory_requirements.alignment, memory_requirements.size,
 							allocation.aligned_offset, size)) {
 		size -= memory_requirements.size;
@@ -56,7 +57,7 @@ device_memory_manager::device_memory_block::try_allocate(const vk::MemoryRequire
 	if((flags & required_flags) != required_flags) return device_memory_allocation();
 	if(!(memory_requirements.memoryTypeBits & (1 << memory_type))) return device_memory_allocation();
 	for(auto it = freelist.begin(); it != freelist.end(); ++it) {
-		auto alloc = it->try_allocate(memory_requirements, id, memory_object.get(), mapped_pointer);
+		auto alloc = it->try_allocate(memory_requirements, id, memory_object.get(), mapped_pointer, flags);
 		if(alloc.valid()) {
 			if(it->size == 0) {
 				// Remove 0-length freelist entry

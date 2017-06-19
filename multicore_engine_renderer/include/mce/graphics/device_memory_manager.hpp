@@ -35,7 +35,7 @@ private:
 		freelist_entry(vk::DeviceSize offset, vk::DeviceSize size) : offset(offset), size(size) {}
 		device_memory_allocation try_allocate(const vk::MemoryRequirements& memory_requirements,
 											  int32_t block_id, const vk::DeviceMemory& memory_object,
-											  void* base_mapped_pointer);
+											  void* base_mapped_pointer,vk::MemoryPropertyFlags properties);
 		bool mergeable(const freelist_entry& successor) const;
 		void merge(freelist_entry& successor);
 	};
