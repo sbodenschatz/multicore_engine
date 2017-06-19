@@ -48,6 +48,14 @@ struct device_memory_allocation {
 	bool valid() const {
 		return block_id != 0;
 	};
+	void flush(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+		if(!(properties & vk::MemoryPropertyFlagBits::eHostCoherent))
+			dev.flushMappedMemoryRanges({{memory_object, offset, size}});
+	}
+	void invalidate(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+		if(!(properties & vk::MemoryPropertyFlagBits::eHostCoherent))
+			dev.invalidateMappedMemoryRanges({{memory_object, offset, size}});
+	}
 };
 
 /// Provides an interface for device memory managers to allocate and free allocations polymorphically.
@@ -133,6 +141,12 @@ public:
 	}
 	void* mapped_pointer() {
 		return allocation_.mapped_pointer;
+	}
+	void flush(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+		allocation_.flush(dev, offset, size);
+	}
+	void invalidate(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+		allocation_.invalidate(dev, offset, size);
 	}
 };
 
