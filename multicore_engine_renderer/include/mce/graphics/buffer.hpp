@@ -27,6 +27,22 @@ public:
 		   destruction_queue_manager* destruction_manager, vk::DeviceSize size, vk::BufferUsageFlags usage,
 		   vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 	~buffer();
+
+	vk::Buffer native_buffer() {
+		return buff_.get();
+	}
+
+	const vk::Buffer& native_buffer() const {
+		return *buff_;
+	}
+
+	vk::DeviceSize size() const {
+		return size_;
+	}
+
+	vk::BufferUsageFlags usage() const {
+		return usage_;
+	}
 };
 
 } /* namespace graphics */
