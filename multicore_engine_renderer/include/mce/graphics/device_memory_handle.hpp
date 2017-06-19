@@ -128,7 +128,10 @@ public:
 			manager_ptr_ = nullptr;
 		}
 	}
-	void* mapped_pointer() const {
+	const void* mapped_pointer() const {
+		return allocation_.mapped_pointer;
+	}
+	void* mapped_pointer() {
 		return allocation_.mapped_pointer;
 	}
 };
