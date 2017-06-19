@@ -26,6 +26,8 @@ struct device_memory_allocation {
 	/// Start offset of the allocated space conforming to the alignment requirement.
 	vk::DeviceSize aligned_offset;
 	vk::DeviceSize aligned_size; ///< Size of the aligned memory unit.
+	void* mapped_pointer = nullptr;
+	size_t mapping_count = 0;
 
 	/// Constructs an empty allocation, indicating a null-value.
 	device_memory_allocation()
