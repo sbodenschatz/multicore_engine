@@ -23,13 +23,13 @@
 #include <boost/variant.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/component_wise.hpp>
+#include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_handle.hpp>
 #include <mce/graphics/image_view.hpp>
 #include <mce/util/math_tools.hpp>
 #include <type_traits>
 #include <vulkan/vulkan.hpp>
-#include <mce/graphics/destruction_queue_manager.hpp>
 
 namespace mce {
 namespace graphics {
@@ -221,20 +221,21 @@ protected:
 	/// Constructs an image using the given parameters and associates it with memory from the given manager.
 	image(device& dev, device_memory_manager_interface& mem_mgr,
 		  destruction_queue_manager* destruction_manager, vk::Format format, size_type size,
-		  vk::ImageUsageFlags usage, uint32_t layers, vk::ImageLayout layout = vk::ImageLayout::eGeneral,
+		  vk::ImageUsageFlags usage, uint32_t layers,
 		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+		  bool preinitialized_layout = false,
 		  boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{},
 		  image_aspect_mode aspect_mode = image_aspect_mode::color)
 			: dev_{dev}, destruction_mgr_{destruction_manager}, format_{format}, size_{size}, usage_{usage},
-			  layout_{layout}, mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{1},
-			  aspect_mode_{aspect_mode} {
+			  layout_{preinitialized_layout ? vk::ImageLayout::ePreinitialized : vk::ImageLayout::eUndefined},
+			  mutable_format_{mutable_format}, tiling_{tiling}, mip_levels_{1}, aspect_mode_{aspect_mode} {
 		vk::ImageCreateInfo ci(
 				(mutable_format ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags{}) |
 						detail::type_mapper<Image_Type>::base_flags(),
 				detail::type_mapper<Image_Type>::img_type, format, detail::to_extent_3d(size), 1,
 				layers * detail::type_mapper<Image_Type>::cube_layer_factor, vk::SampleCountFlagBits::e1,
-				tiling, usage, vk::SharingMode::eExclusive);
+				tiling, usage, vk::SharingMode::eExclusive, 0, nullptr, layout_);
 		struct mip_visitor : boost::static_visitor<> {
 			uint32_t& mip_levels;
 			typename Image_Type::size_type size_;
@@ -249,7 +250,6 @@ protected:
 		};
 		mip_visitor mv{mip_levels_, size};
 		mip_levels.apply_visitor(mv);
-		ci.setInitialLayout(layout);
 		img_ = dev.native_device().createImageUnique(ci);
 		mem_handle_ = make_device_memory_handle(
 				mem_mgr,
@@ -414,13 +414,13 @@ public:
 	single_image(device& dev, device_memory_manager_interface& mem_mgr,
 				 destruction_queue_manager* destruction_manager, vk::Format format,
 				 typename base_t::size_type size, vk::ImageUsageFlags usage,
-				 vk::ImageLayout layout = vk::ImageLayout::eGeneral,
 				 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 				 bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+				 bool preinitialized_layout = false,
 				 boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{},
 				 image_aspect_mode aspect_mode = image_aspect_mode::color)
-			: base_t(dev, mem_mgr, destruction_manager, format, size, usage, 1, layout, required_flags,
-					 mutable_format, tiling, mip_levels, aspect_mode) {}
+			: base_t(dev, mem_mgr, destruction_manager, format, size, usage, 1, required_flags,
+					 mutable_format, tiling, preinitialized_layout, mip_levels, aspect_mode) {}
 
 	/// Creates and returns an image view for the image object using the given view parameters.
 	typename detail::type_mapper<Image_Type>::flat_view
@@ -481,13 +481,13 @@ public:
 	layered_image(device& dev, device_memory_manager_interface& mem_mgr,
 				  destruction_queue_manager* destruction_manager, vk::Format format,
 				  typename base_t::size_type size, vk::ImageUsageFlags usage, uint32_t layers,
-				  vk::ImageLayout layout = vk::ImageLayout::eGeneral,
 				  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 				  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+				  bool preinitialized_layout = false,
 				  boost::variant<uint32_t, full_mip_chain> mip_levels = full_mip_chain{},
 				  image_aspect_mode aspect_mode = image_aspect_mode::color)
-			: base_t(dev, mem_mgr, destruction_manager, format, size, usage, layers, layout, required_flags,
-					 mutable_format, tiling, mip_levels, aspect_mode),
+			: base_t(dev, mem_mgr, destruction_manager, format, size, usage, layers, required_flags,
+					 mutable_format, tiling, preinitialized_layout, mip_levels, aspect_mode),
 			  layers_{layers} {}
 
 	/// Creates and returns a layered image view for the image object using the given view parameters.
