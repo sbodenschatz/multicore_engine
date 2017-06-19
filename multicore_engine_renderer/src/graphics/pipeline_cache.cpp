@@ -51,7 +51,8 @@ pipeline_cache::pipeline_cache(device& dev, bool file_read_only)
 		uuid_str_ += hex_digit((uuid_[i] & 0xF0u) >> 4);
 		uuid_str_ += hex_digit(uuid_[i] & 0x0Fu);
 	}
-	boost::filesystem::create_directories(cache_path_);
+	if(!boost::filesystem::equivalent(boost::filesystem::current_path(), cache_path_))
+		boost::filesystem::create_directories(cache_path_);
 	auto file = read_file(cache_filename().string());
 	vk::PipelineCacheCreateInfo pipeline_cache_ci;
 	if(!file.empty()) {
@@ -68,7 +69,8 @@ pipeline_cache::~pipeline_cache() {
 	device_.native_device().getPipelineCacheData(*native_pipeline_cache_, &data_size, nullptr);
 	std::vector<char> content(data_size);
 	device_.native_device().getPipelineCacheData(*native_pipeline_cache_, &data_size, content.data());
-	boost::filesystem::create_directories(cache_path_);
+	if(!boost::filesystem::equivalent(boost::filesystem::current_path(), cache_path_))
+		boost::filesystem::create_directories(cache_path_);
 	write_file(cache_filename().string(), content);
 }
 
