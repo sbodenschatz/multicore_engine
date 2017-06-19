@@ -171,10 +171,12 @@ target_compile_definitions(deps.glm INTERFACE
 		GLM_FORCE_RADIANS 
 		GLM_FORCE_SIZE_T_LENGTH
 		GLM_FORCE_DEPTH_ZERO_TO_ONE
-		$<$<CXX_COMPILER_ID:MSVC>:GLM_FORCE_CXX11>
 	)
 target_include_directories(deps.glm SYSTEM INTERFACE
 		${GLM_INCLUDE}
+	)
+target_compile_options(mce_compiler_settings INTERFACE
+		$<$<CXX_COMPILER_ID:MSVC>:/wd4201>		
 	)
 	
 add_library(deps.zlib INTERFACE)
