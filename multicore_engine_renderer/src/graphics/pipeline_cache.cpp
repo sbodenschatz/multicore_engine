@@ -13,7 +13,7 @@
 namespace mce {
 namespace graphics {
 
-boost::filesystem::path pipeline_cache::cache_path_ = ".";
+boost::filesystem::path pipeline_cache::cache_path_ = "cache";
 
 std::vector<char> pipeline_cache::read_file(const std::string& filename) {
 	std::vector<char> res;
