@@ -27,17 +27,20 @@ struct device_memory_allocation {
 	/// Start offset of the allocated space conforming to the alignment requirement.
 	vk::DeviceSize aligned_offset;
 	vk::DeviceSize aligned_size; ///< Size of the aligned memory unit.
+	void* mapped_pointer;
 
 	/// Constructs an empty allocation, indicating a null-value.
 	device_memory_allocation()
 			: block_id(0), memory_object(), internal_offset(0), internal_size(0), aligned_offset(0),
-			  aligned_size(0) {}
+			  aligned_size(0), mapped_pointer{nullptr} {}
 	/// \brief Constructs an allocation struct from the given block id, memory, offset and size, alignment is
 	/// done later on by the memory manager.
 	device_memory_allocation(int32_t block_id, vk::DeviceMemory memory_object, vk::DeviceSize offset,
-							 vk::DeviceSize size)
+							 vk::DeviceSize size, void* base_mapped_pointer)
 			: block_id(block_id), memory_object(std::move(memory_object)), internal_offset(offset),
-			  internal_size(size), aligned_offset(offset), aligned_size(size) {}
+			  internal_size(size), aligned_offset(offset), aligned_size(size),
+			  mapped_pointer{base_mapped_pointer ? static_cast<char*>(base_mapped_pointer) + aligned_offset
+												 : nullptr} {}
 	/// Checks if the allocation is valid (not null).
 	bool valid() const {
 		return block_id != 0;
