@@ -50,6 +50,8 @@ public:
 	void* mapped_pointer() {
 		return memory_handle_.mapped_pointer();
 	}
+	void flush(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE);
+	void invalidate(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE);
 };
 
 } /* namespace graphics */

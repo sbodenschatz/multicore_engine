@@ -29,5 +29,12 @@ buffer::~buffer() {
 	}
 }
 
+void buffer::flush(vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
+	memory_handle_.flush(dev, offset, size);
+}
+void buffer::invalidate(vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
+	memory_handle_.invalidate(dev, offset, size);
+}
+
 } /* namespace graphics */
 } /* namespace mce */
