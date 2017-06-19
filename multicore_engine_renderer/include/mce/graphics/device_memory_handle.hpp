@@ -125,6 +125,9 @@ public:
 			manager_ptr_ = nullptr;
 		}
 	}
+	void* mapped_pointer() const {
+		return allocation_.mapped_pointer;
+	}
 };
 
 /// \brief Creates a device_memory_handle from the given allocation and manager
