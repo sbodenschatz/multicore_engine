@@ -34,7 +34,8 @@ private:
 		vk::DeviceSize size;
 		freelist_entry(vk::DeviceSize offset, vk::DeviceSize size) : offset(offset), size(size) {}
 		device_memory_allocation try_allocate(const vk::MemoryRequirements& memory_requirements,
-											  int32_t block_id, const vk::DeviceMemory& memory_object);
+											  int32_t block_id, const vk::DeviceMemory& memory_object,
+											  void* base_mapped_pointer, vk::MemoryPropertyFlags properties);
 		bool mergeable(const freelist_entry& successor) const;
 		void merge(freelist_entry& successor);
 	};
@@ -45,6 +46,7 @@ private:
 		vk::MemoryPropertyFlags flags;
 		uint32_t memory_type;
 		std::vector<freelist_entry> freelist;
+		void* mapped_pointer = nullptr;
 		device_memory_block(int32_t id, vk_mock_interface::device_memory_wrapper&& memory_object,
 							vk::DeviceSize size, vk::MemoryPropertyFlags flags, uint32_t memory_type);
 		device_memory_allocation try_allocate(const vk::MemoryRequirements& memory_requirements,
@@ -79,6 +81,11 @@ public:
 	void cleanup(unsigned int keep_per_memory_type = 0);
 	/// Determines the complete capacity of the memory managed by this memory manager.
 	vk::DeviceSize capacity() const;
+
+	/// Allows access to the device associated with the device memory manager.
+	virtual device* associated_device() const override {
+		return dev;
+	}
 };
 
 } /* namespace graphics */

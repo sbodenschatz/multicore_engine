@@ -33,6 +33,9 @@ public:
 	const std::vector<int>& status() {
 		return destroyed_map;
 	}
+	virtual device* associated_device() const {
+		return nullptr;
+	}
 };
 
 std::pair<int32_t, int32_t> alloc_frame_data_handle(test_memory_manager& mm, destruction_queue_manager& dqm) {

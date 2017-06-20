@@ -16,6 +16,7 @@
 
 namespace mce {
 namespace graphics {
+class device;
 
 /// Defines the data structure to represent an allocated unit of memory.
 struct device_memory_allocation {
@@ -25,22 +26,38 @@ struct device_memory_allocation {
 	vk::DeviceSize internal_size;   ///< Internal size of the allocation (including padding).
 	/// Start offset of the allocated space conforming to the alignment requirement.
 	vk::DeviceSize aligned_offset;
-	vk::DeviceSize aligned_size; ///< Size of the aligned memory unit.
+	vk::DeviceSize aligned_size;		///< Size of the aligned memory unit.
+	void* mapped_pointer;				///< Pointer to mapped address space for host-visible memory.
+	vk::MemoryPropertyFlags properties; ///< Property flags of the containing device memory.
 
 	/// Constructs an empty allocation, indicating a null-value.
 	device_memory_allocation()
 			: block_id(0), memory_object(), internal_offset(0), internal_size(0), aligned_offset(0),
-			  aligned_size(0) {}
+			  aligned_size(0), mapped_pointer{nullptr} {}
 	/// \brief Constructs an allocation struct from the given block id, memory, offset and size, alignment is
 	/// done later on by the memory manager.
 	device_memory_allocation(int32_t block_id, vk::DeviceMemory memory_object, vk::DeviceSize offset,
-							 vk::DeviceSize size)
+							 vk::DeviceSize size, void* base_mapped_pointer,
+							 vk::MemoryPropertyFlags properties)
 			: block_id(block_id), memory_object(std::move(memory_object)), internal_offset(offset),
-			  internal_size(size), aligned_offset(offset), aligned_size(size) {}
+			  internal_size(size), aligned_offset(offset), aligned_size(size),
+			  mapped_pointer{base_mapped_pointer ? static_cast<char*>(base_mapped_pointer) + aligned_offset
+												 : nullptr},
+			  properties{properties} {}
 	/// Checks if the allocation is valid (not null).
 	bool valid() const {
 		return block_id != 0;
 	};
+	/// Flushes non-coherent mapped memory.
+	void flush_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+		if(!(properties & vk::MemoryPropertyFlagBits::eHostCoherent))
+			dev.flushMappedMemoryRanges({{memory_object, offset, size}});
+	}
+	/// Invalidates non-coherent mapped memory.
+	void invalidate_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+		if(!(properties & vk::MemoryPropertyFlagBits::eHostCoherent))
+			dev.invalidateMappedMemoryRanges({{memory_object, offset, size}});
+	}
 };
 
 /// Provides an interface for device memory managers to allocate and free allocations polymorphically.
@@ -54,6 +71,8 @@ public:
 	virtual device_memory_allocation
 	allocate(const vk::MemoryRequirements& memory_requirements,
 			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) = 0;
+	/// Interface function to allow access to the device associated with the device memory manager.
+	virtual device* associated_device() const = 0;
 };
 
 /// Provides a RAII wrapper for managing the lifetime of a device_memory_allocation and the associated memory.
@@ -119,6 +138,22 @@ public:
 			allocation_ = device_memory_allocation();
 			manager_ptr_ = nullptr;
 		}
+	}
+	/// Returns a pointer to the address where the held memory is mapped if the memory is host-visible.
+	const void* mapped_pointer() const {
+		return allocation_.mapped_pointer;
+	}
+	/// Returns a pointer to the address where the held memory is mapped if the memory is host-visible.
+	void* mapped_pointer() {
+		return allocation_.mapped_pointer;
+	}
+	/// Flushes non-coherent mapped memory.
+	void flush_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+		allocation_.flush_mapped(dev, offset, size);
+	}
+	/// Invalidates non-coherent mapped memory.
+	void invalidate_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+		allocation_.invalidate_mapped(dev, offset, size);
 	}
 };
 
