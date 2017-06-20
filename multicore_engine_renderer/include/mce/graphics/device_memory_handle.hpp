@@ -26,9 +26,9 @@ struct device_memory_allocation {
 	vk::DeviceSize internal_size;   ///< Internal size of the allocation (including padding).
 	/// Start offset of the allocated space conforming to the alignment requirement.
 	vk::DeviceSize aligned_offset;
-	vk::DeviceSize aligned_size; ///< Size of the aligned memory unit.
-	void* mapped_pointer;
-	vk::MemoryPropertyFlags properties;
+	vk::DeviceSize aligned_size;		///< Size of the aligned memory unit.
+	void* mapped_pointer;				///< Pointer to mapped address space for host-visible memory.
+	vk::MemoryPropertyFlags properties; ///< Property flags of the containing device memory.
 
 	/// Constructs an empty allocation, indicating a null-value.
 	device_memory_allocation()
@@ -48,10 +48,12 @@ struct device_memory_allocation {
 	bool valid() const {
 		return block_id != 0;
 	};
+	/// Flushes non-coherent mapped memory.
 	void flush_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
 		if(!(properties & vk::MemoryPropertyFlagBits::eHostCoherent))
 			dev.flushMappedMemoryRanges({{memory_object, offset, size}});
 	}
+	/// Invalidates non-coherent mapped memory.
 	void invalidate_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
 		if(!(properties & vk::MemoryPropertyFlagBits::eHostCoherent))
 			dev.invalidateMappedMemoryRanges({{memory_object, offset, size}});
