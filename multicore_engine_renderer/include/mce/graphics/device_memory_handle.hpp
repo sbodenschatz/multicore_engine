@@ -139,15 +139,19 @@ public:
 			manager_ptr_ = nullptr;
 		}
 	}
+	/// Returns a pointer to the address where the held memory is mapped if the memory is host-visible.
 	const void* mapped_pointer() const {
 		return allocation_.mapped_pointer;
 	}
+	/// Returns a pointer to the address where the held memory is mapped if the memory is host-visible.
 	void* mapped_pointer() {
 		return allocation_.mapped_pointer;
 	}
+	/// Flushes non-coherent mapped memory.
 	void flush_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
 		allocation_.flush_mapped(dev, offset, size);
 	}
+	/// Invalidates non-coherent mapped memory.
 	void invalidate_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
 		allocation_.invalidate_mapped(dev, offset, size);
 	}
