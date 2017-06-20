@@ -71,6 +71,7 @@ public:
 	virtual device_memory_allocation
 	allocate(const vk::MemoryRequirements& memory_requirements,
 			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) = 0;
+	/// Interface function to allow access to the device associated with the device memory manager.
 	virtual device* associated_device() const = 0;
 };
 
