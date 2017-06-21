@@ -17,6 +17,7 @@ class ring_chunk_placer {
 	size_t buffer_space_size_;
 	size_t out_pos_ = 0;
 	size_t in_pos_ = 0;
+	size_t wrap_size_;
 
 public:
 	ring_chunk_placer(void* buffer_space, size_t buffer_space_size);
