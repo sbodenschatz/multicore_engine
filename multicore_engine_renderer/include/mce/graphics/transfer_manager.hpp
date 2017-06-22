@@ -7,12 +7,30 @@
 #ifndef MCE_GRAPHICS_TRANSFER_MANAGER_HPP_
 #define MCE_GRAPHICS_TRANSFER_MANAGER_HPP_
 
+#include <mce/graphics/buffer.hpp>
+#include <mce/graphics/command_pool.hpp>
+#include <vector>
+
 namespace mce {
 namespace graphics {
 
 class transfer_manager {
+private:
+	struct transfer_job {};
+
+	device& dev;
+	device_memory_manager_interface& mm;
+	destruction_queue_manager* dqm;
+	std::vector<transfer_job> waiting_jobs;
+	std::vector<std::vector<transfer_job>> running_jobs;
+	command_pool transfer_cmd_pool;
+	command_pool ownership_cmd_pool;
+	std::vector<vk::UniqueCommandBuffer> transfer_command_bufers;
+	std::vector<vk::UniqueCommandBuffer> pending_ownership_command_buffers;
+	buffer staging_buffer;
+
 public:
-	transfer_manager();
+	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm);
 	~transfer_manager();
 };
 

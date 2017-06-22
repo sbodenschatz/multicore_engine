@@ -9,12 +9,14 @@
 namespace mce {
 namespace graphics {
 
-transfer_manager::transfer_manager() {
-	// TODO Auto-generated constructor stub
-}
+transfer_manager::transfer_manager(device& dev, device_memory_manager_interface& mm,
+								   destruction_queue_manager* dqm)
+		: dev{dev}, mm{mm}, dqm{dqm}, transfer_cmd_pool{dev, dev.transfer_queue_index().first, true, true},
+		  ownership_cmd_pool{dev, dev.graphics_queue_index().first, true, true},
+		  staging_buffer{dev, mm, dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc} {}
 
 transfer_manager::~transfer_manager() {
-	// TODO Auto-generated destructor stub
+	if(!dqm) dev.native_device().waitIdle();
 }
 
 } /* namespace graphics */
