@@ -20,13 +20,13 @@ class ring_chunk_placer {
 	size_t in_pos_ = 0;
 	size_t wrap_size_;
 
-	std::tuple<void*, bool> find_pos(void* buffer_space, size_t buffer_space_size);
+	std::tuple<void*, bool> find_pos(size_t data_size);
 
 public:
 	ring_chunk_placer(void* buffer_space, size_t buffer_space_size);
 	void* place_chunk(const void* data, size_t data_size);
 	void free_to(size_t end_of_space_to_free);
-	bool can_fit(const void* data, size_t data_size);
+	bool can_fit(size_t data_size);
 };
 
 } // namespace util
