@@ -27,6 +27,7 @@ public:
 	void* place_chunk(const void* data, size_t data_size);
 	void free_to(size_t end_of_space_to_free);
 	bool can_fit(size_t data_size);
+	bool can_fit_no_wrap(size_t data_size);
 };
 
 } // namespace util

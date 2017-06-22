@@ -53,6 +53,12 @@ bool ring_chunk_placer::can_fit(size_t data_size) {
 	std::tie(target, wrap) = find_pos(data_size);
 	return target;
 }
+bool ring_chunk_placer::can_fit_no_wrap(size_t data_size) {
+	void* target = nullptr;
+	bool wrap = false;
+	std::tie(target, wrap) = find_pos(data_size);
+	return target && !wrap;
+}
 
 } // namespace util
 } // namespace mce
