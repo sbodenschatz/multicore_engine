@@ -23,6 +23,7 @@ public:
 	ring_chunk_placer(void* buffer_space, size_t buffer_space_size);
 	void* place_chunk(const void* data, size_t data_size);
 	void free_to(size_t end_of_space_to_free);
+	bool can_fit(const void* data, size_t data_size);
 };
 
 } // namespace util

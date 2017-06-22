@@ -38,6 +38,20 @@ void ring_chunk_placer::free_to(size_t end_of_space_to_free) {
 	out_pos_ = end_of_space_to_free;
 	if(out_pos_ == wrap_size_) out_pos_ = 0;
 }
+bool ring_chunk_placer::can_fit(const void* data, size_t data_size) {
+	auto in_pos = in_pos_;
+	if(out_pos_ <= in_pos && in_pos + data_size <= buffer_space_size_) {
+		return true;
+	} else if(out_pos_ <= in_pos) {
+		in_pos = 0;
+	}
+
+	if(in_pos + data_size < out_pos_) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 } // namespace util
 } // namespace mce
