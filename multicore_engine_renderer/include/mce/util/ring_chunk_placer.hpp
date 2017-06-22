@@ -8,6 +8,7 @@
 #define MCE_UTIL_RING_CHUNK_PLACER_HPP_
 
 #include <cstddef>
+#include <tuple>
 
 namespace mce {
 namespace util {
@@ -18,6 +19,8 @@ class ring_chunk_placer {
 	size_t out_pos_ = 0;
 	size_t in_pos_ = 0;
 	size_t wrap_size_;
+
+	std::tuple<void*, bool> find_pos(void* buffer_space, size_t buffer_space_size);
 
 public:
 	ring_chunk_placer(void* buffer_space, size_t buffer_space_size);
