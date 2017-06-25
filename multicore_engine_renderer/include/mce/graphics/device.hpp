@@ -13,13 +13,14 @@
  */
 
 #include <boost/container/flat_set.hpp>
+#include <glm/glm.hpp>
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/graphics_defs.hpp>
 #include <utility>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-#if GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
+#if !defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
 #error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
 #endif
 

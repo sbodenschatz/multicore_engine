@@ -13,13 +13,14 @@
  */
 
 #include <atomic>
+#include <glm/glm.hpp>
 #include <mce/glfw/instance.hpp>
 #include <mutex>
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-#if GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
+#if !defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
 #error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
 #endif
 
@@ -43,10 +44,12 @@ private:
 	mutable std::mutex validation_log_mtx;
 
 private:
-	static VkBool32 VKAPI_CALL
-	validation_report_callback_static(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
-									  uint64_t object, size_t location, int32_t messageCode,
-									  const char* pLayerPrefix, const char* pMessage, void* pUserData);
+	static VkBool32 VKAPI_CALL validation_report_callback_static(VkDebugReportFlagsEXT flags,
+																 VkDebugReportObjectTypeEXT objectType,
+																 uint64_t object, size_t location,
+																 int32_t messageCode,
+																 const char* pLayerPrefix,
+																 const char* pMessage, void* pUserData);
 	VkBool32 validation_report_callback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
 										uint64_t object, size_t location, int32_t messageCode,
 										const char* pLayerPrefix, const char* pMessage) const;
