@@ -32,6 +32,7 @@ private:
 public:
 	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm);
 	~transfer_manager();
+	// TODO Handle release of ring buffer slots when the buffer was replaced while the transfer was executing.
 };
 
 } /* namespace graphics */
