@@ -19,6 +19,10 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
+#if GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
+#error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
+#endif
+
 namespace mce {
 namespace graphics {
 
