@@ -45,27 +45,16 @@ public:
 
 	void upload_buffer(void* data, size_t data_size, vk::Buffer dst_buffer, vk::DeviceSize dst_offset);
 
-	void upload_image(void* data, graphics::image_1d& dst_img, vk::ImageLayout final_layout,
-					  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t image_offset,
-					  uint32_t image_extent);
-	void upload_image(void* data, graphics::image_1d_layered& dst_img, vk::ImageLayout final_layout,
-					  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
-					  uint32_t layer_count, uint32_t image_offset, uint32_t image_extent);
-	void upload_image(void* data, graphics::image_2d& dst_img, vk::ImageLayout final_layout,
-					  vk::ImageAspectFlags aspectMask, uint32_t mip_level, glm::uvec2 image_offset,
-					  glm::uvec2 image_extent);
-	void upload_image(void* data, graphics::image_2d_layered& dst_img, vk::ImageLayout final_layout,
-					  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
-					  uint32_t layer_count, glm::uvec2 image_offset, glm::uvec2 image_extent);
-	void upload_image(void* data, graphics::image_cube& dst_img, vk::ImageLayout final_layout,
-					  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
-					  uint32_t layer_count, glm::uvec2 image_offset, glm::uvec2 image_extent);
-	void upload_image(void* data, graphics::image_cube_layered& dst_img, vk::ImageLayout final_layout,
-					  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
-					  uint32_t layer_count, glm::uvec2 image_offset, glm::uvec2 image_extent);
-	void upload_image(void* data, graphics::image_3d& dst_img, vk::ImageLayout final_layout,
-					  vk::ImageAspectFlags aspectMask, uint32_t mip_level, glm::uvec3 image_offset,
-					  glm::uvec3 image_extent);
+	template <typename Img>
+	void upload_single_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
+							 vk::ImageAspectFlags aspectMask, uint32_t mip_level,
+							 typename Img::size_type image_offset, typename Img::size_type image_extent);
+
+	template <typename Img>
+	void upload_layered_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
+							  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
+							  uint32_t layer_count, typename Img::size_type image_offset,
+							  typename Img::size_type image_extent);
 };
 
 } /* namespace graphics */
