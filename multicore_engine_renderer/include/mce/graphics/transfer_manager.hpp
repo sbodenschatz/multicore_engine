@@ -9,6 +9,7 @@
 
 #include <mce/graphics/buffer.hpp>
 #include <mce/graphics/command_pool.hpp>
+#include <mce/util/ring_chunk_placer.hpp>
 #include <vector>
 
 namespace mce {
@@ -28,6 +29,7 @@ private:
 	std::vector<vk::UniqueCommandBuffer> transfer_command_bufers;
 	std::vector<vk::UniqueCommandBuffer> pending_ownership_command_buffers;
 	buffer staging_buffer;
+	util::ring_chunk_placer chunk_placer;
 
 public:
 	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm);
