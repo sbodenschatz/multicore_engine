@@ -5,6 +5,7 @@
  */
 
 #include <cstring>
+#include <cassert>
 #include <mce/util/ring_chunk_placer.hpp>
 
 namespace mce {
@@ -48,6 +49,7 @@ void ring_chunk_placer::free_to(const void* end_of_space_to_free) {
 	auto free_end = static_cast<const char*>(end_of_space_to_free);
 	if(free_end < buffer_start || free_end > (buffer_start + buffer_space_size_)) return;
 	out_pos_ = free_end - buffer_start;
+	assert(out_pos_ <= wrap_size_);
 	if(out_pos_ == wrap_size_) out_pos_ = 0;
 }
 bool ring_chunk_placer::can_fit(size_t data_size) {
