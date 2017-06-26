@@ -40,6 +40,11 @@ public:
 	bool can_fit(size_t data_size);
 	/// Checks if a block of the given size can currently fit into the buffer without wrapping over the end.
 	bool can_fit_no_wrap(size_t data_size);
+
+	/// Returns the specified size of the buffer on which the ring_chunk_placer operates.
+	size_t buffer_space_size() const {
+		return buffer_space_size_;
+	}
 };
 
 } // namespace util
