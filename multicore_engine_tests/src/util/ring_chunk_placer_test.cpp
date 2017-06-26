@@ -100,5 +100,41 @@ TEST(util_ring_chunk_placer_test, fill_up_reuse_two_buffers) {
 	for(int i = 0; i < 16; ++i) ASSERT_EQ(19, buffer[i + 15]);
 }
 
+TEST(util_ring_chunk_placer_test, wrapping) {
+	char buffer[256];
+	ring_chunk_placer p(buffer, 256);
+	char data[128];
+
+	memset(data, 1, 128);
+	auto r = p.place_chunk(data, 128);
+	ASSERT_TRUE(r);
+	for(int i = 0; i < 128; ++i) ASSERT_EQ(1, static_cast<char*>(r)[i]);
+
+	memset(data, 2, 64);
+	r = p.place_chunk(data, 64);
+	ASSERT_TRUE(r);
+	for(int i = 0; i < 64; ++i) ASSERT_EQ(2, static_cast<char*>(r)[i]);
+
+	p.free_to(128);
+
+	memset(data, 3, 128);
+	r = p.place_chunk(data, 128);
+	ASSERT_FALSE(r);
+
+	memset(data, 4, 127);
+	r = p.place_chunk(data, 127);
+	ASSERT_TRUE(r);
+	ASSERT_EQ(buffer, r);
+	for(int i = 0; i < 127; ++i) ASSERT_EQ(4, static_cast<char*>(r)[i]);
+
+	p.free_to(192);
+
+	memset(data, 5, 129);
+	r = p.place_chunk(data, 129);
+	ASSERT_TRUE(r);
+	ASSERT_EQ(buffer + 127, r);
+	for(int i = 0; i < 129; ++i) ASSERT_EQ(5, static_cast<char*>(r)[i]);
+}
+
 } // namespace util
 } // namespace mce
