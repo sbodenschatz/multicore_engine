@@ -51,7 +51,7 @@ public:
 	 * placed chunks.
 	 */
 	const void* in_position() const {
-		return static_cast<const char*>(buffer_space_ + in_pos_);
+		return static_cast<const char*>(buffer_space_) + in_pos_;
 	}
 };
 
