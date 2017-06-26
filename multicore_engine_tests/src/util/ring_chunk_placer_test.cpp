@@ -103,7 +103,7 @@ TEST(util_ring_chunk_placer_test, fill_up_reuse_two_buffers) {
 TEST(util_ring_chunk_placer_test, wrapping) {
 	char buffer[256];
 	ring_chunk_placer p(buffer, 256);
-	char data[128];
+	char data[129];
 
 	memset(data, 1, 128);
 	auto r = p.place_chunk(data, 128);
