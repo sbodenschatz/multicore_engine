@@ -45,6 +45,14 @@ public:
 	size_t buffer_space_size() const {
 		return buffer_space_size_;
 	}
+	/// Returns the address after the last inserted chunk (i.e. the "write" position).
+	/**
+	 * This member function is useful to obtain the the address to pass to free_to to free all previously
+	 * placed chunks.
+	 */
+	const void* in_position() const {
+		return static_cast<const char*>(buffer_space_ + in_pos_);
+	}
 };
 
 } // namespace util
