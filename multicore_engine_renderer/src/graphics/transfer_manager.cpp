@@ -10,8 +10,9 @@ namespace mce {
 namespace graphics {
 
 transfer_manager::transfer_manager(device& dev, device_memory_manager_interface& mm,
-								   destruction_queue_manager* dqm)
-		: dev{dev}, mm{mm}, dqm{dqm}, transfer_cmd_pool{dev, dev.transfer_queue_index().first, true, true},
+								   destruction_queue_manager* dqm, uint32_t ring_slots)
+		: dev{dev}, mm{mm}, dqm{dqm}, ring_slots{ring_slots},
+		  transfer_cmd_pool{dev, dev.transfer_queue_index().first, true, true},
 		  ownership_cmd_pool{dev, dev.graphics_queue_index().first, true, true},
 		  staging_buffer{dev, mm, dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc},
 		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()} {}
