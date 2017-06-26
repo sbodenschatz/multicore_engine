@@ -50,7 +50,7 @@ TEST(util_ring_chunk_placer_test, fill_up_reuse_one_buffer) {
 	for(int j = 0; j < 16; j++)
 		for(int i = 0; i < 16; ++i) ASSERT_EQ(j + 1, buffer[j * 16 + i]);
 
-	p.free_to(1 * 16);
+	p.free_to(buffer + (1 * 16));
 	memset(data, 17, 16);
 	r = p.place_chunk(data, 16);
 	ASSERT_FALSE(r);
@@ -79,7 +79,7 @@ TEST(util_ring_chunk_placer_test, fill_up_reuse_two_buffers) {
 	for(int j = 0; j < 16; j++)
 		for(int i = 0; i < 16; ++i) ASSERT_EQ(j + 1, buffer[j * 16 + i]);
 
-	p.free_to(1 * 16);
+	p.free_to(buffer + (1 * 16));
 	memset(data, 17, 16);
 	r = p.place_chunk(data, 16);
 	ASSERT_FALSE(r);
@@ -89,7 +89,7 @@ TEST(util_ring_chunk_placer_test, fill_up_reuse_two_buffers) {
 	ASSERT_TRUE(r);
 	for(int i = 0; i < 15; ++i) ASSERT_EQ(18, buffer[i]);
 
-	p.free_to(2 * 16);
+	p.free_to(buffer + (2 * 16));
 	memset(data, 19, 16);
 	r = p.place_chunk(data, 16);
 	ASSERT_TRUE(r);
@@ -115,7 +115,7 @@ TEST(util_ring_chunk_placer_test, wrapping) {
 	ASSERT_TRUE(r);
 	for(int i = 0; i < 64; ++i) ASSERT_EQ(2, static_cast<char*>(r)[i]);
 
-	p.free_to(128);
+	p.free_to(buffer + 128);
 
 	memset(data, 3, 128);
 	r = p.place_chunk(data, 128);
@@ -127,7 +127,7 @@ TEST(util_ring_chunk_placer_test, wrapping) {
 	ASSERT_EQ(buffer, r);
 	for(int i = 0; i < 127; ++i) ASSERT_EQ(4, static_cast<char*>(r)[i]);
 
-	p.free_to(192);
+	p.free_to(buffer + 192);
 
 	memset(data, 5, 129);
 	r = p.place_chunk(data, 129);
