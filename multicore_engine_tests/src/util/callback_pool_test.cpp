@@ -117,5 +117,39 @@ TEST(util_callback_pool_test, assign_move_multiple_buffers) {
 	ASSERT_EQ(42, z);
 }
 
+TEST(util_callback_pool_test, buffer_reuse) {
+	callback_pool p;
+	int x = 0;
+	int y = 0;
+	int z = 0;
+	auto f = p.allocate_function<void()>([&]() { x = 42; });
+
+	std::vector<callback_pool_function<void()>> tmp;
+	auto cap = p.capacity() * 3;
+	while(p.capacity() < cap) {
+		tmp.push_back(p.allocate_function<void()>([&]() { y = 42; }));
+	}
+	cap = p.capacity();
+	auto count = tmp.size();
+	tmp.clear();
+	for(decltype(count) i = 0; i < count; ++i) {
+		tmp.push_back(p.allocate_function<void()>([&]() { z = 42; }));
+	}
+
+	ASSERT_EQ(cap, p.capacity());
+
+	for(auto& tmp_f : tmp) {
+		tmp_f();
+	}
+
+	ASSERT_EQ(0, x);
+	ASSERT_EQ(0, y);
+	ASSERT_EQ(42, z);
+	f();
+	ASSERT_EQ(42, x);
+	ASSERT_EQ(0, y);
+	ASSERT_EQ(42, z);
+}
+
 } // namespace util
 } // namespace mce
