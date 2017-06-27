@@ -58,8 +58,7 @@ class callback_pool_function_impl<F, R(Args...)> final : public callback_pool_fu
 
 public:
 	template <typename T>
-	callback_pool_function_impl(T&& fun)
-			: f{std::forward<T>(fun)} {}
+	callback_pool_function_impl(T&& fun) : f{std::forward<T>(fun)} {}
 	virtual ~callback_pool_function_impl() = default;
 	virtual R operator()(Args... args) override {
 		return f(std::forward<Args>(args)...);
@@ -187,7 +186,7 @@ class callback_pool {
 	mutable std::mutex pool_mutex;
 	static constexpr size_t min_slots = 10;
 	static constexpr size_t growth_factor = 2;
-	static constexpr size_t min_buffer_size = 1 << 24;
+	static constexpr size_t min_buffer_size = size_t(1) << 20;
 
 	void reallocate(size_t alloc_size) {
 		// Stash current buffer (full or otherwise unusable when this is called)
@@ -269,6 +268,7 @@ public:
 			loc = try_alloc_obj_block(sizeof(fun), alignof(fun));
 			assert(loc);
 		}
+		current_buffer->increment_ref_count();
 		auto fun_ptr = new(loc) fun(std::forward<F>(f));
 		current_buffer_offset = reinterpret_cast<char*>(fun_ptr + 1) - current_buffer->data();
 		return callback_pool_function<Signature>(fun_ptr, current_buffer);
