@@ -89,5 +89,33 @@ TEST(util_callback_pool_test, assign_move) {
 	ASSERT_TRUE(y == 42);
 }
 
+TEST(util_callback_pool_test, assign_move_multiple_buffers) {
+	int x = 0;
+	int y = 0;
+	int z = 0;
+	callback_pool p;
+	auto l = [&]() { x = 42; };
+	auto f = p.allocate_function<void()>(l);
+	std::vector<callback_pool_function<void()>> tmp;
+	for(size_t i = 0; i < 2 * ((1 << 20) / sizeof(l)); ++i) {
+		tmp.push_back(p.allocate_function<void()>([&]() { z = 42; }));
+	}
+	auto f2 = p.allocate_function<void()>([&]() { z = 42; });
+	for(size_t i = 0; i < 2 * ((1 << 20) / sizeof(l)); ++i) {
+		tmp.push_back(p.allocate_function<void()>([&]() { z = 42; }));
+	}
+	auto f3 = p.allocate_function<void()>([&]() { y = 42; });
+	tmp.clear();
+	f = std::move(f3);
+	f();
+	ASSERT_EQ(0, x);
+	ASSERT_EQ(42, y);
+	ASSERT_EQ(0, z);
+	f2();
+	ASSERT_EQ(0, x);
+	ASSERT_EQ(42, y);
+	ASSERT_EQ(42, z);
+}
+
 } // namespace util
 } // namespace mce
