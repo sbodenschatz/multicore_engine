@@ -58,7 +58,8 @@ class callback_pool_function_impl<F, R(Args...)> final : public callback_pool_fu
 
 public:
 	template <typename T>
-	callback_pool_function_impl(T&& fun) : f{std::forward<T>(fun)} {}
+	callback_pool_function_impl(T&& fun)
+			: f{std::forward<T>(fun)} {}
 	virtual ~callback_pool_function_impl() = default;
 	virtual R operator()(Args... args) override {
 		return f(std::forward<Args>(args)...);
@@ -262,8 +263,9 @@ public:
 		using fun = detail::callback_pool_function_impl<F, Signature>;
 		auto loc = try_alloc_obj_block(sizeof(fun), alignof(fun));
 		if(!loc) {
-			reallocate(std::max(min_buffer_size,
-								sizeof(fun) > curr_buf_cap() ? sizeof(fun) * min_slots : curr_buf_cap()));
+			auto requested_size = sizeof(fun) > curr_buf_cap() ? sizeof(fun) * min_slots : curr_buf_cap();
+			if(requested_size < min_buffer_size) requested_size = min_buffer_size;
+			reallocate(requested_size);
 			loc = try_alloc_obj_block(sizeof(fun), alignof(fun));
 			assert(loc);
 		}
