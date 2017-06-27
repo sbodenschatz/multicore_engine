@@ -35,7 +35,7 @@ TEST(util_local_function_test, call_lambda_ref_pass_through) {
 
 static int test_value_1 = 0;
 
-void test_function_1() {
+static void test_function_1() {
 	test_value_1 = 42;
 }
 
@@ -46,7 +46,7 @@ TEST(util_local_function_test, call_fptr_void_noparams) {
 	ASSERT_TRUE(test_value_1 == 42);
 }
 
-void test_function_2(int val) {
+static void test_function_2(int val) {
 	test_value_1 = val;
 }
 
