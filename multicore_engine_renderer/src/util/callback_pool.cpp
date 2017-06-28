@@ -41,7 +41,7 @@ void callback_pool::reallocate(size_t alloc_size) {
 																   detail::callback_pool_buffer_deleter(tmp));
 }
 
-void* callback_pool::try_alloc_obj_block(size_t size, size_t alignment) {
+void* callback_pool::try_alloc_obj_block(size_t size, size_t alignment) const noexcept {
 	if(!current_buffer) return nullptr;
 	if(current_buffer->size() < size) return nullptr;
 	void* tmp = current_buffer->data() + current_buffer_offset;
@@ -68,7 +68,7 @@ callback_pool& callback_pool::operator=(callback_pool&& other) noexcept {
 	swap(current_buffer_offset, other.current_buffer_offset);
 	return *this;
 }
-size_t callback_pool::capacity() const {
+size_t callback_pool::capacity() const noexcept {
 	std::lock_guard<std::mutex> lock(pool_mutex);
 	size_t tmp = 0;
 	if(current_buffer) tmp = current_buffer->size();
