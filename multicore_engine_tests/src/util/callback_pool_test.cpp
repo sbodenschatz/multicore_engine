@@ -151,5 +151,27 @@ TEST(util_callback_pool_test, buffer_reuse) {
 	ASSERT_EQ(42, z);
 }
 
+TEST(util_callback_pool_test, const_correctnes) {
+	callback_pool p;
+	int x = 0;
+	struct {
+		int& x;
+		int operator()() {
+			return x++;
+		}
+		int operator()() const {
+			return x;
+		}
+	} test_functor{x};
+	auto f = p.allocate_function<int()>(test_functor);
+	const auto& c_f = f;
+	auto c_res = c_f();
+	ASSERT_EQ(0, c_res);
+	ASSERT_EQ(0, x);
+	auto res=f();
+	ASSERT_EQ(0, res);
+	ASSERT_EQ(1, x);
+}
+
 } // namespace util
 } // namespace mce
