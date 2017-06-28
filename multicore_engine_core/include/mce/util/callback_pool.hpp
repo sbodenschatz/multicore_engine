@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/include/mce/util/callback_pool.hpp
+ * File /multicore_engine_core/include/mce/util/callback_pool.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
