@@ -190,8 +190,8 @@ class callback_pool {
 	static constexpr size_t min_buffer_size = size_t(1) << 20;
 
 	void reallocate(size_t alloc_size);
-	void* try_alloc_obj_block(size_t size, size_t alignment);
-	size_t curr_buf_cap() const {
+	void* try_alloc_obj_block(size_t size, size_t alignment) const noexcept;
+	size_t curr_buf_cap() const noexcept {
 		return current_buffer ? current_buffer->size() : size_t(0);
 	}
 
@@ -225,11 +225,11 @@ public:
 			reallocate(size);
 		}
 	}
-	void shrink() {
+	void shrink() noexcept {
 		std::lock_guard<std::mutex> lock(pool_mutex);
 		stashed_buffers.clear();
 	}
-	size_t capacity() const;
+	size_t capacity() const noexcept;
 };
 
 } // namespace util
