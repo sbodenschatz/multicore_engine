@@ -11,6 +11,7 @@
 #include <mce/graphics/buffer.hpp>
 #include <mce/graphics/command_pool.hpp>
 #include <mce/graphics/image.hpp>
+#include <mce/util/callback_pool.hpp>
 #include <mce/util/ring_chunk_placer.hpp>
 #include <vector>
 
@@ -34,6 +35,7 @@ private:
 	std::vector<vk::UniqueCommandBuffer> pending_ownership_command_buffers;
 	buffer staging_buffer;
 	util::ring_chunk_placer chunk_placer;
+	util::callback_pool completion_function_pool;
 
 public:
 	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm,
