@@ -180,6 +180,7 @@ public:
 	}
 };
 
+/// Provides a thread-safe memory pool for backing callback_pool_function objects.
 class callback_pool {
 	std::shared_ptr<detail::callback_pool_buffer> current_buffer;
 	std::vector<std::shared_ptr<detail::callback_pool_buffer>> stashed_buffers;
@@ -196,11 +197,15 @@ class callback_pool {
 	}
 
 public:
+	/// Creates a callback_pool.
 	callback_pool() {}
 
+	/// Allows move-construction.
 	callback_pool(callback_pool&& other) noexcept;
+	/// Allows move-assignment.
 	callback_pool& operator=(callback_pool&& other) noexcept;
 
+	/// Wraps the given function object into a callback_pool_function of the given signature.
 	template <typename Signature, typename F>
 	callback_pool_function<Signature> allocate_function(F&& f) {
 		std::lock_guard<std::mutex> lock(pool_mutex);
@@ -219,16 +224,21 @@ public:
 		return callback_pool_function<Signature>(fun_ptr, current_buffer);
 	}
 
+	/// Ensures that the pool has at least the given size in buffer capacity (not necessarily free).
 	void reserve(size_t size) {
 		std::lock_guard<std::mutex> lock(pool_mutex);
 		if(!current_buffer || current_buffer->size() < size) {
 			reallocate(size);
 		}
 	}
+
+	/// \brief Drops ownership of all but the current pool buffers, however the buffers are kept alive by
+	/// callback_pool_function objects using them.
 	void shrink() noexcept {
 		std::lock_guard<std::mutex> lock(pool_mutex);
 		stashed_buffers.clear();
 	}
+	/// Returns the total (not just free) space in the buffers of the pool.
 	size_t capacity() const noexcept;
 };
 
