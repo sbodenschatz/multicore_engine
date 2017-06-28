@@ -137,5 +137,26 @@ TEST(util_local_function_test, move_assign_different_size) {
 	ASSERT_TRUE(x == 42);
 }
 
+TEST(util_local_function_test, const_correctnes) {
+	int x = 0;
+	struct {
+		int& x;
+		int operator()() {
+			return x++;
+		}
+		int operator()() const {
+			return x;
+		}
+	} test_functor{x};
+	local_function<128, int()> f = test_functor;
+	const auto& c_f = f;
+	auto c_res = c_f();
+	ASSERT_EQ(0, c_res);
+	ASSERT_EQ(0, x);
+	auto res = f();
+	ASSERT_EQ(0, res);
+	ASSERT_EQ(1, x);
+}
+
 } // namespace util
 } // namespace mce
