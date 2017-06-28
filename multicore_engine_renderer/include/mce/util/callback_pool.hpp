@@ -213,7 +213,9 @@ public:
 	callback_pool& operator=(callback_pool&& other) noexcept;
 
 	/// Wraps the given function object into a callback_pool_function of the given signature.
-	template <typename Signature, typename F>
+	template <typename Signature, typename F,
+			  typename = std::enable_if_t<callback_pool_function<Signature>::template is_valid_function_value<
+					  std::decay_t<F>>::value>>
 	callback_pool_function<Signature> allocate_function(F&& f) {
 		std::lock_guard<std::mutex> lock(pool_mutex);
 		using fun = detail::callback_pool_function_impl<F, Signature>;
