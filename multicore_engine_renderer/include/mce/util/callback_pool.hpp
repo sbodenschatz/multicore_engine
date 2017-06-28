@@ -58,7 +58,8 @@ class callback_pool_function_impl<F, R(Args...)> final : public callback_pool_fu
 
 public:
 	template <typename T>
-	callback_pool_function_impl(T&& fun) : f{std::forward<T>(fun)} {}
+	callback_pool_function_impl(T&& fun)
+			: f{std::forward<T>(fun)} {}
 	virtual ~callback_pool_function_impl() = default;
 	virtual R operator()(Args... args) override {
 		return f(std::forward<Args>(args)...);
@@ -188,47 +189,8 @@ class callback_pool {
 	static constexpr size_t growth_factor = 2;
 	static constexpr size_t min_buffer_size = size_t(1) << 20;
 
-	void reallocate(size_t alloc_size) {
-		// Stash current buffer (full or otherwise unusable when this is called)
-		if(current_buffer) stashed_buffers.push_back(std::move(current_buffer));
-		current_buffer_offset = 0;
-		if(stashed_buffers.size() > 1) {
-			// Try to reclaim existing buffer
-			auto it = std::find_if(stashed_buffers.begin(), stashed_buffers.end(),
-								   [alloc_size](const std::shared_ptr<detail::callback_pool_buffer>& b) {
-									   return b->size() >= alloc_size && b->ref_count() == 0;
-								   });
-			if(it != stashed_buffers.end()) {
-				current_buffer = std::move(*it);
-				stashed_buffers.erase(it);
-				return;
-			}
-		}
-		// Create new buffer
-		auto raw_size = growth_factor * alloc_size + sizeof(detail::callback_pool_buffer) +
-						alignof(detail::callback_pool_buffer);
-		auto tmp = new char[raw_size];
-		void* tmp2 = tmp;
-		auto space = sizeof(detail::callback_pool_buffer) + alignof(detail::callback_pool_buffer);
-		auto buffer_header = reinterpret_cast<detail::callback_pool_buffer*>(memory::align(
-				alignof(detail::callback_pool_buffer), sizeof(detail::callback_pool_buffer), tmp2, space));
-		assert(buffer_header);
-
-		auto buffer_size = (tmp + raw_size) - reinterpret_cast<char*>(buffer_header + 1);
-		new(buffer_header)
-				detail::callback_pool_buffer(reinterpret_cast<char*>(buffer_header + 1), buffer_size);
-		current_buffer = std::shared_ptr<detail::callback_pool_buffer>(
-				buffer_header, detail::callback_pool_buffer_deleter(tmp));
-	}
-
-	void* try_alloc_obj_block(size_t size, size_t alignment) {
-		if(!current_buffer) return nullptr;
-		if(current_buffer->size() < size) return nullptr;
-		void* tmp = current_buffer->data() + current_buffer_offset;
-		auto space = current_buffer->size() - current_buffer_offset;
-		return memory::align(alignment, size, tmp, space);
-	}
-
+	void reallocate(size_t alloc_size);
+	void* try_alloc_obj_block(size_t size, size_t alignment);
 	size_t curr_buf_cap() const {
 		return current_buffer ? current_buffer->size() : size_t(0);
 	}
@@ -236,25 +198,8 @@ class callback_pool {
 public:
 	callback_pool() {}
 
-	callback_pool(callback_pool&& other) noexcept {
-		using std::swap;
-		std::lock(pool_mutex, other.pool_mutex);
-		std::lock_guard<std::mutex> l1(pool_mutex, std::adopt_lock);
-		std::lock_guard<std::mutex> l2(other.pool_mutex, std::adopt_lock);
-		swap(current_buffer, other.current_buffer);
-		swap(stashed_buffers, other.stashed_buffers);
-		swap(current_buffer_offset, other.current_buffer_offset);
-	}
-	callback_pool& operator=(callback_pool&& other) noexcept {
-		using std::swap;
-		std::lock(pool_mutex, other.pool_mutex);
-		std::lock_guard<std::mutex> l1(pool_mutex, std::adopt_lock);
-		std::lock_guard<std::mutex> l2(other.pool_mutex, std::adopt_lock);
-		swap(current_buffer, other.current_buffer);
-		swap(stashed_buffers, other.stashed_buffers);
-		swap(current_buffer_offset, other.current_buffer_offset);
-		return *this;
-	}
+	callback_pool(callback_pool&& other) noexcept;
+	callback_pool& operator=(callback_pool&& other) noexcept;
 
 	template <typename Signature, typename F>
 	callback_pool_function<Signature> allocate_function(F&& f) {
@@ -284,15 +229,7 @@ public:
 		std::lock_guard<std::mutex> lock(pool_mutex);
 		stashed_buffers.clear();
 	}
-	size_t capacity() const {
-		std::lock_guard<std::mutex> lock(pool_mutex);
-		size_t tmp = 0;
-		if(current_buffer) tmp = current_buffer->size();
-		return std::accumulate(stashed_buffers.begin(), stashed_buffers.end(), tmp,
-							   [](size_t s, const std::shared_ptr<detail::callback_pool_buffer>& b) {
-								   return s + b->size();
-							   });
-	}
+	size_t capacity() const;
 };
 
 } // namespace util
