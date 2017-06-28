@@ -134,6 +134,8 @@ public:
 template <typename>
 class callback_pool_function {};
 
+/// \brief Provides a type-erasing function wrapper similar to std::function that can take all function
+/// objects with the given return value and argument types.
 template <typename R, typename... Args>
 class callback_pool_function<R(Args...)> {
 	using ifo_t = std::unique_ptr<detail::callback_pool_function_iface<R(Args...)>,
@@ -153,28 +155,33 @@ class callback_pool_function<R(Args...)> {
 			: internal_function_object{std::move(ptr), buffer} {}
 
 public:
+	/// Creates an empty function wrapper, that throws an exception when called.
 	callback_pool_function() noexcept;
+	/// Allows move-construction.
 	callback_pool_function(callback_pool_function&& other) noexcept
 			: internal_function_object{std::move(other.internal_function_object)} {
 		other.internal_function_object = nullptr;
 	}
+	/// Allows move-assignment.
 	callback_pool_function& operator=(callback_pool_function&& other) noexcept {
 		using std::swap;
 		swap(internal_function_object, other.internal_function_object);
 		other.internal_function_object.reset();
 		return *this;
 	}
-
+	/// Calls the wrapped function with the function object being const.
 	R operator()(Args... args) const {
 		const detail::callback_pool_function_iface<R(Args...)>* f = internal_function_object.get();
 		if(!f) throw std::bad_function_call();
 		return (*f)(std::forward<Args>(args)...);
 	}
+	/// Calls the wrapped function with the function object being non-const.
 	R operator()(Args... args) {
 		detail::callback_pool_function_iface<R(Args...)>* f = internal_function_object.get();
 		if(!f) throw std::bad_function_call();
 		return (*f)(std::forward<Args>(args)...);
 	}
+	/// Checks if the function wrapper is non-empty.
 	operator bool() noexcept {
 		return internal_function_object;
 	}
