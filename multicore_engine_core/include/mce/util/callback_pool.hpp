@@ -57,9 +57,7 @@ class callback_pool_function_impl<F, R(Args...)> final : public callback_pool_fu
 	struct const_call_helper<T, std::enable_if_t<std::is_same<R, decltype(std::declval<const T>()(
 																		 std::declval<Args>()...))>::value>> {
 		static R call(const F& f, Args... args) {
-			// TODO: Investigate, why const on f is lost here without this workaround.
-			const auto& const_f = f;
-			return const_f(std::forward<Args>(args)...);
+			return f(std::forward<Args>(args)...);
 		}
 	};
 
@@ -224,7 +222,7 @@ public:
 					  std::decay_t<F>>::value>>
 	callback_pool_function<Signature> allocate_function(F&& f) {
 		std::lock_guard<std::mutex> lock(pool_mutex);
-		using fun = detail::callback_pool_function_impl<F, Signature>;
+		using fun = detail::callback_pool_function_impl<std::decay_t<F>, Signature>;
 		auto loc = try_alloc_obj_block(sizeof(fun), alignof(fun));
 		if(!loc) {
 			auto requested_size = sizeof(fun) > curr_buf_cap() ? sizeof(fun) * min_slots : curr_buf_cap();
