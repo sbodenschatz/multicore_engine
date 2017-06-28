@@ -7,6 +7,11 @@
 #ifndef MCE_UTIL_CALLBACK_POOL_HPP_
 #define MCE_UTIL_CALLBACK_POOL_HPP_
 
+/**
+ * \file
+ * Provides a type-erased function wrapper that stores the functors in pooled memory.
+ */
+
 #include <algorithm>
 #include <atomic>
 #include <cassert>
