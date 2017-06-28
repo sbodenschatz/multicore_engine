@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/src/util/ring_chunk_placer.cpp
+ * File /multicore_engine_core/src/util/ring_chunk_placer.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
