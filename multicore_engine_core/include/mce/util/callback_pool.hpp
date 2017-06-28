@@ -57,14 +57,15 @@ class callback_pool_function_impl<F, R(Args...)> final : public callback_pool_fu
 	struct const_call_helper<T, std::enable_if_t<std::is_same<R, decltype(std::declval<const T>()(
 																		 std::declval<Args>()...))>::value>> {
 		static R call(const F& f, Args... args) {
-			return f(std::forward<Args>(args)...);
+			// TODO: Investigate, why const on f is lost here without this workaround.
+			const auto& const_f = f;
+			return const_f(std::forward<Args>(args)...);
 		}
 	};
 
 public:
 	template <typename T>
-	callback_pool_function_impl(T&& fun)
-			: f{std::forward<T>(fun)} {}
+	callback_pool_function_impl(T&& fun) : f{std::forward<T>(fun)} {}
 	virtual ~callback_pool_function_impl() = default;
 	virtual R operator()(Args... args) override {
 		return f(std::forward<Args>(args)...);
