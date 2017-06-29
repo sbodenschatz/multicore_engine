@@ -8,9 +8,17 @@
 #define MCE_UTIL_MATH_TOOLS_HPP_
 
 #include <algorithm>
-#include <boost/rational.hpp>
 #include <glm/glm.hpp>
 #include <type_traits>
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4146)
+#endif
+#include <boost/rational.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 /**
  * \file

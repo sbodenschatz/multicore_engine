@@ -8,11 +8,19 @@
 #define MCE_CONTAINERS_BYTE_BUFFER_POOL_HPP_
 
 #include <atomic>
-#include <boost/rational.hpp>
 #include <cstddef>
 #include <memory>
 #include <mutex>
 #include <vector>
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4146)
+#endif
+#include <boost/rational.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 namespace mce {
 namespace containers {
@@ -73,6 +81,8 @@ class pooled_byte_buffer_ptr {
 	pooled_byte_buffer_ptr(const std::shared_ptr<detail::byte_buffer_pool_buffer>& pool_buffer, char* data,
 						   size_t size)
 			: pool_buffer_{pool_buffer}, data_{data}, size_{size} {}
+
+	friend class byte_buffer_pool;
 
 public:
 	pooled_byte_buffer_ptr(const pooled_byte_buffer_ptr& other) noexcept : pool_buffer_{other.pool_buffer_},
