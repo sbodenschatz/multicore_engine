@@ -9,16 +9,22 @@
 namespace mce {
 namespace util {
 
-void callback_pool::reallocate(size_t alloc_size) {
+template <typename T>
+static T ceil(boost::rational<T> r) {
+	return T(1) + (r.numerator() - T(1)) / r.denominator();
+}
+
+void callback_pool::reallocate(size_t obj_size, size_t obj_alignment) {
 	// Stash current buffer (full or otherwise unusable when this is called)
 	if(current_buffer) stashed_buffers.push_back(std::move(current_buffer));
 	current_buffer_offset = 0;
 	if(stashed_buffers.size() > 1) {
 		// Try to reclaim existing buffer
-		auto it = std::find_if(stashed_buffers.begin(), stashed_buffers.end(),
-							   [alloc_size](const std::shared_ptr<detail::callback_pool_buffer>& b) {
-								   return b->size() >= alloc_size && b->ref_count() == 0;
-							   });
+		auto it = std::find_if(
+				stashed_buffers.begin(), stashed_buffers.end(),
+				[this, obj_size, obj_alignment](const std::shared_ptr<detail::callback_pool_buffer>& b) {
+					return b->size() >= obj_alignment + min_slots_ * obj_size && b->ref_count() == 0;
+				});
 		if(it != stashed_buffers.end()) {
 			current_buffer = std::move(*it);
 			stashed_buffers.erase(it);
@@ -26,8 +32,12 @@ void callback_pool::reallocate(size_t alloc_size) {
 		}
 	}
 	// Create new buffer
-	auto raw_size = growth_factor * alloc_size + sizeof(detail::callback_pool_buffer) +
-					alignof(detail::callback_pool_buffer);
+	buffer_size_ = ceil(buffer_size_ * growth_factor_);
+	if(buffer_size_ < obj_alignment + min_slots_ * obj_size) {
+		buffer_size_ = obj_alignment + min_slots_ * obj_size;
+	}
+	auto raw_size =
+			buffer_size_ + sizeof(detail::callback_pool_buffer) + alignof(detail::callback_pool_buffer);
 	auto tmp = new char[raw_size];
 	void* tmp2 = tmp;
 	auto space = sizeof(detail::callback_pool_buffer) + alignof(detail::callback_pool_buffer);
@@ -57,6 +67,9 @@ callback_pool::callback_pool(callback_pool&& other) noexcept {
 	swap(current_buffer, other.current_buffer);
 	swap(stashed_buffers, other.stashed_buffers);
 	swap(current_buffer_offset, other.current_buffer_offset);
+	swap(buffer_size_, other.buffer_size_);
+	swap(min_slots_, other.min_slots_);
+	swap(growth_factor_, other.growth_factor_);
 }
 callback_pool& callback_pool::operator=(callback_pool&& other) noexcept {
 	using std::swap;
@@ -66,6 +79,9 @@ callback_pool& callback_pool::operator=(callback_pool&& other) noexcept {
 	swap(current_buffer, other.current_buffer);
 	swap(stashed_buffers, other.stashed_buffers);
 	swap(current_buffer_offset, other.current_buffer_offset);
+	swap(buffer_size_, other.buffer_size_);
+	swap(min_slots_, other.min_slots_);
+	swap(growth_factor_, other.growth_factor_);
 	return *this;
 }
 size_t callback_pool::capacity() const noexcept {

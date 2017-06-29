@@ -125,8 +125,9 @@ TEST(util_callback_pool_test, buffer_reuse) {
 	auto f = p.allocate_function<void()>([&]() { x = 42; });
 
 	std::vector<callback_pool_function<void()>> tmp;
-	auto cap = p.capacity() * 3;
-	while(p.capacity() < cap) {
+	tmp.reserve(100000);
+	auto cap = p.capacity();
+	while(p.capacity() == cap) {
 		tmp.push_back(p.allocate_function<void()>([&]() { y = 42; }));
 	}
 	cap = p.capacity();
