@@ -8,6 +8,7 @@
 #define MCE_UTIL_MATH_TOOLS_HPP_
 
 #include <algorithm>
+#include <boost/rational.hpp>
 #include <glm/glm.hpp>
 #include <type_traits>
 
@@ -110,6 +111,17 @@ T component_mul(const Vector_Type<T, p>& v) {
 template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
 T component_mul(T v) {
 	return v;
+}
+
+/// Provides a ceil function for rational numbers.
+template <typename T>
+T ceil(boost::rational<T> r) {
+	return T(1) + (r.numerator() - T(1)) / r.denominator();
+}
+/// Provides a floor function for rational numbers.
+template <typename T>
+T floor(boost::rational<T> r) {
+	return r.numerator() / r.denominator();
 }
 
 } // namespace util
