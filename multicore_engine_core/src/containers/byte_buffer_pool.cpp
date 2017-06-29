@@ -10,6 +10,13 @@
 namespace mce {
 namespace containers {
 
+void byte_buffer_pool::release_resources() noexcept {
+	std::lock_guard<std::mutex> lock(pool_mutex);
+	current_pool_buffer.reset();
+	current_pool_buffer_offset = 0;
+	stashed_pool_buffers.clear();
+}
+
 size_t byte_buffer_pool::capacity() const noexcept {
 	std::lock_guard<std::mutex> lock(pool_mutex);
 	size_t tmp = 0;
