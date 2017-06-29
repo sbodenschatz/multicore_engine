@@ -93,5 +93,16 @@ size_t callback_pool::capacity() const noexcept {
 			[](size_t s, const std::shared_ptr<detail::callback_pool_buffer>& b) { return s + b->size(); });
 }
 
+void callback_pool::reserve(size_t slots, size_t obj_size, size_t obj_alignment) {
+	auto min_slots = min_slots_;
+	auto restore_min_slots = util::finally([this, min_slots]() { min_slots_ = min_slots; });
+	min_slots_ = slots;
+	std::lock_guard<std::mutex> lock(pool_mutex);
+	if(!current_buffer ||
+	   (current_buffer ? current_buffer->size() - current_buffer_offset : 0) <
+			   (obj_alignment + slots * obj_size)) {
+		reallocate(obj_size, obj_alignment);
+	}
+}
 } // namespace util
 } // namespace mce
