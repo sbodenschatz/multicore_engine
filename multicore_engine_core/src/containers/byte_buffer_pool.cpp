@@ -4,7 +4,10 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <mce/containers/byte_buffer_pool.hpp>
+#include <mce/memory/align.hpp>
+#include <mce/util/math_tools.hpp>
 #include <numeric>
 
 namespace mce {
@@ -59,6 +62,52 @@ size_t byte_buffer_pool::capacity() const noexcept {
 						   [](size_t s, const std::shared_ptr<detail::byte_buffer_pool_buffer>& b) {
 							   return s + b->size();
 						   });
+}
+void byte_buffer_pool::reallocate(size_t buff_size) {
+	// Stash current buffer (full or otherwise unusable when this is called)
+	if(current_pool_buffer) stashed_pool_buffers.push_back(std::move(current_pool_buffer));
+	current_pool_buffer_offset = 0;
+	if(stashed_pool_buffers.size() > 1) {
+		// Try to reclaim existing buffer
+		auto it = std::find_if(stashed_pool_buffers.begin(), stashed_pool_buffers.end(),
+							   [this, buff_size](const std::shared_ptr<detail::byte_buffer_pool_buffer>& b) {
+								   return b->size() >= min_slots_ * buff_size && b->ref_count() == 0;
+							   });
+		if(it != stashed_pool_buffers.end()) {
+			current_pool_buffer = std::move(*it);
+			stashed_pool_buffers.erase(it);
+			return;
+		}
+	}
+	using util::ceil;
+	// Create new buffer
+	pool_buffer_size_ = ceil(pool_buffer_size_ * growth_factor_);
+	if(pool_buffer_size_ < min_slots_ * buff_size) {
+		pool_buffer_size_ = min_slots_ * buff_size;
+	}
+	auto raw_size = pool_buffer_size_ + sizeof(detail::byte_buffer_pool_buffer) +
+					alignof(detail::byte_buffer_pool_buffer);
+	auto tmp = new char[raw_size];
+	void* tmp2 = tmp;
+	auto space = sizeof(detail::byte_buffer_pool_buffer) + alignof(detail::byte_buffer_pool_buffer);
+	auto buffer_header = reinterpret_cast<detail::byte_buffer_pool_buffer*>(memory::align(
+			alignof(detail::byte_buffer_pool_buffer), sizeof(detail::byte_buffer_pool_buffer), tmp2, space));
+	assert(buffer_header);
+
+	auto buffer_size = (tmp + raw_size) - reinterpret_cast<char*>(buffer_header + 1);
+	new(buffer_header)
+			detail::byte_buffer_pool_buffer(reinterpret_cast<char*>(buffer_header + 1), buffer_size);
+	current_pool_buffer = std::shared_ptr<detail::byte_buffer_pool_buffer>(
+			buffer_header, detail::byte_buffer_pool_buffer_deleter(tmp));
+}
+
+void* byte_buffer_pool::try_alloc_buffer_block(size_t size) const noexcept {
+	if(!current_pool_buffer) return nullptr;
+	if(current_pool_buffer->size() < size) return nullptr;
+	void* tmp = current_pool_buffer->data() + current_pool_buffer_offset;
+	auto space = current_pool_buffer->size() - current_pool_buffer_offset;
+	if(space < size) return nullptr;
+	return tmp;
 }
 
 } /* namespace containers */

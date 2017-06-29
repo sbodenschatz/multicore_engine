@@ -48,6 +48,18 @@ public:
 	}
 };
 
+class byte_buffer_pool_buffer_deleter {
+	char* raw_buffer;
+
+public:
+	explicit byte_buffer_pool_buffer_deleter(char* raw_buffer) noexcept : raw_buffer{raw_buffer} {}
+
+	void operator()(byte_buffer_pool_buffer* b) noexcept {
+		b->~byte_buffer_pool_buffer();
+		delete[] raw_buffer;
+	}
+};
+
 } // namespace detail
 
 class pooled_byte_buffer_ptr {
@@ -128,7 +140,7 @@ class byte_buffer_pool {
 	boost::rational<size_t> growth_factor_;
 
 	void reallocate(size_t buff_size);
-	void* try_alloc_buffer_block(size_t size, size_t alignment) const noexcept;
+	void* try_alloc_buffer_block(size_t size) const noexcept;
 
 public:
 	byte_buffer_pool(size_t buffer_size = 0x100000, size_t min_slots = 0x10,

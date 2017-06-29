@@ -5,14 +5,10 @@
  */
 
 #include <mce/util/callback_pool.hpp>
+#include <mce/util/math_tools.hpp>
 
 namespace mce {
 namespace util {
-
-template <typename T>
-static T ceil(boost::rational<T> r) {
-	return T(1) + (r.numerator() - T(1)) / r.denominator();
-}
 
 void callback_pool::reallocate(size_t obj_size, size_t obj_alignment) {
 	// Stash current buffer (full or otherwise unusable when this is called)
