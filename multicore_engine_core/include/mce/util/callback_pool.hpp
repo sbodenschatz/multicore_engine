@@ -16,12 +16,22 @@
 #include <atomic>
 #include <cassert>
 #include <mce/memory/align.hpp>
+#include <mce/util/finally.hpp>
 #include <memory>
 #include <mutex>
 #include <numeric>
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4146)
+#endif
+#include <boost/rational.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 namespace mce {
 namespace util {
@@ -197,19 +207,24 @@ class callback_pool {
 	std::vector<std::shared_ptr<detail::callback_pool_buffer>> stashed_buffers;
 	size_t current_buffer_offset = 0;
 	mutable std::mutex pool_mutex;
-	static constexpr size_t min_slots = 10;
-	static constexpr size_t growth_factor = 2;
-	static constexpr size_t min_buffer_size = size_t(1) << 20;
+	// TODO Make configurable.
+	size_t buffer_size_;
+	size_t min_slots_;
+	boost::rational<size_t> growth_factor_;
 
-	void reallocate(size_t alloc_size);
+	void reallocate(size_t obj_size, size_t obj_alignment);
 	void* try_alloc_obj_block(size_t size, size_t alignment) const noexcept;
-	size_t curr_buf_cap() const noexcept {
-		return current_buffer ? current_buffer->size() : size_t(0);
-	}
 
 public:
-	/// Creates a callback_pool.
-	callback_pool() {}
+	/// Creates a callback_pool with the given allocation parameters.
+	callback_pool(size_t buffer_size = 0x100000, size_t min_slots = 0x10,
+				  boost::rational<size_t> growth_factor = {3u, 2u})
+			: buffer_size_{buffer_size}, min_slots_{min_slots}, growth_factor_{1u} {
+		// Allocate two buffers with the given buffer size.
+		reallocate(1, 1);
+		reallocate(1, 1);
+		growth_factor_ = growth_factor;
+	}
 
 	/// Allows move-construction.
 	callback_pool(callback_pool&& other) noexcept;
@@ -225,9 +240,7 @@ public:
 		using fun = detail::callback_pool_function_impl<std::decay_t<F>, Signature>;
 		auto loc = try_alloc_obj_block(sizeof(fun), alignof(fun));
 		if(!loc) {
-			auto requested_size = sizeof(fun) > curr_buf_cap() ? sizeof(fun) * min_slots : curr_buf_cap();
-			if(requested_size < min_buffer_size) requested_size = min_buffer_size;
-			reallocate(requested_size);
+			reallocate(sizeof(fun), alignof(fun));
 			loc = try_alloc_obj_block(sizeof(fun), alignof(fun));
 			assert(loc);
 		}
@@ -240,20 +253,29 @@ public:
 		return callback_pool_function<Signature>(new(loc) fun(std::forward<F>(f)), std::move(buffer));
 	}
 
-	/// Ensures that the pool has at least the given size in buffer capacity (not necessarily free).
-	void reserve(size_t size) {
+	/// \brief Ensures that the pool has at least space for the given number of functors with the given size
+	/// and alignment.
+	void reserve(size_t slots, size_t obj_size, size_t obj_alignment) {
+		auto min_slots = min_slots_;
+		auto restore_min_slots = util::finally([this, min_slots]() { min_slots_ = min_slots; });
+		min_slots_ = slots;
 		std::lock_guard<std::mutex> lock(pool_mutex);
-		if(!current_buffer || current_buffer->size() < size) {
-			reallocate(size);
+		if(!current_buffer ||
+		   (current_buffer ? current_buffer->size() - current_buffer_offset : 0) <
+				   (obj_alignment + slots * obj_size)) {
+			reallocate(obj_size, obj_alignment);
 		}
 	}
 
-	/// \brief Drops ownership of all but the current pool buffers, however the buffers are kept alive by
-	/// callback_pool_function objects using them.
-	void shrink() noexcept {
+	/// \brief Drops ownership of all memory buffers, however buffer are kept alive if functions are using
+	/// them until this is no longer the case.
+	void release_resources() noexcept {
 		std::lock_guard<std::mutex> lock(pool_mutex);
+		current_buffer = nullptr;
+		current_buffer_offset = 0;
 		stashed_buffers.clear();
 	}
+
 	/// Returns the total (not just free) space in the buffers of the pool.
 	size_t capacity() const noexcept;
 };
