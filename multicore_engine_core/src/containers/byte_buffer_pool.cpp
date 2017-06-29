@@ -10,6 +10,40 @@
 namespace mce {
 namespace containers {
 
+byte_buffer_pool::byte_buffer_pool(size_t buffer_size, size_t min_slots,
+								   boost::rational<size_t> growth_factor)
+		: pool_buffer_size_{buffer_size}, min_slots_{min_slots}, growth_factor_{1u} {
+	// Allocate two buffers with the given buffer size.
+	reallocate(1);
+	reallocate(1);
+	growth_factor_ = growth_factor;
+}
+byte_buffer_pool::byte_buffer_pool(byte_buffer_pool&& other) noexcept {
+	using std::swap;
+	std::lock(pool_mutex, other.pool_mutex);
+	std::lock_guard<std::mutex> l1(pool_mutex, std::adopt_lock);
+	std::lock_guard<std::mutex> l2(other.pool_mutex, std::adopt_lock);
+	swap(current_pool_buffer, other.current_pool_buffer);
+	swap(stashed_pool_buffers, other.stashed_pool_buffers);
+	swap(current_pool_buffer_offset, other.current_pool_buffer_offset);
+	swap(pool_buffer_size_, other.pool_buffer_size_);
+	swap(min_slots_, other.min_slots_);
+	swap(growth_factor_, other.growth_factor_);
+}
+byte_buffer_pool& byte_buffer_pool::operator=(byte_buffer_pool&& other) noexcept {
+	using std::swap;
+	std::lock(pool_mutex, other.pool_mutex);
+	std::lock_guard<std::mutex> l1(pool_mutex, std::adopt_lock);
+	std::lock_guard<std::mutex> l2(other.pool_mutex, std::adopt_lock);
+	swap(current_pool_buffer, other.current_pool_buffer);
+	swap(stashed_pool_buffers, other.stashed_pool_buffers);
+	swap(current_pool_buffer_offset, other.current_pool_buffer_offset);
+	swap(pool_buffer_size_, other.pool_buffer_size_);
+	swap(min_slots_, other.min_slots_);
+	swap(growth_factor_, other.growth_factor_);
+	return *this;
+}
+
 void byte_buffer_pool::release_resources() noexcept {
 	std::lock_guard<std::mutex> lock(pool_mutex);
 	current_pool_buffer.reset();

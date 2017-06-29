@@ -124,13 +124,15 @@ class byte_buffer_pool {
 	size_t current_pool_buffer_offset = 0;
 	mutable std::mutex pool_mutex;
 	size_t pool_buffer_size_;
+	size_t min_slots_;
 	boost::rational<size_t> growth_factor_;
 
-	void reallocate(size_t obj_size, size_t obj_alignment);
+	void reallocate(size_t buff_size);
 	void* try_alloc_buffer_block(size_t size, size_t alignment) const noexcept;
 
 public:
-	byte_buffer_pool();
+	byte_buffer_pool(size_t buffer_size = 0x100000, size_t min_slots = 0x10,
+					 boost::rational<size_t> growth_factor = {3u, 2u});
 	byte_buffer_pool(byte_buffer_pool&& other) noexcept;
 	byte_buffer_pool& operator=(byte_buffer_pool&& other) noexcept;
 	pooled_byte_buffer_ptr allocate_buffer(size_t size);
