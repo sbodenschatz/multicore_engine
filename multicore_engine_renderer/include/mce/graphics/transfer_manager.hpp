@@ -20,7 +20,7 @@ namespace graphics {
 
 class transfer_manager {
 private:
-	struct transfer_job {};
+	struct buffer_transfer_job {};
 
 	device& dev;
 	device_memory_manager_interface& mm;
@@ -46,6 +46,8 @@ public:
 	void complete_and_set_current(uint32_t ring_index);
 
 	void upload_buffer(void* data, size_t data_size, vk::Buffer dst_buffer, vk::DeviceSize dst_offset);
+	void upload_buffer(const std::shared_ptr<void>& data, size_t data_size, vk::Buffer dst_buffer,
+					   vk::DeviceSize dst_offset);
 
 	template <typename Img>
 	void upload_single_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
@@ -53,7 +55,17 @@ public:
 							 typename Img::size_type image_offset, typename Img::size_type image_extent);
 
 	template <typename Img>
+	void upload_single_image(const std::shared_ptr<void>& data, Img& dst_img, vk::ImageLayout final_layout,
+							 vk::ImageAspectFlags aspectMask, uint32_t mip_level,
+							 typename Img::size_type image_offset, typename Img::size_type image_extent);
+
+	template <typename Img>
 	void upload_layered_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
+							  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
+							  uint32_t layer_count, typename Img::size_type image_offset,
+							  typename Img::size_type image_extent);
+	template <typename Img>
+	void upload_layered_image(const std::shared_ptr<void>& data, Img& dst_img, vk::ImageLayout final_layout,
 							  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
 							  uint32_t layer_count, typename Img::size_type image_offset,
 							  typename Img::size_type image_extent);
