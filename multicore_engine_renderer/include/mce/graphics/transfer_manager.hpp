@@ -27,8 +27,8 @@ private:
 	destruction_queue_manager* dqm;
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
-	std::vector<transfer_job> waiting_jobs;
-	std::vector<std::vector<transfer_job>> running_jobs;
+	std::vector<buffer_transfer_job> waiting_jobs;
+	std::vector<std::vector<buffer_transfer_job>> running_jobs;
 	command_pool transfer_cmd_pool;
 	command_pool ownership_cmd_pool;
 	std::vector<vk::UniqueCommandBuffer> transfer_command_bufers;
