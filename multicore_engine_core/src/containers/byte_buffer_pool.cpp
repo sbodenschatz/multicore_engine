@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <cassert>
 #include <mce/containers/byte_buffer_pool.hpp>
 #include <mce/memory/align.hpp>
 #include <mce/util/math_tools.hpp>
@@ -108,6 +109,19 @@ void* byte_buffer_pool::try_alloc_buffer_block(size_t size) const noexcept {
 	auto space = current_pool_buffer->size() - current_pool_buffer_offset;
 	if(space < size) return nullptr;
 	return tmp;
+}
+
+pooled_byte_buffer_ptr byte_buffer_pool::allocate_buffer(size_t size) {
+	std::lock_guard<std::mutex> lock(pool_mutex);
+	auto loc = try_alloc_buffer_block(size);
+	if(!loc) {
+		reallocate(size);
+		loc = try_alloc_buffer_block(size);
+		assert(loc);
+	}
+	current_pool_buffer->increment_ref_count();
+	current_pool_buffer_offset = (reinterpret_cast<char*>(loc) + size) - current_pool_buffer->data();
+	return pooled_byte_buffer_ptr(current_pool_buffer, reinterpret_cast<char*>(loc), size);
 }
 
 } /* namespace containers */
