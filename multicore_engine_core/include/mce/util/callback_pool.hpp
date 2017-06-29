@@ -207,7 +207,6 @@ class callback_pool {
 	std::vector<std::shared_ptr<detail::callback_pool_buffer>> stashed_buffers;
 	size_t current_buffer_offset = 0;
 	mutable std::mutex pool_mutex;
-	// TODO Make configurable.
 	size_t buffer_size_;
 	size_t min_slots_;
 	boost::rational<size_t> growth_factor_;
@@ -255,23 +254,13 @@ public:
 
 	/// \brief Ensures that the pool has at least space for the given number of functors with the given size
 	/// and alignment.
-	void reserve(size_t slots, size_t obj_size, size_t obj_alignment) {
-		auto min_slots = min_slots_;
-		auto restore_min_slots = util::finally([this, min_slots]() { min_slots_ = min_slots; });
-		min_slots_ = slots;
-		std::lock_guard<std::mutex> lock(pool_mutex);
-		if(!current_buffer ||
-		   (current_buffer ? current_buffer->size() - current_buffer_offset : 0) <
-				   (obj_alignment + slots * obj_size)) {
-			reallocate(obj_size, obj_alignment);
-		}
-	}
+	void reserve(size_t slots, size_t obj_size, size_t obj_alignment);
 
 	/// \brief Drops ownership of all memory buffers, however buffer are kept alive if functions are using
 	/// them until this is no longer the case.
 	void release_resources() noexcept {
 		std::lock_guard<std::mutex> lock(pool_mutex);
-		current_buffer = nullptr;
+		current_buffer.reset();
 		current_buffer_offset = 0;
 		stashed_buffers.clear();
 	}
