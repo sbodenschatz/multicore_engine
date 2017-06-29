@@ -252,10 +252,6 @@ public:
 		return callback_pool_function<Signature>(new(loc) fun(std::forward<F>(f)), std::move(buffer));
 	}
 
-	/// \brief Ensures that the pool has at least space for the given number of functors with the given size
-	/// and alignment.
-	void reserve(size_t slots, size_t obj_size, size_t obj_alignment);
-
 	/// \brief Drops ownership of all memory buffers, however buffer are kept alive if functions are using
 	/// them until this is no longer the case.
 	void release_resources() noexcept {
