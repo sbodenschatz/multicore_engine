@@ -8,8 +8,11 @@
 #define MCE_CONTAINERS_BYTE_BUFFER_POOL_HPP_
 
 #include <atomic>
+#include <boost/rational.hpp>
 #include <cstddef>
 #include <memory>
+#include <mutex>
+#include <vector>
 
 namespace mce {
 namespace containers {
@@ -115,7 +118,25 @@ public:
 	}
 };
 
-class byte_buffer_pool {};
+class byte_buffer_pool {
+	std::shared_ptr<detail::byte_buffer_pool_buffer> current_pool_buffer;
+	std::vector<std::shared_ptr<detail::byte_buffer_pool_buffer>> stashed_pool_buffers;
+	size_t current_pool_buffer_offset = 0;
+	mutable std::mutex pool_mutex;
+	size_t pool_buffer_size_;
+	boost::rational<size_t> growth_factor_;
+
+	void reallocate(size_t obj_size, size_t obj_alignment);
+	void* try_alloc_buffer_block(size_t size, size_t alignment) const noexcept;
+
+public:
+	byte_buffer_pool();
+	byte_buffer_pool(byte_buffer_pool&& other) noexcept;
+	byte_buffer_pool& operator=(byte_buffer_pool&& other) noexcept;
+	pooled_byte_buffer_ptr allocate_buffer(size_t size);
+	void release_resources() noexcept;
+	size_t capacity() const noexcept;
+};
 
 } /* namespace containers */
 } /* namespace mce */
