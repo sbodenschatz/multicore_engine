@@ -221,7 +221,7 @@ public:
 			  typename = std::enable_if_t<callback_pool_function<Signature>::template is_valid_function_value<
 					  std::decay_t<F>>::value>>
 	callback_pool_function<Signature> allocate_function(F&& f) {
-		std::lock_guard<std::mutex> lock(pool_mutex);
+		std::unique_lock<std::mutex> lock(pool_mutex);
 		using fun = detail::callback_pool_function_impl<std::decay_t<F>, Signature>;
 		auto loc = try_alloc_obj_block(sizeof(fun), alignof(fun));
 		if(!loc) {
@@ -232,9 +232,12 @@ public:
 			assert(loc);
 		}
 		current_buffer->increment_ref_count();
-		auto fun_ptr = new(loc) fun(std::forward<F>(f));
-		current_buffer_offset = reinterpret_cast<char*>(fun_ptr + 1) - current_buffer->data();
-		return callback_pool_function<Signature>(fun_ptr, current_buffer);
+		current_buffer_offset =
+				reinterpret_cast<char*>(reinterpret_cast<fun*>(loc) + 1) - current_buffer->data();
+		auto buffer = current_buffer;
+		lock.unlock();
+		// Do copy outside the lock to prevent circular wait and reentrance through copy ctor.
+		return callback_pool_function<Signature>(new(loc) fun(std::forward<F>(f)), std::move(buffer));
 	}
 
 	/// Ensures that the pool has at least the given size in buffer capacity (not necessarily free).
