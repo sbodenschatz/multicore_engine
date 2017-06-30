@@ -160,6 +160,10 @@ public:
 	}
 };
 
+/// Provides a thread-safe pool for byte buffers to minimize heap allocation calls.
+/**
+ * The buffers are sub-allocated from larger pool buffers, which can also be reused.
+ */
 class byte_buffer_pool {
 	std::shared_ptr<detail::byte_buffer_pool_buffer> current_pool_buffer;
 	std::vector<std::shared_ptr<detail::byte_buffer_pool_buffer>> stashed_pool_buffers;
@@ -173,12 +177,19 @@ class byte_buffer_pool {
 	void* try_alloc_buffer_block(size_t size) const noexcept;
 
 public:
+	/// Creates a byte_buffer_pool with the given allocation parameters.
 	byte_buffer_pool(size_t buffer_size = 0x100000, size_t min_slots = 0x10,
 					 boost::rational<size_t> growth_factor = {3u, 2u});
+	/// Allows move construction.
 	byte_buffer_pool(byte_buffer_pool&& other) noexcept;
+	/// Allows move construction.
 	byte_buffer_pool& operator=(byte_buffer_pool&& other) noexcept;
+	/// Allocates a byte buffer of the given size and returns a smart pointer managing the ownership of it.
 	pooled_byte_buffer_ptr allocate_buffer(size_t size);
+	/// \brief Drops the ownership of the pool buffers to allow freeing unused ones, however they will be kept
+	/// alive as long as buffers exist in them.
 	void release_resources() noexcept;
+	/// Returns the total (not just free) space in the pool buffers of the pool.
 	size_t capacity() const noexcept;
 };
 
