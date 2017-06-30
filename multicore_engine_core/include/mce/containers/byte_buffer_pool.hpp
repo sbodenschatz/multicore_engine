@@ -7,6 +7,11 @@
 #ifndef MCE_CONTAINERS_BYTE_BUFFER_POOL_HPP_
 #define MCE_CONTAINERS_BYTE_BUFFER_POOL_HPP_
 
+/**
+ * \file
+ * Defines a pool for byte buffers and the smart pointer to manage the buffers in it.
+ */
+
 #include <atomic>
 #include <cstddef>
 #include <memory>
@@ -70,6 +75,7 @@ public:
 
 } // namespace detail
 
+/// Manages the shared ownership over a buffer in byte_buffer_pool.
 class pooled_byte_buffer_ptr {
 	std::shared_ptr<detail::byte_buffer_pool_buffer> pool_buffer_;
 	char* data_;
@@ -85,11 +91,14 @@ class pooled_byte_buffer_ptr {
 	friend class byte_buffer_pool;
 
 public:
+	/// Copies the pooled_byte_buffer_ptr, sharing the ownership between the copy and the original.
 	pooled_byte_buffer_ptr(const pooled_byte_buffer_ptr& other) noexcept : pool_buffer_{other.pool_buffer_},
 																		   data_{other.data_},
 																		   size_{other.size_} {
 		if(pool_buffer_) pool_buffer_->increment_ref_count();
 	}
+
+	/// Copies the pooled_byte_buffer_ptr, sharing the ownership between the copy and the original.
 	pooled_byte_buffer_ptr& operator=(const pooled_byte_buffer_ptr& other) noexcept {
 		if(this == &other) return *this;
 		if(other.pool_buffer_) other.pool_buffer_->increment_ref_count();
@@ -99,12 +108,16 @@ public:
 		size_ = other.size_;
 		return *this;
 	}
+
+	/// Transfers the buffer ownership from other into the newly created pooled_byte_buffer_ptr.
 	pooled_byte_buffer_ptr(pooled_byte_buffer_ptr&& other) noexcept
 			: pool_buffer_{std::move(other.pool_buffer_)},
 			  data_{other.data_},
 			  size_{other.size_} {
 		other.reset();
 	}
+
+	/// Transfers the buffer ownership from other into this pooled_byte_buffer_ptr.
 	pooled_byte_buffer_ptr& operator=(pooled_byte_buffer_ptr&& other) noexcept {
 		using std::swap;
 		if(this == &other) return *this;
@@ -115,11 +128,15 @@ public:
 		return *this;
 	}
 
+	/// Creates an empty pooled_byte_buffer_ptr (not owning a buffer).
 	pooled_byte_buffer_ptr() noexcept : data_{nullptr}, size_{0} {}
+
+	/// Releases the ownership over the held buffer (if any).
 	~pooled_byte_buffer_ptr() noexcept {
 		reset();
 	}
 
+	/// Releases the ownership over the held buffer (if any).
 	void reset() noexcept {
 		if(pool_buffer_) pool_buffer_->decrement_ref_count();
 		pool_buffer_ = nullptr;
@@ -127,14 +144,17 @@ public:
 		size_ = 0;
 	}
 
+	/// Returns a pointer to the actual buffer.
 	const char* data() const {
 		return data_;
 	}
 
+	/// Returns a pointer to the actual buffer.
 	char* data() {
 		return data_;
 	}
 
+	/// Returns the size of the managed buffer.
 	size_t size() const {
 		return size_;
 	}
