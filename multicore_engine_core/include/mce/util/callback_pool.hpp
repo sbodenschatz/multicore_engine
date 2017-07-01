@@ -196,8 +196,16 @@ public:
 		return (*f)(std::forward<Args>(args)...);
 	}
 	/// Checks if the function wrapper is non-empty.
-	operator bool() noexcept {
+	explicit operator bool() const noexcept {
 		return internal_function_object;
+	}
+	/// Checks if the function wrapper is empty.
+	bool operator!() const noexcept {
+		return !internal_function_object;
+	}
+	/// Checks it the function wrapper is empty.
+	bool empty() const noexcept {
+		return !internal_function_object;
 	}
 };
 
