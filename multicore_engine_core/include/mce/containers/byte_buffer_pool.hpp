@@ -145,18 +145,95 @@ public:
 	}
 
 	/// Returns a pointer to the actual buffer.
-	const char* data() const {
+	const char* data() const noexcept {
 		return data_;
 	}
 
 	/// Returns a pointer to the actual buffer.
-	char* data() {
+	char* data() noexcept {
+		if(!pool_buffer_) return 0;
 		return data_;
 	}
 
 	/// Returns the size of the managed buffer.
-	size_t size() const {
+	size_t size() const noexcept {
+		if(!pool_buffer_) return 0;
 		return size_;
+	}
+
+	/// Allows conversion to a raw pointer.
+	operator char*() noexcept {
+		if(!pool_buffer_) return nullptr;
+		return data_;
+	}
+	/// Allows conversion to a raw pointer.
+	operator const char*() const noexcept {
+		if(!pool_buffer_) return nullptr;
+		return data_;
+	}
+
+	/// Returns true if the pooled_byte_buffer_ptr does not own a buffer.
+	bool empty() const noexcept {
+		return !pool_buffer_;
+	}
+
+	/// Returns true if the pooled_byte_buffer_ptr does own a buffer.
+	explicit operator bool() const noexcept {
+		return !empty();
+	}
+
+	/// Returns true if the pooled_byte_buffer_ptr does not own a buffer.
+	bool operator!() const noexcept {
+		return !pool_buffer_;
+	}
+
+	/// Provides access to the bytes in the buffer by index.
+	/*
+	 * \warning Using this on an empty pooled_byte_bufer_ptr invokes undefined behavior.
+	 *
+	 * \warning Does not perform bounds checks, out-of-bounds access invokes undefined behavior.
+	 */
+	char operator[](size_t index) const noexcept {
+		return data_[index];
+	}
+	/// Provides access to the bytes in the buffer by index.
+	/**
+	 * \warning Using this on an empty pooled_byte_bufer_ptr invokes undefined behavior.
+	 *
+	 * \warning Does not perform bounds checks, out-of-bounds access invokes undefined behavior.
+	 */
+	char& operator[](size_t index) noexcept {
+		return data_[index];
+	}
+	/// Returns an iterator referring to the begin of the referenced buffer.
+	char* begin() noexcept {
+		if(!pool_buffer_) return nullptr;
+		return data_;
+	}
+	/// Returns an iterator referring to the end of the referenced buffer.
+	char* end() noexcept {
+		if(!pool_buffer_) return nullptr;
+		return data_ + size_;
+	}
+	/// Returns an iterator referring to the begin of the referenced buffer.
+	const char* begin() const noexcept {
+		if(!pool_buffer_) return nullptr;
+		return data_;
+	}
+	/// Returns an iterator referring to the end of the referenced buffer.
+	const char* end() const noexcept {
+		if(!pool_buffer_) return nullptr;
+		return data_ + size_;
+	}
+	/// Returns an iterator referring to the begin of the referenced buffer.
+	const char* cbegin() const noexcept {
+		if(!pool_buffer_) return nullptr;
+		return data_;
+	}
+	/// Returns an iterator referring to the end of the referenced buffer.
+	const char* cend() const noexcept {
+		if(!pool_buffer_) return nullptr;
+		return data_ + size_;
 	}
 };
 
