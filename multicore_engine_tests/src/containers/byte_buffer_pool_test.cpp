@@ -30,8 +30,8 @@ TEST(containers_byte_buffer_pool_test, allocate_multiple_buffers) {
 TEST(containers_byte_buffer_pool_test, pool_buffers_reuse) {
 	byte_buffer_pool p;
 	std::vector<pooled_byte_buffer_ptr> buffs;
-	auto b = p.allocate_buffer(1024);
-	buffs.push_back(b);
+	auto b0 = p.allocate_buffer(1024);
+	buffs.push_back(b0);
 	auto cap = p.capacity();
 	size_t i = 0;
 	while(cap == p.capacity()) {
