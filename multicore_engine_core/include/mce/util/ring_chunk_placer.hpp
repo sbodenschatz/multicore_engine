@@ -58,6 +58,11 @@ public:
 	size_t to_offset(void* ptr) const {
 		return static_cast<const char*>(ptr) - static_cast<const char*>(buffer_space_);
 	}
+
+	/// Returns the space available without wrapping.
+	size_t available_space_no_wrap() const {
+		return ((out_pos_ <= in_pos_) ? buffer_space_size_ : (out_pos_ - 1)) - in_pos_;
+	}
 };
 
 } // namespace util
