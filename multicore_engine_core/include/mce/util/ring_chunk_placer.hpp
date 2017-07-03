@@ -53,6 +53,11 @@ public:
 	const void* in_position() const {
 		return static_cast<const char*>(buffer_space_) + in_pos_;
 	}
+
+	/// Converts the given pointer in the buffer space to the corresponding offset into the buffer space.
+	size_t to_offset(void* ptr) const {
+		return static_cast<const char*>(ptr) - static_cast<const char*>(buffer_space_);
+	}
 };
 
 } // namespace util
