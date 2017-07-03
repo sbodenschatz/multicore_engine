@@ -141,7 +141,13 @@ public:
 	}
 	template <typename F>
 	void upload_buffer(const std::shared_ptr<void>& data, size_t data_size, vk::Buffer dst_buffer,
-					   vk::DeviceSize dst_offset, F&& callback);
+					   vk::DeviceSize dst_offset, F&& callback) {
+		std::lock_guard<std::mutex> lock(manager_mutex);
+		if(!try_immediate_alloc_buffer(data, data_size, dst_buffer, dst_offset, std::forward<F>(callback))) {
+			waiting_jobs.push_back(buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer,
+													   dst_offset, std::forward<F>(callback)));
+		}
+	}
 
 	template <typename Img>
 	void upload_single_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
