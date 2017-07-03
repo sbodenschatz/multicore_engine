@@ -94,6 +94,23 @@ private:
 	size_t immediate_allocation_slack = 128;
 	mutable std::mutex manager_mutex;
 
+	template <typename F>
+	bool try_immediate_alloc_buffer(void* data, size_t data_size, vk::Buffer dst_buffer,
+									vk::DeviceSize dst_offset, F&& callback) {
+		if(chunk_placer.can_fit_no_wrap(data_size) ||
+		   (chunk_placer.can_fit(data_size) &&
+			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
+			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
+			running_jobs[current_ring_index].push_back(buffer_transfer_job(
+					data_size, staging_ptr, dst_buffer, dst_offset, std::forward<F>(callback)));
+			transfer_command_bufers[current_ring_index]->copyBuffer(
+					staging_buffer.native_buffer(), dst_buffer,
+					{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
+			return true;
+		} else
+			return false;
+	}
+
 public:
 	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm,
 					 uint32_t ring_slots);
@@ -106,26 +123,25 @@ public:
 	void upload_buffer(void* data, size_t data_size, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 					   F&& callback) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
-		if(chunk_placer.can_fit_no_wrap(data_size) ||
-		   (chunk_placer.can_fit(data_size) &&
-			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
-			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
-			running_jobs[current_ring_index].push_back(buffer_transfer_job(
-					data_size, staging_ptr, dst_buffer, dst_offset, std::forward<F>(callback)));
-			transfer_command_bufers[current_ring_index]->copyBuffer(
-					staging_buffer.native_buffer(), dst_buffer,
-					{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
-		} else {
+		if(!try_immediate_alloc_buffer(data, data_size, dst_buffer, dst_offset, std::forward<F>(callback))) {
 			auto byte_buff = byte_buff_pool.allocate_buffer(data_size);
 			memcpy(byte_buff, data, data_size);
 			waiting_jobs.push_back(buffer_transfer_job(std::move(byte_buff), data_size, nullptr, dst_buffer,
 													   dst_offset, std::forward<F>(callback)));
 		}
 	}
+	template <typename F>
 	void upload_buffer(containers::pooled_byte_buffer_ptr data, size_t data_size, vk::Buffer dst_buffer,
-					   vk::DeviceSize dst_offset);
+					   vk::DeviceSize dst_offset, F&& callback) {
+		std::lock_guard<std::mutex> lock(manager_mutex);
+		if(!try_immediate_alloc_buffer(data, data_size, dst_buffer, dst_offset, std::forward<F>(callback))) {
+			waiting_jobs.push_back(buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer,
+													   dst_offset, std::forward<F>(callback)));
+		}
+	}
+	template <typename F>
 	void upload_buffer(const std::shared_ptr<void>& data, size_t data_size, vk::Buffer dst_buffer,
-					   vk::DeviceSize dst_offset);
+					   vk::DeviceSize dst_offset, F&& callback);
 
 	template <typename Img>
 	void upload_single_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
