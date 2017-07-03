@@ -63,6 +63,15 @@ public:
 	size_t available_space_no_wrap() const {
 		return ((out_pos_ <= in_pos_) ? buffer_space_size_ : (out_pos_ - 1)) - in_pos_;
 	}
+
+	/// Returns the space available in the buffer.
+	size_t available_space() const {
+		if(out_pos_ <= in_pos_) {
+			return (buffer_space_size_ - in_pos_) + ((out_pos_ > 0) ? out_pos_ - 1 : 0);
+		} else {
+			return out_pos_ - 1 - in_pos_;
+		}
+	}
 };
 
 } // namespace util
