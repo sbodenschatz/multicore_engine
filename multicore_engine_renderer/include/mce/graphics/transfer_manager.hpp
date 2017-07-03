@@ -7,7 +7,9 @@
 #ifndef MCE_GRAPHICS_TRANSFER_MANAGER_HPP_
 #define MCE_GRAPHICS_TRANSFER_MANAGER_HPP_
 
+#include <boost/variant.hpp>
 #include <glm/glm.hpp>
+#include <mce/containers/byte_buffer_pool.hpp>
 #include <mce/graphics/buffer.hpp>
 #include <mce/graphics/command_pool.hpp>
 #include <mce/graphics/image.hpp>
@@ -20,7 +22,14 @@ namespace graphics {
 
 class transfer_manager {
 private:
-	struct buffer_transfer_job {};
+	struct buffer_transfer_job {
+		boost::variant<boost::blank, std::shared_ptr<const char>, containers::pooled_byte_buffer_ptr>
+				src_data;
+		size_t size = 0;
+		void* staging_buffer_ptr = nullptr;
+		vk::Buffer dst_buffer;
+		vk::DeviceSize dst_offset = 0;
+	};
 
 	device& dev;
 	device_memory_manager_interface& mm;
@@ -36,6 +45,7 @@ private:
 	buffer staging_buffer;
 	util::ring_chunk_placer chunk_placer;
 	util::callback_pool completion_function_pool;
+	std::vector<void*> staging_buffer_ends;
 
 public:
 	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm,
