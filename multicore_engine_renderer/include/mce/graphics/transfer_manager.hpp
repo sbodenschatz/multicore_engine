@@ -118,8 +118,8 @@ public:
 		} else {
 			auto byte_buff = byte_buff_pool.allocate_buffer(data_size);
 			memcpy(byte_buff, data, data_size);
-			waiting_jobs.push_back(buffer_transfer_job(byte_buff, data_size, nullptr, dst_buffer, dst_offset,
-													   std::forward<F>(callback)));
+			waiting_jobs.push_back(buffer_transfer_job(std::move(byte_buff), data_size, nullptr, dst_buffer,
+													   dst_offset, std::forward<F>(callback)));
 		}
 	}
 	void upload_buffer(containers::pooled_byte_buffer_ptr data, size_t data_size, vk::Buffer dst_buffer,
