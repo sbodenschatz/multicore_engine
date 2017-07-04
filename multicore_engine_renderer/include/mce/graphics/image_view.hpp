@@ -12,8 +12,8 @@
  * Defines the image_view class that represents a view of an image.
  */
 
-#include <vulkan/vulkan.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
@@ -41,10 +41,11 @@ class image_view {
 			  format_{format}, base_layer_{base_layer}, layers_{layers} {}
 
 public:
+	// TODO: Implement
 	/// Allows move construction.
-	image_view(image_view&& other) = default;
+	image_view(image_view&& other);
 	/// Allows move assignment.
-	image_view& operator=(image_view&& other) = default;
+	image_view& operator=(image_view&& other);
 	/// Destroys the image_view and releases the native resources used by it to the deletion_queue.
 	~image_view() {
 		if(destruction_mgr_) {

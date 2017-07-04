@@ -36,6 +36,10 @@ public:
 	/// Destroys the buffer wrapper object and releases the used resources to the destruction queue.
 	~buffer();
 
+	// TODO: Implement
+	buffer(buffer&&);
+	buffer& operator=(buffer&&);
+
 	/// Allows access to the underlying native buffer object handle.
 	vk::Buffer native_buffer() {
 		return buff_.get();

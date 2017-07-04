@@ -266,6 +266,10 @@ public:
 		}
 	}
 
+	// TODO: Implement
+	image(image&&);
+	image& operator=(image&&);
+
 	/// Returns the format of the image data.
 	vk::Format format() const {
 		return format_;
