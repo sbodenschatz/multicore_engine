@@ -107,6 +107,8 @@ private:
 					staging_buffer.native_buffer(), dst_buffer,
 					{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
 			return true;
+		} else if(data_size > chunk_placer.buffer_space_size()) {
+			// TODO Reallocate buffer
 		} else
 			return false;
 	}
