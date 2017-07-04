@@ -149,6 +149,7 @@ public:
 		}
 	}
 
+	// TODO: Handle multiple mip levels and trigger completion callback only after all of them are finished.
 	template <typename Img>
 	void upload_single_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
 							 vk::ImageAspectFlags aspectMask, uint32_t mip_level,
