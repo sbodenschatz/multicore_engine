@@ -111,13 +111,16 @@ private:
 			return false;
 	}
 
+	void start_frame_internal(uint32_t ring_index);
+
 public:
 	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm,
 					 uint32_t ring_slots);
 	~transfer_manager();
 
-	void advance();
-	void complete_and_set_current(uint32_t ring_index);
+	void start_frame();
+	void start_frame(uint32_t ring_index);
+	void end_frame();
 
 	template <typename F>
 	void upload_buffer(void* data, size_t data_size, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
