@@ -29,6 +29,29 @@ buffer::~buffer() {
 	}
 }
 
+buffer::buffer(buffer&& other)
+		: buff_{std::move(other.buff_)}, memory_handle_{std::move(other.memory_handle_)},
+		  destruction_mgr_{std::move(other.destruction_mgr_)}, size_{other.size_}, usage_{other.usage_} {
+	other.destruction_mgr_ = nullptr;
+	other.size_ = 0;
+	other.usage_ = {};
+}
+buffer& buffer::operator=(buffer&& other) {
+	if(destruction_mgr_) {
+		destruction_mgr_->enqueue(std::move(buff_));
+		destruction_mgr_->enqueue(std::move(memory_handle_));
+	}
+	buff_ = std::move(other.buff_);
+	memory_handle_ = std::move(other.memory_handle_);
+	destruction_mgr_ = std::move(other.destruction_mgr_);
+	size_ = other.size_;
+	usage_ = other.usage_;
+	other.destruction_mgr_ = nullptr;
+	other.size_ = 0;
+	other.usage_ = {};
+	return *this;
+}
+
 void buffer::flush_mapped(vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
 	memory_handle_.flush_mapped(dev, offset, size);
 }
