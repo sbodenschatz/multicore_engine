@@ -70,10 +70,11 @@ struct image_size<image_dimension::dim_cube, false> {
 
 class base_image_view {
 protected:
+	queued_handle<vk::UniqueImageView> view_;
 	~base_image_view() noexcept;
-	base_image_view(vk::UniqueImageView native_view, destruction_queue_manager* destruction_manager,
-					uint32_t base_mip_level, uint32_t mip_levels, vk::ComponentMapping component_mapping,
-					vk::Format format, uint32_t base_layer = 0, uint32_t layers = 1);
+	base_image_view(queued_handle<vk::UniqueImageView> view, uint32_t base_mip_level, uint32_t mip_levels,
+					vk::ComponentMapping component_mapping, vk::Format format, uint32_t base_layer = 0,
+					uint32_t layers = 1);
 
 public:
 	base_image_view(base_image_view&& other);
@@ -132,7 +133,7 @@ protected:
 	bool layered_;
 	image_aspect_mode aspect_mode_;
 	device* dev_;
-	destruction_queue_manager* destruction_manager_;
+	queued_handle<vk::UniqueImage> img_;
 	vk::Format format_;
 	vk::Extent3D size_;
 	uint32_t layers_;
