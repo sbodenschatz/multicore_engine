@@ -4,7 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <mce/graphics/image_old.hpp>
+#include <mce/graphics/image.hpp>
 
 namespace mce {
 namespace graphics {} /* namespace graphics */
