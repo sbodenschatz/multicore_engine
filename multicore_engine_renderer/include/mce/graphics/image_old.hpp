@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef MCE_GRAPHICS_IMAGE_HPP_
-#define MCE_GRAPHICS_IMAGE_HPP_
+#ifndef MCE_GRAPHICS_IMAGE_OLD_HPP_
+#define MCE_GRAPHICS_IMAGE_OLD_HPP_
 
 /**
  * \file
@@ -26,7 +26,7 @@
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_handle.hpp>
-#include <mce/graphics/image_view.hpp>
+#include <mce/graphics/image_view_old.hpp>
 #include <mce/util/math_tools.hpp>
 #include <type_traits>
 #include <vulkan/vulkan.hpp>
@@ -752,4 +752,4 @@ public:
 } /* namespace graphics */
 } /* namespace mce */
 
-#endif /* MCE_GRAPHICS_IMAGE_HPP_ */
+#endif /* MCE_GRAPHICS_IMAGE_OLD_HPP_ */

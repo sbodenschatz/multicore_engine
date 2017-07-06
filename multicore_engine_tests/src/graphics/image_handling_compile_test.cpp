@@ -10,7 +10,7 @@
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
-#include <mce/graphics/image.hpp>
+#include <mce/graphics/image_old.hpp>
 #include <mce/graphics/window.hpp>
 #include <mce/util/unused.hpp>
 

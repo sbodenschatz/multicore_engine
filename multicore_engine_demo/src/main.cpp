@@ -9,7 +9,7 @@
 #include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
-#include <mce/graphics/image.hpp>
+#include <mce/graphics/image_old.hpp>
 #include <mce/graphics/pipeline_cache.hpp>
 #include <mce/graphics/window.hpp>
 
