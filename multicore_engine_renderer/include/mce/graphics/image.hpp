@@ -106,23 +106,27 @@ public:
 namespace detail {
 
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
-struct view_type_mapper {};
+struct image_view_type_mapper {};
 
 template <image_aspect_mode img_aspect>
-struct view_type_mapper<image_dimension::dim_1d, false, img_aspect> {
-	static constexpr vk::ImageViewType vk_type = vk::ImageViewType::e1D;
+struct image_view_type_mapper<image_dimension::dim_1d, false, img_aspect> {
+	static constexpr vk::ImageType vk_img_type = vk::ImageType::e1D;
+	static constexpr vk::ImageViewType vk_view_type = vk::ImageViewType::e1D;
 };
 template <image_aspect_mode img_aspect>
-struct view_type_mapper<image_dimension::dim_2d, false, img_aspect> {
-	static constexpr vk::ImageViewType vk_type = vk::ImageViewType::e2D;
+struct image_view_type_mapper<image_dimension::dim_2d, false, img_aspect> {
+	static constexpr vk::ImageType vk_img_type = vk::ImageType::e2D;
+	static constexpr vk::ImageViewType vk_view_type = vk::ImageViewType::e2D;
 };
 template <image_aspect_mode img_aspect>
-struct view_type_mapper<image_dimension::dim_3d, false, img_aspect> {
-	static constexpr vk::ImageViewType vk_type = vk::ImageViewType::e3D;
+struct image_view_type_mapper<image_dimension::dim_3d, false, img_aspect> {
+	static constexpr vk::ImageType vk_img_type = vk::ImageType::e3D;
+	static constexpr vk::ImageViewType vk_view_type = vk::ImageViewType::e3D;
 };
 template <image_aspect_mode img_aspect>
-struct view_type_mapper<image_dimension::dim_cube, false, img_aspect> {
-	static constexpr vk::ImageViewType vk_type = vk::ImageViewType::eCube;
+struct image_view_type_mapper<image_dimension::dim_cube, false, img_aspect> {
+	static constexpr vk::ImageType vk_img_type = vk::ImageType::e2D;
+	static constexpr vk::ImageViewType vk_view_type = vk::ImageViewType::eCube;
 };
 
 } // namespace detail
@@ -144,7 +148,8 @@ protected:
 	vk::ImageTiling tiling_;
 
 	~base_image() noexcept;
-	base_image(image_dimension img_dim, bool layered, image_aspect_mode aspect_mode, device& dev,
+	base_image(image_dimension img_dim, bool layered, image_aspect_mode aspect_mode,
+			   vk::ImageCreateFlags base_create_flags, vk::ImageType img_type, device& dev,
 			   device_memory_manager_interface& mem_mgr, destruction_queue_manager* destruction_manager,
 			   vk::Format format, vk::Extent3D size, uint32_t layers, uint32_t mip_levels,
 			   vk::ImageUsageFlags usage,
@@ -153,8 +158,9 @@ protected:
 			   bool preinitialized_layout = false);
 
 public:
-	any_image_view create_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
-							   uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+	any_image_view create_view(vk::ImageViewType view_type, uint32_t base_layer = 0,
+							   uint32_t layers = VK_REMAINING_ARRAY_LAYERS, uint32_t base_mip_level = 0,
+							   uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 							   vk::ComponentMapping component_mapping = {},
 							   boost::optional<vk::Format> view_format = {});
 };
@@ -172,16 +178,19 @@ public:
 		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 		  bool preinitialized_layout = false)
-			: base_image(img_dim, false, img_aspect, dev, mem_mgr, destruction_manager, format,
-						 {size.x, size.y, size.z}, size.layers, mip_levels, usage, required_flags,
-						 mutable_format, tiling, preinitialized_layout) {}
+			: base_image(img_dim, false, img_aspect, {},
+						 detail::image_view_type_mapper<img_dim, false, img_aspect>::vk_img_type, dev,
+						 mem_mgr, destruction_manager, format, {size.width, size.height, size.depth},
+						 size.layers, mip_levels, usage, required_flags, mutable_format, tiling,
+						 preinitialized_layout) {}
 
 	image_view<img_dim, false, img_aspect> create_view(uint32_t base_mip_level = 0,
 													   uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 													   vk::ComponentMapping component_mapping = {},
 													   boost::optional<vk::Format> view_format = {}) {
-		return image_view<img_dim, false, img_aspect>(
-				base_image::create_view(0, 1, base_mip_level, mip_levels, component_mapping, view_format));
+		return image_view<img_dim, false, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<img_dim, false, img_aspect>::vk_view_type, 0, 1,
+				base_mip_level, mip_levels, component_mapping, view_format));
 	}
 };
 
