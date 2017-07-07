@@ -71,14 +71,20 @@ struct image_size<image_dimension::dim_cube, false> {
 class base_image_view {
 protected:
 	queued_handle<vk::UniqueImageView> view_;
+	uint32_t base_mip_level_;
+	uint32_t mip_levels_;
+	vk::ComponentMapping component_mapping_;
+	vk::Format format_;
+	uint32_t base_layer_;
+	uint32_t layers_;
 	~base_image_view() noexcept;
 	base_image_view(queued_handle<vk::UniqueImageView> view, uint32_t base_mip_level, uint32_t mip_levels,
 					vk::ComponentMapping component_mapping, vk::Format format, uint32_t base_layer = 0,
 					uint32_t layers = 1);
 
 public:
-	base_image_view(base_image_view&& other);
-	base_image_view& operator=(base_image_view&& other);
+	base_image_view(base_image_view&& other) noexcept = default;
+	base_image_view& operator=(base_image_view&& other) noexcept = default;
 };
 
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
