@@ -193,6 +193,47 @@ public:
 				base_mip_level, mip_levels, component_mapping, view_format));
 	}
 };
+template <image_aspect_mode img_aspect>
+class image<image_dimension::dim_cube, false, img_aspect> : public base_image {
+public:
+	using size_type = image_size<image_dimension::dim_cube, false>;
+	image(device& dev, device_memory_manager_interface& mem_mgr,
+		  destruction_queue_manager* destruction_manager, vk::Format format, size_type size,
+		  uint32_t mip_levels, vk::ImageUsageFlags usage,
+		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
+		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+		  bool preinitialized_layout = false)
+			: base_image(image_dimension::dim_cube, false, img_aspect,
+						 vk::ImageCreateFlagBits::eCubeCompatible,
+						 detail::image_view_type_mapper<image_dimension::dim_cube, false,
+														img_aspect>::vk_img_type,
+						 dev, mem_mgr, destruction_manager, format, {size.width, size.height, size.depth},
+						 size.layers, mip_levels, usage, required_flags, mutable_format, tiling,
+						 preinitialized_layout) {}
+
+	image_view<image_dimension::dim_cube, false, img_aspect>
+	create_view(uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		return image_view<image_dimension::dim_cube, false, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<image_dimension::dim_cube, false, img_aspect>::vk_view_type, 0,
+				1, base_mip_level, mip_levels, component_mapping, view_format));
+	}
+	image_view<image_dimension::dim_2d, false, img_aspect> create_face_view(
+			uint32_t face, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		return image_view<image_dimension::dim_2d, false, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<image_dimension::dim_2d, false, img_aspect>::vk_view_type,
+				face, 1, base_mip_level, mip_levels, component_mapping, view_format));
+	}
+	image_view<image_dimension::dim_2d, true, img_aspect>
+	create_faces_view(uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+					  vk::ComponentMapping component_mapping = {},
+					  boost::optional<vk::Format> view_format = {}) {
+		return image_view<image_dimension::dim_2d, false, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<image_dimension::dim_2d, false, img_aspect>::vk_view_type, 0,
+				6, base_mip_level, mip_levels, component_mapping, view_format));
+	}
+};
 
 } // namespace graphics
 } // namespace mce
