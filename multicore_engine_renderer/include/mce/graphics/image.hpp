@@ -142,7 +142,9 @@ protected:
 	image_dimension img_dim_;
 	bool layered_;
 	image_aspect_mode aspect_mode_;
+	vk::ImageType img_type_;
 	device* dev_;
+	queued_handle<device_memory_handle> mem_handle_;
 	queued_handle<vk::UniqueImage> img_;
 	vk::Format format_;
 	vk::Extent3D size_;
@@ -152,6 +154,7 @@ protected:
 	vk::MemoryPropertyFlags required_flags_;
 	bool mutable_format_;
 	vk::ImageTiling tiling_;
+	vk::ImageLayout layout_;
 
 	~base_image() noexcept;
 	base_image(image_dimension img_dim, bool layered, image_aspect_mode aspect_mode,
