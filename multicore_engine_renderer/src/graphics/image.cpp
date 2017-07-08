@@ -61,5 +61,17 @@ any_image_view base_image::create_view(vk::ImageViewType view_type, uint32_t bas
 						  base_mip_level, mip_levels, component_mapping, ci.format, base_layer, layers);
 }
 
+base_image_view::~base_image_view() noexcept {}
+base_image_view::base_image_view(queued_handle<vk::UniqueImageView> view, uint32_t base_mip_level,
+								 uint32_t mip_levels, vk::ComponentMapping component_mapping,
+								 vk::Format format, uint32_t base_layer, uint32_t layers)
+		: view_{std::move(view)}, base_mip_level_{base_mip_level}, mip_levels_{mip_levels},
+		  component_mapping_{component_mapping}, format_{format}, base_layer_{base_layer}, layers_{layers} {}
+any_image_view::any_image_view(queued_handle<vk::UniqueImageView> view, uint32_t base_mip_level,
+							   uint32_t mip_levels, vk::ComponentMapping component_mapping, vk::Format format,
+							   uint32_t base_layer, uint32_t layers)
+		: base_image_view(std::move(view), base_mip_level, mip_levels, component_mapping, format, base_layer,
+						  layers) {}
+
 } /* namespace graphics */
 } /* namespace mce */
