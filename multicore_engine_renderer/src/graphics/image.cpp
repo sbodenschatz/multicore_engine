@@ -35,5 +35,31 @@ base_image::base_image(image_dimension img_dim, bool layered, image_aspect_mode 
 	dev.native_device().bindImageMemory(*img_, mem_handle_->memory(), mem_handle_->offset());
 }
 
+vk::ImageAspectFlags base_image::default_aspect_flags() {
+	if(aspect_mode_ == image_aspect_mode::color) {
+		return vk::ImageAspectFlagBits::eColor;
+	} else if(aspect_mode_ == image_aspect_mode::depth) {
+		return vk::ImageAspectFlagBits::eDepth;
+	} else if(aspect_mode_ == image_aspect_mode::stencil) {
+		return vk::ImageAspectFlagBits::eStencil;
+	} else if(aspect_mode_ == image_aspect_mode::depth_stencil) {
+		return vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+	} else {
+		throw std::logic_error("Invalid aspect_mode.");
+	}
+}
+
+any_image_view base_image::create_view(vk::ImageViewType view_type, uint32_t base_layer, uint32_t layers,
+									   uint32_t base_mip_level, uint32_t mip_levels,
+									   vk::ComponentMapping component_mapping,
+									   boost::optional<vk::Format> view_format) {
+	vk::ImageViewCreateInfo ci({}, *img_, view_type, view_format.value_or(format_), component_mapping,
+							   {default_aspect_flags(), base_mip_level, mip_levels, base_layer, layers});
+
+	return any_image_view(queued_handle<vk::UniqueImageView>(dev_->native_device().createImageViewUnique(ci),
+															 img_.destruction_manager()),
+						  base_mip_level, mip_levels, component_mapping, ci.format, base_layer, layers);
+}
+
 } /* namespace graphics */
 } /* namespace mce */

@@ -254,6 +254,10 @@ public:
 		qmgr = nullptr;
 		return std::move(handle_);
 	}
+
+	destruction_queue_manager* destruction_manager() const {
+		return qmgr;
+	}
 };
 
 } /* namespace graphics */

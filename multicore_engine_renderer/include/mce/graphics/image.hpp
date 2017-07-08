@@ -94,6 +94,12 @@ class any_image_view : public base_image_view {
 protected:
 	using base_image_view::base_image_view;
 
+	any_image_view(queued_handle<vk::UniqueImageView> view, uint32_t base_mip_level, uint32_t mip_levels,
+				   vk::ComponentMapping component_mapping, vk::Format format, uint32_t base_layer = 0,
+				   uint32_t layers = 1);
+
+	friend class base_image;
+
 public:
 	template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
 	explicit any_image_view(image_view<img_dim, layered, img_aspect>&& other)
@@ -165,6 +171,8 @@ protected:
 			   vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
 			   bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 			   bool preinitialized_layout = false);
+
+	vk::ImageAspectFlags default_aspect_flags();
 
 public:
 	any_image_view create_view(vk::ImageViewType view_type, uint32_t base_layer = 0,
