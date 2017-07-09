@@ -333,16 +333,20 @@ public:
 	}
 };
 
+/// \brief Empty unspecialized definition for image template class. Specializations provide specific
+/// constructor signatures and view creation functions.
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect = image_aspect_mode::color>
 class image {
 	static_assert(!layered, "Layered images are not yet implemented.");
 };
 
+/// Specialization of the image template class for general unlayered images.
 template <image_dimension img_dim, image_aspect_mode img_aspect>
 class image<img_dim, false, img_aspect> : public base_image {
 public:
 	/// Defines the type used for the size of the image (unsigned integer, varies in dimensionality).
 	using size_type = image_size<img_dim, false>;
+	/// Constructs an image using the given parameters and associates it with memory from the given manager.
 	image(device& dev, device_memory_manager_interface& mem_mgr,
 		  destruction_queue_manager* destruction_manager, vk::Format format, size_type size,
 		  uint32_t mip_levels, vk::ImageUsageFlags usage,
@@ -355,6 +359,7 @@ public:
 						 size.layers, mip_levels, usage, required_flags, mutable_format, tiling,
 						 preinitialized_layout) {}
 
+	/// Creates and returns an image view for the image object using the given view parameters.
 	image_view<img_dim, false, img_aspect> create_view(uint32_t base_mip_level = 0,
 													   uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 													   vk::ComponentMapping component_mapping = {},
@@ -364,10 +369,13 @@ public:
 				base_mip_level, mip_levels, component_mapping, view_format));
 	}
 };
+/// Specialization of the image template class for unlayered cube map images.
 template <image_aspect_mode img_aspect>
 class image<image_dimension::dim_cube, false, img_aspect> : public base_image {
 public:
+	/// Defines the type used for the size of the image (unsigned integer, varies in dimensionality).
 	using size_type = image_size<image_dimension::dim_cube, false>;
+	/// Constructs an image using the given parameters and associates it with memory from the given manager.
 	image(device& dev, device_memory_manager_interface& mem_mgr,
 		  destruction_queue_manager* destruction_manager, vk::Format format, size_type size,
 		  uint32_t mip_levels, vk::ImageUsageFlags usage,
@@ -382,6 +390,7 @@ public:
 						 size.layers, mip_levels, usage, required_flags, mutable_format, tiling,
 						 preinitialized_layout) {}
 
+	/// Creates and returns an image view for the cube map image object using the given view parameters.
 	image_view<image_dimension::dim_cube, false, img_aspect>
 	create_view(uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
@@ -389,6 +398,8 @@ public:
 				detail::image_view_type_mapper<image_dimension::dim_cube, false, img_aspect>::vk_view_type, 0,
 				1, base_mip_level, mip_levels, component_mapping, view_format));
 	}
+	/// \brief Creates and returns an image view for a single face in the image object using the given view
+	/// parameters.
 	image_view<image_dimension::dim_2d, false, img_aspect> create_face_view(
 			uint32_t face, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
@@ -396,6 +407,8 @@ public:
 				detail::image_view_type_mapper<image_dimension::dim_2d, false, img_aspect>::vk_view_type,
 				face, 1, base_mip_level, mip_levels, component_mapping, view_format));
 	}
+	/// \brief Creates and returns an image view for a all faces in the image object as flat image layers
+	/// instead of as a cube map using the given view parameters.
 	image_view<image_dimension::dim_2d, true, img_aspect>
 	create_faces_view(uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 					  vk::ComponentMapping component_mapping = {},
