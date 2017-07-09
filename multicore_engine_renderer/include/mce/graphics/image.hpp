@@ -371,6 +371,15 @@ using image_2d_layered = image<image_dimension::dim_2d, true, image_aspect_mode:
 using image_cube_layered = image<image_dimension::dim_cube, true, image_aspect_mode::color>;
 using image_2d_ds = image<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
 
+using image_view_1d = image_view<image_dimension::dim_1d, false, image_aspect_mode::color>;
+using image_view_2d = image_view<image_dimension::dim_2d, false, image_aspect_mode::color>;
+using image_view_3d = image_view<image_dimension::dim_3d, false, image_aspect_mode::color>;
+using image_view_cube = image_view<image_dimension::dim_cube, false, image_aspect_mode::color>;
+using image_view_1d_layered = image_view<image_dimension::dim_1d, true, image_aspect_mode::color>;
+using image_view_2d_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::color>;
+using image_view_cube_layered = image_view<image_dimension::dim_cube, true, image_aspect_mode::color>;
+using image_view_2d_ds = image_view<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
+
 } // namespace graphics
 } // namespace mce
 
