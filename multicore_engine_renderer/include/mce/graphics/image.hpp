@@ -291,7 +291,9 @@ public:
 };
 
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
-class image {};
+class image {
+	static_assert(!layered, "Layered images are not yet implemented.");
+};
 
 template <image_dimension img_dim, image_aspect_mode img_aspect>
 class image<img_dim, false, img_aspect> : public base_image {
