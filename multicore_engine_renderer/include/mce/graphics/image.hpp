@@ -7,6 +7,12 @@
 #ifndef MCE_GRAPHICS_IMAGE_HPP_
 #define MCE_GRAPHICS_IMAGE_HPP_
 
+/**
+ * \file
+ * Defines the classes that manage images and their associated storage and
+ * the classes for views on the images.
+ */
+
 #include <boost/optional.hpp>
 #include <glm/glm.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
@@ -22,48 +28,62 @@ namespace graphics {
 /// Defines the aspect modes for an image, specifying which aspect(s) it consists of.
 enum class image_aspect_mode { color, depth, stencil, depth_stencil };
 
+/// Defines the dimensionalities for an image.
 enum class image_dimension { dim_1d, dim_2d, dim_3d, dim_cube };
 
+/// \brief Empty unspecialized definition for image_size template class. Specializations are used to
+/// selectively convert image sizes from appropriate types.
 template <image_dimension img_dim, bool layered>
 struct image_size {};
 
+/// Specialization of image_size for unlayered 1d-images.
 template <>
 struct image_size<image_dimension::dim_1d, false> {
-	uint32_t width;
-	uint32_t height = 1;
-	uint32_t depth = 1;
-	uint32_t layers = 1;
+	uint32_t width;		 ///< The width of the image object.
+	uint32_t height = 1; ///< The height of the image object.
+	uint32_t depth = 1;  ///< The depth of the image object.
+	uint32_t layers = 1; ///< The number of layers of the image object.
+	/// Allows taking a single unsigned integer as the size.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(uint32_t width) : width{width} {}
 };
+/// Specialization of image_size for unlayered 2d-images.
 template <>
 struct image_size<image_dimension::dim_2d, false> {
-	uint32_t width;
-	uint32_t height;
-	uint32_t depth = 1;
-	uint32_t layers = 1;
+	uint32_t width;		 ///< The width of the image object.
+	uint32_t height;	 ///< The height of the image object.
+	uint32_t depth = 1;  ///< The depth of the image object.
+	uint32_t layers = 1; ///< The number of layers of the image object.
+	/// Allows taking two unsigned integers as the size.
 	image_size(uint32_t width, uint32_t height) : width{width}, height{height} {}
+	/// Allows taking a 2d unsigned integer vector as the size.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(glm::uvec2 size) : width{size.x}, height{size.y} {}
 };
+/// Specialization of image_size for unlayered 3d-images.
 template <>
 struct image_size<image_dimension::dim_3d, false> {
-	uint32_t width;
-	uint32_t height;
-	uint32_t depth;
-	uint32_t layers = 1;
+	uint32_t width;		 ///< The width of the image object.
+	uint32_t height;	 ///< The height of the image object.
+	uint32_t depth;		 ///< The depth of the image object.
+	uint32_t layers = 1; ///< The number of layers of the image object.
+	/// Allows taking three unsigned integers as the size.
 	image_size(uint32_t width, uint32_t height, uint32_t depth)
 			: width{width}, height{height}, depth{depth} {}
+	/// Allows taking a 3d unsigned integer vector as the size.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(glm::uvec3 size) : width{size.x}, height{size.y}, depth{size.z} {}
 };
+/// Specialization of image_size for unlayered cubemap-images.
 template <>
 struct image_size<image_dimension::dim_cube, false> {
-	uint32_t width;
-	uint32_t height;
-	uint32_t depth = 1;
-	uint32_t layers = 6;
+	uint32_t width;		 ///< The width of the image object.
+	uint32_t height;	 ///< The height of the image object.
+	uint32_t depth = 1;  ///< The depth of the image object.
+	uint32_t layers = 6; ///< The number of layers of the image object.
+	/// Allows taking two unsigned integers as the size.
 	image_size(uint32_t width, uint32_t height) : width{width}, height{height} {}
+	/// Allows taking a 2d unsigned integer vector as the size.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(glm::uvec2 size) : width{size.x}, height{size.y} {}
 };
