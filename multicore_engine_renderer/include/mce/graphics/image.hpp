@@ -88,6 +88,12 @@ struct image_size<image_dimension::dim_cube, false> {
 	image_size(glm::uvec2 size) : width{size.x}, height{size.y} {}
 };
 
+/// Represents the base class for a view of an image object to access the image data.
+/**
+ * This base class is common for all image views regardless of the image type.
+ *
+ * \warning Does not provide polymorphic destruction.
+ */
 class base_image_view {
 	queued_handle<vk::UniqueImageView> view_;
 	uint32_t base_mip_level_;
@@ -98,23 +104,29 @@ class base_image_view {
 	uint32_t layers_;
 
 protected:
+	/// Destroys the image view object and releases it associated resources to the deletion queue.
 	~base_image_view() noexcept;
+	/// Allows sub classes to construct a image view base object from raw resources and data.
 	base_image_view(queued_handle<vk::UniqueImageView> view, uint32_t base_mip_level, uint32_t mip_levels,
 					vk::ComponentMapping component_mapping, vk::Format format, uint32_t base_layer = 0,
 					uint32_t layers = 1);
 
 public:
+	/// Allows move construction.
 	base_image_view(base_image_view&& other) noexcept = default;
+	/// Allows move assignment.
 	base_image_view& operator=(base_image_view&& other) noexcept = default;
 };
 
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
 class image_view;
 
+/// Represents a image view for which the referenced image type is not known statically but only dynamically.
 class any_image_view : public base_image_view {
 protected:
 	using base_image_view::base_image_view;
 
+	/// Initializes a image view from a raw image view and associated data.
 	any_image_view(queued_handle<vk::UniqueImageView> view, uint32_t base_mip_level, uint32_t mip_levels,
 				   vk::ComponentMapping component_mapping, vk::Format format, uint32_t base_layer = 0,
 				   uint32_t layers = 1);
@@ -122,22 +134,29 @@ protected:
 	friend class base_image;
 
 public:
+	/// Allows move construction.
 	any_image_view(any_image_view&& other) noexcept = default;
+	/// Allows move assignment.
 	any_image_view& operator=(any_image_view&& other) noexcept = default;
+	/// Allows moving any statically typed image view object into a dynamically typed one.
 	template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
 	explicit any_image_view(image_view<img_dim, layered, img_aspect>&& other)
 			: base_image_view(std::move(other)) {}
 };
 
+/// Represents an image view for which the properties of the referenced image are known statically.
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect = image_aspect_mode::color>
 class image_view : public base_image_view {
 protected:
 	using base_image_view::base_image_view;
 
 public:
+	/// Allows move construction.
 	image_view(image_view<img_dim, layered, img_aspect>&& other) noexcept = default;
+	/// Allows move assignment.
 	image_view<img_dim, layered, img_aspect>&
 	operator=(image_view<img_dim, layered, img_aspect>&& other) noexcept = default;
+	/// Allows down-casting a dynamically typed image view into a statically typed one.
 	explicit image_view(any_image_view&& other) : base_image_view(std::move(other)) {}
 };
 
