@@ -24,7 +24,8 @@ static void test_image_handling_compilation() {
 	mce::graphics::window win(ai, w, dev);
 	mce::graphics::device_memory_manager mm(&dev, 1u << 26);
 	mce::graphics::destruction_queue_manager dqm(&dev, 1 << 26);
-	mce::graphics::image_2d img(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, {1024, 1024}, 1,
+	mce::graphics::image_2d img(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, {1024, 1024},
+								mce::graphics::image_2d::full_mip_levels(glm::vec2{1024, 1024}),
 								vk::ImageUsageFlagBits::eSampled);
 	auto iv = img.create_view();
 	mce::graphics::image_1d img2(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, 1024, 1,

@@ -187,6 +187,11 @@ protected:
 	vk::ImageAspectFlags default_aspect_flags() const;
 
 public:
+	template <typename T>
+	static uint32_t full_mip_levels(T size) {
+		return uint32_t(1 + floor(log2(util::component_max(size))));
+	}
+
 	any_image_view create_view(vk::ImageViewType view_type, uint32_t base_layer = 0,
 							   uint32_t layers = VK_REMAINING_ARRAY_LAYERS, uint32_t base_mip_level = 0,
 							   uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
