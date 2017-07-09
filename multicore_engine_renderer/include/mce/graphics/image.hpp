@@ -101,6 +101,8 @@ protected:
 	friend class base_image;
 
 public:
+	any_image_view(any_image_view&& other) noexcept = default;
+	any_image_view& operator=(any_image_view&& other) noexcept = default;
 	template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
 	explicit any_image_view(image_view<img_dim, layered, img_aspect>&& other)
 			: base_image_view(std::move(other)) {}
@@ -112,6 +114,9 @@ protected:
 	using base_image_view::base_image_view;
 
 public:
+	image_view(image_view<img_dim, layered, img_aspect>&& other) noexcept = default;
+	image_view<img_dim, layered, img_aspect>&
+	operator=(image_view<img_dim, layered, img_aspect>&& other) noexcept = default;
 	explicit image_view(any_image_view&& other) : base_image_view(std::move(other)) {}
 };
 
