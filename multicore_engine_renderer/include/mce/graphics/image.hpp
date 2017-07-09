@@ -169,6 +169,10 @@ struct image_view_type_mapper<image_dimension::dim_cube, false, img_aspect> {
 
 } // namespace detail
 
+/// Implementation base for all image classes defining the common functionality for images.
+/**
+ * \warning Does not provide polymorphic destruction.
+ */
 class base_image {
 	image_dimension img_dim_;
 	bool layered_;
@@ -188,7 +192,9 @@ class base_image {
 	vk::ImageLayout layout_;
 
 protected:
+	/// Destroys the image object and releases it associated resources to the deletion queue.
 	~base_image() noexcept;
+	/// Constructs an image using the given parameters and associates it with memory from the given manager.
 	base_image(image_dimension img_dim, bool layered, image_aspect_mode aspect_mode,
 			   vk::ImageCreateFlags base_create_flags, vk::ImageType img_type, device& dev,
 			   device_memory_manager_interface& mem_mgr, destruction_queue_manager* destruction_manager,
@@ -207,11 +213,13 @@ protected:
 	vk::ImageAspectFlags default_aspect_flags() const;
 
 public:
+	/// Calculates and returns the number of mip levels in a full chain for the given image size.
 	template <typename T>
 	static uint32_t full_mip_levels(T size) {
 		return uint32_t(1 + floor(log2(util::component_max(size))));
 	}
 
+	/// Creates and returns an image view for the image object using the given view parameters.
 	any_image_view create_view(vk::ImageViewType view_type, uint32_t base_layer = 0,
 							   uint32_t layers = VK_REMAINING_ARRAY_LAYERS, uint32_t base_mip_level = 0,
 							   uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
@@ -295,22 +303,31 @@ public:
 		layout_ = layout;
 	}
 
+	/// Returns the aspect mode of the image.
 	image_aspect_mode aspect_mode() const {
 		return aspect_mode_;
 	}
 
+	/// Returns the dimensionality of the image.
 	image_dimension dimension() const {
 		return img_dim_;
 	}
 
+	/// Returns the vulkan image type of the image.
 	vk::ImageType imgage_type() const {
 		return img_type_;
 	}
 
+	/// Returns true if the image is layered and false if it is not.
+	/**
+	 * For single cube map image this will return false even though a cube map consists of 6 layers because
+	 * there is only a single cube map.
+	 */
 	bool layered() const {
 		return layered_;
 	}
 
+	/// Returns the number of layers in the image object.
 	uint32_t layers() const {
 		return layers_;
 	}
@@ -324,6 +341,7 @@ class image {
 template <image_dimension img_dim, image_aspect_mode img_aspect>
 class image<img_dim, false, img_aspect> : public base_image {
 public:
+	/// Defines the type used for the size of the image (unsigned integer, varies in dimensionality).
 	using size_type = image_size<img_dim, false>;
 	image(device& dev, device_memory_manager_interface& mem_mgr,
 		  destruction_queue_manager* destruction_manager, vk::Format format, size_type size,
