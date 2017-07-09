@@ -108,7 +108,7 @@ public:
 			: base_image_view(std::move(other)) {}
 };
 
-template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
+template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect = image_aspect_mode::color>
 class image_view : public base_image_view {
 protected:
 	using base_image_view::base_image_view;
@@ -290,7 +290,7 @@ public:
 	}
 };
 
-template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
+template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect = image_aspect_mode::color>
 class image {
 	static_assert(!layered, "Layered images are not yet implemented.");
 };
