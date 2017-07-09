@@ -214,6 +214,10 @@ public:
 		qmgr = nullptr;
 		return std::move(handle_);
 	}
+	/// Allows access to the destruction_queue_manager.
+	destruction_queue_manager* destruction_manager() const {
+		return qmgr;
+	}
 };
 template <typename T, typename D>
 class queued_handle<vk::UniqueHandle<T, D>> {
