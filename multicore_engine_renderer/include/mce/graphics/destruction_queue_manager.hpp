@@ -151,18 +151,24 @@ public:
 	void cleanup_and_set_current(uint32_t ring_index);
 };
 
+/// \brief RAII wrapper to hold unique ownership of a resource managed by a T object and release it to an
+/// associated destruction_queue_manager when the queued_handle goes out of scope or is reassigned.
 template <typename T>
 class queued_handle {
 	T handle_;
 	destruction_queue_manager* qmgr;
 
 public:
+	/// Creates an empty queued_handle.
 	queued_handle() noexcept : qmgr{nullptr} {}
+	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
 	queued_handle(T&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
 			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
+	/// Allows move construction.
 	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
 		other.qmgr = nullptr;
 	}
+	/// Allows move assignment.
 	queued_handle& operator=(queued_handle&& other) noexcept {
 		if(qmgr) {
 			qmgr->enqueue(std::move(handle_));
@@ -172,34 +178,38 @@ public:
 		other.qmgr = nullptr;
 		return *this;
 	}
+	/// Releases the held resource to the destruction_queue_manager.
 	~queued_handle() noexcept {
 		if(qmgr) {
 			qmgr->enqueue(std::move(handle_));
 		}
 	}
+	/// Checks if the queued_handle is non-empty.
 	explicit operator bool() const {
 		return handle_.operator bool();
 	}
-
+	/// Allows member access to the held resource.
 	const T* operator->() const {
 		return &handle_;
 	}
-
+	/// Allows member access to the held resource.
 	T* operator->() {
 		return &handle_;
 	}
-
+	/// Allows access to the held resource.
 	const T& operator*() const {
 		return handle_;
 	}
+	/// Allows access to the held resource.
 	T& operator*() {
 		return handle_;
 	}
-
+	/// Allows access to the held resource.
 	T get() const {
 		return handle_;
 	}
-
+	/// \brief Releases the ownership of the held resource and makes the queued_handle empty, the ownership is
+	/// transferred to the returned handle.
 	T release() {
 		qmgr = nullptr;
 		return std::move(handle_);
