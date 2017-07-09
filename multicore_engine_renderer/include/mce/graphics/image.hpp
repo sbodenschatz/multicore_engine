@@ -69,7 +69,6 @@ struct image_size<image_dimension::dim_cube, false> {
 };
 
 class base_image_view {
-protected:
 	queued_handle<vk::UniqueImageView> view_;
 	uint32_t base_mip_level_;
 	uint32_t mip_levels_;
@@ -77,6 +76,8 @@ protected:
 	vk::Format format_;
 	uint32_t base_layer_;
 	uint32_t layers_;
+
+protected:
 	~base_image_view() noexcept;
 	base_image_view(queued_handle<vk::UniqueImageView> view, uint32_t base_mip_level, uint32_t mip_levels,
 					vk::ComponentMapping component_mapping, vk::Format format, uint32_t base_layer = 0,
@@ -149,7 +150,6 @@ struct image_view_type_mapper<image_dimension::dim_cube, false, img_aspect> {
 } // namespace detail
 
 class base_image {
-protected:
 	image_dimension img_dim_;
 	bool layered_;
 	image_aspect_mode aspect_mode_;
@@ -167,6 +167,7 @@ protected:
 	vk::ImageTiling tiling_;
 	vk::ImageLayout layout_;
 
+protected:
 	~base_image() noexcept;
 	base_image(image_dimension img_dim, bool layered, image_aspect_mode aspect_mode,
 			   vk::ImageCreateFlags base_create_flags, vk::ImageType img_type, device& dev,
