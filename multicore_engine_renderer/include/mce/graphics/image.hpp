@@ -362,6 +362,15 @@ public:
 	}
 };
 
+using image_1d = image<image_dimension::dim_1d, false, image_aspect_mode::color>;
+using image_2d = image<image_dimension::dim_2d, false, image_aspect_mode::color>;
+using image_3d = image<image_dimension::dim_3d, false, image_aspect_mode::color>;
+using image_cube = image<image_dimension::dim_cube, false, image_aspect_mode::color>;
+using image_1d_layered = image<image_dimension::dim_1d, true, image_aspect_mode::color>;
+using image_2d_layered = image<image_dimension::dim_2d, true, image_aspect_mode::color>;
+using image_cube_layered = image<image_dimension::dim_cube, true, image_aspect_mode::color>;
+using image_2d_ds = image<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
+
 } // namespace graphics
 } // namespace mce
 
