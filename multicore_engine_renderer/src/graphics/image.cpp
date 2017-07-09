@@ -35,7 +35,7 @@ base_image::base_image(image_dimension img_dim, bool layered, image_aspect_mode 
 	dev.native_device().bindImageMemory(*img_, mem_handle_->memory(), mem_handle_->offset());
 }
 
-vk::ImageAspectFlags base_image::default_aspect_flags() {
+vk::ImageAspectFlags base_image::default_aspect_flags() const {
 	if(aspect_mode_ == image_aspect_mode::color) {
 		return vk::ImageAspectFlagBits::eColor;
 	} else if(aspect_mode_ == image_aspect_mode::depth) {

@@ -172,7 +172,13 @@ protected:
 			   bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 			   bool preinitialized_layout = false);
 
-	vk::ImageAspectFlags default_aspect_flags();
+	/// Returns the aspect flags for the aspect mode of the image.
+	/**
+	 * For color, depth, and stencil only the respective flag is set.
+	 * For depth_stencil both the depth and stencil flag are set.
+	 * The returned aspect flags set is the usual value used for views into images of this aspect mode.
+	 */
+	vk::ImageAspectFlags default_aspect_flags() const;
 
 public:
 	any_image_view create_view(vk::ImageViewType view_type, uint32_t base_layer = 0,
@@ -180,6 +186,103 @@ public:
 							   uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 							   vk::ComponentMapping component_mapping = {},
 							   boost::optional<vk::Format> view_format = {});
+
+	/// Returns the format of the image data.
+	vk::Format format() const {
+		return format_;
+	}
+
+	/// Allows access to the handle for the underlying vulkan image object.
+	const vk::Image& native_image() const {
+		return *img_;
+	}
+
+	/// \brief Returns the current layout according to the tracking performed with generate_transition,
+	/// mark_layout_undefined, and set_layout_external.
+	vk::ImageLayout tracked_layout() const {
+		return layout_;
+	}
+
+	/// Returns the number of mip levels in the image.
+	uint32_t mip_levels() const {
+		return mip_levels_;
+	}
+
+	/// Returns true if the image was created with mutable format, allowing views with different formats.
+	bool mutable_format() const {
+		return mutable_format_;
+	}
+
+	/// Returns the size of the image.
+	vk::Extent3D size() const {
+		return size_;
+	}
+
+	/// Returns the tiling of the image.
+	vk::ImageTiling tiling() const {
+		return tiling_;
+	}
+
+	/// Returns the allowed usage flags for the image.
+	vk::ImageUsageFlags usage() const {
+		return usage_;
+	}
+
+	/// Returns the parent device.
+	const device& dev() const {
+		return *dev_;
+	}
+
+	/// Generates and returns a layout transition image memory barrier.
+	/**
+	 * It is assumed that the barriers returned from called to this member function are executed in the same
+	 * order as the calls and that none of them are dropped.
+	 * The tracked layout is updated immediately.
+	 */
+	vk::ImageMemoryBarrier generate_transition(vk::ImageLayout new_layout, vk::AccessFlags src_access,
+											   vk::AccessFlags dst_access) {
+		vk::ImageMemoryBarrier b(
+				src_access, dst_access, layout_, new_layout, VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+				*img_, vk::ImageSubresourceRange(default_aspect_flags(), 0, mip_levels_, 0, layers_));
+		layout_ = new_layout;
+		return b;
+	}
+
+	/// Resets the tracked layout into an undefined state.
+	/**
+	 * The tracked layout is updated immediately.
+	 */
+	void mark_layout_undefined() {
+		layout_ = vk::ImageLayout::eUndefined;
+	}
+
+	/// Sets the tracked layout to a new value to which the image was transitioned externally.
+	/**
+	 * The tracked layout is updated immediately.
+	 */
+	void set_layout_external(vk::ImageLayout layout) {
+		layout_ = layout;
+	}
+
+	image_aspect_mode aspect_mode() const {
+		return aspect_mode_;
+	}
+
+	image_dimension dimension() const {
+		return img_dim_;
+	}
+
+	vk::ImageType imgage_type() const {
+		return img_type_;
+	}
+
+	bool layered() const {
+		return layered_;
+	}
+
+	uint32_t layers() const {
+		return layers_;
+	}
 };
 
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
