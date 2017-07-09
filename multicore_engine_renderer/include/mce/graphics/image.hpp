@@ -438,22 +438,42 @@ public:
 	}
 };
 
+/// Type alias for 1d unlayered color images.
 using image_1d = image<image_dimension::dim_1d, false, image_aspect_mode::color>;
+/// Type alias for 2d unlayered color images.
 using image_2d = image<image_dimension::dim_2d, false, image_aspect_mode::color>;
+/// Type alias for 3d unlayered color images.
 using image_3d = image<image_dimension::dim_3d, false, image_aspect_mode::color>;
+/// Type alias for unlayered cube map color images.
 using image_cube = image<image_dimension::dim_cube, false, image_aspect_mode::color>;
+/* Currently unimplemented.
+/// Type alias for 1d layered color images.
 using image_1d_layered = image<image_dimension::dim_1d, true, image_aspect_mode::color>;
+/// Type alias for 2d layered color images.
 using image_2d_layered = image<image_dimension::dim_2d, true, image_aspect_mode::color>;
+/// Type alias for layered cube map color images.
 using image_cube_layered = image<image_dimension::dim_cube, true, image_aspect_mode::color>;
+*/
+/// Type alias for 2d unlayered depth and stencil images.
 using image_2d_ds = image<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
 
+/// Type alias for 1d unlayered image views on color images.
 using image_view_1d = image_view<image_dimension::dim_1d, false, image_aspect_mode::color>;
+/// Type alias for 2d unlayered image views on color images.
 using image_view_2d = image_view<image_dimension::dim_2d, false, image_aspect_mode::color>;
+/// Type alias for 3d unlayered image views on color images.
 using image_view_3d = image_view<image_dimension::dim_3d, false, image_aspect_mode::color>;
+/// Type alias for unlayered cube map image views on color images.
 using image_view_cube = image_view<image_dimension::dim_cube, false, image_aspect_mode::color>;
+/* Currently unimplemented.
+/// Type alias for 1d layered image views on color images.
 using image_view_1d_layered = image_view<image_dimension::dim_1d, true, image_aspect_mode::color>;
+/// Type alias for 2d layered image views on color images.
 using image_view_2d_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::color>;
+/// Type alias for layered cube map image views on color images.
 using image_view_cube_layered = image_view<image_dimension::dim_cube, true, image_aspect_mode::color>;
+*/
+/// Type alias for 2d unlayered image views on depth stencil images.
 using image_view_2d_ds = image_view<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
 
 } // namespace graphics
