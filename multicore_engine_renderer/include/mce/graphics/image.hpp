@@ -81,11 +81,8 @@ struct image_size<image_dimension::dim_cube, false> {
 	uint32_t height;	 ///< The height of the image object.
 	uint32_t depth = 1;  ///< The depth of the image object.
 	uint32_t layers = 6; ///< The number of layers of the image object.
-	/// Allows taking two unsigned integers as the size.
-	image_size(uint32_t width, uint32_t height) : width{width}, height{height} {}
-	/// Allows taking a 2d unsigned integer vector as the size.
-	// cppcheck-suppress noExplicitConstructor
-	image_size(glm::uvec2 size) : width{size.x}, height{size.y} {}
+	/// Allows taking an unsigned integers as the length of the cube sides.
+	image_size(uint32_t side_length) : width{side_length}, height{side_length} {}
 };
 
 /// Represents the base class for a view of an image object to access the image data.
