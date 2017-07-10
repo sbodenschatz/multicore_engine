@@ -53,8 +53,9 @@ private:
 		buffer_transfer_job(size_t size, void* staging_buffer_ptr, vk::Buffer dst_buffer,
 							vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
-				: size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_buffer{dst_buffer},
-				  dst_offset{dst_offset}, completion_callback{std::move(completion_callback)} {}
+				: src_data{boost::blank{}}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
+																		  std::move(completion_callback)} {}
 		// cppcheck-suppress passedByValue
 		buffer_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
 							vk::Buffer dst_buffer, vk::DeviceSize dst_offset, no_callback_tag)
@@ -69,8 +70,8 @@ private:
 		// cppcheck-suppress passedByValue
 		buffer_transfer_job(size_t size, void* staging_buffer_ptr, vk::Buffer dst_buffer,
 							vk::DeviceSize dst_offset, no_callback_tag)
-				: size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_buffer{dst_buffer},
-				  dst_offset{dst_offset} {}
+				: src_data{boost::blank{}}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset} {}
 	};
 
 	using transfer_job = boost::variant<buffer_transfer_job>;
