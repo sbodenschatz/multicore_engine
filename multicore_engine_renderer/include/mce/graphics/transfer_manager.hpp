@@ -160,6 +160,11 @@ private:
 			return false;
 	}
 
+	template <typename F>
+	bool try_immediate_alloc_image(void* data, size_t data_size, base_image& dst_img,
+								   vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
+								   F&& callback);
+
 	void start_frame_internal(uint32_t ring_index);
 
 public:
@@ -203,18 +208,42 @@ public:
 		}
 	}
 
-	// TODO: Handle multiple mip levels and trigger completion callback only after all of them are finished.
 	template <typename F>
 	void upload_image(void* data, size_t data_size, base_image& dst_img, vk::ImageLayout final_layout,
-					  vk::ArrayProxy<vk::BufferImageCopy> regions, F&& callback);
+					  vk::ArrayProxy<vk::BufferImageCopy> regions, F&& callback) {
+		std::lock_guard<std::mutex> lock(manager_mutex);
+		if(!try_immediate_alloc_image(data, data_size, dst_img, final_layout, regions,
+									  std::forward<F>(callback))) {
+			auto byte_buff = byte_buff_pool.allocate_buffer(data_size);
+			memcpy(byte_buff, data, data_size);
+			waiting_jobs.push_back(image_transfer_job(byte_buff, data_size, nullptr, dst_img.native_image(),
+													  final_layout, regions, std::forward<F>(callback)));
+		}
+	}
 	template <typename F>
 	void upload_image(const std::shared_ptr<void>& data, size_t data_size, base_image& dst_img,
 					  vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
-					  F&& callback);
+					  F&& callback) {
+		std::lock_guard<std::mutex> lock(manager_mutex);
+		if(!try_immediate_alloc_image(data.get(), data_size, dst_img, final_layout, regions,
+									  std::forward<F>(callback))) {
+			waiting_jobs.push_back(image_transfer_job(std::move(data), data_size, nullptr,
+													  dst_img.native_image(), final_layout, regions,
+													  std::forward<F>(callback)));
+		}
+	}
 	template <typename F>
 	void upload_image(containers::pooled_byte_buffer_ptr data, size_t data_size, base_image& dst_img,
 					  vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
-					  F&& callback);
+					  F&& callback) {
+		std::lock_guard<std::mutex> lock(manager_mutex);
+		if(!try_immediate_alloc_image(data.data(), data_size, dst_img, final_layout, regions,
+									  std::forward<F>(callback))) {
+			waiting_jobs.push_back(image_transfer_job(std::move(data), data_size, nullptr,
+													  dst_img.native_image(), final_layout, regions,
+													  std::forward<F>(callback)));
+		}
+	}
 
 	// TODO: Ownership transfer
 };
