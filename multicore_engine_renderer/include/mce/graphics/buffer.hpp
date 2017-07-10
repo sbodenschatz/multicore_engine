@@ -12,19 +12,18 @@
  * Provides the definition of the wrapper class for buffer objects.
  */
 
+#include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device_memory_handle.hpp>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
-class destruction_queue_manager;
 class device;
 
 /// Implements buffer objects, with which arbitrary data can be kept in device memory for different purposes.
 class buffer {
-	vk::UniqueBuffer buff_;
-	device_memory_handle memory_handle_;
-	destruction_queue_manager* destruction_mgr_;
+	queued_handle<vk::UniqueBuffer> buff_;
+	queued_handle<device_memory_handle> memory_handle_;
 	vk::DeviceSize size_;
 	vk::BufferUsageFlags usage_;
 
@@ -61,11 +60,11 @@ public:
 
 	/// Allows host access to the buffer content if it is host-visible.
 	const void* mapped_pointer() const {
-		return memory_handle_.mapped_pointer();
+		return memory_handle_->mapped_pointer();
 	}
 	/// Allows host access to the buffer content if it is host-visible.
 	void* mapped_pointer() {
-		return memory_handle_.mapped_pointer();
+		return memory_handle_->mapped_pointer();
 	}
 	/// Flushes the non-coherent buffer content from the host.
 	void flush_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE);

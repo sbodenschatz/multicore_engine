@@ -13,13 +13,13 @@
  */
 
 #include <boost/variant.hpp>
+#include <condition_variable>
 #include <functional>
+#include <mce/containers/scratch_pad_pool.hpp>
 #include <mce/graphics/device_memory_handle.hpp>
 #include <mutex>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include <mce/containers/scratch_pad_pool.hpp>
-#include <condition_variable>
 
 namespace mce {
 namespace graphics {
@@ -95,10 +95,10 @@ private:
 					   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
 					   vk::UniqueImageView, vk::UniquePipeline, vk::UniqueQueryPool, vk::UniqueRenderPass,
 					   vk::UniqueSampler, vk::UniqueSemaphore, vk::UniqueShaderModule, vk::UniqueSurfaceKHR,
-					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>> data;
+					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>>
+				data;
 		template <typename T>
-		element(T&& data)
-				: data{std::move(data)} {}
+		element(T&& data) : data{std::move(data)} {}
 		element(element&& other) noexcept {
 			try {
 				data = std::move(other.data);
@@ -139,7 +139,7 @@ public:
 	/// \brief Inserts the resource managed by the given handle to be destroyed when the current ring index is
 	/// cleared.
 	template <typename T>
-	void enqueue(T&& handle) {
+	void enqueue(T&& handle) { // TODO make noexcept because it is used in destructors.
 		std::lock_guard<std::mutex> lock(queue_mutex);
 		queues[current_ring_index].emplace_back(std::move(handle));
 	}
@@ -149,6 +149,139 @@ public:
 
 	/// Cleans the given ring index and sets it as the new current ring index.
 	void cleanup_and_set_current(uint32_t ring_index);
+};
+
+/// \brief RAII wrapper to hold unique ownership of a resource managed by a T object and release it to an
+/// associated destruction_queue_manager when the queued_handle goes out of scope or is reassigned.
+template <typename T>
+class queued_handle {
+	T handle_;
+	destruction_queue_manager* qmgr;
+
+public:
+	/// Creates an empty queued_handle.
+	queued_handle() noexcept : qmgr{nullptr} {}
+	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
+	queued_handle(T&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
+			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
+	/// Allows move construction.
+	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
+		other.qmgr = nullptr;
+	}
+	/// Allows move assignment.
+	queued_handle& operator=(queued_handle&& other) noexcept {
+		if(qmgr) {
+			qmgr->enqueue(std::move(handle_));
+		}
+		handle_ = std::move(other.handle_);
+		qmgr = other.qmgr;
+		other.qmgr = nullptr;
+		return *this;
+	}
+	/// Releases the held resource to the destruction_queue_manager.
+	~queued_handle() noexcept {
+		if(qmgr) {
+			qmgr->enqueue(std::move(handle_));
+		}
+	}
+	/// Checks if the queued_handle is non-empty.
+	explicit operator bool() const {
+		return handle_.operator bool();
+	}
+	/// Allows member access to the held resource.
+	const T* operator->() const {
+		return &handle_;
+	}
+	/// Allows member access to the held resource.
+	T* operator->() {
+		return &handle_;
+	}
+	/// Allows access to the held resource.
+	const T& operator*() const {
+		return handle_;
+	}
+	/// Allows access to the held resource.
+	T& operator*() {
+		return handle_;
+	}
+	/// Allows access to the held resource.
+	T get() const {
+		return handle_;
+	}
+	/// \brief Releases the ownership of the held resource and makes the queued_handle empty, the ownership is
+	/// transferred to the returned handle.
+	T release() {
+		qmgr = nullptr;
+		return std::move(handle_);
+	}
+	/// Allows access to the destruction_queue_manager.
+	destruction_queue_manager* destruction_manager() const {
+		return qmgr;
+	}
+};
+/// \brief RAII wrapper to hold unique ownership of a resource managed by a vk::unique_handle<T> and release
+/// it to an associated destruction_queue_manager when the queued_handle goes out of scope or is reassigned.
+template <typename T, typename D>
+class queued_handle<vk::UniqueHandle<T, D>> {
+	vk::UniqueHandle<T, D> handle_;
+	destruction_queue_manager* qmgr;
+
+public:
+	/// Creates an empty queued_handle.
+	queued_handle() noexcept : qmgr{nullptr} {}
+	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
+	queued_handle(vk::UniqueHandle<T, D>&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
+			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
+	/// Allows move construction.
+	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
+		other.qmgr = nullptr;
+	}
+	/// Allows move assignment.
+	queued_handle& operator=(queued_handle&& other) noexcept {
+		if(qmgr) {
+			qmgr->enqueue(std::move(handle_));
+		}
+		handle_ = std::move(other.handle_);
+		qmgr = other.qmgr;
+		other.qmgr = nullptr;
+		return *this;
+	}
+	/// Releases the held resource to the destruction_queue_manager.
+	~queued_handle() noexcept {
+		if(qmgr) {
+			qmgr->enqueue(std::move(handle_));
+		}
+	}
+	/// Checks if the queued_handle is non-empty.
+	explicit operator bool() const {
+		return handle_.operator bool();
+	}
+	/// Allows member access to the held resource.
+	const vk::UniqueHandle<T, D>& operator->() const {
+		return handle_;
+	}
+	/// Allows member access to the held resource.
+	vk::UniqueHandle<T, D>& operator->() {
+		return handle_;
+	}
+	/// Allows access to the held resource.
+	const T& operator*() const {
+		return *handle_;
+	}
+	/// Allows access to the held resource.
+	T get() const {
+		return handle_.get();
+	}
+	/// \brief Releases the ownership of the held resource and makes the queued_handle empty, the ownership is
+	/// transferred to the returned handle.
+	vk::UniqueHandle<T, D> release() {
+		qmgr = nullptr;
+		return std::move(handle_);
+	}
+	/// Allows access to the destruction_queue_manager.
+	destruction_queue_manager* destruction_manager() const {
+		return qmgr;
+	}
 };
 
 } /* namespace graphics */
