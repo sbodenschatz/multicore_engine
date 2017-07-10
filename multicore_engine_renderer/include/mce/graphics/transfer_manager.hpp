@@ -40,15 +40,15 @@ private:
 							vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
 				: src_data{std::move(src_data)}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset},
-				  completion_callback{std::move(completion_callback)} {}
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
+																		  std::move(completion_callback)} {}
 		// cppcheck-suppress passedByValue
 		buffer_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size,
 							void* staging_buffer_ptr, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
 				: src_data{std::move(src_data)}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset},
-				  completion_callback{std::move(completion_callback)} {}
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
+																		  std::move(completion_callback)} {}
 		// cppcheck-suppress passedByValue
 		buffer_transfer_job(size_t size, void* staging_buffer_ptr, vk::Buffer dst_buffer,
 							vk::DeviceSize dst_offset,
@@ -155,26 +155,11 @@ public:
 	}
 
 	// TODO: Handle multiple mip levels and trigger completion callback only after all of them are finished.
-	template <typename Img>
-	void upload_single_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
-							 vk::ImageAspectFlags aspectMask, uint32_t mip_level,
-							 typename Img::size_type image_offset, typename Img::size_type image_extent);
+	void upload_image(void* data, base_image& dst_img, vk::ImageLayout final_layout,
+					  vk::ArrayProxy<vk::BufferImageCopy> regions);
 
-	template <typename Img>
-	void upload_single_image(const std::shared_ptr<void>& data, Img& dst_img, vk::ImageLayout final_layout,
-							 vk::ImageAspectFlags aspectMask, uint32_t mip_level,
-							 typename Img::size_type image_offset, typename Img::size_type image_extent);
-
-	template <typename Img>
-	void upload_layered_image(void* data, Img& dst_img, vk::ImageLayout final_layout,
-							  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
-							  uint32_t layer_count, typename Img::size_type image_offset,
-							  typename Img::size_type image_extent);
-	template <typename Img>
-	void upload_layered_image(const std::shared_ptr<void>& data, Img& dst_img, vk::ImageLayout final_layout,
-							  vk::ImageAspectFlags aspectMask, uint32_t mip_level, uint32_t base_array_layer,
-							  uint32_t layer_count, typename Img::size_type image_offset,
-							  typename Img::size_type image_extent);
+	void upload_image(const std::shared_ptr<void>& data, base_image& dst_img, vk::ImageLayout final_layout,
+					  vk::ArrayProxy<vk::BufferImageCopy> regions);
 
 	// TODO: Ownership transfer
 };
