@@ -50,15 +50,18 @@ vk::ImageAspectFlags base_image::default_aspect_flags() const {
 }
 
 any_image_view base_image::create_view(vk::ImageViewType view_type, uint32_t base_layer, uint32_t view_layers,
-									   uint32_t base_mip_level, uint32_t mip_levels,
+									   uint32_t base_mip_level, uint32_t view_mip_levels,
 									   vk::ComponentMapping component_mapping,
 									   boost::optional<vk::Format> view_format) {
-	vk::ImageViewCreateInfo ci({}, *img_, view_type, view_format.value_or(format_), component_mapping,
-							   {default_aspect_flags(), base_mip_level, mip_levels, base_layer, view_layers});
+	vk::ImageViewCreateInfo ci(
+			{}, *img_, view_type, view_format.value_or(format_), component_mapping,
+			{default_aspect_flags(), base_mip_level, view_mip_levels, base_layer, view_layers});
 
 	return any_image_view(queued_handle<vk::UniqueImageView>(dev_->native_device().createImageViewUnique(ci),
 															 img_.destruction_manager()),
-						  base_mip_level, mip_levels, component_mapping, ci.format, base_layer,
+						  base_mip_level,
+						  (view_mip_levels == VK_REMAINING_MIP_LEVELS) ? mip_levels_ : view_mip_levels,
+						  component_mapping, ci.format, base_layer,
 						  (view_layers == VK_REMAINING_ARRAY_LAYERS) ? layers_ : view_layers);
 }
 
