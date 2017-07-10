@@ -155,11 +155,12 @@ public:
 	}
 
 	// TODO: Handle multiple mip levels and trigger completion callback only after all of them are finished.
+	template <typename F>
 	void upload_image(void* data, base_image& dst_img, vk::ImageLayout final_layout,
-					  vk::ArrayProxy<vk::BufferImageCopy> regions);
-
+					  vk::ArrayProxy<vk::BufferImageCopy> regions, F&& callback);
+	template <typename F>
 	void upload_image(const std::shared_ptr<void>& data, base_image& dst_img, vk::ImageLayout final_layout,
-					  vk::ArrayProxy<vk::BufferImageCopy> regions);
+					  vk::ArrayProxy<vk::BufferImageCopy> regions, F&& callback);
 
 	// TODO: Ownership transfer
 };
