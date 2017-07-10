@@ -162,6 +162,10 @@ public:
 	void upload_image(const std::shared_ptr<void>& data, size_t data_size, base_image& dst_img,
 					  vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
 					  F&& callback);
+	template <typename F>
+	void upload_image(containers::pooled_byte_buffer_ptr data, size_t data_size, base_image& dst_img,
+					  vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
+					  F&& callback);
 
 	// TODO: Ownership transfer
 };
