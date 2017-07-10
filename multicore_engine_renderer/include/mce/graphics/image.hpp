@@ -573,7 +573,7 @@ public:
 				detail::image_view_type_mapper<image_dimension::dim_2d, false, img_aspect>::vk_view_type,
 				face, 1, base_mip_level, mip_levels, component_mapping, view_format));
 	}
-	/// \brief Creates and returns an image view for a all faces in the image object as flat image layers
+	/// \brief Creates and returns an image view for faces in the image object as flat image layers
 	/// instead of as a cube map using the given view parameters.
 	image_view<image_dimension::dim_2d, true, img_aspect>
 	create_faces_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
