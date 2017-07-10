@@ -295,10 +295,6 @@ public:
 							   vk::ComponentMapping component_mapping = {},
 							   boost::optional<vk::Format> view_format = {});
 
-	// TODO: Implement
-	image(image&&);
-	image& operator=(image&&);
-
 	/// Returns the format of the image data.
 	vk::Format format() const {
 		return format_;
