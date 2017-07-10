@@ -183,6 +183,22 @@ struct image_view_type_mapper<image_dimension::dim_cube, false, img_aspect> {
 	static constexpr vk::ImageViewType vk_view_type = vk::ImageViewType::eCube;
 };
 
+template <image_aspect_mode img_aspect>
+struct image_view_type_mapper<image_dimension::dim_1d, true, img_aspect> {
+	static constexpr vk::ImageType vk_img_type = vk::ImageType::e1D;
+	static constexpr vk::ImageViewType vk_view_type = vk::ImageViewType::e1DArray;
+};
+template <image_aspect_mode img_aspect>
+struct image_view_type_mapper<image_dimension::dim_2d, true, img_aspect> {
+	static constexpr vk::ImageType vk_img_type = vk::ImageType::e2D;
+	static constexpr vk::ImageViewType vk_view_type = vk::ImageViewType::e2DArray;
+};
+template <image_aspect_mode img_aspect>
+struct image_view_type_mapper<image_dimension::dim_cube, true, img_aspect> {
+	static constexpr vk::ImageType vk_img_type = vk::ImageType::e2D;
+	static constexpr vk::ImageViewType vk_view_type = vk::ImageViewType::eCubeArray;
+};
+
 } // namespace detail
 
 /// Implementation base for all image classes defining the common functionality for images.
@@ -429,9 +445,9 @@ public:
 	create_faces_view(uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
 					  vk::ComponentMapping component_mapping = {},
 					  boost::optional<vk::Format> view_format = {}) {
-		return image_view<image_dimension::dim_2d, false, img_aspect>(base_image::create_view(
-				detail::image_view_type_mapper<image_dimension::dim_2d, false, img_aspect>::vk_view_type, 0,
-				6, base_mip_level, mip_levels, component_mapping, view_format));
+		return image_view<image_dimension::dim_2d, true, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<image_dimension::dim_2d, true, img_aspect>::vk_view_type, 0, 6,
+				base_mip_level, mip_levels, component_mapping, view_format));
 	}
 };
 
