@@ -186,7 +186,8 @@ public:
 	void upload_buffer(containers::pooled_byte_buffer_ptr data, size_t data_size, vk::Buffer dst_buffer,
 					   vk::DeviceSize dst_offset, F&& callback) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
-		if(!try_immediate_alloc_buffer(data, data_size, dst_buffer, dst_offset, std::forward<F>(callback))) {
+		if(!try_immediate_alloc_buffer(data.data(), data_size, dst_buffer, dst_offset,
+									   std::forward<F>(callback))) {
 			waiting_jobs.push_back(buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer,
 													   dst_offset, std::forward<F>(callback)));
 		}
@@ -195,7 +196,8 @@ public:
 	void upload_buffer(const std::shared_ptr<void>& data, size_t data_size, vk::Buffer dst_buffer,
 					   vk::DeviceSize dst_offset, F&& callback) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
-		if(!try_immediate_alloc_buffer(data, data_size, dst_buffer, dst_offset, std::forward<F>(callback))) {
+		if(!try_immediate_alloc_buffer(data.get(), data_size, dst_buffer, dst_offset,
+									   std::forward<F>(callback))) {
 			waiting_jobs.push_back(buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer,
 													   dst_offset, std::forward<F>(callback)));
 		}
