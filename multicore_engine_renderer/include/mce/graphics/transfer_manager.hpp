@@ -74,7 +74,53 @@ private:
 				  dst_buffer{dst_buffer}, dst_offset{dst_offset} {}
 	};
 
-	using transfer_job = boost::variant<buffer_transfer_job>;
+	struct image_transfer_job {
+		boost::variant<boost::blank, std::shared_ptr<const char>, containers::pooled_byte_buffer_ptr>
+				src_data;
+		size_t size = 0;
+		void* staging_buffer_ptr = nullptr;
+		vk::Image dst_img;
+		vk::ImageLayout final_layout;
+		boost::container::small_vector<vk::BufferImageCopy, 16> regions;
+		util::callback_pool_function<void(vk::Image)> completion_callback;
+
+		image_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
+						   vk::Image dst_img, vk::ImageLayout final_layout,
+						   vk::ArrayProxy<vk::BufferImageCopy> regions,
+						   util::callback_pool_function<void(vk::Image)> completion_callback)
+				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
+				  final_layout{final_layout}, regions{regions.begin(), regions.end()},
+				  completion_callback{std::move(completion_callback)} {}
+		image_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size, void* staging_buffer_ptr,
+						   vk::Image dst_img, vk::ImageLayout final_layout,
+						   vk::ArrayProxy<vk::BufferImageCopy> regions,
+						   util::callback_pool_function<void(vk::Image)> completion_callback)
+				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
+				  final_layout{final_layout}, regions{regions.begin(), regions.end()},
+				  completion_callback{std::move(completion_callback)} {}
+		image_transfer_job(void* staging_buffer_ptr, vk::Image dst_img, vk::ImageLayout final_layout,
+						   vk::ArrayProxy<vk::BufferImageCopy> regions,
+						   util::callback_pool_function<void(vk::Image)> completion_callback)
+				: src_data{boost::blank{}}, size{0}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
+				  final_layout{final_layout}, regions{regions.begin(), regions.end()},
+				  completion_callback{std::move(completion_callback)} {}
+		image_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
+						   vk::Image dst_img, vk::ImageLayout final_layout,
+						   vk::ArrayProxy<vk::BufferImageCopy> regions, no_callback_tag)
+				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
+				  final_layout{final_layout}, regions{regions.begin(), regions.end()} {}
+		image_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size, void* staging_buffer_ptr,
+						   vk::Image dst_img, vk::ImageLayout final_layout,
+						   vk::ArrayProxy<vk::BufferImageCopy> regions, no_callback_tag)
+				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
+				  final_layout{final_layout}, regions{regions.begin(), regions.end()} {}
+		image_transfer_job(void* staging_buffer_ptr, vk::Image dst_img, vk::ImageLayout final_layout,
+						   vk::ArrayProxy<vk::BufferImageCopy> regions, no_callback_tag)
+				: src_data{boost::blank{}}, size{0}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
+				  final_layout{final_layout}, regions{regions.begin(), regions.end()} {}
+	};
+
+	using transfer_job = boost::variant<buffer_transfer_job, image_transfer_job>;
 
 	device& dev;
 	device_memory_manager_interface& mm;
