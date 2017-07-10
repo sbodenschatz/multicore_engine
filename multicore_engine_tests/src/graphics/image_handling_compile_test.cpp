@@ -35,20 +35,21 @@ static void test_image_handling_compilation() {
 								 vk::ImageUsageFlagBits::eSampled);
 	auto iv3 = img3.create_view();
 
-	/*mce::graphics::image_2d_layered img4(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, {1024, 1024}, 1,
-										 vk::ImageUsageFlagBits::eSampled, 8);
-		auto iv4 = img4.create_view();
-		auto iv4_1 = img4.create_single_layer_view(2);
-			mce::graphics::image_1d_layered img5(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, 1024,
-												 vk::ImageUsageFlagBits::eSampled, 8);
-			auto iv5 = img5.create_view();
-			auto iv5_1 = img5.create_single_layer_view(2);
-			mce::graphics::image_cube img6(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, 1024,
-										   vk::ImageUsageFlagBits::eSampled);
-			auto iv6 = img6.create_view();
-			auto iv6_1 = img6.create_single_side_view(3);
-			auto iv6_2 = img6.create_layered_side_view(4);
-			mce::graphics::image_cube_layered img7(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, 1024,
+	mce::graphics::image_cube img6(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, 1024, 1,
+								   vk::ImageUsageFlagBits::eSampled);
+	auto iv6 = img6.create_view();
+	auto iv6_1 = img6.create_face_view(3);
+	auto iv6_2 = img6.create_faces_view();
+
+	mce::graphics::image_2d_layered img4(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, {1024, 1024, 8}, 1,
+										 vk::ImageUsageFlagBits::eSampled);
+	auto iv4 = img4.create_view();
+	auto iv4_1 = img4.create_single_view(2);
+	mce::graphics::image_1d_layered img5(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, {1024, 8}, 1,
+										 vk::ImageUsageFlagBits::eSampled);
+	auto iv5 = img5.create_view();
+	auto iv5_1 = img5.create_single_view(2);
+	/*mce::graphics::image_cube_layered img7(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, 1024,
 												   vk::ImageUsageFlagBits::eSampled, 8);
 			auto iv7 = img7.create_view();
 			auto iv7_1 = img7.create_single_layer_view(2);

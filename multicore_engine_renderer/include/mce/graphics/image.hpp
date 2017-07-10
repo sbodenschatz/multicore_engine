@@ -84,6 +84,31 @@ struct image_size<image_dimension::dim_cube, false> {
 	/// Allows taking an unsigned integers as the length of the cube sides.
 	image_size(uint32_t side_length) : width{side_length}, height{side_length} {}
 };
+/// Specialization of image_size for layered 1d-images.
+template <>
+struct image_size<image_dimension::dim_1d, true> {
+	uint32_t width;		 ///< The width of the image object.
+	uint32_t height = 1; ///< The height of the image object.
+	uint32_t depth = 1;  ///< The depth of the image object.
+	uint32_t layers;	 ///< The number of layers of the image object.
+	/// Allows taking a single unsigned integer as the size and an unsigned integer as the layer count.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(uint32_t width, uint32_t layers) : width{width}, layers{layers} {}
+};
+/// Specialization of image_size for layered 2d-images.
+template <>
+struct image_size<image_dimension::dim_2d, true> {
+	uint32_t width;		///< The width of the image object.
+	uint32_t height;	///< The height of the image object.
+	uint32_t depth = 1; ///< The depth of the image object.
+	uint32_t layers;	///< The number of layers of the image object.
+	/// Allows taking two unsigned integers as the size and an unsigned integer as the layer count.
+	image_size(uint32_t width, uint32_t height, uint32_t layers)
+			: width{width}, height{height}, layers{layers} {}
+	/// Allows taking a 2d unsigned integer vector as the size and an unsigned integer as the layer count.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(glm::uvec2 size, uint32_t layers) : width{size.x}, height{size.y}, layers{layers} {}
+};
 
 /// Represents the base class for a view of an image object to access the image data.
 /**
@@ -450,6 +475,44 @@ public:
 				base_mip_level, mip_levels, component_mapping, view_format));
 	}
 };
+/// Specialization of the image template class for general layered images.
+template <image_dimension img_dim, image_aspect_mode img_aspect>
+class image<img_dim, true, img_aspect> : public base_image {
+public:
+	/// Defines the type used for the size of the image (unsigned integer, varies in dimensionality).
+	using size_type = image_size<img_dim, true>;
+	/// Constructs an image using the given parameters and associates it with memory from the given manager.
+	image(device& dev, device_memory_manager_interface& mem_mgr,
+		  destruction_queue_manager* destruction_manager, vk::Format format, size_type size,
+		  uint32_t mip_levels, vk::ImageUsageFlags usage,
+		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
+		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+		  bool preinitialized_layout = false)
+			: base_image(img_dim, true, img_aspect, {},
+						 detail::image_view_type_mapper<img_dim, true, img_aspect>::vk_img_type, dev, mem_mgr,
+						 destruction_manager, format, {size.width, size.height, size.depth}, size.layers,
+						 mip_levels, usage, required_flags, mutable_format, tiling, preinitialized_layout) {}
+
+	/// Creates and returns an image view for the image object using the given view parameters.
+	image_view<img_dim, true, img_aspect>
+	create_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
+				uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		return image_view<img_dim, true, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<img_dim, true, img_aspect>::vk_view_type, base_layer, layers,
+				base_mip_level, mip_levels, component_mapping, view_format));
+	}
+	/// \brief Creates and returns an image view for a single layer in the image object using the given view
+	/// parameters.
+	image_view<img_dim, false, img_aspect> create_single_view(uint32_t layer, uint32_t base_mip_level = 0,
+															  uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+															  vk::ComponentMapping component_mapping = {},
+															  boost::optional<vk::Format> view_format = {}) {
+		return image_view<img_dim, false, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<img_dim, false, img_aspect>::vk_view_type, layer, 1,
+				base_mip_level, mip_levels, component_mapping, view_format));
+	}
+};
 
 /// Type alias for 1d unlayered color images.
 using image_1d = image<image_dimension::dim_1d, false, image_aspect_mode::color>;
@@ -459,11 +522,11 @@ using image_2d = image<image_dimension::dim_2d, false, image_aspect_mode::color>
 using image_3d = image<image_dimension::dim_3d, false, image_aspect_mode::color>;
 /// Type alias for unlayered cube map color images.
 using image_cube = image<image_dimension::dim_cube, false, image_aspect_mode::color>;
-/* Currently unimplemented.
 /// Type alias for 1d layered color images.
 using image_1d_layered = image<image_dimension::dim_1d, true, image_aspect_mode::color>;
 /// Type alias for 2d layered color images.
 using image_2d_layered = image<image_dimension::dim_2d, true, image_aspect_mode::color>;
+/* Currently unimplemented.
 /// Type alias for layered cube map color images.
 using image_cube_layered = image<image_dimension::dim_cube, true, image_aspect_mode::color>;
 */
