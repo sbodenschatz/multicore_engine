@@ -109,6 +109,18 @@ struct image_size<image_dimension::dim_2d, true> {
 	// cppcheck-suppress noExplicitConstructor
 	image_size(glm::uvec2 size, uint32_t layers) : width{size.x}, height{size.y}, layers{layers} {}
 };
+/// Specialization of image_size for layered cubemap-images.
+template <>
+struct image_size<image_dimension::dim_cube, true> {
+	uint32_t width;		///< The width of the image object.
+	uint32_t height;	///< The height of the image object.
+	uint32_t depth = 1; ///< The depth of the image object.
+	uint32_t layers;	///< The number of layers of the image object.
+	/// \brief Allows taking an unsigned integers as the length of the cube sides and an unsigned integer as
+	/// the layer count.
+	image_size(uint32_t side_length, uint32_t layers)
+			: width{side_length}, height{side_length}, layers{layers} {}
+};
 
 /// Represents the base class for a view of an image object to access the image data.
 /**
@@ -513,6 +525,66 @@ public:
 				base_mip_level, mip_levels, component_mapping, view_format));
 	}
 };
+/// Specialization of the image template class for unlayered cube map images.
+template <image_aspect_mode img_aspect>
+class image<image_dimension::dim_cube, true, img_aspect> : public base_image {
+public:
+	/// Defines the type used for the size of the image (unsigned integer, varies in dimensionality).
+	using size_type = image_size<image_dimension::dim_cube, true>;
+	/// Constructs an image using the given parameters and associates it with memory from the given manager.
+	image(device& dev, device_memory_manager_interface& mem_mgr,
+		  destruction_queue_manager* destruction_manager, vk::Format format, size_type size,
+		  uint32_t mip_levels, vk::ImageUsageFlags usage,
+		  vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal,
+		  bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+		  bool preinitialized_layout = false)
+			: base_image(image_dimension::dim_cube, true, img_aspect,
+						 vk::ImageCreateFlagBits::eCubeCompatible,
+						 detail::image_view_type_mapper<image_dimension::dim_cube, true,
+														img_aspect>::vk_img_type,
+						 dev, mem_mgr, destruction_manager, format, {size.width, size.height, size.depth},
+						 size.layers, mip_levels, usage, required_flags, mutable_format, tiling,
+						 preinitialized_layout) {}
+
+	/// Creates and returns an image view for the cube map image object using the given view parameters.
+	image_view<image_dimension::dim_cube, true, img_aspect>
+	create_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
+				uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		return image_view<image_dimension::dim_cube, true, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<image_dimension::dim_cube, true, img_aspect>::vk_view_type,
+				base_layer, layers, base_mip_level, mip_levels, component_mapping, view_format));
+	}
+	/// \brief Creates and returns an image view for a single cube map in the cube map image object using the
+	/// given view parameters.
+	image_view<image_dimension::dim_cube, true, img_aspect> create_single_view(
+			uint32_t layer, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		return image_view<image_dimension::dim_cube, true, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<image_dimension::dim_cube, true, img_aspect>::vk_view_type,
+				layer, 6, base_mip_level, mip_levels, component_mapping, view_format));
+	}
+	/// \brief Creates and returns an image view for a single face in the image object using the given view
+	/// parameters.
+	image_view<image_dimension::dim_2d, false, img_aspect> create_face_view(
+			uint32_t face, uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+			vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
+		return image_view<image_dimension::dim_2d, false, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<image_dimension::dim_2d, false, img_aspect>::vk_view_type,
+				face, 1, base_mip_level, mip_levels, component_mapping, view_format));
+	}
+	/// \brief Creates and returns an image view for a all faces in the image object as flat image layers
+	/// instead of as a cube map using the given view parameters.
+	image_view<image_dimension::dim_2d, true, img_aspect>
+	create_faces_view(uint32_t base_layer = 0, uint32_t layers = VK_REMAINING_ARRAY_LAYERS,
+					  uint32_t base_mip_level = 0, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+					  vk::ComponentMapping component_mapping = {},
+					  boost::optional<vk::Format> view_format = {}) {
+		return image_view<image_dimension::dim_2d, true, img_aspect>(base_image::create_view(
+				detail::image_view_type_mapper<image_dimension::dim_2d, true, img_aspect>::vk_view_type,
+				base_layer, layers, base_mip_level, mip_levels, component_mapping, view_format));
+	}
+};
 
 /// Type alias for 1d unlayered color images.
 using image_1d = image<image_dimension::dim_1d, false, image_aspect_mode::color>;
@@ -526,10 +598,8 @@ using image_cube = image<image_dimension::dim_cube, false, image_aspect_mode::co
 using image_1d_layered = image<image_dimension::dim_1d, true, image_aspect_mode::color>;
 /// Type alias for 2d layered color images.
 using image_2d_layered = image<image_dimension::dim_2d, true, image_aspect_mode::color>;
-/* Currently unimplemented.
 /// Type alias for layered cube map color images.
 using image_cube_layered = image<image_dimension::dim_cube, true, image_aspect_mode::color>;
-*/
 /// Type alias for 2d unlayered depth and stencil images.
 using image_2d_ds = image<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
 
@@ -545,10 +615,8 @@ using image_view_cube = image_view<image_dimension::dim_cube, false, image_aspec
 using image_view_1d_layered = image_view<image_dimension::dim_1d, true, image_aspect_mode::color>;
 /// Type alias for 2d layered image views on color images.
 using image_view_2d_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::color>;
-/* Currently unimplemented.
 /// Type alias for layered cube map image views on color images.
 using image_view_cube_layered = image_view<image_dimension::dim_cube, true, image_aspect_mode::color>;
-*/
 /// Type alias for 2d unlayered image views on depth stencil images.
 using image_view_2d_ds = image_view<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
 
