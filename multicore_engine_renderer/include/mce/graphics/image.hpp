@@ -453,7 +453,7 @@ public:
 				vk::ComponentMapping component_mapping = {}, boost::optional<vk::Format> view_format = {}) {
 		return image_view<image_dimension::dim_cube, false, img_aspect>(base_image::create_view(
 				detail::image_view_type_mapper<image_dimension::dim_cube, false, img_aspect>::vk_view_type, 0,
-				1, base_mip_level, mip_levels, component_mapping, view_format));
+				6, base_mip_level, mip_levels, component_mapping, view_format));
 	}
 	/// \brief Creates and returns an image view for a single face in the image object using the given view
 	/// parameters.
