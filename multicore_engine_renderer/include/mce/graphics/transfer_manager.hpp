@@ -65,7 +65,7 @@ private:
 		void* staging_buffer_ptr = nullptr;
 		vk::Image dst_img;
 		vk::ImageLayout final_layout;
-		boost::container::small_vector<vk::BufferImageCopy, 16> regions;
+		std::vector<vk::BufferImageCopy> regions; // TODO: Find nothrow but heap-avoiding solution.
 		util::callback_pool_function<void(vk::Image)> completion_callback;
 
 		image_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
@@ -120,6 +120,13 @@ private:
 		return util::callback_pool_function<S>();
 	}
 
+	void record_buffer_copy(void* staging_ptr, size_t data_size, vk::Buffer dst_buffer,
+							vk::DeviceSize dst_offset,
+							util::callback_pool_function<void(vk::Buffer)> callback);
+	void record_image_copy(void* staging_ptr, base_image& dst_img, vk::ImageLayout final_layout,
+						   vk::ArrayProxy<vk::BufferImageCopy> regions,
+						   util::callback_pool_function<void(vk::Image)> callback);
+
 	template <typename F>
 	bool try_immediate_alloc_buffer(void* data, size_t data_size, vk::Buffer dst_buffer,
 									vk::DeviceSize dst_offset, F&& callback) {
@@ -127,24 +134,8 @@ private:
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
 			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
-			running_jobs[current_ring_index].push_back(
-					buffer_transfer_job(data_size, staging_ptr, dst_buffer, dst_offset,
-										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
-			staging_buffer.flush_mapped(dev.native_device());
-			transfer_command_bufers[current_ring_index]->pipelineBarrier(
-					vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
-					vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
-					{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite,
-											 vk::AccessFlagBits::eTransferRead, VK_QUEUE_FAMILY_IGNORED,
-											 VK_QUEUE_FAMILY_IGNORED, staging_buffer.native_buffer(), 0,
-											 VK_WHOLE_SIZE),
-					 vk::BufferMemoryBarrier(~vk::AccessFlags{}, vk::AccessFlagBits::eTransferWrite,
-											 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED, dst_buffer, 0,
-											 VK_WHOLE_SIZE)},
-					{});
-			transfer_command_bufers[current_ring_index]->copyBuffer(
-					staging_buffer.native_buffer(), dst_buffer,
-					{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
+			record_buffer_copy(staging_ptr, data_size, dst_buffer, dst_offset,
+							   take_callback<void(vk::Buffer)>(std::forward<F>(callback)));
 			return true;
 		} else if(data_size > chunk_placer.buffer_space_size()) {
 			// TODO Reallocate buffer
@@ -160,29 +151,8 @@ private:
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
 			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
-			running_jobs[current_ring_index].push_back(
-					image_transfer_job(staging_ptr, dst_img.native_image(), final_layout, regions,
-									   take_callback<void(vk::Image)>(std::forward<F>(callback))));
-			boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
-																						regions.end());
-			auto offset = chunk_placer.to_offset(staging_ptr);
-			for(vk::BufferImageCopy& region : regions_transformed) {
-				region.bufferOffset += offset;
-			}
-			staging_buffer.flush_mapped(dev.native_device());
-			transfer_command_bufers[current_ring_index]->pipelineBarrier(
-					vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
-					vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
-					{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite,
-											 vk::AccessFlagBits::eTransferRead, VK_QUEUE_FAMILY_IGNORED,
-											 VK_QUEUE_FAMILY_IGNORED, staging_buffer.native_buffer(), 0,
-											 VK_WHOLE_SIZE)},
-					{dst_img.generate_transition(vk::ImageLayout::eTransferDstOptimal, ~vk::AccessFlags{},
-												 vk::AccessFlagBits::eTransferWrite)});
-			transfer_command_bufers[current_ring_index]->copyBufferToImage(
-					staging_buffer.native_buffer(), dst_img.native_image(),
-					vk::ImageLayout::eTransferDstOptimal,
-					{uint32_t(regions_transformed.size()), regions_transformed.data()});
+			record_image_copy(staging_ptr, data_size, dst_img, final_layout, regions,
+							  take_callback<void(vk::Image)>(std::forward<F>(callback)));
 			return true;
 		} else if(data_size > chunk_placer.buffer_space_size()) {
 			// TODO Reallocate buffer
@@ -208,8 +178,9 @@ public:
 		if(!try_immediate_alloc_buffer(data, data_size, dst_buffer, dst_offset, std::forward<F>(callback))) {
 			auto byte_buff = byte_buff_pool.allocate_buffer(data_size);
 			memcpy(byte_buff, data, data_size);
-			waiting_jobs.push_back(buffer_transfer_job(std::move(byte_buff), data_size, nullptr, dst_buffer,
-													   dst_offset, std::forward<F>(callback)));
+			waiting_jobs.push_back(
+					buffer_transfer_job(std::move(byte_buff), data_size, nullptr, dst_buffer, dst_offset,
+										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
 		}
 	}
 	template <typename F>
@@ -218,8 +189,9 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_buffer(data.data(), data_size, dst_buffer, dst_offset,
 									   std::forward<F>(callback))) {
-			waiting_jobs.push_back(buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer,
-													   dst_offset, std::forward<F>(callback)));
+			waiting_jobs.push_back(
+					buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer, dst_offset,
+										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
 		}
 	}
 	template <typename F>
@@ -228,8 +200,9 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_buffer(data.get(), data_size, dst_buffer, dst_offset,
 									   std::forward<F>(callback))) {
-			waiting_jobs.push_back(buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer,
-													   dst_offset, std::forward<F>(callback)));
+			waiting_jobs.push_back(
+					buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer, dst_offset,
+										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
 		}
 	}
 
@@ -241,8 +214,9 @@ public:
 									  std::forward<F>(callback))) {
 			auto byte_buff = byte_buff_pool.allocate_buffer(data_size);
 			memcpy(byte_buff, data, data_size);
-			waiting_jobs.push_back(image_transfer_job(byte_buff, data_size, nullptr, dst_img.native_image(),
-													  final_layout, regions, std::forward<F>(callback)));
+			waiting_jobs.push_back(
+					image_transfer_job(byte_buff, data_size, nullptr, dst_img.native_image(), final_layout,
+									   regions, take_callback<void(vk::Image)>(std::forward<F>(callback))));
 		}
 	}
 	template <typename F>
@@ -252,9 +226,9 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_image(data.get(), data_size, dst_img, final_layout, regions,
 									  std::forward<F>(callback))) {
-			waiting_jobs.push_back(image_transfer_job(std::move(data), data_size, nullptr,
-													  dst_img.native_image(), final_layout, regions,
-													  std::forward<F>(callback)));
+			waiting_jobs.push_back(image_transfer_job(
+					std::move(data), data_size, nullptr, dst_img.native_image(), final_layout, regions,
+					take_callback<void(vk::Image)>(std::forward<F>(callback))));
 		}
 	}
 	template <typename F>
@@ -264,9 +238,9 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_image(data.data(), data_size, dst_img, final_layout, regions,
 									  std::forward<F>(callback))) {
-			waiting_jobs.push_back(image_transfer_job(std::move(data), data_size, nullptr,
-													  dst_img.native_image(), final_layout, regions,
-													  std::forward<F>(callback)));
+			waiting_jobs.push_back(image_transfer_job(
+					std::move(data), data_size, nullptr, dst_img.native_image(), final_layout, regions,
+					take_callback<void(vk::Image)>(std::forward<F>(callback))));
 		}
 	}
 

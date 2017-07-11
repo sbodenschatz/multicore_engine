@@ -21,5 +21,50 @@ transfer_manager::~transfer_manager() {
 	if(!dqm) dev.native_device().waitIdle();
 }
 
+void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, vk::Buffer dst_buffer,
+										  vk::DeviceSize dst_offset,
+										  util::callback_pool_function<void(vk::Buffer)> callback) {
+	running_jobs[current_ring_index].push_back(
+			buffer_transfer_job(data_size, staging_ptr, dst_buffer, dst_offset, std::move(callback)));
+	staging_buffer.flush_mapped(dev.native_device());
+	transfer_command_bufers[current_ring_index]->pipelineBarrier(
+			vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
+			vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite, vk::AccessFlagBits::eTransferRead,
+									 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+									 staging_buffer.native_buffer(), 0, VK_WHOLE_SIZE),
+			 vk::BufferMemoryBarrier(~vk::AccessFlags{}, vk::AccessFlagBits::eTransferWrite,
+									 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED, dst_buffer, 0,
+									 VK_WHOLE_SIZE)},
+			{});
+	transfer_command_bufers[current_ring_index]->copyBuffer(
+			staging_buffer.native_buffer(), dst_buffer,
+			{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
+}
+void transfer_manager::record_image_copy(void* staging_ptr, base_image& dst_img, vk::ImageLayout final_layout,
+										 vk::ArrayProxy<vk::BufferImageCopy> regions,
+										 util::callback_pool_function<void(vk::Image)> callback) {
+	running_jobs[current_ring_index].push_back(image_transfer_job(
+			staging_ptr, dst_img.native_image(), final_layout, regions, std::move(callback)));
+	boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
+																				regions.end());
+	auto offset = chunk_placer.to_offset(staging_ptr);
+	for(vk::BufferImageCopy& region : regions_transformed) {
+		region.bufferOffset += offset;
+	}
+	staging_buffer.flush_mapped(dev.native_device());
+	transfer_command_bufers[current_ring_index]->pipelineBarrier(
+			vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
+			vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite, vk::AccessFlagBits::eTransferRead,
+									 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+									 staging_buffer.native_buffer(), 0, VK_WHOLE_SIZE)},
+			{dst_img.generate_transition(vk::ImageLayout::eTransferDstOptimal, ~vk::AccessFlags{},
+										 vk::AccessFlagBits::eTransferWrite)});
+	transfer_command_bufers[current_ring_index]->copyBufferToImage(
+			staging_buffer.native_buffer(), dst_img.native_image(), vk::ImageLayout::eTransferDstOptimal,
+			{uint32_t(regions_transformed.size()), regions_transformed.data()});
+}
+
 } /* namespace graphics */
 } /* namespace mce */
