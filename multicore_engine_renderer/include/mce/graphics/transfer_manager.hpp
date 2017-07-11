@@ -197,7 +197,7 @@ private:
 			transfer_command_bufers[current_ring_index]->copyBufferToImage(
 					staging_buffer.native_buffer(), dst_img.native_image(),
 					vk::ImageLayout::eTransferDstOptimal,
-					{regions_transformed.size(), regions_transformed.data()});
+					{uint32_t(regions_transformed.size()), regions_transformed.data()});
 			return true;
 		} else if(data_size > chunk_placer.buffer_space_size()) {
 			// TODO Reallocate buffer
