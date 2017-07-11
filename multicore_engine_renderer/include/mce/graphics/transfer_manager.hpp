@@ -40,22 +40,22 @@ private:
 							vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
 				: src_data{std::move(src_data)}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset},
-				  completion_callback{std::move(completion_callback)} {}
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
+																		  std::move(completion_callback)} {}
 		// cppcheck-suppress passedByValue
 		buffer_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size,
 							void* staging_buffer_ptr, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
 				: src_data{std::move(src_data)}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset},
-				  completion_callback{std::move(completion_callback)} {}
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
+																		  std::move(completion_callback)} {}
 		// cppcheck-suppress passedByValue
 		buffer_transfer_job(size_t size, void* staging_buffer_ptr, vk::Buffer dst_buffer,
 							vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
 				: src_data{boost::blank{}}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset},
-				  completion_callback{std::move(completion_callback)} {}
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
+																		  std::move(completion_callback)} {}
 	};
 
 	struct image_transfer_job {
@@ -127,9 +127,14 @@ private:
 						   vk::ArrayProxy<vk::BufferImageCopy> regions,
 						   util::callback_pool_function<void(vk::Image)> callback);
 
+	void reallocate_buffer(size_t min_size);
+
 	template <typename F>
 	bool try_immediate_alloc_buffer(void* data, size_t data_size, vk::Buffer dst_buffer,
 									vk::DeviceSize dst_offset, F&& callback) {
+		if(data_size > chunk_placer.buffer_space_size()) {
+			reallocate_buffer(data_size);
+		}
 		if(chunk_placer.can_fit_no_wrap(data_size) ||
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
@@ -137,8 +142,6 @@ private:
 			record_buffer_copy(staging_ptr, data_size, dst_buffer, dst_offset,
 							   take_callback<void(vk::Buffer)>(std::forward<F>(callback)));
 			return true;
-		} else if(data_size > chunk_placer.buffer_space_size()) {
-			// TODO Reallocate buffer
 		} else
 			return false;
 	}
@@ -147,6 +150,9 @@ private:
 	bool try_immediate_alloc_image(void* data, size_t data_size, base_image& dst_img,
 								   vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
 								   F&& callback) {
+		if(data_size > chunk_placer.buffer_space_size()) {
+			reallocate_buffer(data_size);
+		}
 		if(chunk_placer.can_fit_no_wrap(data_size) ||
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
@@ -154,8 +160,6 @@ private:
 			record_image_copy(staging_ptr, data_size, dst_img, final_layout, regions,
 							  take_callback<void(vk::Image)>(std::forward<F>(callback)));
 			return true;
-		} else if(data_size > chunk_placer.buffer_space_size()) {
-			// TODO Reallocate buffer
 		} else
 			return false;
 	}
