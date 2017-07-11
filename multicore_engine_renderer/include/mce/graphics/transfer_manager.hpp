@@ -184,6 +184,10 @@ private:
 					staging_ptr, dst_img.native_image(), final_layout, regions, std::forward<F>(callback)));
 			boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
 																						regions.end());
+			auto offset = chunk_placer.to_offset(staging_ptr);
+			for(vk::BufferImageCopy& region : regions_transformed) {
+				region.bufferOffset += offset;
+			}
 			staging_buffer.flush_mapped(dev.native_device());
 			transfer_command_bufers[current_ring_index]->pipelineBarrier(
 					vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
