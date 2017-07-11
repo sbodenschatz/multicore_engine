@@ -203,7 +203,7 @@ public:
 
 	template <typename F>
 	void upload_buffer(void* data, size_t data_size, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
-					   F&& callback) {
+					   F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_buffer(data, data_size, dst_buffer, dst_offset, std::forward<F>(callback))) {
 			auto byte_buff = byte_buff_pool.allocate_buffer(data_size);
@@ -214,7 +214,7 @@ public:
 	}
 	template <typename F>
 	void upload_buffer(containers::pooled_byte_buffer_ptr data, size_t data_size, vk::Buffer dst_buffer,
-					   vk::DeviceSize dst_offset, F&& callback) {
+					   vk::DeviceSize dst_offset, F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_buffer(data.data(), data_size, dst_buffer, dst_offset,
 									   std::forward<F>(callback))) {
@@ -224,7 +224,7 @@ public:
 	}
 	template <typename F>
 	void upload_buffer(const std::shared_ptr<void>& data, size_t data_size, vk::Buffer dst_buffer,
-					   vk::DeviceSize dst_offset, F&& callback) {
+					   vk::DeviceSize dst_offset, F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_buffer(data.get(), data_size, dst_buffer, dst_offset,
 									   std::forward<F>(callback))) {
@@ -235,7 +235,7 @@ public:
 
 	template <typename F>
 	void upload_image(void* data, size_t data_size, base_image& dst_img, vk::ImageLayout final_layout,
-					  vk::ArrayProxy<vk::BufferImageCopy> regions, F&& callback) {
+					  vk::ArrayProxy<vk::BufferImageCopy> regions, F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_image(data, data_size, dst_img, final_layout, regions,
 									  std::forward<F>(callback))) {
@@ -248,7 +248,7 @@ public:
 	template <typename F>
 	void upload_image(const std::shared_ptr<void>& data, size_t data_size, base_image& dst_img,
 					  vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
-					  F&& callback) {
+					  F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_image(data.get(), data_size, dst_img, final_layout, regions,
 									  std::forward<F>(callback))) {
@@ -260,7 +260,7 @@ public:
 	template <typename F>
 	void upload_image(containers::pooled_byte_buffer_ptr data, size_t data_size, base_image& dst_img,
 					  vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
-					  F&& callback) {
+					  F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_image(data.data(), data_size, dst_img, final_layout, regions,
 									  std::forward<F>(callback))) {
