@@ -27,10 +27,10 @@ buffer::buffer(device& dev, device_memory_manager_interface& mem_mgr,
 
 buffer::~buffer() {}
 
-void buffer::flush_mapped(vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
+void buffer::flush_mapped(const vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
 	memory_handle_->flush_mapped(dev, offset, size);
 }
-void buffer::invalidate_mapped(vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
+void buffer::invalidate_mapped(const vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
 	memory_handle_->invalidate_mapped(dev, offset, size);
 }
 

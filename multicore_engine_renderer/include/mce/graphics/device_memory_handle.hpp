@@ -40,21 +40,24 @@ struct device_memory_allocation {
 							 vk::DeviceSize size, void* base_mapped_pointer,
 							 vk::MemoryPropertyFlags properties)
 			: block_id(block_id), memory_object(std::move(memory_object)), internal_offset(offset),
-			  internal_size(size), aligned_offset(offset), aligned_size(size),
-			  mapped_pointer{base_mapped_pointer ? static_cast<char*>(base_mapped_pointer) + aligned_offset
-												 : nullptr},
+			  internal_size(size), aligned_offset(offset),
+			  aligned_size(size), mapped_pointer{base_mapped_pointer
+														 ? static_cast<char*>(base_mapped_pointer) +
+																   aligned_offset
+														 : nullptr},
 			  properties{properties} {}
 	/// Checks if the allocation is valid (not null).
 	bool valid() const {
 		return block_id != 0;
 	};
 	/// Flushes non-coherent mapped memory.
-	void flush_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+	void flush_mapped(const vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
 		if(!(properties & vk::MemoryPropertyFlagBits::eHostCoherent))
 			dev.flushMappedMemoryRanges({{memory_object, offset, size}});
 	}
 	/// Invalidates non-coherent mapped memory.
-	void invalidate_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+	void invalidate_mapped(const vk::Device& dev, vk::DeviceSize offset = 0,
+						   vk::DeviceSize size = VK_WHOLE_SIZE) {
 		if(!(properties & vk::MemoryPropertyFlagBits::eHostCoherent))
 			dev.invalidateMappedMemoryRanges({{memory_object, offset, size}});
 	}
@@ -148,11 +151,12 @@ public:
 		return allocation_.mapped_pointer;
 	}
 	/// Flushes non-coherent mapped memory.
-	void flush_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+	void flush_mapped(const vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
 		allocation_.flush_mapped(dev, offset, size);
 	}
 	/// Invalidates non-coherent mapped memory.
-	void invalidate_mapped(vk::Device& dev, vk::DeviceSize offset = 0, vk::DeviceSize size = VK_WHOLE_SIZE) {
+	void invalidate_mapped(const vk::Device& dev, vk::DeviceSize offset = 0,
+						   vk::DeviceSize size = VK_WHOLE_SIZE) {
 		allocation_.invalidate_mapped(dev, offset, size);
 	}
 };
