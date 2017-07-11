@@ -8,6 +8,7 @@
 #define MCE_UTIL_MATH_TOOLS_HPP_
 
 #include <algorithm>
+#include <boost/rational.hpp>
 #include <glm/glm.hpp>
 #include <type_traits>
 
