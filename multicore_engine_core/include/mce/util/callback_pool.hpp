@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <functional>
 #include <mce/memory/align.hpp>
 #include <mce/util/finally.hpp>
 #include <memory>
@@ -73,7 +74,8 @@ class callback_pool_function_impl<F, R(Args...)> final : public callback_pool_fu
 
 public:
 	template <typename T>
-	callback_pool_function_impl(T&& fun) : f{std::forward<T>(fun)} {}
+	callback_pool_function_impl(T&& fun)
+			: f{std::forward<T>(fun)} {}
 	virtual ~callback_pool_function_impl() = default;
 	virtual R operator()(Args... args) override {
 		return f(std::forward<Args>(args)...);
