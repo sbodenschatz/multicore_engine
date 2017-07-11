@@ -35,7 +35,7 @@ TEST(util_local_function_test, call_lambda_ref_pass_through) {
 
 static int test_value_1 = 0;
 
-void test_function_1() {
+static void test_function_1() {
 	test_value_1 = 42;
 }
 
@@ -46,7 +46,7 @@ TEST(util_local_function_test, call_fptr_void_noparams) {
 	ASSERT_TRUE(test_value_1 == 42);
 }
 
-void test_function_2(int val) {
+static void test_function_2(int val) {
 	test_value_1 = val;
 }
 
@@ -135,6 +135,27 @@ TEST(util_local_function_test, move_assign_different_size) {
 	f2 = std::move(f);
 	f2();
 	ASSERT_TRUE(x == 42);
+}
+
+TEST(util_local_function_test, const_correctnes) {
+	int x = 0;
+	struct {
+		int& x;
+		int operator()() {
+			return x++;
+		}
+		int operator()() const {
+			return x;
+		}
+	} test_functor{x};
+	local_function<128, int()> f = test_functor;
+	const auto& c_f = f;
+	auto c_res = c_f();
+	ASSERT_EQ(0, c_res);
+	ASSERT_EQ(0, x);
+	auto res = f();
+	ASSERT_EQ(0, res);
+	ASSERT_EQ(1, x);
 }
 
 } // namespace util
