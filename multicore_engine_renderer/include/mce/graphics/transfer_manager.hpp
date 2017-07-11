@@ -148,6 +148,18 @@ private:
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
 			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
+			staging_buffer.flush_mapped(dev.native_device());
+			transfer_command_bufers[current_ring_index]->pipelineBarrier(
+					vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
+					vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+					{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite,
+											 vk::AccessFlagBits::eTransferRead, VK_QUEUE_FAMILY_IGNORED,
+											 VK_QUEUE_FAMILY_IGNORED, staging_buffer.native_buffer(), 0,
+											 VK_WHOLE_SIZE),
+					 vk::BufferMemoryBarrier(~vk::AccessFlags{}, vk::AccessFlagBits::eTransferWrite,
+											 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED, dst_buffer, 0,
+											 VK_WHOLE_SIZE)},
+					{});
 			running_jobs[current_ring_index].push_back(buffer_transfer_job(
 					data_size, staging_ptr, dst_buffer, dst_offset, std::forward<F>(callback)));
 			transfer_command_bufers[current_ring_index]->copyBuffer(
