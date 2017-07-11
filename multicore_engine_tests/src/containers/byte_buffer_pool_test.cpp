@@ -35,7 +35,7 @@ TEST(containers_byte_buffer_pool_test, pool_buffers_reuse) {
 	auto cap = p.capacity();
 	size_t i = 0;
 	while(cap == p.capacity()) {
-		auto b = p.allocate_buffer(1024);
+		b = p.allocate_buffer(1024);
 		buffs.push_back(b);
 		memset(b, i % 128, b.size());
 		ASSERT_TRUE(std::all_of(b.begin(), b.end(), [i](auto c) { return size_t(c) == i % 128; }));
@@ -44,7 +44,7 @@ TEST(containers_byte_buffer_pool_test, pool_buffers_reuse) {
 	cap = p.capacity();
 	buffs.clear();
 	for(; i > 0; --i) {
-		auto b = p.allocate_buffer(512);
+		b = p.allocate_buffer(512);
 		buffs.push_back(b);
 		memset(b, i % 128, b.size());
 		ASSERT_TRUE(std::all_of(b.begin(), b.end(), [i](auto c) { return size_t(c) == i % 128; }));
