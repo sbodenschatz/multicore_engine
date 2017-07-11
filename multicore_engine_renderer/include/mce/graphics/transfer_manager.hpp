@@ -175,7 +175,35 @@ private:
 	template <typename F>
 	bool try_immediate_alloc_image(void* data, size_t data_size, base_image& dst_img,
 								   vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
-								   F&& callback);
+								   F&& callback) {
+		if(chunk_placer.can_fit_no_wrap(data_size) ||
+		   (chunk_placer.can_fit(data_size) &&
+			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
+			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
+			running_jobs[current_ring_index].push_back(image_transfer_job(
+					staging_ptr, dst_img.native_image(), final_layout, regions, std::forward<F>(callback)));
+			boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
+																						regions.end());
+			staging_buffer.flush_mapped(dev.native_device());
+			transfer_command_bufers[current_ring_index]->pipelineBarrier(
+					vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
+					vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+					{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite,
+											 vk::AccessFlagBits::eTransferRead, VK_QUEUE_FAMILY_IGNORED,
+											 VK_QUEUE_FAMILY_IGNORED, staging_buffer.native_buffer(), 0,
+											 VK_WHOLE_SIZE)},
+					{dst_img.generate_transition(vk::ImageLayout::eTransferDstOptimal, ~vk::AccessFlags{},
+												 vk::AccessFlagBits::eTransferWrite)});
+			transfer_command_bufers[current_ring_index]->copyBufferToImage(
+					staging_buffer.native_buffer(), dst_img.native_image(),
+					vk::ImageLayout::eTransferDstOptimal,
+					{regions_transformed.size(), regions_transformed.data()});
+			return true;
+		} else if(data_size > chunk_placer.buffer_space_size()) {
+			// TODO Reallocate buffer
+		} else
+			return false;
+	}
 
 	void start_frame_internal(uint32_t ring_index);
 
