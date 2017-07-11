@@ -40,38 +40,22 @@ private:
 							vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
 				: src_data{std::move(src_data)}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
-																		  std::move(completion_callback)} {}
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset},
+				  completion_callback{std::move(completion_callback)} {}
 		// cppcheck-suppress passedByValue
 		buffer_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size,
 							void* staging_buffer_ptr, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
 				: src_data{std::move(src_data)}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
-																		  std::move(completion_callback)} {}
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset},
+				  completion_callback{std::move(completion_callback)} {}
 		// cppcheck-suppress passedByValue
 		buffer_transfer_job(size_t size, void* staging_buffer_ptr, vk::Buffer dst_buffer,
 							vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> completion_callback)
 				: src_data{boost::blank{}}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset}, completion_callback{
-																		  std::move(completion_callback)} {}
-		// cppcheck-suppress passedByValue
-		buffer_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
-							vk::Buffer dst_buffer, vk::DeviceSize dst_offset, no_callback_tag)
-				: src_data{std::move(src_data)}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset} {}
-		// cppcheck-suppress passedByValue
-		buffer_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size,
-							void* staging_buffer_ptr, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
-							no_callback_tag)
-				: src_data{std::move(src_data)}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset} {}
-		// cppcheck-suppress passedByValue
-		buffer_transfer_job(size_t size, void* staging_buffer_ptr, vk::Buffer dst_buffer,
-							vk::DeviceSize dst_offset, no_callback_tag)
-				: src_data{boost::blank{}}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_buffer{dst_buffer}, dst_offset{dst_offset} {}
+				  dst_buffer{dst_buffer}, dst_offset{dst_offset},
+				  completion_callback{std::move(completion_callback)} {}
 	};
 
 	struct image_transfer_job {
@@ -104,20 +88,6 @@ private:
 				: src_data{boost::blank{}}, size{0}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
 				  final_layout{final_layout}, regions{regions.begin(), regions.end()},
 				  completion_callback{std::move(completion_callback)} {}
-		image_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
-						   vk::Image dst_img, vk::ImageLayout final_layout,
-						   vk::ArrayProxy<vk::BufferImageCopy> regions, no_callback_tag)
-				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
-				  final_layout{final_layout}, regions{regions.begin(), regions.end()} {}
-		image_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size, void* staging_buffer_ptr,
-						   vk::Image dst_img, vk::ImageLayout final_layout,
-						   vk::ArrayProxy<vk::BufferImageCopy> regions, no_callback_tag)
-				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
-				  final_layout{final_layout}, regions{regions.begin(), regions.end()} {}
-		image_transfer_job(void* staging_buffer_ptr, vk::Image dst_img, vk::ImageLayout final_layout,
-						   vk::ArrayProxy<vk::BufferImageCopy> regions, no_callback_tag)
-				: src_data{boost::blank{}}, size{0}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
-				  final_layout{final_layout}, regions{regions.begin(), regions.end()} {}
 	};
 
 	using transfer_job = boost::variant<buffer_transfer_job, image_transfer_job>;
@@ -141,6 +111,15 @@ private:
 	size_t immediate_allocation_slack = 128;
 	mutable std::mutex manager_mutex;
 
+	template <typename S, typename F>
+	util::callback_pool_function<S> take_callback(F&& f) {
+		return completion_function_pool.allocate_function(std::forward<F>(f));
+	}
+	template <typename S>
+	util::callback_pool_function<S> take_callback(no_callback_tag) {
+		return util::callback_pool_function<S>();
+	}
+
 	template <typename F>
 	bool try_immediate_alloc_buffer(void* data, size_t data_size, vk::Buffer dst_buffer,
 									vk::DeviceSize dst_offset, F&& callback) {
@@ -148,6 +127,9 @@ private:
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
 			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
+			running_jobs[current_ring_index].push_back(
+					buffer_transfer_job(data_size, staging_ptr, dst_buffer, dst_offset,
+										take_callback(std::forward<F>(callback))));
 			staging_buffer.flush_mapped(dev.native_device());
 			transfer_command_bufers[current_ring_index]->pipelineBarrier(
 					vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
@@ -160,8 +142,6 @@ private:
 											 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED, dst_buffer, 0,
 											 VK_WHOLE_SIZE)},
 					{});
-			running_jobs[current_ring_index].push_back(buffer_transfer_job(
-					data_size, staging_ptr, dst_buffer, dst_offset, std::forward<F>(callback)));
 			transfer_command_bufers[current_ring_index]->copyBuffer(
 					staging_buffer.native_buffer(), dst_buffer,
 					{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
@@ -180,8 +160,9 @@ private:
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
 			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
-			running_jobs[current_ring_index].push_back(image_transfer_job(
-					staging_ptr, dst_img.native_image(), final_layout, regions, std::forward<F>(callback)));
+			running_jobs[current_ring_index].push_back(
+					image_transfer_job(staging_ptr, dst_img.native_image(), final_layout, regions,
+									   take_callback(std::forward<F>(callback))));
 			boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
 																						regions.end());
 			auto offset = chunk_placer.to_offset(staging_ptr);
