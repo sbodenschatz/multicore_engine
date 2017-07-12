@@ -82,11 +82,11 @@ private:
 				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
 				  final_layout{final_layout}, regions{regions.begin(), regions.end()},
 				  completion_callback{std::move(completion_callback)} {}
-		image_transfer_job(void* staging_buffer_ptr, vk::Image dst_img, vk::ImageLayout final_layout,
-						   vk::ArrayProxy<vk::BufferImageCopy> regions,
+		image_transfer_job(size_t size, void* staging_buffer_ptr, vk::Image dst_img,
+						   vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
 						   util::callback_pool_function<void(vk::Image)> completion_callback)
-				: src_data{boost::blank{}}, size{0}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
-				  final_layout{final_layout}, regions{regions.begin(), regions.end()},
+				: src_data{boost::blank{}}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
+				  dst_img{dst_img}, final_layout{final_layout}, regions{regions.begin(), regions.end()},
 				  completion_callback{std::move(completion_callback)} {}
 	};
 
@@ -123,8 +123,8 @@ private:
 	void record_buffer_copy(void* staging_ptr, size_t data_size, vk::Buffer dst_buffer,
 							vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> callback);
-	void record_image_copy(void* staging_ptr, base_image& dst_img, vk::ImageLayout final_layout,
-						   vk::ArrayProxy<vk::BufferImageCopy> regions,
+	void record_image_copy(void* staging_ptr, size_t data_size, base_image& dst_img,
+						   vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
 						   util::callback_pool_function<void(vk::Image)> callback);
 
 	void reallocate_buffer(size_t min_size);
