@@ -67,5 +67,14 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, ba
 			{uint32_t(regions_transformed.size()), regions_transformed.data()});
 }
 
+void transfer_manager::start_frame() {
+	std::lock_guard<std::mutex> lock(manager_mutex);
+	start_frame_internal((current_ring_index + 1) % ring_slots);
+}
+void transfer_manager::start_frame(uint32_t ring_index) {
+	std::lock_guard<std::mutex> lock(manager_mutex);
+	start_frame_internal(ring_index);
+}
+
 } /* namespace graphics */
 } /* namespace mce */
