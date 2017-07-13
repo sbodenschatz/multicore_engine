@@ -43,10 +43,11 @@ void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, v
 }
 void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, base_image& dst_img,
 										 vk::ImageLayout final_layout,
-										 vk::ArrayProxy<vk::BufferImageCopy> regions,
+										 decltype(image_transfer_job::regions) regions,
 										 util::callback_pool_function<void(vk::Image)> callback) {
-	running_jobs[current_ring_index].push_back(image_transfer_job(
-			data_size, staging_ptr, dst_img.native_image(), final_layout, regions, std::move(callback)));
+	running_jobs[current_ring_index].push_back(image_transfer_job(data_size, staging_ptr,
+																  dst_img.native_image(), final_layout,
+																  std::move(regions), std::move(callback)));
 	boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
 																				regions.end());
 	auto offset = chunk_placer.to_offset(staging_ptr);

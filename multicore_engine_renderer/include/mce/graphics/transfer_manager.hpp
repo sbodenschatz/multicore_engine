@@ -69,24 +69,22 @@ private:
 		util::callback_pool_function<void(vk::Image)> completion_callback;
 
 		image_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
-						   vk::Image dst_img, vk::ImageLayout final_layout,
-						   vk::ArrayProxy<vk::BufferImageCopy> regions,
+						   vk::Image dst_img, vk::ImageLayout final_layout, decltype(regions) regions,
 						   util::callback_pool_function<void(vk::Image)> completion_callback)
 				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
-				  final_layout{final_layout}, regions{regions.begin(), regions.end()},
-				  completion_callback{std::move(completion_callback)} {}
+				  final_layout{final_layout}, regions{std::move(regions)}, completion_callback{std::move(
+																				   completion_callback)} {}
 		image_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size, void* staging_buffer_ptr,
-						   vk::Image dst_img, vk::ImageLayout final_layout,
-						   vk::ArrayProxy<vk::BufferImageCopy> regions,
+						   vk::Image dst_img, vk::ImageLayout final_layout, decltype(regions) regions,
 						   util::callback_pool_function<void(vk::Image)> completion_callback)
 				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
-				  final_layout{final_layout}, regions{regions.begin(), regions.end()},
-				  completion_callback{std::move(completion_callback)} {}
+				  final_layout{final_layout}, regions{std::move(regions)}, completion_callback{std::move(
+																				   completion_callback)} {}
 		image_transfer_job(size_t size, void* staging_buffer_ptr, vk::Image dst_img,
-						   vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
+						   vk::ImageLayout final_layout, decltype(regions) regions,
 						   util::callback_pool_function<void(vk::Image)> completion_callback)
 				: src_data{boost::blank{}}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_img{dst_img}, final_layout{final_layout}, regions{regions.begin(), regions.end()},
+				  dst_img{dst_img}, final_layout{final_layout}, regions{std::move(regions)},
 				  completion_callback{std::move(completion_callback)} {}
 	};
 
@@ -124,7 +122,7 @@ private:
 							vk::DeviceSize dst_offset,
 							util::callback_pool_function<void(vk::Buffer)> callback);
 	void record_image_copy(void* staging_ptr, size_t data_size, base_image& dst_img,
-						   vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
+						   vk::ImageLayout final_layout, decltype(image_transfer_job::regions) regions,
 						   util::callback_pool_function<void(vk::Image)> callback);
 
 	void reallocate_buffer(size_t min_size);
@@ -148,8 +146,8 @@ private:
 
 	template <typename F>
 	bool try_immediate_alloc_image(void* data, size_t data_size, base_image& dst_img,
-								   vk::ImageLayout final_layout, vk::ArrayProxy<vk::BufferImageCopy> regions,
-								   F&& callback) {
+								   vk::ImageLayout final_layout,
+								   decltype(image_transfer_job::regions) regions, F&& callback) {
 		if(data_size > chunk_placer.buffer_space_size()) {
 			reallocate_buffer(data_size);
 		}
@@ -157,7 +155,7 @@ private:
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
 			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
-			record_image_copy(staging_ptr, data_size, dst_img, final_layout, regions,
+			record_image_copy(staging_ptr, data_size, dst_img, final_layout, std::move(regions),
 							  take_callback<void(vk::Image)>(std::forward<F>(callback)));
 			return true;
 		} else
