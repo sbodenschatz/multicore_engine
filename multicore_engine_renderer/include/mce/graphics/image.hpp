@@ -356,6 +356,17 @@ public:
 		return b;
 	}
 
+	/// Generates and returns a layout transition image memory barrier.
+	static vk::ImageMemoryBarrier
+	generate_transition_native(vk::Image img, vk::ImageLayout old_layout, vk::ImageLayout new_layout,
+							   vk::AccessFlags src_access, vk::AccessFlags dst_access,
+							   vk::ImageAspectFlags aspects, uint32_t mip_levels, uint32_t layers) {
+		vk::ImageMemoryBarrier b(src_access, dst_access, old_layout, new_layout, VK_QUEUE_FAMILY_IGNORED,
+								 VK_QUEUE_FAMILY_IGNORED, img,
+								 vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers));
+		return b;
+	}
+
 	/// Resets the tracked layout into an undefined state.
 	/**
 	 * The tracked layout is updated immediately.
