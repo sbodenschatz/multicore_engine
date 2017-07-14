@@ -109,6 +109,7 @@ private:
 	std::vector<void*> staging_buffer_ends;
 	size_t immediate_allocation_slack = 128;
 	std::vector<vk::UniqueFence> fences;
+	containers::scratch_pad_pool<std::vector<transfer_job>> job_scratch_pad;
 	mutable std::mutex manager_mutex;
 
 	template <typename S, typename F>
@@ -128,6 +129,8 @@ private:
 						   util::callback_pool_function<void(vk::Image)> callback);
 
 	void reallocate_buffer(size_t min_size);
+	void process_waiting_jobs();
+	void process_ready_callbacks(std::vector<transfer_job>& jobs);
 
 	template <typename F>
 	bool try_immediate_alloc_buffer(void* data, size_t data_size, vk::Buffer dst_buffer,
@@ -164,7 +167,7 @@ private:
 			return false;
 	}
 
-	void start_frame_internal(uint32_t ring_index);
+	void start_frame_internal(uint32_t ring_index, std::unique_lock<std::mutex> lock);
 
 public:
 	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm,

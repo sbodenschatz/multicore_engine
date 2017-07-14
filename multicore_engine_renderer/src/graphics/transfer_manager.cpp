@@ -82,12 +82,12 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, ba
 }
 
 void transfer_manager::start_frame() {
-	std::lock_guard<std::mutex> lock(manager_mutex);
-	start_frame_internal((current_ring_index + 1) % ring_slots);
+	std::unique_lock<std::mutex> lock(manager_mutex);
+	start_frame_internal((current_ring_index + 1) % ring_slots, std::move(lock));
 }
 void transfer_manager::start_frame(uint32_t ring_index) {
-	std::lock_guard<std::mutex> lock(manager_mutex);
-	start_frame_internal(ring_index);
+	std::unique_lock<std::mutex> lock(manager_mutex);
+	start_frame_internal(ring_index, std::move(lock));
 }
 
 void transfer_manager::reallocate_buffer(size_t min_size) {
@@ -98,6 +98,26 @@ void transfer_manager::reallocate_buffer(size_t min_size) {
 	swap(staging_buffer, new_buffer);
 	swap(chunk_placer, new_chunk_placer);
 	staging_buffer_ends.assign(ring_slots, nullptr);
+}
+void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_lock<std::mutex> lock) {
+	auto jobs = job_scratch_pad.get();
+	current_ring_index = ring_index;
+	auto nd = dev.native_device();
+	nd.waitForFences({fences[current_ring_index].get()}, true, ~0);
+	transfer_command_bufers[current_ring_index]->reset({});
+	ready_ownership_command_buffers.push_back(
+			std::move(pending_ownership_command_buffers[current_ring_index]));
+	pending_ownership_command_buffers[current_ring_index] =
+			ownership_cmd_pool.allocate_primary_command_buffer();
+	std::swap(running_jobs[current_ring_index], *jobs);
+	if(staging_buffer_ends[current_ring_index]) chunk_placer.free_to(staging_buffer_ends[current_ring_index]);
+	transfer_command_bufers[current_ring_index]->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+	pending_ownership_command_buffers[current_ring_index]->begin(
+			{vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+	process_waiting_jobs();
+	lock.unlock();
+	process_ready_callbacks(*jobs);
+	jobs->clear();
 }
 
 } /* namespace graphics */
