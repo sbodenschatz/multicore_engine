@@ -10,6 +10,7 @@
 #include <boost/variant.hpp>
 #include <glm/glm.hpp>
 #include <mce/containers/byte_buffer_pool.hpp>
+#include <mce/containers/scratch_pad_pool.hpp>
 #include <mce/graphics/buffer.hpp>
 #include <mce/graphics/command_pool.hpp>
 #include <mce/graphics/image.hpp>
@@ -92,7 +93,7 @@ private:
 
 	device& dev;
 	device_memory_manager_interface& mm;
-	destruction_queue_manager* dqm;
+	destruction_queue_manager dqm;
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
 	std::vector<transfer_job> waiting_jobs;
@@ -170,8 +171,7 @@ private:
 	void start_frame_internal(uint32_t ring_index, std::unique_lock<std::mutex> lock);
 
 public:
-	transfer_manager(device& dev, device_memory_manager_interface& mm, destruction_queue_manager* dqm,
-					 uint32_t ring_slots);
+	transfer_manager(device& dev, device_memory_manager_interface& mm, uint32_t ring_slots);
 	~transfer_manager();
 
 	void start_frame();

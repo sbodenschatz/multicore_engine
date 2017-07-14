@@ -10,12 +10,11 @@
 namespace mce {
 namespace graphics {
 
-transfer_manager::transfer_manager(device& dev, device_memory_manager_interface& mm,
-								   destruction_queue_manager* dqm, uint32_t ring_slots)
-		: dev{dev}, mm{mm}, dqm{dqm}, ring_slots{ring_slots}, running_jobs{ring_slots},
+transfer_manager::transfer_manager(device& dev, device_memory_manager_interface& mm, uint32_t ring_slots)
+		: dev{dev}, mm{mm}, dqm{&dev, ring_slots}, ring_slots{ring_slots}, running_jobs{ring_slots},
 		  transfer_cmd_pool{dev, dev.transfer_queue_index().first, true, true},
 		  ownership_cmd_pool{dev, dev.graphics_queue_index().first, true, true},
-		  staging_buffer{dev, mm, dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc},
+		  staging_buffer{dev, mm, &dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc},
 		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()}, staging_buffer_ends{
 																						ring_slots, nullptr} {
 	transfer_command_bufers.reserve(ring_slots);
@@ -29,7 +28,7 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 }
 
 transfer_manager::~transfer_manager() {
-	if(!dqm) dev.native_device().waitIdle();
+	dev.native_device().waitIdle();
 	transfer_command_bufers.clear();
 	pending_ownership_command_buffers.clear();
 }
@@ -91,7 +90,7 @@ void transfer_manager::start_frame(uint32_t ring_index) {
 }
 
 void transfer_manager::reallocate_buffer(size_t min_size) {
-	buffer new_buffer(dev, mm, dqm, std::max(min_size * 4, staging_buffer.size()),
+	buffer new_buffer(dev, mm, &dqm, std::max(min_size * 4, staging_buffer.size()),
 					  vk::BufferUsageFlagBits::eTransferSrc);
 	util::ring_chunk_placer new_chunk_placer(new_buffer.mapped_pointer(), new_buffer.size());
 	using std::swap;
@@ -104,6 +103,7 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	current_ring_index = ring_index;
 	auto nd = dev.native_device();
 	nd.waitForFences({fences[current_ring_index].get()}, true, ~0ull);
+	dqm.cleanup_and_set_current(ring_index);
 	transfer_command_bufers[current_ring_index]->reset({});
 	ready_ownership_command_buffers.push_back(
 			std::move(pending_ownership_command_buffers[current_ring_index]));
