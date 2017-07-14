@@ -131,6 +131,7 @@ void transfer_manager::end_frame() {
 	vk::SubmitInfo si;
 	si.commandBufferCount = 1;
 	si.pCommandBuffers = &*transfer_command_bufers[current_ring_index];
+	dev.native_device().resetFences({fences[current_ring_index].get()});
 	dev.transfer_queue().submit({}, *fences[current_ring_index]);
 }
 void transfer_manager::process_waiting_jobs() {
