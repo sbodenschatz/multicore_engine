@@ -12,14 +12,24 @@ namespace graphics {
 
 transfer_manager::transfer_manager(device& dev, device_memory_manager_interface& mm,
 								   destruction_queue_manager* dqm, uint32_t ring_slots)
-		: dev{dev}, mm{mm}, dqm{dqm}, ring_slots{ring_slots},
+		: dev{dev}, mm{mm}, dqm{dqm}, ring_slots{ring_slots}, running_jobs{ring_slots},
 		  transfer_cmd_pool{dev, dev.transfer_queue_index().first, true, true},
 		  ownership_cmd_pool{dev, dev.graphics_queue_index().first, true, true},
 		  staging_buffer{dev, mm, dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc},
-		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()} {}
+		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()}, staging_buffer_ends{
+																						ring_slots, nullptr} {
+	transfer_command_bufers.reserve(ring_slots);
+	pending_ownership_command_buffers.reserve(ring_slots);
+	for(uint32_t i = 0; i < ring_slots; ++i) {
+		transfer_command_bufers.push_back(transfer_cmd_pool.allocate_primary_command_buffer());
+		pending_ownership_command_buffers.push_back(ownership_cmd_pool.allocate_primary_command_buffer());
+	}
+}
 
 transfer_manager::~transfer_manager() {
 	if(!dqm) dev.native_device().waitIdle();
+	transfer_command_bufers.clear();
+	pending_ownership_command_buffers.clear();
 }
 
 void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, vk::Buffer dst_buffer,
@@ -85,6 +95,7 @@ void transfer_manager::reallocate_buffer(size_t min_size) {
 	using std::swap;
 	swap(staging_buffer, new_buffer);
 	swap(chunk_placer, new_chunk_placer);
+	staging_buffer_ends.assign(ring_slots, nullptr);
 }
 
 } /* namespace graphics */

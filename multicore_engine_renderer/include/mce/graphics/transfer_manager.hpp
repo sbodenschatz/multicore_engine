@@ -101,6 +101,7 @@ private:
 	command_pool ownership_cmd_pool;
 	std::vector<vk::UniqueCommandBuffer> transfer_command_bufers;
 	std::vector<vk::UniqueCommandBuffer> pending_ownership_command_buffers;
+	std::vector<vk::UniqueCommandBuffer> ready_ownership_command_buffers;
 	buffer staging_buffer;
 	util::ring_chunk_placer chunk_placer;
 	util::callback_pool completion_function_pool;
