@@ -5,6 +5,7 @@
  */
 
 #include <mce/graphics/transfer_manager.hpp>
+#include <utility>
 
 namespace mce {
 namespace graphics {
@@ -75,6 +76,15 @@ void transfer_manager::start_frame() {
 void transfer_manager::start_frame(uint32_t ring_index) {
 	std::lock_guard<std::mutex> lock(manager_mutex);
 	start_frame_internal(ring_index);
+}
+
+void transfer_manager::reallocate_buffer(size_t min_size) {
+	buffer new_buffer(dev, mm, dqm, std::max(min_size * 4, staging_buffer.size()),
+					  vk::BufferUsageFlagBits::eTransferSrc);
+	util::ring_chunk_placer new_chunk_placer(new_buffer.mapped_pointer(), new_buffer.size());
+	using std::swap;
+	swap(staging_buffer, new_buffer);
+	swap(chunk_placer, new_chunk_placer);
 }
 
 } /* namespace graphics */
