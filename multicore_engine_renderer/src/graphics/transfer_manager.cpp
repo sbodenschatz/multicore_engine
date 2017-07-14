@@ -16,8 +16,8 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 		  transfer_cmd_pool{dev, dev.transfer_queue_index().first, true, true},
 		  ownership_cmd_pool{dev, dev.graphics_queue_index().first, true, true},
 		  staging_buffer{dev, mm, &dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc},
-		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()}, staging_buffer_ends{
-																						ring_slots, nullptr} {
+		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()},
+		  staging_buffer_ends{ring_slots, nullptr} {
 	transfer_command_bufers.reserve(ring_slots);
 	pending_ownership_command_buffers.reserve(ring_slots);
 	fences.reserve(ring_slots);
@@ -182,7 +182,7 @@ void transfer_manager::process_waiting_jobs() {
 								  std::move(job.completion_callback));
 			return true;
 		}
-		job_visitor(transfer_manager& mgr) : mgr{mgr} {}
+		explicit job_visitor(transfer_manager& mgr) : mgr{mgr} {}
 	};
 	job_visitor v{*this};
 
