@@ -108,6 +108,7 @@ private:
 	containers::byte_buffer_pool byte_buff_pool;
 	std::vector<void*> staging_buffer_ends;
 	size_t immediate_allocation_slack = 128;
+	std::vector<vk::UniqueFence> fences;
 	mutable std::mutex manager_mutex;
 
 	template <typename S, typename F>

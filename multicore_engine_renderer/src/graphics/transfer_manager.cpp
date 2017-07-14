@@ -20,9 +20,11 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 																						ring_slots, nullptr} {
 	transfer_command_bufers.reserve(ring_slots);
 	pending_ownership_command_buffers.reserve(ring_slots);
+	fences.reserve(ring_slots);
 	for(uint32_t i = 0; i < ring_slots; ++i) {
 		transfer_command_bufers.push_back(transfer_cmd_pool.allocate_primary_command_buffer());
 		pending_ownership_command_buffers.push_back(ownership_cmd_pool.allocate_primary_command_buffer());
+		fences.push_back(dev.native_device().createFenceUnique({vk::FenceCreateFlagBits::eSignaled}));
 	}
 }
 
