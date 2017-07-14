@@ -277,6 +277,7 @@ public:
 					dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(), dst_img.layout(),
 					regions, take_callback<void(vk::Image)>(std::forward<F>(callback))));
 		}
+		dst_img.set_layout_external(final_layout);
 	}
 	template <typename F>
 	void upload_image(const std::shared_ptr<void>& data, size_t data_size, base_image& dst_img,
@@ -290,6 +291,7 @@ public:
 					dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(), dst_img.layout(),
 					regions, take_callback<void(vk::Image)>(std::forward<F>(callback))));
 		}
+		dst_img.set_layout_external(final_layout);
 	}
 	template <typename F>
 	void upload_image(containers::pooled_byte_buffer_ptr data, size_t data_size, base_image& dst_img,
@@ -303,6 +305,7 @@ public:
 					dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(), dst_img.layout(),
 					regions, take_callback<void(vk::Image)>(std::forward<F>(callback))));
 		}
+		dst_img.set_layout_external(final_layout);
 	}
 
 	// TODO: Ownership transfer
