@@ -308,6 +308,7 @@ public:
 		dst_img.set_layout_external(final_layout);
 	}
 
+	// TODO: Final layout transition
 	// TODO: Ownership transfer
 };
 
