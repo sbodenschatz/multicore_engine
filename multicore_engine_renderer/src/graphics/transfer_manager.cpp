@@ -119,6 +119,17 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	process_ready_callbacks(*jobs);
 	jobs->clear();
 }
+void transfer_manager::end_frame() {
+	process_waiting_jobs();
+	staging_buffer.flush_mapped(dev.native_device());
+	staging_buffer_ends[current_ring_index] = chunk_placer.in_position();
+	transfer_command_bufers[current_ring_index]->end();
+	pending_ownership_command_buffers[current_ring_index]->end();
+	vk::SubmitInfo si;
+	si.commandBufferCount = 1;
+	si.pCommandBuffers = &*transfer_command_bufers[current_ring_index];
+	dev.transfer_queue().submit({}, *fences[current_ring_index]);
+}
 
 } /* namespace graphics */
 } /* namespace mce */

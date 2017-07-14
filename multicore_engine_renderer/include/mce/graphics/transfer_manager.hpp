@@ -107,7 +107,7 @@ private:
 	util::ring_chunk_placer chunk_placer;
 	util::callback_pool completion_function_pool;
 	containers::byte_buffer_pool byte_buff_pool;
-	std::vector<void*> staging_buffer_ends;
+	std::vector<const void*> staging_buffer_ends;
 	size_t immediate_allocation_slack = 128;
 	std::vector<vk::UniqueFence> fences;
 	containers::scratch_pad_pool<std::vector<transfer_job>> job_scratch_pad;
