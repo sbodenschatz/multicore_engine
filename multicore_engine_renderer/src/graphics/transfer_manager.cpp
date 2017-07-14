@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <cassert>
 #include <mce/graphics/transfer_manager.hpp>
 #include <utility>
 
@@ -131,6 +132,63 @@ void transfer_manager::end_frame() {
 	si.commandBufferCount = 1;
 	si.pCommandBuffers = &*transfer_command_bufers[current_ring_index];
 	dev.transfer_queue().submit({}, *fences[current_ring_index]);
+}
+void transfer_manager::process_waiting_jobs() {
+	struct size_visitor : boost::static_visitor<size_t> {
+		size_t operator()(buffer_transfer_job& job) const {
+			return job.size;
+		}
+		size_t operator()(image_transfer_job& job) const {
+			return job.size;
+		}
+	};
+	std::sort(waiting_jobs.begin(), waiting_jobs.end(), [](transfer_job& job_a, transfer_job& job_b) {
+		size_visitor v;
+		return job_a.apply_visitor(v) > job_b.apply_visitor(v);
+	});
+
+	struct ptr_visitor : boost::static_visitor<const char*> {
+		const char* operator()(boost::blank) const {
+			return nullptr;
+		}
+		const char* operator()(const std::shared_ptr<const char>& ptr) const {
+			return ptr.get();
+		}
+		const char* operator()(const containers::pooled_byte_buffer_ptr& ptr) const {
+			return ptr.data();
+		}
+	};
+
+	struct job_visitor : boost::static_visitor<bool> {
+		transfer_manager& mgr;
+		ptr_visitor pv;
+		bool operator()(buffer_transfer_job& job) const {
+			if(!mgr.chunk_placer.can_fit(job.size)) return false;
+			auto data = job.src_data.apply_visitor(pv);
+			assert(data);
+			auto staging_ptr = mgr.chunk_placer.place_chunk(data, job.size);
+			mgr.record_buffer_copy(staging_ptr, job.size, job.dst_buffer, job.dst_offset,
+								   std::move(job.completion_callback));
+			return true;
+		}
+		bool operator()(image_transfer_job& job) const {
+			if(!mgr.chunk_placer.can_fit(job.size)) return false;
+			auto data = job.src_data.apply_visitor(pv);
+			assert(data);
+			auto staging_ptr = mgr.chunk_placer.place_chunk(data, job.size);
+			mgr.record_image_copy(staging_ptr, job.size, job.dst_img, job.final_layout, job.aspects,
+								  job.mip_levels, job.layers, job.old_layout, std::move(job.regions),
+								  std::move(job.completion_callback));
+			return true;
+		}
+		job_visitor(transfer_manager& mgr) : mgr{mgr} {}
+	};
+	job_visitor v{*this};
+
+	while(!waiting_jobs.empty()) {
+		if(!waiting_jobs.back().apply_visitor(v)) break;
+		waiting_jobs.pop_back();
+	}
 }
 
 } /* namespace graphics */
