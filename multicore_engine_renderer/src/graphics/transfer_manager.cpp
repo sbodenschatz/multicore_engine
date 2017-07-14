@@ -103,7 +103,7 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	auto jobs = job_scratch_pad.get();
 	current_ring_index = ring_index;
 	auto nd = dev.native_device();
-	nd.waitForFences({fences[current_ring_index].get()}, true, ~0);
+	nd.waitForFences({fences[current_ring_index].get()}, true, ~0ull);
 	transfer_command_bufers[current_ring_index]->reset({});
 	ready_ownership_command_buffers.push_back(
 			std::move(pending_ownership_command_buffers[current_ring_index]));
