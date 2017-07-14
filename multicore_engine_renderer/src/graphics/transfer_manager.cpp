@@ -49,13 +49,14 @@ void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, v
 			staging_buffer.native_buffer(), dst_buffer,
 			{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
 }
-void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, base_image& dst_img,
-										 vk::ImageLayout final_layout,
+void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk::Image dst_img,
+										 vk::ImageLayout final_layout, vk::ImageAspectFlags aspects,
+										 uint32_t mip_levels, uint32_t layers, vk::ImageLayout old_layout,
 										 decltype(image_transfer_job::regions) regions,
 										 util::callback_pool_function<void(vk::Image)> callback) {
-	running_jobs[current_ring_index].push_back(image_transfer_job(data_size, staging_ptr,
-																  dst_img.native_image(), final_layout,
-																  std::move(regions), std::move(callback)));
+	running_jobs[current_ring_index].push_back(
+			image_transfer_job(data_size, staging_ptr, dst_img, final_layout, aspects, mip_levels, layers,
+							   old_layout, std::move(regions), std::move(callback)));
 	boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
 																				regions.end());
 	auto offset = chunk_placer.to_offset(staging_ptr);
@@ -65,10 +66,11 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, ba
 	transfer_command_bufers[current_ring_index]->pipelineBarrier(
 			vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
 			vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
-			{dst_img.generate_transition(vk::ImageLayout::eTransferDstOptimal, ~vk::AccessFlags{},
-										 vk::AccessFlagBits::eTransferWrite)});
+			{base_image::generate_transition_native(dst_img, old_layout, vk::ImageLayout::eTransferDstOptimal,
+													~vk::AccessFlags{}, vk::AccessFlagBits::eTransferWrite,
+													aspects, mip_levels, layers)});
 	transfer_command_bufers[current_ring_index]->copyBufferToImage(
-			staging_buffer.native_buffer(), dst_img.native_image(), vk::ImageLayout::eTransferDstOptimal,
+			staging_buffer.native_buffer(), dst_img, vk::ImageLayout::eTransferDstOptimal,
 			{uint32_t(regions_transformed.size()), regions_transformed.data()});
 }
 
