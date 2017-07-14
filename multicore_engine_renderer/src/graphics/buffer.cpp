@@ -34,5 +34,21 @@ void buffer::invalidate_mapped(const vk::Device& dev, vk::DeviceSize offset, vk:
 	memory_handle_->invalidate_mapped(dev, offset, size);
 }
 
+buffer::buffer(buffer&& other) noexcept
+		: buff_{std::move(other.buff_)}, memory_handle_{std::move(other.memory_handle_)},
+		  size_{std::move(other.size_)}, usage_{std::move(other.usage_)} {
+	other.size_ = 0;
+	other.usage_ = {};
+}
+buffer& buffer::operator=(buffer&& other) noexcept {
+	buff_ = std::move(other.buff_);
+	memory_handle_ = std::move(other.memory_handle_);
+	size_ = std::move(other.size_);
+	usage_ = std::move(other.usage_);
+	other.size_ = 0;
+	other.usage_ = {};
+	return *this;
+}
+
 } /* namespace graphics */
 } /* namespace mce */

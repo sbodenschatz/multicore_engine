@@ -35,6 +35,11 @@ public:
 	/// Destroys the buffer wrapper object and releases the used resources to the destruction queue.
 	~buffer();
 
+	/// Allow nothrow move construction.
+	buffer(buffer&&) noexcept;
+	/// Allow nothrow move assignment.
+	buffer& operator=(buffer&&) noexcept;
+
 	/// Allows access to the underlying native buffer object handle.
 	vk::Buffer native_buffer() {
 		return buff_.get();
