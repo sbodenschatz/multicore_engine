@@ -38,14 +38,10 @@ void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, v
 										  util::callback_pool_function<void(vk::Buffer)> callback) {
 	running_jobs[current_ring_index].push_back(
 			buffer_transfer_job(data_size, staging_ptr, dst_buffer, dst_offset, std::move(callback)));
-	staging_buffer.flush_mapped(dev.native_device());
 	transfer_command_bufers[current_ring_index]->pipelineBarrier(
 			vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
 			vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
-			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite, vk::AccessFlagBits::eTransferRead,
-									 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
-									 staging_buffer.native_buffer(), 0, VK_WHOLE_SIZE),
-			 vk::BufferMemoryBarrier(~vk::AccessFlags{}, vk::AccessFlagBits::eTransferWrite,
+			{vk::BufferMemoryBarrier(~vk::AccessFlags{}, vk::AccessFlagBits::eTransferWrite,
 									 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED, dst_buffer, 0,
 									 VK_WHOLE_SIZE)},
 			{});
@@ -66,13 +62,9 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, ba
 	for(vk::BufferImageCopy& region : regions_transformed) {
 		region.bufferOffset += offset;
 	}
-	staging_buffer.flush_mapped(dev.native_device());
 	transfer_command_bufers[current_ring_index]->pipelineBarrier(
 			vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
-			vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
-			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite, vk::AccessFlagBits::eTransferRead,
-									 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
-									 staging_buffer.native_buffer(), 0, VK_WHOLE_SIZE)},
+			vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
 			{dst_img.generate_transition(vk::ImageLayout::eTransferDstOptimal, ~vk::AccessFlags{},
 										 vk::AccessFlagBits::eTransferWrite)});
 	transfer_command_bufers[current_ring_index]->copyBufferToImage(
@@ -90,6 +82,7 @@ void transfer_manager::start_frame(uint32_t ring_index) {
 }
 
 void transfer_manager::reallocate_buffer(size_t min_size) {
+	staging_buffer.flush_mapped(dev.native_device());
 	buffer new_buffer(dev, mm, &dqm, std::max(min_size * 4, staging_buffer.size()),
 					  vk::BufferUsageFlagBits::eTransferSrc);
 	util::ring_chunk_placer new_chunk_placer(new_buffer.mapped_pointer(), new_buffer.size());
@@ -114,6 +107,13 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	transfer_command_bufers[current_ring_index]->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 	pending_ownership_command_buffers[current_ring_index]->begin(
 			{vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+	transfer_command_bufers[current_ring_index]->pipelineBarrier(
+			vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
+			vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite, vk::AccessFlagBits::eTransferRead,
+									 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+									 staging_buffer.native_buffer(), 0, VK_WHOLE_SIZE)},
+			{});
 	process_waiting_jobs();
 	lock.unlock();
 	process_ready_callbacks(*jobs);
