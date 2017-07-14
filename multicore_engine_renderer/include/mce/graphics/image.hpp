@@ -273,6 +273,7 @@ protected:
 			   bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 			   bool preinitialized_layout = false);
 
+public:
 	/// Returns the aspect flags for the aspect mode of the image.
 	/**
 	 * For color, depth, and stencil only the respective flag is set.
@@ -281,7 +282,6 @@ protected:
 	 */
 	vk::ImageAspectFlags default_aspect_flags() const;
 
-public:
 	/// Calculates and returns the number of mip levels in a full chain for the given image size.
 	template <typename T>
 	static uint32_t full_mip_levels(T size) {
