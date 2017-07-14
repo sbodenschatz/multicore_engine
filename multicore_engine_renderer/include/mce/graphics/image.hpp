@@ -411,6 +411,10 @@ public:
 	uint32_t layers() const {
 		return layers_;
 	}
+
+	vk::ImageLayout layout() const {
+		return layout_;
+	}
 };
 
 /// \brief Empty unspecialized definition for image template class. Specializations provide specific
