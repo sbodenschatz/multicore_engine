@@ -228,6 +228,7 @@ public:
 	void start_frame();
 	void start_frame(uint32_t ring_index);
 	void end_frame();
+	std::vector<vk::UniqueCommandBuffer> retrieve_waiting_ownership_transfers();
 
 	template <typename F>
 	void upload_buffer(void* data, size_t data_size, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,

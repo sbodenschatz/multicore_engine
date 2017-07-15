@@ -206,5 +206,13 @@ void transfer_manager::process_ready_callbacks(std::vector<transfer_job>& jobs) 
 	}
 }
 
+std::vector<vk::UniqueCommandBuffer> transfer_manager::retrieve_waiting_ownership_transfers() {
+	std::vector<vk::UniqueCommandBuffer> res;
+	std::unique_lock<std::mutex> lock(manager_mutex);
+	using std::swap;
+	swap(waiting_jobs, res);
+	return res;
+}
+
 } /* namespace graphics */
 } /* namespace mce */
