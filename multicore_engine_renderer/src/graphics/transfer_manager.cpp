@@ -123,6 +123,7 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	jobs->clear();
 }
 void transfer_manager::end_frame() {
+	std::unique_lock<std::mutex> lock(manager_mutex);
 	process_waiting_jobs();
 	staging_buffer.flush_mapped(dev.native_device());
 	staging_buffer_ends[current_ring_index] = chunk_placer.in_position();
@@ -206,11 +207,11 @@ void transfer_manager::process_ready_callbacks(std::vector<transfer_job>& jobs) 
 	}
 }
 
-std::vector<vk::UniqueCommandBuffer> transfer_manager::retrieve_waiting_ownership_transfers() {
+std::vector<vk::UniqueCommandBuffer> transfer_manager::retrieve_ready_ownership_transfers() {
 	std::vector<vk::UniqueCommandBuffer> res;
 	std::unique_lock<std::mutex> lock(manager_mutex);
 	using std::swap;
-	swap(waiting_jobs, res);
+	swap(ready_ownership_command_buffers, res);
 	return res;
 }
 
