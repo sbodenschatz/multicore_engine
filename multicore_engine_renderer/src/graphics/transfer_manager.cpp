@@ -70,11 +70,11 @@ void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, v
 void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk::Image dst_img,
 										 vk::ImageLayout final_layout, vk::ImageAspectFlags aspects,
 										 uint32_t mip_levels, uint32_t layers, vk::ImageLayout old_layout,
-										 decltype(image_transfer_job::regions) regions,
+										 vk::ArrayProxy<const vk::BufferImageCopy> regions,
 										 util::callback_pool_function<void(vk::Image)> callback) {
-	running_jobs[current_ring_index].push_back(
-			image_transfer_job(data_size, staging_ptr, dst_img, final_layout, aspects, mip_levels, layers,
-							   old_layout, std::move(regions), std::move(callback)));
+	running_jobs[current_ring_index].push_back(image_transfer_job(data_size, staging_ptr, dst_img,
+																  final_layout, aspects, mip_levels, layers,
+																  old_layout, {}, std::move(callback)));
 	boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
 																				regions.end());
 	auto offset = chunk_placer.to_offset(staging_ptr);
@@ -221,7 +221,7 @@ void transfer_manager::process_waiting_jobs() {
 			assert(data);
 			auto staging_ptr = mgr.chunk_placer.place_chunk(data, job.size);
 			mgr.record_image_copy(staging_ptr, job.size, job.dst_img, job.final_layout, job.aspects,
-								  job.mip_levels, job.layers, job.old_layout, std::move(job.regions),
+								  job.mip_levels, job.layers, job.old_layout, job.regions,
 								  std::move(job.completion_callback));
 			return true;
 		}
