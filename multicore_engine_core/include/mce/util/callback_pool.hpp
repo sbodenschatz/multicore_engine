@@ -171,7 +171,7 @@ class callback_pool_function<R(Args...)> {
 
 public:
 	/// Creates an empty function wrapper, that throws an exception when called.
-	callback_pool_function() noexcept;
+	callback_pool_function() noexcept=default;
 	/// Allows move-construction.
 	callback_pool_function(callback_pool_function&& other) noexcept
 			: internal_function_object{std::move(other.internal_function_object)} {
