@@ -412,6 +412,7 @@ public:
 		return layers_;
 	}
 
+	/// Returns the current tracked layout of the image.
 	vk::ImageLayout layout() const {
 		return layout_;
 	}
