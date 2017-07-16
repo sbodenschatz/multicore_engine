@@ -237,10 +237,10 @@ void transfer_manager::process_waiting_jobs() {
 void transfer_manager::process_ready_callbacks(std::vector<transfer_job>& jobs) {
 	struct job_visitor : boost::static_visitor<> {
 		void operator()(buffer_transfer_job& job) const {
-			job.completion_callback(job.dst_buffer);
+			if(job.completion_callback) job.completion_callback(job.dst_buffer);
 		}
 		void operator()(image_transfer_job& job) const {
-			job.completion_callback(job.dst_img);
+			if(job.completion_callback) job.completion_callback(job.dst_img);
 		}
 	};
 	job_visitor v;
