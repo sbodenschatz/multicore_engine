@@ -74,8 +74,7 @@ class callback_pool_function_impl<F, R(Args...)> final : public callback_pool_fu
 
 public:
 	template <typename T>
-	callback_pool_function_impl(T&& fun)
-			: f{std::forward<T>(fun)} {}
+	callback_pool_function_impl(T&& fun) : f{std::forward<T>(fun)} {}
 	virtual ~callback_pool_function_impl() = default;
 	virtual R operator()(Args... args) override {
 		return f(std::forward<Args>(args)...);
@@ -199,7 +198,7 @@ public:
 	}
 	/// Checks if the function wrapper is non-empty.
 	explicit operator bool() const noexcept {
-		return internal_function_object;
+		return bool(internal_function_object);
 	}
 	/// Checks if the function wrapper is empty.
 	bool operator!() const noexcept {
