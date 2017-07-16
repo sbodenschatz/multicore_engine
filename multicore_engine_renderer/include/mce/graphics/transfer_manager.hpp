@@ -283,7 +283,7 @@ public:
 		dst_img.set_layout_external(final_layout);
 	}
 	template <typename F>
-	void upload_image(const std::shared_ptr<void>& data, size_t data_size, base_image& dst_img,
+	void upload_image(const std::shared_ptr<const char>& data, size_t data_size, base_image& dst_img,
 					  vk::ImageLayout final_layout, vk::ArrayProxy<const vk::BufferImageCopy> regions,
 					  F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
