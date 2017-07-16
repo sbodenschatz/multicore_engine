@@ -290,7 +290,7 @@ public:
 		if(!try_immediate_alloc_image(data.get(), data_size, dst_img, final_layout, regions,
 									  std::forward<F>(callback))) {
 			waiting_jobs.push_back(image_transfer_job(
-					std::move(data), data_size, nullptr, dst_img.native_image(), final_layout,
+					data, data_size, nullptr, dst_img.native_image(), final_layout,
 					dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(), dst_img.layout(),
 					decltype(image_transfer_job::regions)(regions.begin(), regions.end()),
 					take_callback<void(vk::Image)>(std::forward<F>(callback))));
