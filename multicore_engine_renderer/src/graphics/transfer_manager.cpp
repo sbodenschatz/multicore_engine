@@ -56,7 +56,7 @@ void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, v
 			{});
 	pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
 			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
-			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eTransferWrite, {}, dev.transfer_queue_index().first,
+			{vk::BufferMemoryBarrier({}, ~vk::AccessFlags{}, dev.transfer_queue_index().first,
 									 dev.graphics_queue_index().first, dst_buffer, 0, VK_WHOLE_SIZE)},
 			{});
 }
