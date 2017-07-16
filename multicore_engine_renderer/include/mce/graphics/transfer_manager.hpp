@@ -163,7 +163,7 @@ private:
 
 	template <typename S, typename F>
 	util::callback_pool_function<S> take_callback(F&& f) {
-		return completion_function_pool.allocate_function(std::forward<F>(f));
+		return completion_function_pool.allocate_function<S>(std::forward<F>(f));
 	}
 	template <typename S>
 	util::callback_pool_function<S> take_callback(no_callback_tag) {
