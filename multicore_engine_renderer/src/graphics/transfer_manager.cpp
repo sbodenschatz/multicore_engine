@@ -49,6 +49,16 @@ void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, v
 	transfer_command_bufers[current_ring_index]->copyBuffer(
 			staging_buffer.native_buffer(), dst_buffer,
 			{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
+	transfer_command_bufers[current_ring_index]->pipelineBarrier(
+			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eTransferWrite, {}, dev.transfer_queue_index().first,
+									 dev.graphics_queue_index().first, dst_buffer, 0, VK_WHOLE_SIZE)},
+			{});
+	pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
+			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eTransferWrite, {}, dev.transfer_queue_index().first,
+									 dev.graphics_queue_index().first, dst_buffer, 0, VK_WHOLE_SIZE)},
+			{});
 }
 void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk::Image dst_img,
 										 vk::ImageLayout final_layout, vk::ImageAspectFlags aspects,
