@@ -231,7 +231,7 @@ public:
 	void end_frame();
 	std::vector<vk::UniqueCommandBuffer> retrieve_ready_ownership_transfers();
 
-	template <typename F>
+	template <typename F = no_callback_tag>
 	void upload_buffer(void* data, size_t data_size, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 					   F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
@@ -243,7 +243,7 @@ public:
 										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
 		}
 	}
-	template <typename F>
+	template <typename F = no_callback_tag>
 	void upload_buffer(containers::pooled_byte_buffer_ptr data, size_t data_size, vk::Buffer dst_buffer,
 					   vk::DeviceSize dst_offset, F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
@@ -254,7 +254,7 @@ public:
 										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
 		}
 	}
-	template <typename F>
+	template <typename F = no_callback_tag>
 	void upload_buffer(const std::shared_ptr<const char>& data, size_t data_size, vk::Buffer dst_buffer,
 					   vk::DeviceSize dst_offset, F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
