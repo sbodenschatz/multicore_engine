@@ -255,7 +255,7 @@ public:
 		}
 	}
 	template <typename F>
-	void upload_buffer(const std::shared_ptr<void>& data, size_t data_size, vk::Buffer dst_buffer,
+	void upload_buffer(const std::shared_ptr<const char>& data, size_t data_size, vk::Buffer dst_buffer,
 					   vk::DeviceSize dst_offset, F&& callback = no_callback_tag{}) {
 		std::lock_guard<std::mutex> lock(manager_mutex);
 		if(!try_immediate_alloc_buffer(data.get(), data_size, dst_buffer, dst_offset,
