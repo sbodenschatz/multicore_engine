@@ -7,6 +7,11 @@
 #ifndef MCE_GRAPHICS_TRANSFER_MANAGER_HPP_
 #define MCE_GRAPHICS_TRANSFER_MANAGER_HPP_
 
+/**
+ * \file
+ * Provides the transfer_manager class that implements resource upload logic to the graphics device.
+ */
+
 #include <boost/variant.hpp>
 #include <glm/glm.hpp>
 #include <mce/containers/byte_buffer_pool.hpp>
@@ -22,6 +27,7 @@
 namespace mce {
 namespace graphics {
 
+/// Manages the asynchronous upload of image and buffer data from the host to the graphics device.
 class transfer_manager {
 public:
 	struct no_callback_tag {};
@@ -223,14 +229,32 @@ private:
 	void start_frame_internal(uint32_t ring_index, std::unique_lock<std::mutex> lock);
 
 public:
+	/// \brief Constructs a transfer_manager for the given device and memory manager with the given number of
+	/// frame ring buffer slots.
 	transfer_manager(device& dev, device_memory_manager_interface& mm, uint32_t ring_slots);
+	/// \brief Ensures that all started operations have finished by waiting for the device to be idle and
+	/// releases the resources used by the transfer_manager.
 	~transfer_manager();
 
+	/// \brief Switches to the next frame ring slot, waits for it to be ready, calls the callback for
+	/// completed transfers and prepares for the new frame.
 	void start_frame();
+	/// \brief Switches to the given frame ring slot, waits for it to be ready, calls the callback for
+	/// completed transfers and prepares for the new frame.
 	void start_frame(uint32_t ring_index);
+	/// Completes the job preparations for this frame and submits the transfer command buffers to the device.
 	void end_frame();
+	/// \brief Retrieves the command buffers that perform the queue ownership acquire barriers to be executed
+	/// on the graphics queue before transfered resources can be used.
 	std::vector<vk::UniqueCommandBuffer> retrieve_ready_ownership_transfers();
 
+	/// Transfers the given data into the given buffer on the device asynchronously at the given offset.
+	/**
+	 * Calls the (optionally) given callback after the transfer is completed.
+	 *
+	 * The data is internally copied if required to ensure that the data pointer is only required to be valid
+	 * while executing the member function.
+	 */
 	template <typename F = no_callback_tag>
 	void upload_buffer(void* data, size_t data_size, vk::Buffer dst_buffer, vk::DeviceSize dst_offset,
 					   F&& callback = no_callback_tag{}) {
@@ -243,6 +267,10 @@ public:
 										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
 		}
 	}
+	/// Transfers the given data into the given buffer on the device asynchronously at the given offset.
+	/**
+	 * Calls the (optionally) given callback after the transfer is completed.
+	 */
 	template <typename F = no_callback_tag>
 	void upload_buffer(containers::pooled_byte_buffer_ptr data, size_t data_size, vk::Buffer dst_buffer,
 					   vk::DeviceSize dst_offset, F&& callback = no_callback_tag{}) {
@@ -254,6 +282,12 @@ public:
 										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
 		}
 	}
+	/// Transfers the given data into the given buffer on the device asynchronously at the given offset.
+	/**
+	 * Calls the (optionally) given callback after the transfer is completed.
+	 *
+	 * The pending or running task participates in shared ownership of the data as long as it is required.
+	 */
 	template <typename F = no_callback_tag>
 	void upload_buffer(const std::shared_ptr<const char>& data, size_t data_size, vk::Buffer dst_buffer,
 					   vk::DeviceSize dst_offset, F&& callback = no_callback_tag{}) {
@@ -266,6 +300,13 @@ public:
 		}
 	}
 
+	/// Transfers the given data into the given sections of the image on the device asynchronously.
+	/**
+	 * Calls the (optionally) given callback after the transfer is completed.
+	 *
+	 * The data is internally copied if required to ensure that the data pointer is only required to be valid
+	 * while executing the member function.
+	 */
 	template <typename F = no_callback_tag>
 	void upload_image(void* data, size_t data_size, base_image& dst_img, vk::ImageLayout final_layout,
 					  vk::ArrayProxy<const vk::BufferImageCopy> regions, F&& callback = no_callback_tag{}) {
@@ -282,6 +323,12 @@ public:
 		}
 		dst_img.set_layout_external(final_layout);
 	}
+	/// Transfers the given data into the given sections of the image on the device asynchronously.
+	/**
+	 * Calls the (optionally) given callback after the transfer is completed.
+	 *
+	 * The pending or running task participates in shared ownership of the data as long as it is required.
+	 */
 	template <typename F = no_callback_tag>
 	void upload_image(const std::shared_ptr<const char>& data, size_t data_size, base_image& dst_img,
 					  vk::ImageLayout final_layout, vk::ArrayProxy<const vk::BufferImageCopy> regions,
@@ -297,6 +344,10 @@ public:
 		}
 		dst_img.set_layout_external(final_layout);
 	}
+	/// Transfers the given data into the given sections of the image on the device asynchronously.
+	/**
+	 * Calls the (optionally) given callback after the transfer is completed.
+	 */
 	template <typename F = no_callback_tag>
 	void upload_image(containers::pooled_byte_buffer_ptr data, size_t data_size, base_image& dst_img,
 					  vk::ImageLayout final_layout, vk::ArrayProxy<const vk::BufferImageCopy> regions,
