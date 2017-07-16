@@ -49,16 +49,19 @@ void transfer_manager::record_buffer_copy(void* staging_ptr, size_t data_size, v
 	transfer_command_bufers[current_ring_index]->copyBuffer(
 			staging_buffer.native_buffer(), dst_buffer,
 			{{chunk_placer.to_offset(staging_ptr), dst_offset, data_size}});
-	transfer_command_bufers[current_ring_index]->pipelineBarrier(
-			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
-			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eTransferWrite, {}, dev.transfer_queue_index().first,
-									 dev.graphics_queue_index().first, dst_buffer, 0, VK_WHOLE_SIZE)},
-			{});
-	pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
-			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
-			{vk::BufferMemoryBarrier({}, ~vk::AccessFlags{}, dev.transfer_queue_index().first,
-									 dev.graphics_queue_index().first, dst_buffer, 0, VK_WHOLE_SIZE)},
-			{});
+	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
+		transfer_command_bufers[current_ring_index]->pipelineBarrier(
+				vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+				{vk::BufferMemoryBarrier(vk::AccessFlagBits::eTransferWrite, {},
+										 dev.transfer_queue_index().first, dev.graphics_queue_index().first,
+										 dst_buffer, 0, VK_WHOLE_SIZE)},
+				{});
+		pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
+				vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+				{vk::BufferMemoryBarrier({}, ~vk::AccessFlags{}, dev.transfer_queue_index().first,
+										 dev.graphics_queue_index().first, dst_buffer, 0, VK_WHOLE_SIZE)},
+				{});
+	}
 }
 void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk::Image dst_img,
 										 vk::ImageLayout final_layout, vk::ImageAspectFlags aspects,
@@ -83,18 +86,27 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk
 	transfer_command_bufers[current_ring_index]->copyBufferToImage(
 			staging_buffer.native_buffer(), dst_img, vk::ImageLayout::eTransferDstOptimal,
 			{uint32_t(regions_transformed.size()), regions_transformed.data()});
-	transfer_command_bufers[current_ring_index]->pipelineBarrier(
-			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
-			{vk::ImageMemoryBarrier(vk::AccessFlagBits::eTransferWrite, {},
-									vk::ImageLayout::eTransferDstOptimal, final_layout,
-									dev.transfer_queue_index().first, dev.graphics_queue_index().first,
-									dst_img, vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
-	pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
-			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
-			{vk::ImageMemoryBarrier({}, ~vk::AccessFlags{}, vk::ImageLayout::eTransferDstOptimal,
-									final_layout, dev.transfer_queue_index().first,
-									dev.graphics_queue_index().first, dst_img,
-									vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
+	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
+		transfer_command_bufers[current_ring_index]->pipelineBarrier(
+				vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
+				{vk::ImageMemoryBarrier(
+						vk::AccessFlagBits::eTransferWrite, {}, vk::ImageLayout::eTransferDstOptimal,
+						final_layout, dev.transfer_queue_index().first, dev.graphics_queue_index().first,
+						dst_img, vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
+		pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
+				vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
+				{vk::ImageMemoryBarrier({}, ~vk::AccessFlags{}, vk::ImageLayout::eTransferDstOptimal,
+										final_layout, dev.transfer_queue_index().first,
+										dev.graphics_queue_index().first, dst_img,
+										vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
+	} else {
+		transfer_command_bufers[current_ring_index]->pipelineBarrier(
+				vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
+				vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
+				{base_image::generate_transition_native(dst_img, vk::ImageLayout::eTransferDstOptimal,
+														final_layout, vk::AccessFlagBits::eTransferWrite,
+														~vk::AccessFlags{}, aspects, mip_levels, layers)});
+	}
 }
 
 void transfer_manager::start_frame() {
