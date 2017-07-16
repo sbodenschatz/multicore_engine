@@ -201,7 +201,7 @@ private:
 	}
 
 	template <typename F>
-	bool try_immediate_alloc_image(void* data, size_t data_size, base_image& dst_img,
+	bool try_immediate_alloc_image(const void* data, size_t data_size, base_image& dst_img,
 								   vk::ImageLayout final_layout,
 								   vk::ArrayProxy<const vk::BufferImageCopy> regions, F&& callback) {
 		if(data_size > chunk_placer.buffer_space_size()) {
