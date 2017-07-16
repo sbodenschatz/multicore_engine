@@ -19,11 +19,15 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()}, staging_buffer_ends{
 																						ring_slots, nullptr} {
 	transfer_command_bufers.reserve(ring_slots);
-	pending_ownership_command_buffers.reserve(ring_slots);
+	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
+		pending_ownership_command_buffers.reserve(ring_slots);
+	}
 	fences.reserve(ring_slots);
 	for(uint32_t i = 0; i < ring_slots; ++i) {
 		transfer_command_bufers.push_back(transfer_cmd_pool.allocate_primary_command_buffer());
-		pending_ownership_command_buffers.push_back(ownership_cmd_pool.allocate_primary_command_buffer());
+		if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
+			pending_ownership_command_buffers.push_back(ownership_cmd_pool.allocate_primary_command_buffer());
+		}
 		fences.push_back(dev.native_device().createFenceUnique({vk::FenceCreateFlagBits::eSignaled}));
 	}
 }
@@ -135,15 +139,17 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	nd.waitForFences({fences[current_ring_index].get()}, true, ~0ull);
 	dqm.cleanup_and_set_current(ring_index);
 	transfer_command_bufers[current_ring_index]->reset({});
-	ready_ownership_command_buffers.push_back(
-			std::move(pending_ownership_command_buffers[current_ring_index]));
-	pending_ownership_command_buffers[current_ring_index] =
-			ownership_cmd_pool.allocate_primary_command_buffer();
+	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
+		ready_ownership_command_buffers.push_back(
+				std::move(pending_ownership_command_buffers[current_ring_index]));
+		pending_ownership_command_buffers[current_ring_index] =
+				ownership_cmd_pool.allocate_primary_command_buffer();
+		pending_ownership_command_buffers[current_ring_index]->begin(
+				{vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+	}
 	std::swap(running_jobs[current_ring_index], *jobs);
 	if(staging_buffer_ends[current_ring_index]) chunk_placer.free_to(staging_buffer_ends[current_ring_index]);
 	transfer_command_bufers[current_ring_index]->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-	pending_ownership_command_buffers[current_ring_index]->begin(
-			{vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 	transfer_command_bufers[current_ring_index]->pipelineBarrier(
 			vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
 			vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
@@ -162,7 +168,9 @@ void transfer_manager::end_frame() {
 	staging_buffer.flush_mapped(dev.native_device());
 	staging_buffer_ends[current_ring_index] = chunk_placer.in_position();
 	transfer_command_bufers[current_ring_index]->end();
-	pending_ownership_command_buffers[current_ring_index]->end();
+	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
+		pending_ownership_command_buffers[current_ring_index]->end();
+	}
 	vk::SubmitInfo si;
 	si.commandBufferCount = 1;
 	si.pCommandBuffers = &*transfer_command_bufers[current_ring_index];
@@ -244,8 +252,10 @@ void transfer_manager::process_ready_callbacks(std::vector<transfer_job>& jobs) 
 std::vector<vk::UniqueCommandBuffer> transfer_manager::retrieve_ready_ownership_transfers() {
 	std::vector<vk::UniqueCommandBuffer> res;
 	std::unique_lock<std::mutex> lock(manager_mutex);
-	using std::swap;
-	swap(ready_ownership_command_buffers, res);
+	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
+		using std::swap;
+		swap(ready_ownership_command_buffers, res);
+	}
 	return res;
 }
 
