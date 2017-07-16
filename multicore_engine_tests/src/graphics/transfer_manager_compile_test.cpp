@@ -60,6 +60,13 @@ static void test_transfer_manager_compilation() {
 										 vk::ImageSubresourceLayers(vk::ImageAspectFlagBits::eColor, 0, 0, 1),
 										 {0, 0, 0}, {1024, 1024, 1})},
 					[](vk::Image) {});
+	mce::graphics::buffer buff(dev, mm, &dqm, 1024, vk::BufferUsageFlagBits::eVertexBuffer);
+	tm.upload_buffer(std::shared_ptr<const char>(), 1024, buff.native_buffer(), 0, [](vk::Buffer) {});
+	tm.upload_buffer(containers::pooled_byte_buffer_ptr{}, 1024, buff.native_buffer(), 0, [](vk::Buffer) {});
+	tm.upload_buffer(data_ptr, 1024, buff.native_buffer(), 0, [](vk::Buffer) {});
+	tm.upload_buffer(std::shared_ptr<const char>(), 1024, buff.native_buffer(), 0);
+	tm.upload_buffer(containers::pooled_byte_buffer_ptr{}, 1024, buff.native_buffer(), 0);
+	tm.upload_buffer(data_ptr, 1024, buff.native_buffer(), 0);
 }
 
 TEST(graphics_transfer_manager, compile_test) {
