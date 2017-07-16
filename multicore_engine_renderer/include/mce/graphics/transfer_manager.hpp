@@ -211,7 +211,7 @@ private:
 		   (chunk_placer.can_fit(data_size) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
 			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
-			record_image_copy(staging_ptr, data_size, dst_img, final_layout,
+			record_image_copy(staging_ptr, data_size, dst_img.native_image(), final_layout,
 							  dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(),
 							  dst_img.layout(), regions,
 							  take_callback<void(vk::Image)>(std::forward<F>(callback)));
