@@ -83,6 +83,18 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk
 	transfer_command_bufers[current_ring_index]->copyBufferToImage(
 			staging_buffer.native_buffer(), dst_img, vk::ImageLayout::eTransferDstOptimal,
 			{uint32_t(regions_transformed.size()), regions_transformed.data()});
+	transfer_command_bufers[current_ring_index]->pipelineBarrier(
+			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
+			{vk::ImageMemoryBarrier(vk::AccessFlagBits::eTransferWrite, {},
+									vk::ImageLayout::eTransferDstOptimal, final_layout,
+									dev.transfer_queue_index().first, dev.graphics_queue_index().first,
+									dst_img, vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
+	pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
+			vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
+			{vk::ImageMemoryBarrier({}, ~vk::AccessFlags{}, vk::ImageLayout::eTransferDstOptimal,
+									final_layout, dev.transfer_queue_index().first,
+									dev.graphics_queue_index().first, dst_img,
+									vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
 }
 
 void transfer_manager::start_frame() {
