@@ -184,7 +184,7 @@ private:
 	void process_ready_callbacks(std::vector<transfer_job>& jobs);
 
 	template <typename F>
-	bool try_immediate_alloc_buffer(void* data, size_t data_size, vk::Buffer dst_buffer,
+	bool try_immediate_alloc_buffer(const void* data, size_t data_size, vk::Buffer dst_buffer,
 									vk::DeviceSize dst_offset, F&& callback) {
 		if(data_size > chunk_placer.buffer_space_size()) {
 			reallocate_buffer(data_size);
