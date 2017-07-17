@@ -30,10 +30,13 @@ void shader_module::load_shader_module(device& dev, const asset::asset& shader_b
 		throw std::runtime_error("Shader binary asset not ready yet, deferred loading not supported in "
 								 "shader_module constructor.");
 	vk::Device owner_dev = dev.native_device();
+	if(shader_binary_asset.size() % 4 != 0)
+		throw std::runtime_error("Invalid size of shader binary asset (not a multiple of 4).");
+	std::vector<uint32_t> aligned_buffer(shader_binary_asset.size() / 4);
+	std::memcpy(aligned_buffer.data(), shader_binary_asset.data(), shader_binary_asset.size());
 	vk::ShaderModuleCreateInfo ci;
-	ci.codeSize = shader_binary_asset.size();
-	// TODO: Check if alignment has to be ensured here.
-	ci.pCode = reinterpret_cast<const uint32_t*>(shader_binary_asset.data());
+	ci.codeSize = aligned_buffer.size();
+	ci.pCode = aligned_buffer.data();
 	native_shader_module_ = owner_dev.createShaderModuleUnique(ci);
 }
 
