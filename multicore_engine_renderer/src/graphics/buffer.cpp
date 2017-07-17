@@ -27,11 +27,27 @@ buffer::buffer(device& dev, device_memory_manager_interface& mem_mgr,
 
 buffer::~buffer() {}
 
-void buffer::flush_mapped(vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
+void buffer::flush_mapped(const vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
 	memory_handle_->flush_mapped(dev, offset, size);
 }
-void buffer::invalidate_mapped(vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
+void buffer::invalidate_mapped(const vk::Device& dev, vk::DeviceSize offset, vk::DeviceSize size) {
 	memory_handle_->invalidate_mapped(dev, offset, size);
+}
+
+buffer::buffer(buffer&& other) noexcept
+		: buff_{std::move(other.buff_)}, memory_handle_{std::move(other.memory_handle_)},
+		  size_{std::move(other.size_)}, usage_{std::move(other.usage_)} {
+	other.size_ = 0;
+	other.usage_ = {};
+}
+buffer& buffer::operator=(buffer&& other) noexcept {
+	buff_ = std::move(other.buff_);
+	memory_handle_ = std::move(other.memory_handle_);
+	size_ = std::move(other.size_);
+	usage_ = std::move(other.usage_);
+	other.size_ = 0;
+	other.usage_ = {};
+	return *this;
 }
 
 } /* namespace graphics */

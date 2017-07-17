@@ -30,12 +30,12 @@ TEST(containers_byte_buffer_pool_test, allocate_multiple_buffers) {
 TEST(containers_byte_buffer_pool_test, pool_buffers_reuse) {
 	byte_buffer_pool p;
 	std::vector<pooled_byte_buffer_ptr> buffs;
-	auto b = p.allocate_buffer(1024);
-	buffs.push_back(b);
+	auto b0 = p.allocate_buffer(1024);
+	buffs.push_back(b0);
 	auto cap = p.capacity();
 	size_t i = 0;
 	while(cap == p.capacity()) {
-		b = p.allocate_buffer(1024);
+		auto b = p.allocate_buffer(1024);
 		buffs.push_back(b);
 		memset(b, i % 128, b.size());
 		ASSERT_TRUE(std::all_of(b.begin(), b.end(), [i](auto c) { return size_t(c) == i % 128; }));
@@ -44,7 +44,7 @@ TEST(containers_byte_buffer_pool_test, pool_buffers_reuse) {
 	cap = p.capacity();
 	buffs.clear();
 	for(; i > 0; --i) {
-		b = p.allocate_buffer(512);
+		auto b = p.allocate_buffer(512);
 		buffs.push_back(b);
 		memset(b, i % 128, b.size());
 		ASSERT_TRUE(std::all_of(b.begin(), b.end(), [i](auto c) { return size_t(c) == i % 128; }));

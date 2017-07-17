@@ -32,6 +32,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1459155580" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -45,6 +46,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1005330771" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -57,6 +59,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.906289021" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -106,6 +109,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2072545442" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -119,6 +123,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033980625" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -131,6 +136,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.851904731" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -186,6 +192,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1112907143" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -199,6 +206,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.243078766" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -211,6 +219,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gtest\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_tests/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2033298425" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>

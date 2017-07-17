@@ -273,6 +273,7 @@ protected:
 			   bool mutable_format = false, vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
 			   bool preinitialized_layout = false);
 
+public:
 	/// Returns the aspect flags for the aspect mode of the image.
 	/**
 	 * For color, depth, and stencil only the respective flag is set.
@@ -281,7 +282,6 @@ protected:
 	 */
 	vk::ImageAspectFlags default_aspect_flags() const;
 
-public:
 	/// Calculates and returns the number of mip levels in a full chain for the given image size.
 	template <typename T>
 	static uint32_t full_mip_levels(T size) {
@@ -356,6 +356,17 @@ public:
 		return b;
 	}
 
+	/// Generates and returns a layout transition image memory barrier.
+	static vk::ImageMemoryBarrier
+	generate_transition_native(vk::Image img, vk::ImageLayout old_layout, vk::ImageLayout new_layout,
+							   vk::AccessFlags src_access, vk::AccessFlags dst_access,
+							   vk::ImageAspectFlags aspects, uint32_t mip_levels, uint32_t layers) {
+		vk::ImageMemoryBarrier b(src_access, dst_access, old_layout, new_layout, VK_QUEUE_FAMILY_IGNORED,
+								 VK_QUEUE_FAMILY_IGNORED, img,
+								 vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers));
+		return b;
+	}
+
 	/// Resets the tracked layout into an undefined state.
 	/**
 	 * The tracked layout is updated immediately.
@@ -399,6 +410,11 @@ public:
 	/// Returns the number of layers in the image object.
 	uint32_t layers() const {
 		return layers_;
+	}
+
+	/// Returns the current tracked layout of the image.
+	vk::ImageLayout layout() const {
+		return layout_;
 	}
 };
 
