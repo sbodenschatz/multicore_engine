@@ -71,7 +71,7 @@ public:
 		callback_functions.do_transaction([&](callback_container& cc) {
 			cc.erase(std::remove_if(cc.begin(), cc.end(), [&](auto& e) {
 				return std::find(callback_ids.begin(), callback_ids.end(), e.first) != callback_ids.end();
-			}));
+			}),cc.end());
 		});
 	}
 };

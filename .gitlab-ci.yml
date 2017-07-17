@@ -228,7 +228,7 @@ api-doc:
     script:
     - chmod +x generate_cloc_report.sh
     - ./generate_cloc_report.sh
-    - doxygen Doxyfile
+    - doxygen Doxyfile > doc/Doxygen.log
     - cd doc/latex
     - pdflatex refman.tex > LaTeX.log
     - makeindex refman >> LaTeX.log

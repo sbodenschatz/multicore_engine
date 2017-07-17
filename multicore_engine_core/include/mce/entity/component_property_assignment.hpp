@@ -87,7 +87,7 @@ public:
 
 /// Represents a concrete assignment of a component property with a specific type of the stored value.
 template <typename Root_Type, typename T>
-class component_property_assignment : public abstract_component_property_assignment<Root_Type> {
+class component_property_assignment final : public abstract_component_property_assignment<Root_Type> {
 	const reflection::property<Root_Type, T, mce::entity::abstract_component_property_assignment,
 							   mce::entity::component_property_assignment, core::engine*>& property_;
 	T value_;

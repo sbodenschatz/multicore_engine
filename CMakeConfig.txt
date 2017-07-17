@@ -47,7 +47,7 @@ target_compile_definitions(mce_compiler_settings INTERFACE
 		$<$<NOT:$<PLATFORM_ID:Windows>>:MULTICORE_ENGINE_NOT_WINDOWS>
 	)
 target_compile_options(mce_compiler_settings INTERFACE
-		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>: -std=c++1z -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast>
+		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>: -std=c++14 -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast>
 		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++ -Wno-unused-private-field>
 		$<$<CXX_COMPILER_ID:GNU>:>
 		$<$<CXX_COMPILER_ID:MSVC>: /W4 /WX /MP /std:c++latest>
@@ -170,10 +170,13 @@ add_library(deps.glm INTERFACE)
 target_compile_definitions(deps.glm INTERFACE
 		GLM_FORCE_RADIANS 
 		GLM_FORCE_SIZE_T_LENGTH
-		$<$<CXX_COMPILER_ID:MSVC>:GLM_FORCE_CXX11>
+		GLM_FORCE_DEPTH_ZERO_TO_ONE
 	)
 target_include_directories(deps.glm SYSTEM INTERFACE
 		${GLM_INCLUDE}
+	)
+target_compile_options(mce_compiler_settings INTERFACE
+		$<$<CXX_COMPILER_ID:MSVC>:/wd4201>		
 	)
 	
 add_library(deps.zlib INTERFACE)
@@ -261,6 +264,9 @@ target_link_libraries(deps.gtest INTERFACE
 add_library(deps.Boost INTERFACE)
 target_compile_definitions(deps.Boost INTERFACE
 		$<$<CXX_COMPILER_ID:MSVC>:_HAS_AUTO_PTR_ETC>
+		#The following 2 defines are needed to extend the allowed parameter count for boost::variant to the required amount.
+		BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+		BOOST_MPL_LIMIT_LIST_SIZE=30
 	)
 target_include_directories(deps.Boost SYSTEM INTERFACE
 		${BOOST_INCLUDE}

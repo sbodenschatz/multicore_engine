@@ -52,7 +52,7 @@ void window::configure_surface_format() {
 	surface_format_ = vk::Format::eB8G8R8A8Unorm;
 	if(surface_formats.size() != 1 || surface_formats[0].format != vk::Format::eUndefined) {
 		std::vector<vk::Format> format_preferences = {// TODO Place other preferred formats here
-													  vk::Format::eB8G8R8A8Unorm, vk::Format::eB8G8R8A8Srgb};
+													  vk::Format::eB8G8R8A8Unorm};
 		std::stable_sort(surface_formats.begin(), surface_formats.end(),
 						 [&format_preferences](const auto& v0, const auto& v1) {
 							 auto pref = [&format_preferences](auto x) {
@@ -76,6 +76,10 @@ void window::select_present_mode() {
 	   present_modes.end()) {
 		present_mode_ = vk::PresentModeKHR::eFifoRelaxed;
 	}
+	if(std::find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eMailbox) !=
+	   present_modes.end()) {
+		present_mode_ = vk::PresentModeKHR::eMailbox;
+	}
 	for(const auto& pm : present_modes) std::cout << vk::to_string(pm) << std::endl;
 }
 
@@ -86,7 +90,7 @@ void window::create_swapchain() {
 
 	vk::SwapchainCreateInfoKHR swapchain_ci;
 	swapchain_ci.surface = surface_.get();
-	uint32_t image_count = surface_caps.minImageCount + 2;
+	uint32_t image_count = std::max(surface_caps.minImageCount, 3u);
 
 	if(surface_caps.maxImageCount > 0 && image_count > surface_caps.maxImageCount)
 		image_count = surface_caps.maxImageCount;
@@ -96,6 +100,10 @@ void window::create_swapchain() {
 
 	auto resolution = window_.framebuffer_size();
 	vk::Extent2D swapchain_size = vk::Extent2D{uint32_t(resolution.x), uint32_t(resolution.y)};
+	swapchain_size.width = std::min(surface_caps.maxImageExtent.width,
+									std::max(surface_caps.minImageExtent.width, swapchain_size.width));
+	swapchain_size.height = std::min(surface_caps.maxImageExtent.height,
+									 std::max(surface_caps.minImageExtent.height, swapchain_size.height));
 	if(surface_caps.currentExtent.width != ~0u) {
 		swapchain_size = surface_caps.currentExtent;
 	}
