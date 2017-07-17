@@ -13,13 +13,15 @@
 namespace mce {
 namespace graphics {
 
-shader_module::shader_module(device& dev, asset::asset_manager& asset_mgr, const std::string& asset_name) {
+shader_module::shader_module(device& dev, asset::asset_manager& asset_mgr, const std::string& asset_name)
+		: name{asset_name} {
 	auto binary_asset = asset_mgr.load_asset_sync(asset_name);
 	if(!binary_asset) std::runtime_error("Couldn't load shader binary asset.");
 	load_shader_module(dev, *binary_asset);
 }
 
-shader_module::shader_module(device& dev, const asset::asset& shader_binary_asset) {
+shader_module::shader_module(device& dev, const asset::asset& shader_binary_asset)
+		: name{shader_binary_asset.name()} {
 	load_shader_module(dev, shader_binary_asset);
 }
 
