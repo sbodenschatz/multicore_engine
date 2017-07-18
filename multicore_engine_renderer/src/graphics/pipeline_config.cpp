@@ -51,7 +51,7 @@ vk::PipelineColorBlendStateCreateInfo pipeline_config::color_blend_state_config:
 
 vk::GraphicsPipelineCreateInfo pipeline_config::generate_create_info_structure() {
 	vk::GraphicsPipelineCreateInfo ci;
-	shader_stages_.clear();
+	shader_stages_ci.clear();
 	std::transform(shader_stages_.begin(), shader_stages_.end(), std::back_inserter(shader_stages_ci),
 				   [](const shader_stage_config& ssc) { return ssc.create_info(); });
 	ci.stageCount = uint32_t(shader_stages_ci.size());
