@@ -11,7 +11,8 @@
 namespace mce {
 namespace graphics {
 
-vk::PipelineShaderStageCreateInfo pipeline_config::shader_stage_config::create_info() const {
+vk::PipelineShaderStageCreateInfo pipeline_config::shader_stage_config::create_info() {
+	update_specialization_info();
 	vk::PipelineShaderStageCreateInfo ci;
 	ci.stage = stage_;
 	ci.pName = entry_point_name_.c_str();
@@ -53,7 +54,7 @@ vk::GraphicsPipelineCreateInfo pipeline_config::generate_create_info_structure()
 	vk::GraphicsPipelineCreateInfo ci;
 	shader_stages_ci.clear();
 	std::transform(shader_stages_.begin(), shader_stages_.end(), std::back_inserter(shader_stages_ci),
-				   [](const shader_stage_config& ssc) { return ssc.create_info(); });
+				   [](shader_stage_config& ssc) { return ssc.create_info(); });
 	ci.stageCount = uint32_t(shader_stages_ci.size());
 	ci.pStages = shader_stages_ci.data();
 	input_state_ci = input_state_.create_info();

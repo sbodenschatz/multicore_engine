@@ -106,7 +106,7 @@ public:
 		}
 
 		/// Returns the corresponding create info structure for passing to vulkan.
-		vk::PipelineShaderStageCreateInfo create_info() const;
+		vk::PipelineShaderStageCreateInfo create_info();
 	};
 
 	/// Bundles the configuration data for the input stage.
