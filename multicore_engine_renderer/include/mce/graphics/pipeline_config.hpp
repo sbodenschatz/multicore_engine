@@ -18,6 +18,7 @@ namespace graphics {
 
 class pipeline_config {
 public:
+	/// Bundles all data for a shader stage.
 	class shader_stage_config {
 	private:
 		vk::ShaderStageFlagBits stage_;
@@ -35,26 +36,32 @@ public:
 		}
 
 	public:
+		/// Gets the name of the entry point.
 		const std::string& entry_point_name() const {
 			return entry_point_name_;
 		}
 
+		/// Sets the name of the entry point.
 		void entry_point_name(const std::string& entry_point_name) {
 			entry_point_name_ = entry_point_name;
 		}
 
+		/// Gets the shader module containing the binary.
 		vk::ShaderModule module() const {
 			return module_;
 		}
 
+		/// Sets the shader module containing the binary.
 		void module(vk::ShaderModule module) {
 			module_ = module;
 		}
 
+		/// Gets the specialization data for the shader binary.
 		const std::vector<char>& specialization_data() const {
 			return specialization_data_;
 		}
 
+		/// Sets the specialization data for the shader binary.
 		void specialization_data(size_t specialization_data_size, const void* specialization_data) {
 			specialization_data_.resize(specialization_data_size);
 			auto begin = reinterpret_cast<const char*>(specialization_data);
@@ -63,27 +70,34 @@ public:
 			update_specialization_info();
 		}
 
+		/// Gets the specialization map for the shader binary.
 		const std::vector<vk::SpecializationMapEntry>& specialization_map() const {
 			return specialization_map_;
 		}
 
+		/// Adds the given entry to the specialization map for the shader binary.
 		void add_specialization_map_entry(const vk::SpecializationMapEntry& specialization_map_entry) {
 			specialization_map_.push_back(specialization_map_entry);
 			update_specialization_info();
 		}
+
+		/// Empties the specialization map for the shader binary.
 		void clear_specialization_map() {
 			specialization_map_.clear();
 			update_specialization_info();
 		}
 
+		/// Gets the associated shader stage.
 		vk::ShaderStageFlagBits stage() const {
 			return stage_;
 		}
 
+		/// Sets the associated shader stage.
 		void stage(vk::ShaderStageFlagBits stage) {
 			stage_ = stage;
 		}
 
+		/// Returns the corresponding create info structure for passing to vulkan.
 		vk::PipelineShaderStageCreateInfo create_info() const;
 	};
 
