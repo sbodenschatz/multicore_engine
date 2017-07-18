@@ -144,36 +144,44 @@ public:
 		vk::PipelineVertexInputStateCreateInfo create_info() const;
 	};
 
+	/// Bundles the configuration data for the view port state of a pipeline.
 	class viewport_state_config {
 	private:
 		std::vector<vk::Viewport> viewports_;
 		std::vector<vk::Rect2D> scissors_;
 
 	public:
+		/// Gets the scissor rectangles.
 		const std::vector<vk::Rect2D>& scissors() const {
 			return scissors_;
 		}
 
+		/// Adds the given scissor rectangles.
 		void add_scissor(const vk::Rect2D& scissor) {
 			scissors_.push_back(scissor);
 		}
 
+		/// Clears the scissor rectangles.
 		void clear_scissor() {
 			scissors_.clear();
 		}
 
+		/// Gets the view port dimensions.
 		const std::vector<vk::Viewport>& viewports() const {
 			return viewports_;
 		}
 
+		/// Adds the given view port dimensions.
 		void add_viewport(const vk::Viewport& viewport) {
 			viewports_.push_back(viewport);
 		}
 
+		/// Clears the view port dimensions.
 		void clear_viewports() {
 			viewports_.clear();
 		}
 
+		/// Returns the corresponding creation info structure to pass to vulkan.
 		vk::PipelineViewportStateCreateInfo create_info() const;
 	};
 
