@@ -7,6 +7,11 @@
 #ifndef GRAPHICS_PIPELINE_CONFIG_HPP_
 #define GRAPHICS_PIPELINE_CONFIG_HPP_
 
+/**
+ * \file
+ * Provides the pipeline_config class that contains all data required for creating a graphics pipeline.
+ */
+
 #include <algorithm>
 #include <boost/optional.hpp>
 #include <memory>
@@ -18,6 +23,7 @@ namespace mce {
 namespace graphics {
 class shader_module;
 
+/// Bundles and owns all data required for creating a pipeline.
 class pipeline_config {
 public:
 	/// Bundles all data for a shader stage.
@@ -267,111 +273,142 @@ private:
 	uint32_t subpass_;
 
 public:
+	/// Initializes the pipeline_config object to an empty state.
 	pipeline_config();
+	/// Destroys the pipeline_config object and releases associated resources.
 	~pipeline_config();
 
+	/// Provides read-only access to the vertex_input_state_config.
 	const vertex_input_state_config& input_state() const {
 		return input_state_;
 	}
 
+	/// Provides read-write access to the vertex_input_state_config.
 	vertex_input_state_config& input_state() {
 		return input_state_;
 	}
 
+	/// Provides read-only access to the shader_stage_config collection.
 	const std::vector<shader_stage_config>& shader_stages() const {
 		return shader_stages_;
 	}
 
+	/// Provides read-write access to the shader_stage_config collection.
 	std::vector<shader_stage_config>& shader_stages() {
 		return shader_stages_;
 	}
 
+	/// Provides read-only access to the input assembly state configuration.
 	const vk::PipelineInputAssemblyStateCreateInfo& assembly_state() const {
 		return assembly_state_;
 	}
 
+	/// Provides read-write access to the input assembly state configuration.
 	vk::PipelineInputAssemblyStateCreateInfo& assembly_state() {
 		return assembly_state_;
 	}
 
+	/// Provides read-only access to the tesselation state configuration.
 	const boost::optional<vk::PipelineTessellationStateCreateInfo>& tesselation_state() const {
 		return tesselation_state_;
 	}
 
+	/// Provides read-write access to the tesselation state configuration.
 	boost::optional<vk::PipelineTessellationStateCreateInfo>& tesselation_state() {
 		return tesselation_state_;
 	}
 
+	/// Provides read-only access to the viewport_state_config.
 	const boost::optional<viewport_state_config>& viewport_state() const {
 		return viewport_state_;
 	}
 
+	/// Provides read-write access to the viewport_state_config.
 	boost::optional<viewport_state_config>& viewport_state() {
 		return viewport_state_;
 	}
 
+	/// Provides read-only access to the rasterization state configuration.
 	const vk::PipelineRasterizationStateCreateInfo& rasterization_state() const {
 		return rasterization_state_;
 	}
 
+	/// Provides read-write access to the rasterization state configuration.
 	vk::PipelineRasterizationStateCreateInfo& rasterization_state() {
 		return rasterization_state_;
 	}
 
+	/// Provides read-only access to the color_blend_state_config.
 	const boost::optional<color_blend_state_config>& color_blend_state() const {
 		return color_blend_state_;
 	}
 
+	/// Provides read-write access to the color_blend_state_config.
 	boost::optional<color_blend_state_config>& color_blend_state() {
 		return color_blend_state_;
 	}
 
+	/// Provides read-only access to the depth and stencil state configuration.
 	const boost::optional<vk::PipelineDepthStencilStateCreateInfo>& depth_stencil_state() const {
 		return depth_stencil_state_;
 	}
 
+	/// Provides read-write access to the depth and stencil state configuration.
 	boost::optional<vk::PipelineDepthStencilStateCreateInfo>& depth_stencil_state() {
 		return depth_stencil_state_;
 	}
 
+	/// Provides read-only access to the dynamic states collection.
 	const boost::optional<std::vector<vk::DynamicState>>& dynamic_states() const {
 		return dynamic_states_;
 	}
 
+	/// Provides read-write access to the dynamic states collection.
 	boost::optional<std::vector<vk::DynamicState>>& dynamic_states() {
 		return dynamic_states_;
 	}
 
+	/// Gets the pipeline layout for the pipeline.
 	vk::PipelineLayout layout() const {
 		return layout_;
 	}
 
+	/// Sets the pipeline layout for the pipeline.
 	void layout(vk::PipelineLayout layout) {
 		this->layout_ = layout;
 	}
 
+	/// Provides read-only access to the multisampling state configuration.
 	const boost::optional<vk::PipelineMultisampleStateCreateInfo>& multisample_state() const {
 		return multisample_state_;
 	}
+
+	/// Provides read-write access to the multisampling state configuration.
 	boost::optional<vk::PipelineMultisampleStateCreateInfo>& multisample_state() {
 		return multisample_state_;
 	}
 
+	/// Gets the render pass with which the render pass should be compatible.
 	vk::RenderPass render_pass() const {
 		return render_pass_;
 	}
 
+	/// Sets the render pass with which the render pass should be compatible.
 	void render_pass(vk::RenderPass render_pass) {
 		this->render_pass_ = render_pass;
 	}
 
+	/// Gets the subpass in the render pass with which the render pass should be compatible.
 	uint32_t subpass() const {
 		return subpass_;
 	}
 
+	/// Sets the subpass in the render pass with which the render pass should be compatible.
 	void subpass(uint32_t subpass) {
 		this->subpass_ = subpass;
 	}
+
+	/// Updates pointer structures and generates a creation info structure for the whole pipeline.
 	vk::GraphicsPipelineCreateInfo generate_create_info_structure();
 };
 
