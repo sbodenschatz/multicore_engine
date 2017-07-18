@@ -101,32 +101,39 @@ public:
 		vk::PipelineShaderStageCreateInfo create_info() const;
 	};
 
+	/// Bundles the configuration data for the input stage.
 	class vertex_input_state_config {
 	private:
 		std::vector<vk::VertexInputBindingDescription> bindings_;
 		std::vector<vk::VertexInputAttributeDescription> attributes_;
 
 	public:
+		/// Gets the vertex input attributes.
 		const std::vector<vk::VertexInputAttributeDescription>& attributes() const {
 			return attributes_;
 		}
 
+		/// Adds the given vertex input attribute.
 		void add_attribute(const vk::VertexInputAttributeDescription& attribute) {
 			attributes_.push_back(attribute);
 		}
 
+		/// Empties the vertex input attributes.
 		void clear_attributes() {
 			attributes_.clear();
 		}
 
+		/// Gets the vertex input binding descriptions.
 		const std::vector<vk::VertexInputBindingDescription>& bindings() const {
 			return bindings_;
 		}
 
+		/// Adds the given vertex input binding descriptions.
 		void add_binding(const vk::VertexInputBindingDescription& binding) {
 			bindings_.push_back(binding);
 		}
 
+		/// Returns the corresponding create info structure for passing to vulkan.
 		vk::PipelineVertexInputStateCreateInfo create_info() const;
 	};
 
