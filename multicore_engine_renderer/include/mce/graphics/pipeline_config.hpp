@@ -133,6 +133,11 @@ public:
 			bindings_.push_back(binding);
 		}
 
+		/// Empties the vertex input bindings.
+		void clear_bindings() {
+			bindings_.clear();
+		}
+
 		/// Returns the corresponding create info structure for passing to vulkan.
 		vk::PipelineVertexInputStateCreateInfo create_info() const;
 	};
