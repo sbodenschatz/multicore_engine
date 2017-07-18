@@ -9,12 +9,14 @@
 
 #include <algorithm>
 #include <boost/optional.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
+class shader_module;
 
 class pipeline_config {
 public:
@@ -22,7 +24,7 @@ public:
 	class shader_stage_config {
 	private:
 		vk::ShaderStageFlagBits stage_;
-		vk::ShaderModule module_;
+		std::shared_ptr<shader_module> module_;
 		std::string entry_point_name_;
 		std::vector<char> specialization_data_;
 		std::vector<vk::SpecializationMapEntry> specialization_map_;
@@ -47,13 +49,13 @@ public:
 		}
 
 		/// Gets the shader module containing the binary.
-		vk::ShaderModule module() const {
+		const std::shared_ptr<shader_module>& module() const {
 			return module_;
 		}
 
 		/// Sets the shader module containing the binary.
-		void module(vk::ShaderModule module) {
-			module_ = module;
+		void module(std::shared_ptr<shader_module> module) {
+			module_ = std::move(module);
 		}
 
 		/// Gets the specialization data for the shader binary.

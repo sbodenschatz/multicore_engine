@@ -6,6 +6,7 @@
 
 #include <iterator>
 #include <mce/graphics/pipeline_config.hpp>
+#include <mce/graphics/shader_module.hpp>
 
 namespace mce {
 namespace graphics {
@@ -14,7 +15,7 @@ vk::PipelineShaderStageCreateInfo pipeline_config::shader_stage_config::create_i
 	vk::PipelineShaderStageCreateInfo ci;
 	ci.stage = stage_;
 	ci.pName = entry_point_name_.c_str();
-	ci.module = module_;
+	ci.module = module_->native_shader_module();
 	if(specialization_data_.size() || specialization_map_.size()) {
 		ci.pSpecializationInfo = &specialization_info_;
 	}
