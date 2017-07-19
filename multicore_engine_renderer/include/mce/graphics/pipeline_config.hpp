@@ -268,7 +268,7 @@ private:
 	boost::optional<vk::PipelineColorBlendStateCreateInfo> color_blend_state_ci;
 	boost::optional<std::vector<vk::DynamicState>> dynamic_states_;
 	boost::optional<vk::PipelineDynamicStateCreateInfo> dynamic_states_ci;
-	vk::PipelineLayout layout_;
+	std::shared_ptr<vk::UniquePipelineLayout> layout_;
 	vk::RenderPass render_pass_;
 	uint32_t subpass_;
 
@@ -369,12 +369,12 @@ public:
 	}
 
 	/// Gets the pipeline layout for the pipeline.
-	vk::PipelineLayout layout() const {
+	const std::shared_ptr<vk::UniquePipelineLayout>& layout() const {
 		return layout_;
 	}
 
 	/// Sets the pipeline layout for the pipeline.
-	void layout(vk::PipelineLayout layout) {
+	void layout(const std::shared_ptr<vk::UniquePipelineLayout>& layout) {
 		this->layout_ = layout;
 	}
 

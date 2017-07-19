@@ -90,7 +90,7 @@ vk::GraphicsPipelineCreateInfo pipeline_config::generate_create_info_structure()
 	} else {
 		dynamic_states_ci.reset();
 	}
-	ci.layout = layout_;
+	ci.layout = layout_->get();
 	ci.renderPass = render_pass_;
 	ci.subpass = subpass_;
 	return ci;
