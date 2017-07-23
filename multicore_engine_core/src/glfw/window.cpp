@@ -16,7 +16,6 @@
 namespace mce {
 namespace glfw {
 
-// cppcheck-suppress passedByValue
 window::window(const std::string& title, const glm::ivec2& size, window_hint_flags hints)
 		: instance_{std::make_unique<instance>()},
 		  window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
@@ -28,7 +27,6 @@ window::window(const std::string& title, const glm::ivec2& size, window_hint_fla
 	if(!window_) throw window_creation_exception("Failed to create window.");
 	setup_callbacks();
 }
-// cppcheck-suppress passedByValue
 window::window(const std::string& title, const monitor& mon, const video_mode& mode, window_hint_flags hints)
 		: instance_{std::make_unique<instance>()},
 		  window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
@@ -44,7 +42,6 @@ window::window(const std::string& title, const monitor& mon, const video_mode& m
 	if(!window_) throw window_creation_exception("Failed to create window.");
 	setup_callbacks();
 }
-// cppcheck-suppress passedByValue
 window::window(const std::string& title, const monitor& mon, window_hint_flags hints)
 		: window(title, mon, mon.current_video_mode(), hints) {}
 
@@ -69,7 +66,6 @@ void window::setup_callbacks() {
 	glfwSetWindowRefreshCallback(window_.get(), window_refresh_callback_s);
 }
 
-// cppcheck-suppress passedByValue
 void window::set_window_hints(window_hint_flags hints) {
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
