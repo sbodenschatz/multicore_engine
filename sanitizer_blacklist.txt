@@ -1,1 +1,2 @@
 src:/usr/include/c\+\+/v1/memory
+src:/usr/include/c\+\+/v1/algorithm
