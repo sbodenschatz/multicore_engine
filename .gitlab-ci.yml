@@ -149,6 +149,7 @@ clang-debug-build:
         BUILD_TYPE: "Debug"
         BUILD_COMPILER_NAME: "clang"
         BUILD_SANITIZE: "YES"
+        ASAN_OPTIONS: "detect_leaks=0"
     tags:
     - cpp
     <<: *linux-build-task
