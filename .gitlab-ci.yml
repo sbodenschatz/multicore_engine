@@ -208,7 +208,7 @@ cpp-check:
     dependencies: []
     stage: auxiliary
     script:
-    - cppcheck -j 8 -v --inline-suppr --error-exitcode=2 --enable=all -U_MSC_VER -UMULTICORE_ENGINE_WINDOWS -I multicore_engine_base/include/ -I multicore_engine_core/include/ multicore_engine_{parsers,base,core,renderer,demo,load_unit_gen,pack_file_gen,model_converter}
+    - ./run_cppcheck.sh
     tags:
     - cpp
 
