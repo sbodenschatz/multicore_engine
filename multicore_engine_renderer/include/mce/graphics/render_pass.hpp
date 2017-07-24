@@ -19,12 +19,9 @@ class render_pass {
 private:
 	device& device_;
 	vk::UniqueRenderPass native_render_pass;
-	vk::Rect2D render_area;
-	std::vector<vk::ClearValue> clear_values;
-	vk::Format depth_format;
 
 public:
-	render_pass(device& device_, window& window_, const vk::Rect2D& render_area, vk::Format depth_format);
+	render_pass(device& device_);
 	~render_pass();
 };
 

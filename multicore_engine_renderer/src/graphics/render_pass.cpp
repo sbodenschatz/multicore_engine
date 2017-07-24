@@ -11,9 +11,8 @@
 namespace mce {
 namespace graphics {
 
-render_pass::render_pass(device& device_, window& window_, const vk::Rect2D& render_area,
-						 vk::Format depth_format)
-		: device_(device_), render_area(render_area), depth_format(depth_format) {
+render_pass::render_pass(device& device_)
+		: device_(device_) {
 
 	vk::AttachmentDescription attachments_desc[2];
 	attachments_desc[0].initialLayout = vk::ImageLayout::eUndefined;
