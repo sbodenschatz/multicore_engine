@@ -19,9 +19,10 @@ class render_pass {
 private:
 	device& device_;
 	vk::UniqueRenderPass native_render_pass;
+	std::shared_ptr<framebuffer_layout> fb_layout_;
 
 public:
-	render_pass(device& device_);
+	render_pass(device& device_, std::shared_ptr<framebuffer_layout> fb_layout);
 	~render_pass();
 };
 

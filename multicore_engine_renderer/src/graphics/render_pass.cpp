@@ -11,8 +11,8 @@
 namespace mce {
 namespace graphics {
 
-render_pass::render_pass(device& device_)
-		: device_(device_) {
+render_pass::render_pass(device& device_, std::shared_ptr<framebuffer_layout> fb_layout)
+		: device_(device_), fb_layout_{std::move(fb_layout)} {
 
 	vk::AttachmentDescription attachments_desc[2];
 	attachments_desc[0].initialLayout = vk::ImageLayout::eUndefined;
