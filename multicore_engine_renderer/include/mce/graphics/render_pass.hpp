@@ -25,6 +25,12 @@ struct attachment_access {
 	vk::AttachmentLoadOp stencil_store_op = vk::AttachmentLoadOp::eDontCare;
 };
 
+struct attachment_reference_layout {
+	uint32_t subpass;
+	uint32_t attachment;
+	vk::ImageLayout layout;
+};
+
 class render_pass {
 private:
 	device& device_;
@@ -33,7 +39,8 @@ private:
 
 public:
 	render_pass(device& device_, std::shared_ptr<framebuffer_layout> fb_layout,
-				vk::ArrayProxy<attachment_access> attachment_access_modes);
+				vk::ArrayProxy<attachment_access> attachment_access_modes,
+				vk::ArrayProxy<attachment_reference_layout> attachment_ref_layout_map);
 	~render_pass();
 };
 
