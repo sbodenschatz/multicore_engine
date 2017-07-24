@@ -120,6 +120,7 @@ void window::create_swapchain() {
 
 	swapchain_ = device_.native_device().createSwapchainKHRUnique(swapchain_ci);
 	swapchain_size_ = {swapchain_size_ext.width, swapchain_size_ext.height};
+	swapchain_images_ = device_.native_device().getSwapchainImagesKHR(swapchain_.get());
 }
 
 } /* namespace graphics */
