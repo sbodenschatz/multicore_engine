@@ -622,7 +622,7 @@ using image_2d_ds = image<image_dimension::dim_2d, false, image_aspect_mode::dep
 /// Type alias for 2d layered depth and stencil images.
 using image_2d_ds_layered = image<image_dimension::dim_2d, true, image_aspect_mode::depth_stencil>;
 
-/// Type alias for a variant that can contain any of the common image formats.
+/// Type alias for a variant that can contain any of the common image types.
 using image_var = boost::variant<image_1d, image_1d_layered, image_2d, image_2d_ds, image_2d_ds_layered,
 								 image_2d_layered, image_3d, image_cube, image_cube_layered>;
 
