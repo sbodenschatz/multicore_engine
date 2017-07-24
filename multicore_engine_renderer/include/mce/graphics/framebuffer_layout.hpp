@@ -19,6 +19,8 @@ class framebuffer_attachment_layout {
 	vk::AttachmentDescriptionFlags flags_;
 	bool is_swapchain_image_ = false;
 
+	friend class window;
+
 public:
 	framebuffer_attachment_layout(vk::Format format, image_aspect_mode aspect_mode = image_aspect_mode::color,
 								  vk::AttachmentDescriptionFlags flags = {})
@@ -43,6 +45,8 @@ public:
 
 class framebuffer_layout {
 	std::vector<framebuffer_attachment_layout> attachment_layouts_;
+
+	friend class window;
 
 public:
 	framebuffer_layout(vk::ArrayProxy<framebuffer_attachment_layout> attachment_layouts)
