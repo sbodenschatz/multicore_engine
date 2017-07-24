@@ -200,7 +200,7 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.809694774" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.809694774" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.771757608" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -215,7 +215,7 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1584369689" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1584369689" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2044758054" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
