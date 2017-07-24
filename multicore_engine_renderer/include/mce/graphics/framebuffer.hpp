@@ -7,6 +7,7 @@
 #ifndef GRAPHICS_FRAMEBUFFER_HPP_
 #define GRAPHICS_FRAMEBUFFER_HPP_
 
+#include <mce/graphics/framebuffer_layout.hpp>
 #include <mce/graphics/image.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -14,16 +15,6 @@
 namespace mce {
 namespace graphics {
 class device;
-
-struct framebuffer_layout {
-	struct attachment_layout {
-		vk::AttachmentDescriptionFlags flags;
-		vk::Format format;
-		image_aspect_mode aspect_mode;
-	};
-
-	std::vector<attachment_layout> additional_attachment_layouts;
-};
 
 class framebuffer_frame {
 	uint32_t swapchain_image_index;
