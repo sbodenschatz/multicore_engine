@@ -13,11 +13,32 @@
 namespace mce {
 namespace graphics {
 
-struct framebuffer_attachment_layout {
-	vk::Format format;
-	image_aspect_mode aspect_mode;
-	vk::AttachmentDescriptionFlags flags;
-	bool swapchain_image = false;
+class framebuffer_attachment_layout {
+	vk::Format format_;
+	image_aspect_mode aspect_mode_;
+	vk::AttachmentDescriptionFlags flags_;
+	bool is_swapchain_image_ = false;
+
+public:
+	framebuffer_attachment_layout(vk::Format format, image_aspect_mode aspect_mode,
+								  vk::AttachmentDescriptionFlags flags)
+			: format_{format}, aspect_mode_{aspect_mode}, flags_{flags} {}
+
+	image_aspect_mode aspect_mode() const {
+		return aspect_mode_;
+	}
+
+	vk::AttachmentDescriptionFlags flags() const {
+		return flags_;
+	}
+
+	vk::Format format() const {
+		return format_;
+	}
+
+	bool is_swapchain_image() const {
+		return is_swapchain_image_;
+	}
 };
 
 struct framebuffer_layout {
