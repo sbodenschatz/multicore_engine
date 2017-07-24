@@ -31,6 +31,7 @@ private:
 	vk::ColorSpaceKHR color_space_;
 	vk::Format surface_format_;
 	vk::PresentModeKHR present_mode_;
+	glm::uvec2 swapchain_size_;
 
 	void create_surface();
 	void select_present_mode();
@@ -62,6 +63,11 @@ public:
 	/// Returns a handle to the swapchain created for the window.
 	const vk::SwapchainKHR& swapchain() const {
 		return *swapchain_;
+	}
+
+	/// Returns the size of the swapchain.
+	const glm::uvec2& swapchain_size() const {
+		return swapchain_size_;
 	}
 };
 

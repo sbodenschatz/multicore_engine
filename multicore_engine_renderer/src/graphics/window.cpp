@@ -99,15 +99,17 @@ void window::create_swapchain() {
 	swapchain_ci.imageColorSpace = color_space_;
 
 	auto resolution = window_.framebuffer_size();
-	vk::Extent2D swapchain_size = vk::Extent2D{uint32_t(resolution.x), uint32_t(resolution.y)};
-	swapchain_size.width = std::min(surface_caps.maxImageExtent.width,
-									std::max(surface_caps.minImageExtent.width, swapchain_size.width));
-	swapchain_size.height = std::min(surface_caps.maxImageExtent.height,
-									 std::max(surface_caps.minImageExtent.height, swapchain_size.height));
+	vk::Extent2D swapchain_size_ext = vk::Extent2D{uint32_t(resolution.x), uint32_t(resolution.y)};
+	swapchain_size_ext.width =
+			std::min(surface_caps.maxImageExtent.width,
+					 std::max(surface_caps.minImageExtent.width, swapchain_size_ext.width));
+	swapchain_size_ext.height =
+			std::min(surface_caps.maxImageExtent.height,
+					 std::max(surface_caps.minImageExtent.height, swapchain_size_ext.height));
 	if(surface_caps.currentExtent.width != ~0u) {
-		swapchain_size = surface_caps.currentExtent;
+		swapchain_size_ext = surface_caps.currentExtent;
 	}
-	swapchain_ci.imageExtent = swapchain_size;
+	swapchain_ci.imageExtent = swapchain_size_ext;
 	swapchain_ci.imageArrayLayers = 1;
 	swapchain_ci.imageSharingMode = vk::SharingMode::eExclusive;
 	swapchain_ci.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
@@ -117,6 +119,7 @@ void window::create_swapchain() {
 	swapchain_ci.presentMode = present_mode_;
 
 	swapchain_ = device_.native_device().createSwapchainKHRUnique(swapchain_ci);
+	swapchain_size_ = {swapchain_size_ext.width, swapchain_size_ext.height};
 }
 
 } /* namespace graphics */
