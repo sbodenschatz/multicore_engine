@@ -12,7 +12,7 @@ namespace mce {
 namespace graphics {
 
 framebuffer::framebuffer(device& dev, window& win, const framebuffer_layout& layout)
-		: dev_{dev}, win_{win}, size_{win.glfw_window().framebuffer_size()} {
+		: dev_{&dev}, win_{&win}, size_{win.glfw_window().framebuffer_size()} {
 	UNUSED(layout);
 }
 

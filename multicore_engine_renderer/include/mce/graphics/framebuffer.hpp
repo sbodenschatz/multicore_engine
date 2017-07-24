@@ -32,8 +32,8 @@ class framebuffer_frame {
 
 class framebuffer {
 private:
-	device& dev_;
-	window& win_;
+	device* dev_;
+	window* win_;
 	glm::uvec2 size_;
 	std::vector<image_var> additional_attachments_;
 	std::vector<image_view_var> attachment_views_;
