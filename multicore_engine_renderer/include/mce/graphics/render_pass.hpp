@@ -31,14 +31,42 @@ struct attachment_reference_layout {
 	vk::ImageLayout layout;
 };
 
+struct subpass_entry {
+	vk::PipelineBindPoint pipeline_bind_point;
+	std::vector<uint32_t> input;
+	std::vector<uint32_t> color;
+	std::vector<uint32_t> resolve;
+	uint32_t depth_stencil;
+	std::vector<uint32_t> preserve;
+};
+
+class subpass_graph {
+	std::vector<subpass_entry> subpasses_;
+	std::vector<vk::SubpassDependency> dependencies_;
+
+public:
+	subpass_graph(std::vector<subpass_entry> subpasses, std::vector<vk::SubpassDependency> dependencies)
+			: subpasses_{std::move(subpasses)}, dependencies_{std::move(dependencies)} {}
+
+	const std::vector<vk::SubpassDependency>& dependencies() const {
+		return dependencies_;
+	}
+
+	const std::vector<subpass_entry>& subpasses() const {
+		return subpasses_;
+	}
+};
+
 class render_pass {
 private:
 	device& device_;
-	vk::UniqueRenderPass native_render_pass;
+	vk::UniqueRenderPass native_render_pass_;
+	std::shared_ptr<subpass_graph> subpasses_;
 	std::shared_ptr<framebuffer_layout> fb_layout_;
 
 public:
-	render_pass(device& device_, std::shared_ptr<framebuffer_layout> fb_layout,
+	render_pass(device& device_, std::shared_ptr<subpass_graph> subpasses,
+				std::shared_ptr<framebuffer_layout> fb_layout,
 				vk::ArrayProxy<attachment_access> attachment_access_modes,
 				vk::ArrayProxy<attachment_reference_layout> attachment_ref_layout_map);
 	~render_pass();

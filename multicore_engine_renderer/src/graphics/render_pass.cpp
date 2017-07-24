@@ -12,10 +12,11 @@
 namespace mce {
 namespace graphics {
 
-render_pass::render_pass(device& device_, std::shared_ptr<framebuffer_layout> fb_layout,
+render_pass::render_pass(device& device_, std::shared_ptr<subpass_graph> subpasses,
+						 std::shared_ptr<framebuffer_layout> fb_layout,
 						 vk::ArrayProxy<attachment_access> attachment_access_modes,
 						 vk::ArrayProxy<attachment_reference_layout> attachment_ref_layout_map)
-		: device_(device_), fb_layout_{std::move(fb_layout)} {
+		: device_(device_), subpasses_{std::move(subpasses)}, fb_layout_{std::move(fb_layout)} {
 
 	UNUSED(attachment_access_modes);
 	UNUSED(attachment_ref_layout_map);

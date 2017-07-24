@@ -218,7 +218,7 @@ m2=*</panel_attributes>
       <w>243</w>
       <h>135</h>
     </coordinates>
-    <panel_attributes>SubpassDependency
+    <panel_attributes>vk::SubpassDependency
 --
 srcSubpass: uint32_t
 dstSubpass: uint32_t
