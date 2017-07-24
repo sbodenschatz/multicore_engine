@@ -11,10 +11,9 @@
 namespace mce {
 namespace graphics {
 
-framebuffer::framebuffer(device& dev, window& win, 
-						 std::vector<vk::Format> additional_attachment_formats)
-		: dev_{dev}, win_{win}, size_{win.glfw_window().framebuffer_size()}, layers_{layers} {
-	UNUSED(additional_attachment_formats);
+framebuffer::framebuffer(device& dev, window& win, const framebuffer_layout& layout)
+		: dev_{dev}, win_{win}, size_{win.glfw_window().framebuffer_size()} {
+	UNUSED(layout);
 }
 
 framebuffer::~framebuffer() {}

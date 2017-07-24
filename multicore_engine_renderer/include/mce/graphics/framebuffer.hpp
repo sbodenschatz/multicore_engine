@@ -15,6 +15,16 @@ namespace mce {
 namespace graphics {
 class device;
 
+struct framebuffer_layout {
+	struct attachment_layout {
+		vk::AttachmentDescriptionFlags flags;
+		vk::Format format;
+		image_aspect_mode aspect_mode;
+	};
+
+	std::vector<attachment_layout> additional_attachment_layouts;
+};
+
 class framebuffer {
 private:
 	device& dev_;
@@ -25,8 +35,7 @@ private:
 	vk::UniqueFramebuffer native_framebuffer_;
 
 public:
-	framebuffer(device& dev, window& win,
-				std::vector<vk::Format> additional_attachment_formats);
+	framebuffer(device& dev, window& win, const framebuffer_layout& layout);
 	~framebuffer();
 };
 
