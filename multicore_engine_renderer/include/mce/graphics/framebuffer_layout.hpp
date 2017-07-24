@@ -20,8 +20,8 @@ class framebuffer_attachment_layout {
 	bool is_swapchain_image_ = false;
 
 public:
-	framebuffer_attachment_layout(vk::Format format, image_aspect_mode aspect_mode,
-								  vk::AttachmentDescriptionFlags flags)
+	framebuffer_attachment_layout(vk::Format format, image_aspect_mode aspect_mode = image_aspect_mode::color,
+								  vk::AttachmentDescriptionFlags flags = {})
 			: format_{format}, aspect_mode_{aspect_mode}, flags_{flags} {}
 
 	image_aspect_mode aspect_mode() const {
