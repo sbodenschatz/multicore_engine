@@ -66,6 +66,16 @@ public:
 		return *swapchain_;
 	}
 
+	/// Returns the used color space.
+	vk::ColorSpaceKHR color_space() const {
+		return color_space_;
+	}
+
+	/// Returns the used present mode.
+	vk::PresentModeKHR present_mode() const {
+		return present_mode_;
+	}
+
 	/// Returns the size of the swapchain.
 	const glm::uvec2& swapchain_size() const {
 		return swapchain_size_;
