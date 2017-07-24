@@ -13,6 +13,7 @@
  */
 
 #include <mce/glfw/window.hpp>
+#include <mce/graphics/framebuffer_layout.hpp>
 #include <memory>
 
 namespace mce {
@@ -31,6 +32,8 @@ private:
 	vk::ColorSpaceKHR color_space_;
 	vk::Format surface_format_;
 	vk::PresentModeKHR present_mode_;
+	glm::uvec2 swapchain_size_;
+	std::vector<vk::Image> swapchain_images_;
 
 	void create_surface();
 	void select_present_mode();
@@ -43,6 +46,9 @@ public:
 	window(application_instance& app_instance, glfw::window& win, device& dev);
 	/// Releases the graphics window resources.
 	~window();
+
+	framebuffer_layout
+	make_framebuffer_layout(vk::ArrayProxy<framebuffer_attachment_layout> additional_attachments);
 
 	/// Returns the vulkan surface held by this window.
 	const vk::SurfaceKHR& surface() const {
@@ -62,6 +68,26 @@ public:
 	/// Returns a handle to the swapchain created for the window.
 	const vk::SwapchainKHR& swapchain() const {
 		return *swapchain_;
+	}
+
+	/// Returns the used color space.
+	vk::ColorSpaceKHR color_space() const {
+		return color_space_;
+	}
+
+	/// Returns the used present mode.
+	vk::PresentModeKHR present_mode() const {
+		return present_mode_;
+	}
+
+	/// Returns the size of the swapchain.
+	const glm::uvec2& swapchain_size() const {
+		return swapchain_size_;
+	}
+
+	/// Allows read access to the collection of swapchain images.
+	const std::vector<vk::Image>& swapchain_images() const {
+		return swapchain_images_;
 	}
 };
 
