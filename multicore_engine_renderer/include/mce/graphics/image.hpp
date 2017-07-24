@@ -642,6 +642,8 @@ using image_view_2d_layered = image_view<image_dimension::dim_2d, true, image_as
 using image_view_cube_layered = image_view<image_dimension::dim_cube, true, image_aspect_mode::color>;
 /// Type alias for 2d unlayered image views on depth stencil images.
 using image_view_2d_ds = image_view<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
+/// Type alias for 2d layered image views on depth stencil images.
+using image_view_2d_ds_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::depth_stencil>;
 
 } // namespace graphics
 } // namespace mce
