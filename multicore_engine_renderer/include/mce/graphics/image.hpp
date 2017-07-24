@@ -646,9 +646,9 @@ using image_view_2d_ds = image_view<image_dimension::dim_2d, false, image_aspect
 using image_view_2d_ds_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::depth_stencil>;
 
 /// Type alias for a variant that can contain any of the common image view types.
-using image_var = boost::variant<image_view_1d, image_view_1d_layered, image_view_2d, image_view_2d_ds,
-								 image_view_2d_ds_layered, image_view_2d_layered, image_view_3d,
-								 image_view_cube, image_view_cube_layered>;
+using image_view_var = boost::variant<image_view_1d, image_view_1d_layered, image_view_2d, image_view_2d_ds,
+									  image_view_2d_ds_layered, image_view_2d_layered, image_view_3d,
+									  image_view_cube, image_view_cube_layered>;
 
 } // namespace graphics
 } // namespace mce
