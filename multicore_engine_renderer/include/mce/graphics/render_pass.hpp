@@ -16,6 +16,15 @@ namespace graphics {
 class device;
 class window;
 
+struct attachment_access {
+	vk::ImageLayout initial_layout = vk::ImageLayout::eUndefined;
+	vk::ImageLayout final_layout = vk::ImageLayout::ePresentSrcKHR;
+	vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eDontCare;
+	vk::AttachmentLoadOp store_op = vk::AttachmentLoadOp::eDontCare;
+	vk::AttachmentLoadOp stencil_load_op = vk::AttachmentLoadOp::eDontCare;
+	vk::AttachmentLoadOp stencil_store_op = vk::AttachmentLoadOp::eDontCare;
+};
+
 class render_pass {
 private:
 	device& device_;
@@ -23,7 +32,8 @@ private:
 	std::shared_ptr<framebuffer_layout> fb_layout_;
 
 public:
-	render_pass(device& device_, std::shared_ptr<framebuffer_layout> fb_layout);
+	render_pass(device& device_, std::shared_ptr<framebuffer_layout> fb_layout,
+				vk::ArrayProxy<attachment_access> attachment_access_modes);
 	~render_pass();
 };
 
