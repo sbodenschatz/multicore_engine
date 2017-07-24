@@ -11,10 +11,8 @@
 namespace mce {
 namespace graphics {
 
-framebuffer::framebuffer(device& dev, window& win, const framebuffer_layout& layout)
-		: dev_{&dev}, win_{&win}, size_{win.glfw_window().framebuffer_size()} {
-	UNUSED(layout);
-}
+framebuffer::framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_layout> layout)
+		: dev_{&dev}, win_{&win}, size_{win.glfw_window().framebuffer_size()}, layout_{std::move(layout)} {}
 
 framebuffer::~framebuffer() {}
 

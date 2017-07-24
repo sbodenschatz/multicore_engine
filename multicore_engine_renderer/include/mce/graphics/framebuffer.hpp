@@ -28,10 +28,11 @@ private:
 	glm::uvec2 size_;
 	std::vector<image_var> additional_attachments_;
 	std::vector<image_view_var> attachment_views_;
+	std::shared_ptr<framebuffer_layout> layout_;
 	std::vector<framebuffer_frame> frames;
 
 public:
-	framebuffer(device& dev, window& win, const framebuffer_layout& layout);
+	framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_layout> layout);
 	~framebuffer();
 };
 
