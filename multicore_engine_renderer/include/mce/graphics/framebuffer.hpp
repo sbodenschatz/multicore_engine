@@ -18,15 +18,15 @@ class device;
 class framebuffer {
 private:
 	device& dev_;
-	vk::Image swapchain_image_;
-	std::vector<image_2d> additional_attachments_;
+	window& win_;
+	glm::uvec2 size_;
+	uint32_t layers_;
+	std::vector<image_var> additional_attachments_;
 	std::vector<image_view_2d> attachment_views_;
 	vk::UniqueFramebuffer native_framebuffer_;
 
 public:
-	framebuffer(device& dev, uint32_t width, uint32_t height, int swapchain_image_index,
-				std::vector<vk::Format> additional_attachment_formats);
-	framebuffer(device& dev, uint32_t width, uint32_t height,
+	framebuffer(device& dev, window& win, uint32_t layers,
 				std::vector<vk::Format> additional_attachment_formats);
 	~framebuffer();
 };

@@ -5,24 +5,15 @@
  */
 
 #include <mce/graphics/framebuffer.hpp>
+#include <mce/graphics/window.hpp>
 #include <mce/util/unused.hpp>
 
 namespace mce {
 namespace graphics {
 
-framebuffer::framebuffer(device& dev, uint32_t width, uint32_t height, int swapchain_image_index,
+framebuffer::framebuffer(device& dev, window& win, uint32_t layers,
 						 std::vector<vk::Format> additional_attachment_formats)
-		: dev_(dev) {
-	UNUSED(width);
-	UNUSED(height);
-	UNUSED(swapchain_image_index);
-	UNUSED(additional_attachment_formats);
-}
-framebuffer::framebuffer(device& dev, uint32_t width, uint32_t height,
-						 std::vector<vk::Format> additional_attachment_formats)
-		: dev_(dev) {
-	UNUSED(width);
-	UNUSED(height);
+		: dev_{dev}, win_{win}, size_{win.glfw_window().framebuffer_size()}, layers_{layers} {
 	UNUSED(additional_attachment_formats);
 }
 
