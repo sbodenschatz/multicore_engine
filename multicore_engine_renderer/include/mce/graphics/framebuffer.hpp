@@ -25,14 +25,19 @@ struct framebuffer_layout {
 	std::vector<attachment_layout> additional_attachment_layouts;
 };
 
+class framebuffer_frame {
+	uint32_t swapchain_image_index;
+	vk::UniqueFramebuffer native_framebuffer_;
+};
+
 class framebuffer {
 private:
 	device& dev_;
 	window& win_;
 	glm::uvec2 size_;
 	std::vector<image_var> additional_attachments_;
-	std::vector<image_view_2d> attachment_views_;
-	vk::UniqueFramebuffer native_framebuffer_;
+	std::vector<image_view_var> attachment_views_;
+	std::vector<framebuffer_frame> frames;
 
 public:
 	framebuffer(device& dev, window& win, const framebuffer_layout& layout);
