@@ -20,13 +20,12 @@ private:
 	device& dev_;
 	window& win_;
 	glm::uvec2 size_;
-	uint32_t layers_;
 	std::vector<image_var> additional_attachments_;
 	std::vector<image_view_2d> attachment_views_;
 	vk::UniqueFramebuffer native_framebuffer_;
 
 public:
-	framebuffer(device& dev, window& win, uint32_t layers,
+	framebuffer(device& dev, window& win,
 				std::vector<vk::Format> additional_attachment_formats);
 	~framebuffer();
 };
