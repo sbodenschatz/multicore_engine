@@ -7,6 +7,7 @@
 #ifndef GRAPHICS_RENDER_PASS_HPP_
 #define GRAPHICS_RENDER_PASS_HPP_
 
+#include <mce/graphics/framebuffer_layout.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
