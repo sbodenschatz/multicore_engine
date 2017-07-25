@@ -4,8 +4,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>261</x>
-      <y>63</y>
+      <x>225</x>
+      <y>360</y>
       <w>144</w>
       <h>135</h>
     </coordinates>
@@ -16,8 +16,8 @@ m2=*</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>63</x>
-      <y>36</y>
+      <x>27</x>
+      <y>333</y>
       <w>207</w>
       <h>81</h>
     </coordinates>
@@ -31,8 +31,8 @@ size: uint32_t</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>378</x>
-      <y>180</y>
+      <x>342</x>
+      <y>477</y>
       <w>180</w>
       <h>72</h>
     </coordinates>
@@ -45,8 +45,8 @@ size: uint32_t</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>90</x>
-      <y>189</y>
+      <x>54</x>
+      <y>486</y>
       <w>153</w>
       <h>45</h>
     </coordinates>
@@ -58,8 +58,8 @@ size: uint32_t</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>171</x>
-      <y>225</y>
+      <x>135</x>
+      <y>522</y>
       <w>27</w>
       <h>144</h>
     </coordinates>
@@ -70,8 +70,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>234</x>
-      <y>216</y>
+      <x>198</x>
+      <y>513</y>
       <w>162</w>
       <h>36</h>
     </coordinates>
@@ -82,8 +82,8 @@ m2=*</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>72</x>
-      <y>351</y>
+      <x>36</x>
+      <y>648</y>
       <w>234</w>
       <h>99</h>
     </coordinates>
@@ -98,8 +98,8 @@ stageFlags: VkShaderStageFlags</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>180</x>
-      <y>441</y>
+      <x>144</x>
+      <y>738</y>
       <w>126</w>
       <h>117</h>
     </coordinates>
@@ -110,8 +110,8 @@ m1=0,descriptorCount</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>108</x>
-      <y>540</y>
+      <x>72</x>
+      <y>837</y>
       <w>153</w>
       <h>27</h>
     </coordinates>
@@ -122,8 +122,8 @@ m1=0,descriptorCount</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>405</x>
-      <y>369</y>
+      <x>369</x>
+      <y>666</y>
       <w>135</w>
       <h>207</h>
     </coordinates>
@@ -147,8 +147,8 @@ subpass
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>459</x>
-      <y>243</y>
+      <x>423</x>
+      <y>540</y>
       <w>27</w>
       <h>144</h>
     </coordinates>
@@ -159,8 +159,8 @@ m1=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>720</x>
-      <y>387</y>
+      <x>684</x>
+      <y>684</y>
       <w>180</w>
       <h>81</h>
     </coordinates>
@@ -173,8 +173,8 @@ m1=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1161</x>
-      <y>486</y>
+      <x>1125</x>
+      <y>783</y>
       <w>207</w>
       <h>63</h>
     </coordinates>
@@ -188,8 +188,8 @@ swapchain_image_index: uint32_t
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1323</x>
-      <y>396</y>
+      <x>1287</x>
+      <y>693</y>
       <w>90</w>
       <h>36</h>
     </coordinates>
@@ -200,8 +200,8 @@ m2=*</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1395</x>
-      <y>396</y>
+      <x>1359</x>
+      <y>693</y>
       <w>90</w>
       <h>27</h>
     </coordinates>
@@ -213,8 +213,8 @@ m2=*</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>603</x>
-      <y>0</y>
+      <x>567</x>
+      <y>252</y>
       <w>243</w>
       <h>135</h>
     </coordinates>
@@ -233,8 +233,8 @@ dependencyFlags: VkDependencyFlags
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>585</x>
-      <y>558</y>
+      <x>612</x>
+      <y>837</y>
       <w>234</w>
       <h>117</h>
     </coordinates>
@@ -252,44 +252,32 @@ finalLayout: VkImageLayout
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>657</x>
-      <y>459</y>
-      <w>90</w>
-      <h>117</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
-m2=*</panel_attributes>
-    <additional_attributes>80.0;10.0;80.0;60.0;10.0;60.0;10.0;110.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>774</x>
-      <y>459</y>
-      <w>99</w>
-      <h>117</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
-m2=*</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;60.0;90.0;60.0;90.0;110.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>729</x>
-      <y>126</y>
+      <x>684</x>
+      <y>756</y>
       <w>27</w>
-      <h>90</h>
+      <h>99</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
 m2=*</panel_attributes>
-    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>693</x>
+      <y>378</y>
+      <w>27</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
+m2=*</panel_attributes>
+    <additional_attributes>10.0;130.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>711</x>
-      <y>198</y>
+      <x>675</x>
+      <y>495</y>
       <w>180</w>
       <h>63</h>
     </coordinates>
@@ -302,39 +290,34 @@ m2=*</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>864</x>
-      <y>9</y>
-      <w>234</w>
-      <h>126</h>
+      <x>828</x>
+      <y>252</y>
+      <w>288</w>
+      <h>54</h>
     </coordinates>
     <panel_attributes>subpass_entry
 --
 pipelineBindPoint: VkPipelineBindPoint
-input: uint32_t [*]
-color: uint32_t [*]
-resolve: uint32_t [*]
-depthStencil: uint32_t
-preserve: uint32_t [*]
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>873</x>
-      <y>126</y>
+      <x>837</x>
+      <y>297</y>
       <w>27</w>
-      <h>90</h>
+      <h>216</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
 m2=*</panel_attributes>
-    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;220.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>981</x>
-      <y>360</y>
+      <x>945</x>
+      <y>657</y>
       <w>180</w>
       <h>63</h>
     </coordinates>
@@ -346,8 +329,8 @@ m2=*</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>945</x>
-      <y>180</y>
+      <x>909</x>
+      <y>477</y>
       <w>225</w>
       <h>81</h>
     </coordinates>
@@ -363,8 +346,8 @@ samples: VkSampleCountFlagBits
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1017</x>
-      <y>252</y>
+      <x>981</x>
+      <y>549</y>
       <w>27</w>
       <h>126</h>
     </coordinates>
@@ -375,8 +358,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>891</x>
-      <y>396</y>
+      <x>855</x>
+      <y>693</y>
       <w>108</w>
       <h>36</h>
     </coordinates>
@@ -387,8 +370,8 @@ m1=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1152</x>
-      <y>387</y>
+      <x>1116</x>
+      <y>684</y>
       <w>72</w>
       <h>36</h>
     </coordinates>
@@ -399,8 +382,8 @@ m1=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>792</x>
-      <y>252</y>
+      <x>756</x>
+      <y>549</y>
       <w>27</w>
       <h>153</h>
     </coordinates>
@@ -411,8 +394,8 @@ m1=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>531</x>
-      <y>396</y>
+      <x>495</x>
+      <y>693</y>
       <w>207</w>
       <h>36</h>
     </coordinates>
@@ -423,8 +406,8 @@ m1=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1206</x>
-      <y>342</y>
+      <x>1170</x>
+      <y>639</y>
       <w>126</w>
       <h>81</h>
     </coordinates>
@@ -440,8 +423,8 @@ layers: uint32_t
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1242</x>
-      <y>414</y>
+      <x>1206</x>
+      <y>711</y>
       <w>27</w>
       <h>90</h>
     </coordinates>
@@ -452,8 +435,8 @@ m2=*</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1215</x>
-      <y>243</y>
+      <x>1179</x>
+      <y>540</y>
       <w>90</w>
       <h>27</h>
     </coordinates>
@@ -463,8 +446,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1233</x>
-      <y>261</y>
+      <x>1197</x>
+      <y>558</y>
       <w>27</w>
       <h>99</h>
     </coordinates>
@@ -475,8 +458,8 @@ m1=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1395</x>
-      <y>243</y>
+      <x>1359</x>
+      <y>540</y>
       <w>90</w>
       <h>27</h>
     </coordinates>
@@ -486,8 +469,8 @@ m1=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1296</x>
-      <y>243</y>
+      <x>1260</x>
+      <y>540</y>
       <w>117</w>
       <h>36</h>
     </coordinates>
@@ -498,8 +481,8 @@ m2=*</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1395</x>
-      <y>360</y>
+      <x>1359</x>
+      <y>657</y>
       <w>90</w>
       <h>27</h>
     </coordinates>
@@ -509,8 +492,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1323</x>
-      <y>360</y>
+      <x>1287</x>
+      <y>657</y>
       <w>90</w>
       <h>36</h>
     </coordinates>
@@ -521,8 +504,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>891</x>
-      <y>450</y>
+      <x>855</x>
+      <y>747</y>
       <w>288</w>
       <h>99</h>
     </coordinates>
@@ -533,18 +516,81 @@ m1=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>837</x>
-      <y>558</y>
-      <w>252</w>
-      <h>90</h>
+      <x>873</x>
+      <y>387</y>
+      <w>270</w>
+      <h>63</h>
     </coordinates>
-    <panel_attributes>attachment_reference_layout
+    <panel_attributes>vk::AttachmentReference
 --
-subpass: uint32_t
-ref_type: attachment_ref_type
-ref_index: uint32_t
-layout: vk::ImageLayout
+attachment: uint32_t
+layout: VkImageLayout
 </panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1080</x>
+      <y>297</y>
+      <w>72</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
+m2=*
+r2=preserve</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>999</x>
+      <y>297</y>
+      <w>90</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
+m2=1
+r2=depthStencil</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>945</x>
+      <y>297</y>
+      <w>72</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
+m2=0,|color|
+r2=resolve</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>909</x>
+      <y>297</y>
+      <w>54</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
+m2=*
+r2=color</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>873</x>
+      <y>297</y>
+      <w>54</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
+m2=*
+r2=input</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
   </element>
 </diagram>

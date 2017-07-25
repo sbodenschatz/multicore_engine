@@ -7,6 +7,7 @@
 #ifndef GRAPHICS_RENDER_PASS_HPP_
 #define GRAPHICS_RENDER_PASS_HPP_
 
+#include <boost/optional.hpp>
 #include <mce/graphics/framebuffer_layout.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -20,26 +21,19 @@ struct attachment_access {
 	vk::ImageLayout initial_layout = vk::ImageLayout::eUndefined;
 	vk::ImageLayout final_layout = vk::ImageLayout::ePresentSrcKHR;
 	vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eDontCare;
-	vk::AttachmentLoadOp store_op = vk::AttachmentLoadOp::eDontCare;
+	vk::AttachmentStoreOp store_op = vk::AttachmentStoreOp::eDontCare;
 	vk::AttachmentLoadOp stencil_load_op = vk::AttachmentLoadOp::eDontCare;
-	vk::AttachmentLoadOp stencil_store_op = vk::AttachmentLoadOp::eDontCare;
+	vk::AttachmentStoreOp stencil_store_op = vk::AttachmentStoreOp::eDontCare;
 };
 
 enum class attachment_ref_type { input, color, resolve, depth_stencil, preserve };
 
-struct attachment_reference_layout {
-	uint32_t subpass;
-	attachment_ref_type ref_type;
-	uint32_t ref_index;
-	vk::ImageLayout layout;
-};
-
 struct subpass_entry {
 	vk::PipelineBindPoint pipeline_bind_point;
-	std::vector<uint32_t> input;
-	std::vector<uint32_t> color;
-	std::vector<uint32_t> resolve;
-	uint32_t depth_stencil;
+	std::vector<vk::AttachmentReference> input;
+	std::vector<vk::AttachmentReference> color;
+	std::vector<vk::AttachmentReference> resolve;
+	boost::optional<vk::AttachmentReference> depth_stencil;
 	std::vector<uint32_t> preserve;
 };
 
@@ -68,10 +62,9 @@ private:
 	std::shared_ptr<framebuffer_layout> fb_layout_;
 
 public:
-	render_pass(device& device_, destruction_queue_manager dqm, std::shared_ptr<subpass_graph> subpasses,
+	render_pass(device& device_, destruction_queue_manager* dqm, std::shared_ptr<subpass_graph> subpasses,
 				std::shared_ptr<framebuffer_layout> fb_layout,
-				vk::ArrayProxy<attachment_access> attachment_access_modes,
-				vk::ArrayProxy<attachment_reference_layout> attachment_ref_layout_map);
+				vk::ArrayProxy<attachment_access> attachment_access_modes);
 	~render_pass();
 };
 
