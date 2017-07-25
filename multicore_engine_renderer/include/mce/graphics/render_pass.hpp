@@ -68,7 +68,7 @@ private:
 	std::shared_ptr<framebuffer_layout> fb_layout_;
 
 public:
-	render_pass(device& device_, std::shared_ptr<subpass_graph> subpasses,
+	render_pass(device& device_, destruction_queue_manager dqm, std::shared_ptr<subpass_graph> subpasses,
 				std::shared_ptr<framebuffer_layout> fb_layout,
 				vk::ArrayProxy<attachment_access> attachment_access_modes,
 				vk::ArrayProxy<attachment_reference_layout> attachment_ref_layout_map);
