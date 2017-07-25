@@ -25,9 +25,12 @@ struct attachment_access {
 	vk::AttachmentLoadOp stencil_store_op = vk::AttachmentLoadOp::eDontCare;
 };
 
+enum class attachment_ref_type { input, color, resolve, depth_stencil, preserve };
+
 struct attachment_reference_layout {
 	uint32_t subpass;
-	uint32_t attachment;
+	attachment_ref_type ref_type;
+	uint32_t ref_index;
 	vk::ImageLayout layout;
 };
 
