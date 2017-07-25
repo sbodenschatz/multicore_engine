@@ -60,7 +60,7 @@ public:
 class render_pass {
 private:
 	device& device_;
-	vk::UniqueRenderPass native_render_pass_;
+	queued_handle<vk::UniqueRenderPass> native_render_pass_;
 	std::shared_ptr<subpass_graph> subpasses_;
 	std::shared_ptr<framebuffer_layout> fb_layout_;
 
