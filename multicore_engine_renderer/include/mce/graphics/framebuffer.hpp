@@ -18,7 +18,7 @@ class device;
 
 class framebuffer_frame {
 	uint32_t swapchain_image_index;
-	vk::UniqueFramebuffer native_framebuffer_;
+	queued_handle<vk::UniqueFramebuffer> native_framebuffer_;
 };
 
 class framebuffer {
