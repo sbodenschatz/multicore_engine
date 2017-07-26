@@ -8,6 +8,7 @@
 #define GRAPHICS_RENDER_PASS_HPP_
 
 #include <boost/optional.hpp>
+#include <mce/graphics/framebuffer.hpp>
 #include <mce/graphics/framebuffer_layout.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
