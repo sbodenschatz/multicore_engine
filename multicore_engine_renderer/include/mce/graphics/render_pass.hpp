@@ -66,6 +66,18 @@ public:
 				std::shared_ptr<framebuffer_layout> fb_layout,
 				vk::ArrayProxy<attachment_access> attachment_access_modes);
 	~render_pass();
+
+	const std::shared_ptr<framebuffer_layout>& fb_layout() const {
+		return fb_layout_;
+	}
+
+	const queued_handle<vk::UniqueRenderPass>& native_render_pass() const {
+		return native_render_pass_;
+	}
+
+	const std::shared_ptr<subpass_graph>& subpasses() const {
+		return subpasses_;
+	}
 };
 
 } /* namespace graphics */
