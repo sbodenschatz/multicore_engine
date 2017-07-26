@@ -82,6 +82,8 @@ public:
 
 	void begin(vk::CommandBuffer cb, framebuffer_frame& fb, vk::ArrayProxy<VkClearValue> clear_values,
 			   vk::SubpassContents subpass_contents) const;
+
+	void next_subpass(vk::CommandBuffer cb, vk::SubpassContents subpass_contents) const;
 };
 
 } /* namespace graphics */
