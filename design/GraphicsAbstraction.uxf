@@ -160,15 +160,15 @@ m1=1</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>540</x>
-      <y>684</y>
+      <y>648</y>
       <w>342</w>
-      <h>81</h>
+      <h>117</h>
     </coordinates>
     <panel_attributes>renderpass
 --
-begin(fb:framebuffer_frame, clear_values:vk::ClearValue[*], 
-subpass_contents:vk::SubpassContents )
-
+begin(cb: vk::CommandBuffer,fb:framebuffer_frame, 
+clear_values:vk::ClearValue[*],
+subpass_contents:vk::SubpassContents)
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -387,11 +387,11 @@ m1=1</panel_attributes>
       <x>747</x>
       <y>549</y>
       <w>27</w>
-      <h>153</h>
+      <h>117</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 m1=1</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;110.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
