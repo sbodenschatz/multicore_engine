@@ -78,6 +78,8 @@ public:
 	const std::shared_ptr<subpass_graph>& subpasses() const {
 		return subpasses_;
 	}
+
+	void begin(framebuffer_frame& fb, vk::ArrayProxy<VkClearValue> clear_values) const;
 };
 
 } /* namespace graphics */
