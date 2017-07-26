@@ -159,14 +159,16 @@ m1=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>558</x>
+      <x>540</x>
       <y>684</y>
       <w>342</w>
       <h>81</h>
     </coordinates>
     <panel_attributes>renderpass
 --
-begin(fb:framebuffer_frame,vk::ClearValue clear_values[*])
+begin(fb:framebuffer_frame, clear_values:vk::ClearValue[*], 
+subpass_contents:vk::SubpassContents )
+
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -358,14 +360,14 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>891</x>
+      <x>873</x>
       <y>693</y>
-      <w>63</w>
+      <w>81</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 m1=1</panel_attributes>
-    <additional_attributes>50.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>70.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -396,12 +398,12 @@ m1=1</panel_attributes>
     <coordinates>
       <x>486</x>
       <y>693</y>
-      <w>90</w>
+      <w>72</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 m1=1</panel_attributes>
-    <additional_attributes>80.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
@@ -504,14 +506,14 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>891</x>
+      <x>873</x>
       <y>747</y>
-      <w>243</w>
+      <w>261</w>
       <h>99</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 m1=1</panel_attributes>
-    <additional_attributes>10.0;10.0;140.0;10.0;140.0;90.0;250.0;90.0</additional_attributes>
+    <additional_attributes>10.0;10.0;160.0;10.0;160.0;90.0;270.0;90.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
