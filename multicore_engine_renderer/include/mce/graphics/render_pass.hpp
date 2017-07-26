@@ -84,6 +84,7 @@ public:
 			   vk::SubpassContents subpass_contents) const;
 
 	void next_subpass(vk::CommandBuffer cb, vk::SubpassContents subpass_contents) const;
+	void end(vk::CommandBuffer cb) const;
 };
 
 } /* namespace graphics */

@@ -169,6 +169,9 @@ m1=1</panel_attributes>
 begin(cb: vk::CommandBuffer,fb:framebuffer_frame, 
 clear_values:vk::ClearValue[*],
 subpass_contents:vk::SubpassContents)
+next_subpass(cb: vk::CommandBuffer,
+subpass_contents:vk::SubpassContents)
+end(cb: vk::CommandBuffer)
 </panel_attributes>
     <additional_attributes/>
   </element>
