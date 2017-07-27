@@ -72,8 +72,8 @@ public:
 		return fb_layout_;
 	}
 
-	const queued_handle<vk::UniqueRenderPass>& native_render_pass() const {
-		return native_render_pass_;
+	RenderPass native_render_pass() const {
+		return native_render_pass_.get();
 	}
 
 	const std::shared_ptr<subpass_graph>& subpasses() const {
