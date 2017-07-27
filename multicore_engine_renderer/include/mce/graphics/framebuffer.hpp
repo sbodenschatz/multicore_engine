@@ -17,8 +17,17 @@ namespace graphics {
 class device;
 
 class framebuffer_frame {
-	uint32_t swapchain_image_index;
+	uint32_t swapchain_image_index_;
 	queued_handle<vk::UniqueFramebuffer> native_framebuffer_;
+
+public:
+	vk::Framebuffer native_framebuffer() const {
+		return native_framebuffer_.get();
+	}
+
+	uint32_t swapchain_image_index() const {
+		return swapchain_image_index_;
+	}
 };
 
 class framebuffer {
