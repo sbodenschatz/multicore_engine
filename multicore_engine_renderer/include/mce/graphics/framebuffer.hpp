@@ -16,9 +16,17 @@ namespace mce {
 namespace graphics {
 class device;
 
+class framebuffer;
+
 class framebuffer_frame {
 	uint32_t swapchain_image_index_;
 	queued_handle<vk::UniqueFramebuffer> native_framebuffer_;
+	framebuffer* owner_;
+
+	framebuffer_frame(uint32_t swapchain_image_index, queued_handle<vk::UniqueFramebuffer> native_framebuffer,
+					  framebuffer& owner_)
+			: swapchain_image_index_{swapchain_image_index},
+			  native_framebuffer_{std::move(native_framebuffer)}, owner_{&owner_} {}
 
 public:
 	vk::Framebuffer native_framebuffer() const {
@@ -27,6 +35,13 @@ public:
 
 	uint32_t swapchain_image_index() const {
 		return swapchain_image_index_;
+	}
+
+	const framebuffer& owner() const {
+		return *owner_;
+	}
+	framebuffer& owner() {
+		return *owner_;
 	}
 };
 
