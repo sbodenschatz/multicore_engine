@@ -53,11 +53,23 @@ private:
 	std::vector<image_var> additional_attachments_;
 	std::vector<image_view_var> attachment_views_;
 	std::shared_ptr<framebuffer_layout> layout_;
-	std::vector<framebuffer_frame> frames;
+	std::vector<framebuffer_frame> frames_;
 
 public:
 	framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_layout> layout);
 	~framebuffer();
+
+	const std::shared_ptr<framebuffer_layout>& layout() const {
+		return layout_;
+	}
+
+	const glm::uvec2& size() const {
+		return size_;
+	}
+
+	const std::vector<framebuffer_frame>& frames() const {
+		return frames_;
+	}
 };
 
 } /* namespace graphics */
