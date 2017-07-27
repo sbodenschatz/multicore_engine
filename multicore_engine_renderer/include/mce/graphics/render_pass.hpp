@@ -38,18 +38,22 @@ struct subpass_entry {
 	std::vector<uint32_t> preserve;
 };
 
+/// Describes the structure of the subpasses for a render_pass.
 class subpass_graph {
 	std::vector<subpass_entry> subpasses_;
 	std::vector<vk::SubpassDependency> dependencies_;
 
 public:
+	/// Creates a subpass_graph consisting of the given nodes (subpasses) and edges (dependencies).
 	subpass_graph(std::vector<subpass_entry> subpasses, std::vector<vk::SubpassDependency> dependencies)
 			: subpasses_{std::move(subpasses)}, dependencies_{std::move(dependencies)} {}
 
+	/// Allows access to the dependencies between the subpasses.
 	const std::vector<vk::SubpassDependency>& dependencies() const {
 		return dependencies_;
 	}
 
+	/// Allows access to the subpasses.
 	const std::vector<subpass_entry>& subpasses() const {
 		return subpasses_;
 	}
