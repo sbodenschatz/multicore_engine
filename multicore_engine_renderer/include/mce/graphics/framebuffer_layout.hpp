@@ -51,6 +51,8 @@ class framebuffer_layout {
 public:
 	framebuffer_layout(vk::ArrayProxy<framebuffer_attachment_layout> attachment_layouts)
 			: attachment_layouts_{attachment_layouts.begin(), attachment_layouts.end()} {}
+	framebuffer_layout(std::vector<framebuffer_attachment_layout>&& attachment_layouts)
+			: attachment_layouts_{std::move(attachment_layouts)} {}
 
 	const std::vector<framebuffer_attachment_layout>& attachment_layouts() const {
 		return attachment_layouts_;
