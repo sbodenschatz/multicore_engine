@@ -7,6 +7,11 @@
 #ifndef GRAPHICS_RENDER_PASS_HPP_
 #define GRAPHICS_RENDER_PASS_HPP_
 
+/**
+ * \file
+ * Provides the classes and structs related to the encapsulation of vulkan render passes.
+ */
+
 #include <boost/optional.hpp>
 #include <mce/graphics/framebuffer.hpp>
 #include <mce/graphics/framebuffer_layout.hpp>
