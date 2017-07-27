@@ -77,5 +77,9 @@ void render_pass::begin(vk::CommandBuffer cb, framebuffer_frame& fb,
 					   subpass_contents);
 }
 
+void render_pass::next_subpass(vk::CommandBuffer cb, vk::SubpassContents subpass_contents) const {
+	cb.nextSubpass(subpass_contents);
+}
+
 } /* namespace graphics */
 } /* namespace mce */
