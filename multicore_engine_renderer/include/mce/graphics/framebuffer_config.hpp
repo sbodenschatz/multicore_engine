@@ -7,6 +7,11 @@
 #ifndef MCE_GRAPHICS_FRAMEBUFFER_CONFIG_HPP_
 #define MCE_GRAPHICS_FRAMEBUFFER_CONFIG_HPP_
 
+/**
+ * \file
+ * Provides the configuration classes for framebuffers.
+ */
+
 #include <mce/graphics/image.hpp>
 #include <vulkan/vulkan.hpp>
 
