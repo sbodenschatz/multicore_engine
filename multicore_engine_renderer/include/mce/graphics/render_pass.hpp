@@ -18,16 +18,21 @@ namespace graphics {
 class device;
 class window;
 
+/// Describes how a framebuffer attachment is accessed by a render_pass.
 struct attachment_access {
+	/// The layout the render_pass will expect the attachment to be in when it begins.
 	vk::ImageLayout initial_layout = vk::ImageLayout::eUndefined;
+	/// The layout the render_pass will leave the attachment in when it is finished.
 	vk::ImageLayout final_layout = vk::ImageLayout::ePresentSrcKHR;
+	/// The operation / behavior used to load data from this attachment.
 	vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eDontCare;
+	/// The operation / behavior used to store data to this attachment.
 	vk::AttachmentStoreOp store_op = vk::AttachmentStoreOp::eDontCare;
+	/// The operation / behavior used to load data from the stencil data of this attachment.
 	vk::AttachmentLoadOp stencil_load_op = vk::AttachmentLoadOp::eDontCare;
+	/// The operation / behavior used to store data to the stencil data of this attachment.
 	vk::AttachmentStoreOp stencil_store_op = vk::AttachmentStoreOp::eDontCare;
 };
-
-enum class attachment_ref_type { input, color, resolve, depth_stencil, preserve };
 
 /// Describes a subpass in the subpass_graph.
 struct subpass_entry {
