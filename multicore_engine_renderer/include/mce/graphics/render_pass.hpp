@@ -30,7 +30,6 @@ struct attachment_access {
 enum class attachment_ref_type { input, color, resolve, depth_stencil, preserve };
 
 struct subpass_entry {
-	vk::PipelineBindPoint pipeline_bind_point;
 	std::vector<vk::AttachmentReference> input;
 	std::vector<vk::AttachmentReference> color;
 	std::vector<vk::AttachmentReference> resolve;

@@ -51,8 +51,9 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 	boost::container::small_vector<vk::SubpassDescription, 16> subpass_desc;
 	std::transform(subpasses_->subpasses().begin(), subpasses_->subpasses().end(),
 				   std::back_inserter(subpass_desc), [](const subpass_entry& e) {
-					   return vk::SubpassDescription({}, e.pipeline_bind_point, uint32_t(e.input.size()),
-													 e.input.data(), uint32_t(e.color.size()), e.color.data(),
+					   return vk::SubpassDescription({}, vk::PipelineBindPoint::eGraphics,
+													 uint32_t(e.input.size()), e.input.data(),
+													 uint32_t(e.color.size()), e.color.data(),
 													 e.resolve.size() ? e.resolve.data() : nullptr,
 													 e.depth_stencil ? &(e.depth_stencil.value()) : nullptr,
 													 uint32_t(e.preserve.size()), e.preserve.data());
