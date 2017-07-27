@@ -16,9 +16,33 @@ namespace mce {
 namespace graphics {
 class device;
 
+class framebuffer;
+
 class framebuffer_frame {
-	uint32_t swapchain_image_index;
-	vk::UniqueFramebuffer native_framebuffer_;
+	uint32_t swapchain_image_index_;
+	queued_handle<vk::UniqueFramebuffer> native_framebuffer_;
+	framebuffer* owner_;
+
+	framebuffer_frame(uint32_t swapchain_image_index, queued_handle<vk::UniqueFramebuffer> native_framebuffer,
+					  framebuffer& owner_)
+			: swapchain_image_index_{swapchain_image_index},
+			  native_framebuffer_{std::move(native_framebuffer)}, owner_{&owner_} {}
+
+public:
+	vk::Framebuffer native_framebuffer() const {
+		return native_framebuffer_.get();
+	}
+
+	uint32_t swapchain_image_index() const {
+		return swapchain_image_index_;
+	}
+
+	const framebuffer& owner() const {
+		return *owner_;
+	}
+	framebuffer& owner() {
+		return *owner_;
+	}
 };
 
 class framebuffer {
@@ -29,11 +53,23 @@ private:
 	std::vector<image_var> additional_attachments_;
 	std::vector<image_view_var> attachment_views_;
 	std::shared_ptr<framebuffer_layout> layout_;
-	std::vector<framebuffer_frame> frames;
+	std::vector<framebuffer_frame> frames_;
 
 public:
 	framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_layout> layout);
 	~framebuffer();
+
+	const std::shared_ptr<framebuffer_layout>& layout() const {
+		return layout_;
+	}
+
+	const glm::uvec2& size() const {
+		return size_;
+	}
+
+	const std::vector<framebuffer_frame>& frames() const {
+		return frames_;
+	}
 };
 
 } /* namespace graphics */
