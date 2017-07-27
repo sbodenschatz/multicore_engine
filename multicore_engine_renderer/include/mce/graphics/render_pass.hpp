@@ -29,6 +29,7 @@ struct attachment_access {
 
 enum class attachment_ref_type { input, color, resolve, depth_stencil, preserve };
 
+/// Describes a subpass in the subpass_graph.
 struct subpass_entry {
 	std::vector<vk::AttachmentReference> input;
 	std::vector<vk::AttachmentReference> color;
@@ -96,7 +97,7 @@ public:
 	}
 
 	/// Allows access to the wrapped native vulkan framebuffer.
-	RenderPass native_render_pass() const {
+	vk::RenderPass native_render_pass() const {
 		return native_render_pass_.get();
 	}
 
