@@ -57,17 +57,27 @@ public:
 	}
 };
 
+/// Describes the configuration for a framebuffer (composed of framebuffer_attachment_config entries).
 class framebuffer_config {
 	std::vector<framebuffer_attachment_config> attachment_configs_;
 
 	friend class window;
 
 public:
+	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
+	/**
+	 * General copying version of the constructor.
+	 */
 	framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> attachment_configs)
 			: attachment_configs_{attachment_configs.begin(), attachment_configs.end()} {}
+	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
+	/**
+	 * Optimized version of the constructor for moving the data from a vector and avoiding the copy.
+	 */
 	framebuffer_config(std::vector<framebuffer_attachment_config>&& attachment_configs)
 			: attachment_configs_{std::move(attachment_configs)} {}
 
+	/// Allows access to the framebuffer_attachment_config entries.
 	const std::vector<framebuffer_attachment_config>& attachment_configs() const {
 		return attachment_configs_;
 	}
