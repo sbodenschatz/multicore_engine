@@ -81,5 +81,9 @@ void render_pass::next_subpass(vk::CommandBuffer cb, vk::SubpassContents subpass
 	cb.nextSubpass(subpass_contents);
 }
 
+void render_pass::end(vk::CommandBuffer cb) const {
+	cb.endRenderPass();
+}
+
 } /* namespace graphics */
 } /* namespace mce */
