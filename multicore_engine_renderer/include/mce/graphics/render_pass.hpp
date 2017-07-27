@@ -55,6 +55,19 @@ public:
 	}
 };
 
+/// Abstracts a vulkan render pass consisting of multiple rendering steps (subpasses).
+/**
+ * The subpasses in a render pass work on a common set of (framebuffer) attachment images.
+ * Attachment data are handed through the subpass chain per pixel.
+ * This means a subsequent subpasss can't do gather operations on the output of a previous pass but it can
+ * read the data from the previous pass that corresponds to each pixel.
+ * Subpasses can also express pipeline-barrier-like dependencies and perform image layout transitions.
+ * See vulkan spec for details.
+ *
+ * The structure of the subpasses is described in a subpass_graph object.
+ * The structure of the used attachments is described using a framebuffer_layout object that can also be used
+ * to create an appropriate framebuffer.
+ */
 class render_pass {
 private:
 	device& device_;
@@ -63,23 +76,34 @@ private:
 	std::shared_ptr<framebuffer_layout> fb_layout_;
 
 public:
+	/// \brief Creates a render_pass on the given device with the given subpass and framebuffer structure and
+	/// using the given destruction_queue_manager.
+	/**
+	 * The created object participates in ownership of the given subpass_graph and framebuffer_layout.
+	 */
 	render_pass(device& device_, destruction_queue_manager* dqm, std::shared_ptr<subpass_graph> subpasses,
 				std::shared_ptr<framebuffer_layout> fb_layout,
 				vk::ArrayProxy<attachment_access> attachment_access_modes);
+	/// Destroys the render_pass and releases the wrapped native render_pass to the destruction_queue_manager.
 	~render_pass();
 
+	/// Allows access to used framebuffer_layout.
 	const std::shared_ptr<framebuffer_layout>& fb_layout() const {
 		return fb_layout_;
 	}
 
+	/// Allows access to the wrapped native vulkan framebuffer.
 	RenderPass native_render_pass() const {
 		return native_render_pass_.get();
 	}
 
+	/// Allows access to the used subpass_graph.
 	const std::shared_ptr<subpass_graph>& subpasses() const {
 		return subpasses_;
 	}
 
+	/// \brief Begins the render_pass in the given command buffer using the given framebuffer_frame, clear
+	/// values and mode for the subpass contents.
 	void begin(vk::CommandBuffer cb, framebuffer_frame& fb, vk::ArrayProxy<vk::ClearValue> clear_values,
 			   vk::SubpassContents subpass_contents) const;
 };
