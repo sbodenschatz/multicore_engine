@@ -68,5 +68,14 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 
 render_pass::~render_pass() {}
 
+void render_pass::begin(vk::CommandBuffer cb, framebuffer_frame& fb,
+						vk::ArrayProxy<vk::ClearValue> clear_values,
+						vk::SubpassContents subpass_contents) const {
+	cb.beginRenderPass(vk::RenderPassBeginInfo(native_render_pass_.get(), fb.native_framebuffer(),
+											   {{}, {fb.owner().size().x, fb.owner().size().y}},
+											   clear_values.size(), clear_values.data()),
+					   subpass_contents);
+}
+
 } /* namespace graphics */
 } /* namespace mce */

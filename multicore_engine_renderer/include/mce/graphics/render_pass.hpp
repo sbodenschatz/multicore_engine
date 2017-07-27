@@ -80,7 +80,7 @@ public:
 		return subpasses_;
 	}
 
-	void begin(vk::CommandBuffer cb, framebuffer_frame& fb, vk::ArrayProxy<VkClearValue> clear_values,
+	void begin(vk::CommandBuffer cb, framebuffer_frame& fb, vk::ArrayProxy<vk::ClearValue> clear_values,
 			   vk::SubpassContents subpass_contents) const;
 
 	void next_subpass(vk::CommandBuffer cb, vk::SubpassContents subpass_contents) const;
