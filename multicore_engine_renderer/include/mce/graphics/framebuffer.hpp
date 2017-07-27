@@ -52,15 +52,15 @@ private:
 	glm::uvec2 size_;
 	std::vector<image_var> additional_attachments_;
 	std::vector<image_view_var> attachment_views_;
-	std::shared_ptr<framebuffer_config> layout_;
+	std::shared_ptr<framebuffer_config> config_;
 	std::vector<framebuffer_frame> frames_;
 
 public:
-	framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_config> layout);
+	framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_config> config);
 	~framebuffer();
 
-	const std::shared_ptr<framebuffer_config>& layout() const {
-		return layout_;
+	const std::shared_ptr<framebuffer_config>& config() const {
+		return config_;
 	}
 
 	const glm::uvec2& size() const {
