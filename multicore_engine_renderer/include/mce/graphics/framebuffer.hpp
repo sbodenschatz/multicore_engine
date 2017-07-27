@@ -7,7 +7,7 @@
 #ifndef GRAPHICS_FRAMEBUFFER_HPP_
 #define GRAPHICS_FRAMEBUFFER_HPP_
 
-#include <mce/graphics/framebuffer_layout.hpp>
+#include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/image.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -52,14 +52,14 @@ private:
 	glm::uvec2 size_;
 	std::vector<image_var> additional_attachments_;
 	std::vector<image_view_var> attachment_views_;
-	std::shared_ptr<framebuffer_layout> layout_;
+	std::shared_ptr<framebuffer_config> layout_;
 	std::vector<framebuffer_frame> frames_;
 
 public:
-	framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_layout> layout);
+	framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_config> layout);
 	~framebuffer();
 
-	const std::shared_ptr<framebuffer_layout>& layout() const {
+	const std::shared_ptr<framebuffer_config>& layout() const {
 		return layout_;
 	}
 

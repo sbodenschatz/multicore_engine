@@ -18,20 +18,20 @@ namespace graphics {
 
 render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 						 std::shared_ptr<subpass_graph> subpasses,
-						 std::shared_ptr<framebuffer_layout> fb_layout,
+						 std::shared_ptr<framebuffer_config> fb_config,
 						 vk::ArrayProxy<attachment_access> attachment_access_modes)
-		: device_(device_), subpasses_{std::move(subpasses)}, fb_layout_{std::move(fb_layout)} {
+		: device_(device_), subpasses_{std::move(subpasses)}, fb_config_{std::move(fb_config)} {
 
-	if(attachment_access_modes.size() != fb_layout_->attachment_layouts().size()) {
+	if(attachment_access_modes.size() != fb_config_->attachment_configs().size()) {
 		throw mce::graphics_exception(
 				"Mismatching numbers of attachment layouts and attachment access modes.");
 	}
 
 	boost::container::small_vector<vk::AttachmentDescription, 16> att_desc;
-	for(uint32_t i = 0; i < fb_layout_->attachment_layouts().size(); ++i) {
+	for(uint32_t i = 0; i < fb_config_->attachment_configs().size(); ++i) {
 		vk::AttachmentDescription ad;
-		ad.flags = fb_layout_->attachment_layouts()[i].flags();
-		ad.format = fb_layout_->attachment_layouts()[i].format();
+		ad.flags = fb_config_->attachment_configs()[i].flags();
+		ad.format = fb_config_->attachment_configs()[i].format();
 		ad.samples = vk::SampleCountFlagBits::e1;
 		ad.initialLayout = attachment_access_modes.data()[i].initial_layout;
 		ad.finalLayout = attachment_access_modes.data()[i].final_layout;

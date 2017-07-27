@@ -13,7 +13,7 @@
  */
 
 #include <mce/glfw/window.hpp>
-#include <mce/graphics/framebuffer_layout.hpp>
+#include <mce/graphics/framebuffer_config.hpp>
 #include <memory>
 
 namespace mce {
@@ -47,8 +47,8 @@ public:
 	/// Releases the graphics window resources.
 	~window();
 
-	framebuffer_layout
-	make_framebuffer_layout(vk::ArrayProxy<framebuffer_attachment_layout> additional_attachments);
+	framebuffer_config
+	make_framebuffer_layout(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments);
 
 	/// Returns the vulkan surface held by this window.
 	const vk::SurfaceKHR& surface() const {

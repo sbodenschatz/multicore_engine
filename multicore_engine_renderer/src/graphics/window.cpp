@@ -123,12 +123,12 @@ void window::create_swapchain() {
 	swapchain_images_ = device_.native_device().getSwapchainImagesKHR(swapchain_.get());
 }
 
-framebuffer_layout
-window::make_framebuffer_layout(vk::ArrayProxy<framebuffer_attachment_layout> additional_attachments) {
-	framebuffer_layout res{additional_attachments};
-	framebuffer_attachment_layout swapchain_attachment(surface_format_);
+framebuffer_config
+window::make_framebuffer_layout(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments) {
+	framebuffer_config res{additional_attachments};
+	framebuffer_attachment_config swapchain_attachment(surface_format_);
 	swapchain_attachment.is_swapchain_image_ = true;
-	res.attachment_layouts_.insert(res.attachment_layouts_.begin(), swapchain_attachment);
+	res.attachment_configs_.insert(res.attachment_configs_.begin(), swapchain_attachment);
 	return res;
 }
 
