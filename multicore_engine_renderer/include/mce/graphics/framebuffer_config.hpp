@@ -13,6 +13,7 @@
 namespace mce {
 namespace graphics {
 
+/// Describes the configuration of an attachment in a framebuffer.
 class framebuffer_attachment_config {
 	vk::Format format_;
 	image_aspect_mode aspect_mode_;
@@ -22,22 +23,35 @@ class framebuffer_attachment_config {
 	friend class window;
 
 public:
+	/// Constructs a framebuffer_attachment_config with the given parameters for a non-swapchain-image
+	/// attachment.
+	/**
+	 * A framebuffer_attachment_config object for a swapchain-image can only be created by the window managing
+	 * the swapchain.
+	 */
 	framebuffer_attachment_config(vk::Format format, image_aspect_mode aspect_mode = image_aspect_mode::color,
 								  vk::AttachmentDescriptionFlags flags = {})
 			: format_{format}, aspect_mode_{aspect_mode}, flags_{flags} {}
 
+	/// Returns the image_aspect_mode for the attachment.
+	/**
+	 * This parameter indicates if the image is a color image or a depth and/or stencil image.
+	 */
 	image_aspect_mode aspect_mode() const {
 		return aspect_mode_;
 	}
 
+	/// Returns the flags for the attachment that are passed through to vulkan.
 	vk::AttachmentDescriptionFlags flags() const {
 		return flags_;
 	}
 
+	/// Returns the pixel format for the attachment.
 	vk::Format format() const {
 		return format_;
 	}
 
+	/// Returns a boolean indicating if this attachment is a swapchain image.
 	bool is_swapchain_image() const {
 		return is_swapchain_image_;
 	}
