@@ -51,10 +51,19 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 					   view_visitor v;
 					   return view.apply_visitor(v);
 				   });
-	for(vk::Image sci : win.swapchain_images()) {
-		// TODO: Create framebuffer_frame objects.
-		UNUSED(sci);
-		UNUSED(compatible_pass);
+	auto sci_pos_it =
+			std::find_if(config_->attachment_configs().begin(), config_->attachment_configs().end(),
+						 [](const framebuffer_attachment_config& cfg) { return cfg.is_swapchain_image(); });
+	auto sci_pos = std::distance(config_->attachment_configs().begin(), sci_pos_it);
+	for(uint32_t index = 0; index < win.swapchain_image_views().size(); ++index) {
+		views[sci_pos] = win.swapchain_image_views()[index].get();
+		frames_.push_back(framebuffer_frame(
+				index,
+				queued_handle<vk::UniqueFramebuffer>(
+						dev.native_device().createFramebufferUnique(vk::FramebufferCreateInfo(
+								{}, compatible_pass, views.size(), views.data(), size_.x, size_.y, 1u)),
+						destruction_manager),
+				*this));
 	}
 }
 

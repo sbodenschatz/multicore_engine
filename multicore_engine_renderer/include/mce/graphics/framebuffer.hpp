@@ -29,6 +29,8 @@ class framebuffer_frame {
 			: swapchain_image_index_{swapchain_image_index},
 			  native_framebuffer_{std::move(native_framebuffer)}, owner_{&owner_} {}
 
+	friend class framebuffer;
+
 public:
 	vk::Framebuffer native_framebuffer() const {
 		return native_framebuffer_.get();
