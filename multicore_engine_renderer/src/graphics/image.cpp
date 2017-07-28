@@ -77,5 +77,32 @@ any_image_view::any_image_view(queued_handle<vk::UniqueImageView> view, uint32_t
 		: base_image_view(std::move(view), base_mip_level, mip_levels, component_mapping, format, base_layer,
 						  layers) {}
 
+base_image::base_image(base_image&& other) noexcept
+		: img_dim_{other.img_dim_}, layered_{other.layered_}, aspect_mode_{other.aspect_mode_},
+		  img_type_{other.img_type_}, dev_{other.dev_}, mem_handle_{std::move(other.mem_handle_)},
+		  img_{std::move(other.img_)}, format_{other.format_}, size_{other.size_}, layers_{other.layers_},
+		  mip_levels_{other.mip_levels_}, usage_{other.usage_}, required_flags_{other.required_flags_},
+		  mutable_format_{other.mutable_format_}, tiling_{other.tiling_}, layout_{other.layout_} {}
+
+base_image& base_image::operator=(base_image&& other) noexcept {
+	img_dim_ = other.img_dim_;
+	layered_ = other.layered_;
+	aspect_mode_ = other.aspect_mode_;
+	img_type_ = other.img_type_;
+	dev_ = other.dev_;
+	mem_handle_ = std::move(other.mem_handle_);
+	img_ = std::move(other.img_);
+	format_ = other.format_;
+	size_ = other.size_;
+	layers_ = other.layers_;
+	mip_levels_ = other.mip_levels_;
+	usage_ = other.usage_;
+	required_flags_ = other.required_flags_;
+	mutable_format_ = other.mutable_format_;
+	tiling_ = other.tiling_;
+	layout_ = other.layout_;
+	return *this;
+}
+
 } /* namespace graphics */
 } /* namespace mce */

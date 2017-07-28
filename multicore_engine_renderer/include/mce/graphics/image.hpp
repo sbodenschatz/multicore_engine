@@ -275,6 +275,11 @@ protected:
 			   bool preinitialized_layout = false);
 
 public:
+	/// Allows move-construction and works around missing noexcept in vulkan-hpp wrappers.
+	base_image(base_image&& other) noexcept;
+	/// Allows move-assignment and works around missing noexcept in vulkan-hpp wrappers.
+	base_image& operator=(base_image&& other) noexcept;
+
 	/// Returns the aspect flags for the aspect mode of the image.
 	/**
 	 * For color, depth, and stencil only the respective flag is set.
