@@ -58,6 +58,9 @@ public:
 	}
 };
 
+/// \brief Encapsulates the management of a framebuffer consisting of (optionally) a number of swapchain
+/// images, a number of additional attachment images and framebuffer_frames holding the native vulkan
+/// framebuffers.
 class framebuffer {
 private:
 	device* dev_;
@@ -98,27 +101,42 @@ private:
 	};
 
 public:
+	/// \brief Creates a framebuffer on the given device for the given window (holding the swapchain images
+	/// and determining the size) using the given memory and destruction managers with the given configuration
+	/// to be compatible with the given render pass.
 	framebuffer(device& dev, window& win, device_memory_manager_interface& mem_mgr,
 				destruction_queue_manager* destruction_manager, std::shared_ptr<framebuffer_config> config,
 				vk::RenderPass compatible_pass);
+	/// Destroys the framebuffer and releases the resources to the destruction_manager given on construction.
 	~framebuffer();
 
+	/// Allows access to the framebuffer_config describing the structure of the framebuffer.
 	const std::shared_ptr<framebuffer_config>& config() const {
 		return config_;
 	}
 
+	/// Returns the size of the framebuffer.
 	const glm::uvec2& size() const {
 		return size_;
 	}
 
+	/// Returns the associated framebuffer_frame objects.
 	const std::vector<framebuffer_frame>& frames() const {
 		return frames_;
 	}
 
+	/// Returns the attachments of the framebuffer.
+	/**
+	 * If the framebuffer contains a swaphain image it is represented by a placeholder value vk::Image().
+	 */
 	const std::vector<image_var>& additional_attachments() const {
 		return additional_attachments_;
 	}
 
+	/// Return views on the attachments of the framebuffer.
+	/**
+	 * If the framebuffer contains a swaphain image it is represented by a placeholder value vk::ImageView().
+	 */
 	const std::vector<image_view_var>& attachment_views() const {
 		return attachment_views_;
 	}
