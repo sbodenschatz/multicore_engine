@@ -66,7 +66,7 @@ private:
 	device* dev_;
 	window* win_;
 	glm::uvec2 size_;
-	std::vector<image_var> additional_attachments_;
+	std::vector<image_var> attachments_;
 	std::vector<image_view_var> attachment_views_;
 	std::shared_ptr<framebuffer_config> config_;
 	std::vector<framebuffer_frame> frames_;
@@ -129,8 +129,8 @@ public:
 	/**
 	 * If the framebuffer contains a swaphain image it is represented by a placeholder value vk::Image().
 	 */
-	const std::vector<image_var>& additional_attachments() const {
-		return additional_attachments_;
+	const std::vector<image_var>& attachments() const {
+		return attachments_;
 	}
 
 	/// Return views on the attachments of the framebuffer.

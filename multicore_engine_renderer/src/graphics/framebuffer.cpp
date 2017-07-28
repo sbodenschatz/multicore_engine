@@ -22,12 +22,12 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 				"Framebuffer config contains multiple swapchain image attachment configs.");
 	for(auto& ac : config_->attachment_configs()) {
 		if(ac.is_swapchain_image()) {
-			additional_attachments_.emplace_back(vk::Image());
+			attachments_.emplace_back(vk::Image());
 			attachment_views_.emplace_back(vk::ImageView());
 		} else {
 			switch(ac.aspect_mode()) {
 			case image_aspect_mode::color:
-				additional_attachments_.emplace_back(image_2d(
+				attachments_.emplace_back(image_2d(
 						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
 						vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eInputAttachment |
 								vk::ImageUsageFlagBits::eSampled));
@@ -35,14 +35,14 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 			case image_aspect_mode::depth:
 			case image_aspect_mode::depth_stencil:
 			case image_aspect_mode::stencil:
-				additional_attachments_.emplace_back(image_2d_ds(
+				attachments_.emplace_back(image_2d_ds(
 						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
 						vk::ImageUsageFlagBits::eDepthStencilAttachment |
 								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));
 				break;
 			}
 			imgview_visitor v(this);
-			additional_attachments_.back().apply_visitor(v);
+			attachments_.back().apply_visitor(v);
 		}
 	}
 	std::vector<vk::ImageView> views;
