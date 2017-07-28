@@ -61,7 +61,7 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 				index,
 				queued_handle<vk::UniqueFramebuffer>(
 						dev.native_device().createFramebufferUnique(vk::FramebufferCreateInfo(
-								{}, compatible_pass, views.size(), views.data(), size_.x, size_.y, 1u)),
+								{}, compatible_pass, uint32_t(views.size()), views.data(), size_.x, size_.y, 1u)),
 						destruction_manager),
 				*this));
 	}
