@@ -19,6 +19,11 @@ class device;
 
 class framebuffer;
 
+/// Encapsulates the data specific for a frame / swapchain image in a framebuffer.
+/**
+ * This class corresponds with the vulkan concept of a framebuffer (vk::Framebuffer) while the
+ * graphics::framebuffer class also holds the additional attachment images.
+ */
 class framebuffer_frame {
 	uint32_t swapchain_image_index_;
 	queued_handle<vk::UniqueFramebuffer> native_framebuffer_;
@@ -32,17 +37,22 @@ class framebuffer_frame {
 	friend class framebuffer;
 
 public:
+	/// Allows access to the native vulkan framebuffer.
 	vk::Framebuffer native_framebuffer() const {
 		return native_framebuffer_.get();
 	}
 
+	/// Returns the index of associated swapchain image.
 	uint32_t swapchain_image_index() const {
 		return swapchain_image_index_;
 	}
 
+	/// Returns a reference to the owner framebuffer object.
 	const framebuffer& owner() const {
 		return *owner_;
 	}
+
+	/// Returns a reference to the owner framebuffer object.
 	framebuffer& owner() {
 		return *owner_;
 	}
