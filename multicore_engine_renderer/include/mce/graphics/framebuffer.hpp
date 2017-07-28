@@ -55,9 +55,35 @@ private:
 	std::shared_ptr<framebuffer_config> config_;
 	std::vector<framebuffer_frame> frames_;
 
+	class imgview_visitor : public boost::static_visitor<> {
+		framebuffer* fb;
+
+	public:
+		imgview_visitor(framebuffer* fb) : fb{fb} {}
+		void operator()(image_2d& img) const {
+			fb->attachment_views_.emplace_back(img.create_view());
+		}
+		void operator()(image_2d_ds& img) const {
+			fb->attachment_views_.emplace_back(img.create_view());
+		}
+		template <typename T>
+		void operator()(T&) const {}
+	};
+
+	class view_visitor : public boost::static_visitor<vk::ImageView> {
+	public:
+		template <typename T>
+		vk::ImageView operator()(T& iv) const {
+			// TODO: Implement
+			static_cast<void>(iv);
+			return vk::ImageView();
+		}
+	};
+
 public:
 	framebuffer(device& dev, window& win, device_memory_manager_interface& mem_mgr,
-				destruction_queue_manager* destruction_manager, std::shared_ptr<framebuffer_config> config);
+				destruction_queue_manager* destruction_manager, std::shared_ptr<framebuffer_config> config,
+				vk::RenderPass compatible_pass);
 	~framebuffer();
 
 	const std::shared_ptr<framebuffer_config>& config() const {
