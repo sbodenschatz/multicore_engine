@@ -121,6 +121,12 @@ void window::create_swapchain() {
 	swapchain_ = device_.native_device().createSwapchainKHRUnique(swapchain_ci);
 	swapchain_size_ = {swapchain_size_ext.width, swapchain_size_ext.height};
 	swapchain_images_ = device_.native_device().getSwapchainImagesKHR(swapchain_.get());
+	for(auto& sci : swapchain_images_) {
+		swapchain_image_views_.push_back(
+				device_.native_device().createImageViewUnique(vk::ImageViewCreateInfo(
+						{}, sci, vk::ImageViewType::e2D, surface_format_, {},
+						vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1))));
+	}
 }
 
 framebuffer_config

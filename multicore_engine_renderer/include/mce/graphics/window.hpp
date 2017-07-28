@@ -34,6 +34,7 @@ private:
 	vk::PresentModeKHR present_mode_;
 	glm::uvec2 swapchain_size_;
 	std::vector<vk::Image> swapchain_images_;
+	std::vector<vk::UniqueImageView> swapchain_image_views_;
 
 	void create_surface();
 	void select_present_mode();
@@ -88,6 +89,11 @@ public:
 	/// Allows read access to the collection of swapchain images.
 	const std::vector<vk::Image>& swapchain_images() const {
 		return swapchain_images_;
+	}
+
+	/// Allows read access to the collection of views on the swapchain images.
+	const std::vector<vk::UniqueImageView>& swapchain_image_views() const {
+		return swapchain_image_views_;
 	}
 };
 
