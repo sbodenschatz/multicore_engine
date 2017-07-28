@@ -114,6 +114,14 @@ public:
 	const std::vector<framebuffer_frame>& frames() const {
 		return frames_;
 	}
+
+	const std::vector<image_var>& additional_attachments() const {
+		return additional_attachments_;
+	}
+
+	const std::vector<image_view_var>& attachment_views() const {
+		return attachment_views_;
+	}
 };
 
 } /* namespace graphics */
