@@ -77,9 +77,11 @@ private:
 	public:
 		template <typename T>
 		vk::ImageView operator()(T& iv) const {
-			// TODO: Implement
-			static_cast<void>(iv);
-			return vk::ImageView();
+			return iv.native_view();
+		}
+
+		vk::ImageView operator()(vk::ImageView iv) const {
+			return iv;
 		}
 	};
 
