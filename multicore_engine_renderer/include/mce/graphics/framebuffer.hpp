@@ -56,7 +56,8 @@ private:
 	std::vector<framebuffer_frame> frames_;
 
 public:
-	framebuffer(device& dev, window& win, std::shared_ptr<framebuffer_config> config);
+	framebuffer(device& dev, window& win, device_memory_manager_interface& mem_mgr,
+				destruction_queue_manager* destruction_manager, std::shared_ptr<framebuffer_config> config);
 	~framebuffer();
 
 	const std::shared_ptr<framebuffer_config>& config() const {
