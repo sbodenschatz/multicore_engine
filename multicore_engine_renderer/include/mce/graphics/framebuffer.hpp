@@ -7,6 +7,7 @@
 #ifndef GRAPHICS_FRAMEBUFFER_HPP_
 #define GRAPHICS_FRAMEBUFFER_HPP_
 
+#include <cassert>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/image.hpp>
 #include <vector>
@@ -67,7 +68,9 @@ private:
 			fb->attachment_views_.emplace_back(img.create_view());
 		}
 		template <typename T>
-		void operator()(T&) const {}
+		void operator()(T&) const {
+			assert(false && "Imageviews in the framebuffer should only be 2d non-layered currently.");
+		}
 	};
 
 	class view_visitor : public boost::static_visitor<vk::ImageView> {
