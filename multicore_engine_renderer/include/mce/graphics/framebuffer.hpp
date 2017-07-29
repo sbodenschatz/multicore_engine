@@ -7,6 +7,11 @@
 #ifndef GRAPHICS_FRAMEBUFFER_HPP_
 #define GRAPHICS_FRAMEBUFFER_HPP_
 
+/**
+ * \file
+ * Provides the encapsulation classes for framebuffers.
+ */
+
 #include <cassert>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/image.hpp>
