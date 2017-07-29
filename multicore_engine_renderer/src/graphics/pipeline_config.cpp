@@ -91,12 +91,12 @@ vk::GraphicsPipelineCreateInfo pipeline_config::generate_create_info_structure()
 		dynamic_states_ci.reset();
 	}
 	ci.layout = layout_->get();
-	ci.renderPass = render_pass_->native_render_pass();
-	ci.subpass = subpass_;
+	ci.renderPass = compatible_render_pass_->native_render_pass();
+	ci.subpass = compatible_subpass_;
 	return ci;
 }
 
-pipeline_config::pipeline_config() : subpass_(0) {}
+pipeline_config::pipeline_config() : compatible_subpass_(0) {}
 
 pipeline_config::~pipeline_config() {}
 

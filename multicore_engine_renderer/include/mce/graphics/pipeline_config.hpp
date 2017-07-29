@@ -270,8 +270,8 @@ private:
 	boost::optional<std::vector<vk::DynamicState>> dynamic_states_;
 	boost::optional<vk::PipelineDynamicStateCreateInfo> dynamic_states_ci;
 	std::shared_ptr<vk::UniquePipelineLayout> layout_;
-	std::shared_ptr<render_pass> render_pass_;
-	uint32_t subpass_;
+	std::shared_ptr<render_pass> compatible_render_pass_;
+	uint32_t compatible_subpass_;
 
 public:
 	/// Initializes the pipeline_config object to an empty state.
@@ -390,23 +390,23 @@ public:
 	}
 
 	/// Gets the render pass with which the render pass should be compatible.
-	const std::shared_ptr<graphics::render_pass>& render_pass() const {
-		return render_pass_;
+	const std::shared_ptr<graphics::render_pass>& compatible_render_pass() const {
+		return compatible_render_pass_;
 	}
 
 	/// Sets the render pass with which the render pass should be compatible.
-	void render_pass(const std::shared_ptr<graphics::render_pass>& render_pass) {
-		this->render_pass_ = render_pass;
+	void compatible_render_pass(const std::shared_ptr<graphics::render_pass>& compatible_render_pass) {
+		this->compatible_render_pass_ = compatible_render_pass;
 	}
 
 	/// Gets the subpass in the render pass with which the render pass should be compatible.
-	uint32_t subpass() const {
-		return subpass_;
+	uint32_t compatible_subpass() const {
+		return compatible_subpass_;
 	}
 
 	/// Sets the subpass in the render pass with which the render pass should be compatible.
-	void subpass(uint32_t subpass) {
-		this->subpass_ = subpass;
+	void compatible_subpass(uint32_t compatible_subpass) {
+		this->compatible_subpass_ = compatible_subpass;
 	}
 
 	/// Updates pointer structures and generates a creation info structure for the whole pipeline.
