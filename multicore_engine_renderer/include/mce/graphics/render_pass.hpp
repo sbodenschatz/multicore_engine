@@ -14,7 +14,7 @@
 
 #include <boost/optional.hpp>
 #include <mce/graphics/framebuffer.hpp>
-#include <mce/graphics/framebuffer_layout.hpp>
+#include <mce/graphics/framebuffer_config.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
@@ -87,7 +87,7 @@ public:
  * See vulkan spec for details.
  *
  * The structure of the subpasses is described in a subpass_graph object.
- * The structure of the used attachments is described using a framebuffer_layout object that can also be used
+ * The structure of the used attachments is described using a framebuffer_config object that can also be used
  * to create an appropriate framebuffer.
  */
 class render_pass {
@@ -95,23 +95,23 @@ private:
 	device& device_;
 	queued_handle<vk::UniqueRenderPass> native_render_pass_;
 	std::shared_ptr<subpass_graph> subpasses_;
-	std::shared_ptr<framebuffer_layout> fb_layout_;
+	std::shared_ptr<framebuffer_config> fb_config_;
 
 public:
 	/// \brief Creates a render_pass on the given device with the given subpass and framebuffer structure and
 	/// using the given destruction_queue_manager.
 	/**
-	 * The created object participates in ownership of the given subpass_graph and framebuffer_layout.
+	 * The created object participates in ownership of the given subpass_graph and framebuffer_config.
 	 */
 	render_pass(device& device_, destruction_queue_manager* dqm, std::shared_ptr<subpass_graph> subpasses,
-				std::shared_ptr<framebuffer_layout> fb_layout,
+				std::shared_ptr<framebuffer_config> fb_config,
 				vk::ArrayProxy<attachment_access> attachment_access_modes);
 	/// Destroys the render_pass and releases the wrapped native render_pass to the destruction_queue_manager.
 	~render_pass();
 
-	/// Allows access to used framebuffer_layout.
-	const std::shared_ptr<framebuffer_layout>& fb_layout() const {
-		return fb_layout_;
+	/// Allows access to used framebuffer_config.
+	const std::shared_ptr<framebuffer_config>& fb_config() const {
+		return fb_config_;
 	}
 
 	/// Allows access to the wrapped native vulkan framebuffer.
