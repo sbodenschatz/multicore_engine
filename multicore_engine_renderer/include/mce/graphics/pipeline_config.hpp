@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include <mce/graphics/render_pass.hpp>
 
 namespace mce {
 namespace graphics {
@@ -269,7 +270,7 @@ private:
 	boost::optional<std::vector<vk::DynamicState>> dynamic_states_;
 	boost::optional<vk::PipelineDynamicStateCreateInfo> dynamic_states_ci;
 	std::shared_ptr<vk::UniquePipelineLayout> layout_;
-	vk::RenderPass render_pass_;
+	std::shared_ptr<render_pass> render_pass_;
 	uint32_t subpass_;
 
 public:
@@ -389,12 +390,12 @@ public:
 	}
 
 	/// Gets the render pass with which the render pass should be compatible.
-	vk::RenderPass render_pass() const {
+	const std::shared_ptr<graphics::render_pass>& render_pass() const {
 		return render_pass_;
 	}
 
 	/// Sets the render pass with which the render pass should be compatible.
-	void render_pass(vk::RenderPass render_pass) {
+	void render_pass(const std::shared_ptr<graphics::render_pass>& render_pass) {
 		this->render_pass_ = render_pass;
 	}
 
