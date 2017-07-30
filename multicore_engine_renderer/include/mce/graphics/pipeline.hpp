@@ -19,6 +19,7 @@ class pipeline_cache;
 class pipeline {
 private:
 	vk::UniquePipeline native_pipeline_;
+	std::shared_ptr<vk::UniquePipelineLayout> layout_;
 
 	pipeline();
 
@@ -31,6 +32,10 @@ public:
 
 	const vk::UniquePipeline& native_pipeline() const {
 		return native_pipeline_;
+	}
+
+	const std::shared_ptr<vk::UniquePipelineLayout>& layout() const {
+		return layout_;
 	}
 };
 

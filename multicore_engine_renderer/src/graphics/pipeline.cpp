@@ -32,6 +32,9 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, pipeline_cac
 					   p.native_pipeline_ = std::move(native_pipeline);
 					   return p;
 				   });
+	for(size_t i = 0; i < native_pipelines.size(); ++i) {
+		pipelines[i].layout_ = pipeline_configs[i].layout();
+	}
 	return pipelines;
 }
 
