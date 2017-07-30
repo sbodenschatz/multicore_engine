@@ -18,7 +18,7 @@ class pipeline_cache;
 
 class pipeline {
 private:
-	vk::UniquePipeline native_pipeline;
+	vk::UniquePipeline native_pipeline_;
 
 	pipeline();
 
@@ -28,6 +28,10 @@ public:
 	~pipeline();
 	static std::vector<pipeline> create_pipelines(const device& dev, pipeline_cache& pipeline_cache,
 												  const std::vector<pipeline_config>& pipeline_configs);
+
+	const vk::UniquePipeline& native_pipeline() const {
+		return native_pipeline_;
+	}
 };
 
 } /* namespace graphics */

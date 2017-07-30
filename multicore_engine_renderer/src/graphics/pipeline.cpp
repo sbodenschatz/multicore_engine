@@ -29,7 +29,7 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, pipeline_cac
 	std::transform(native_pipelines.begin(), native_pipelines.end(), std::back_inserter(pipelines),
 				   [owner_dev](vk::UniquePipeline& native_pipeline) {
 					   pipeline p;
-					   p.native_pipeline = std::move(native_pipeline);
+					   p.native_pipeline_ = std::move(native_pipeline);
 					   return p;
 				   });
 	return pipelines;
