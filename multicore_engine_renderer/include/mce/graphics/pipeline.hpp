@@ -27,7 +27,8 @@ private:
 	queued_handle<vk::UniquePipeline> native_pipeline_;
 	queued_handle<std::shared_ptr<vk::UniquePipelineLayout>> layout_;
 
-	pipeline();
+	pipeline(destruction_queue_manager* dqm, vk::UniquePipeline native_pipeline,
+			 std::shared_ptr<vk::UniquePipelineLayout> layout);
 
 public:
 	/// Allows move-construction.

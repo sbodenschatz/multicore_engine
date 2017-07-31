@@ -13,7 +13,10 @@
 namespace mce {
 namespace graphics {
 
-pipeline::pipeline() {}
+pipeline::pipeline(destruction_queue_manager* dqm, vk::UniquePipeline native_pipeline,
+				   std::shared_ptr<vk::UniquePipelineLayout> layout)
+		: native_pipeline_{queued_handle<vk::UniquePipeline>(std::move(native_pipeline), dqm)},
+		  layout_{queued_handle<std::shared_ptr<vk::UniquePipelineLayout>>(std::move(layout), dqm)} {}
 
 pipeline::~pipeline() {}
 
@@ -30,13 +33,7 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_
 	std::transform(native_pipelines.begin(), native_pipelines.end(), pipeline_configs.begin(),
 				   std::back_inserter(pipelines),
 				   [owner_dev, dqm](vk::UniquePipeline& native_pipeline, const pipeline_config& config) {
-					   pipeline p;
-					   p.native_pipeline_ =
-							   queued_handle<vk::UniquePipeline>(std::move(native_pipeline), dqm);
-					   auto layout_handle = config.layout();
-					   p.layout_ = queued_handle<std::shared_ptr<vk::UniquePipelineLayout>>(
-							   std::move(layout_handle), dqm);
-					   return p;
+					   return pipeline(dqm, std::move(native_pipeline), config.layout());
 				   });
 	return pipelines;
 }
