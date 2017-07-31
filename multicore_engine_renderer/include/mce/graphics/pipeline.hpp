@@ -24,7 +24,7 @@ class pipeline_cache;
 /// Encapsulates a vulkan graphics pipeline state object.
 class pipeline {
 private:
-	vk::UniquePipeline native_pipeline_;
+	queued_handle<vk::UniquePipeline> native_pipeline_;
 	std::shared_ptr<vk::UniquePipelineLayout> layout_;
 
 	pipeline();
@@ -34,11 +34,14 @@ public:
 	pipeline(pipeline&&) = default;
 	/// Allows move-assignment.
 	pipeline& operator=(pipeline&&) = default;
-	/// Destroys the pipeline and releases the associated resources.
+	/// \brief Destroys the pipeline and releases the associated resources to the destruction_queue_manager
+	/// given to the create_pipelines function.
 	~pipeline();
 	/// \brief Creates a pipeline for each of the given pipeline_config on the given device using the given
-	/// pipeline_cache for build time improvement.
-	static std::vector<pipeline> create_pipelines(const device& dev, pipeline_cache& pipeline_cache,
+	/// destruction_queue_manager to free native resources and the given pipeline_cache for build time
+	/// improvement.
+	static std::vector<pipeline> create_pipelines(const device& dev, destruction_queue_manager* dqm,
+												  pipeline_cache& pipeline_cache,
 												  const std::vector<pipeline_config>& pipeline_configs);
 
 	/// Bind this pipeline in the given command buffer.

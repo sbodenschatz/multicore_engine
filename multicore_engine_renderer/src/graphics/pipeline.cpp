@@ -17,7 +17,8 @@ pipeline::pipeline() {}
 
 pipeline::~pipeline() {}
 
-std::vector<pipeline> pipeline::create_pipelines(const device& dev, pipeline_cache& pipeline_cache,
+std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_queue_manager* dqm,
+												 pipeline_cache& pipeline_cache,
 												 const std::vector<pipeline_config>& pipeline_configs) {
 	std::vector<pipeline> pipelines;
 	vk::Device owner_dev = dev.native_device();
@@ -27,9 +28,10 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, pipeline_cac
 	auto native_pipelines =
 			owner_dev.createGraphicsPipelinesUnique(pipeline_cache.native_pipeline_cache(), pipelines_ci);
 	std::transform(native_pipelines.begin(), native_pipelines.end(), std::back_inserter(pipelines),
-				   [owner_dev](vk::UniquePipeline& native_pipeline) {
+				   [owner_dev, dqm](vk::UniquePipeline& native_pipeline) {
 					   pipeline p;
-					   p.native_pipeline_ = std::move(native_pipeline);
+					   p.native_pipeline_ =
+							   queued_handle<vk::UniquePipeline>(std::move(native_pipeline), dqm);
 					   return p;
 				   });
 	for(size_t i = 0; i < native_pipelines.size(); ++i) {
