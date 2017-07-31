@@ -45,8 +45,8 @@ public:
 	void bind(vk::CommandBuffer cb) const;
 
 	/// Allows access to the underlying native vulkan pipeline object.
-	const vk::UniquePipeline& native_pipeline() const {
-		return native_pipeline_;
+	vk::Pipeline native_pipeline() const {
+		return native_pipeline_.get();
 	}
 
 	/// Allows access to the pipeline layout used by the pipeline.
