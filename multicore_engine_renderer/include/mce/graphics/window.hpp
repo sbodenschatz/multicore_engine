@@ -49,7 +49,7 @@ public:
 	~window();
 
 	framebuffer_config
-	make_framebuffer_layout(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments);
+	make_framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments);
 
 	/// Returns the vulkan surface held by this window.
 	const vk::SurfaceKHR& surface() const {
