@@ -27,18 +27,17 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_
 				   [&, owner_dev](pipeline_config pcfg) { return pcfg.generate_create_info_structure(); });
 	auto native_pipelines =
 			owner_dev.createGraphicsPipelinesUnique(pipeline_cache.native_pipeline_cache(), pipelines_ci);
-	std::transform(native_pipelines.begin(), native_pipelines.end(), std::back_inserter(pipelines),
-				   [owner_dev, dqm](vk::UniquePipeline& native_pipeline) {
+	std::transform(native_pipelines.begin(), native_pipelines.end(), pipeline_configs.begin(),
+				   std::back_inserter(pipelines),
+				   [owner_dev, dqm](vk::UniquePipeline& native_pipeline, const pipeline_config& config) {
 					   pipeline p;
 					   p.native_pipeline_ =
 							   queued_handle<vk::UniquePipeline>(std::move(native_pipeline), dqm);
+					   auto layout_handle = config.layout();
+					   p.layout_ = queued_handle<std::shared_ptr<vk::UniquePipelineLayout>>(
+							   std::move(layout_handle), dqm);
 					   return p;
 				   });
-	for(size_t i = 0; i < native_pipelines.size(); ++i) {
-		auto layout_handle = pipeline_configs[i].layout();
-		pipelines[i].layout_ =
-				queued_handle<std::shared_ptr<vk::UniquePipelineLayout>>(std::move(layout_handle), dqm);
-	}
 	return pipelines;
 }
 
