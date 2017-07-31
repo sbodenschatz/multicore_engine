@@ -16,7 +16,7 @@ namespace graphics {
 
 class descriptor_set_layout {
 public:
-	struct binding {
+	struct binding_element {
 		uint32_t binding;
 		vk::DescriptorType descriptorType;
 		uint32_t descriptorCount;
@@ -25,14 +25,14 @@ public:
 	};
 
 private:
-	std::vector<binding> bindings_;
+	std::vector<binding_element> bindings_;
 	queued_handle<vk::UniqueDescriptorSetLayout> native_layout_;
 
 public:
 	descriptor_set_layout();
 	~descriptor_set_layout();
 
-	const std::vector<binding>& bindings() const {
+	const std::vector<binding_element>& bindings() const {
 		return bindings_;
 	}
 
