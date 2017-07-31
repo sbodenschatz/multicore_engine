@@ -30,6 +30,8 @@ public:
 	static std::vector<pipeline> create_pipelines(const device& dev, pipeline_cache& pipeline_cache,
 												  const std::vector<pipeline_config>& pipeline_configs);
 
+	void bind(vk::CommandBuffer cb) const;
+	
 	const vk::UniquePipeline& native_pipeline() const {
 		return native_pipeline_;
 	}

@@ -38,5 +38,9 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, pipeline_cac
 	return pipelines;
 }
 
+void pipeline::bind(vk::CommandBuffer cb) const {
+	cb.bindPipeline(vk::PipelineBindPoint::eGraphics, native_pipeline_.get());
+}
+
 } /* namespace graphics */
 } /* namespace mce */
