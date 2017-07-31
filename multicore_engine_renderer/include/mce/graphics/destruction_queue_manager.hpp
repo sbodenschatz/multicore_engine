@@ -58,6 +58,7 @@ class device;
  *   - vk::UniqueSwapchainKHR
  *   - mce::graphics::device_memory_handle
  *   - mce::graphics::destruction_queue_manager::executor<std::function<void()>>
+ *   - std::shared_ptr<void>
  */
 class destruction_queue_manager {
 public:
@@ -95,10 +96,11 @@ private:
 					   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
 					   vk::UniqueImageView, vk::UniquePipeline, vk::UniqueQueryPool, vk::UniqueRenderPass,
 					   vk::UniqueSampler, vk::UniqueSemaphore, vk::UniqueShaderModule, vk::UniqueSurfaceKHR,
-					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>>
-				data;
+					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>,
+					   std::shared_ptr<void>> data;
 		template <typename T>
-		element(T&& data) : data{std::move(data)} {}
+		element(T&& data)
+				: data{std::move(data)} {}
 		element(element&& other) noexcept {
 			try {
 				data = std::move(other.data);
@@ -163,7 +165,8 @@ public:
 	queued_handle() noexcept : qmgr{nullptr} {}
 	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
 	queued_handle(T&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
-			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
+			: handle_{std::move(handle)},
+			  qmgr{destruction_queue_mgr} {}
 	/// Allows move construction.
 	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
 		other.qmgr = nullptr;
@@ -231,7 +234,8 @@ public:
 	queued_handle() noexcept : qmgr{nullptr} {}
 	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
 	queued_handle(vk::UniqueHandle<T, D>&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
-			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
+			: handle_{std::move(handle)},
+			  qmgr{destruction_queue_mgr} {}
 	/// Allows move construction.
 	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
 		other.qmgr = nullptr;
