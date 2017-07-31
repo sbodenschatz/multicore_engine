@@ -22,7 +22,9 @@ class pipeline_layout {
 	queued_handle<vk::UniquePipelineLayout> native_layout_;
 
 public:
-	pipeline_layout();
+	pipeline_layout(const device& dev, destruction_queue_manager* dqm,
+					std::vector<std::shared_ptr<descriptor_set_layout>> descriptor_set_layouts,
+					std::vector<vk::PushConstantRange> push_constant_ranges = {});
 	~pipeline_layout();
 
 	const std::vector<std::shared_ptr<descriptor_set_layout>>& descriptor_set_layouts() const {
