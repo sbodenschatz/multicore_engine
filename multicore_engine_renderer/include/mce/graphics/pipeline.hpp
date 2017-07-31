@@ -25,7 +25,7 @@ class pipeline_cache;
 class pipeline {
 private:
 	queued_handle<vk::UniquePipeline> native_pipeline_;
-	std::shared_ptr<vk::UniquePipelineLayout> layout_;
+	queued_handle<std::shared_ptr<vk::UniquePipelineLayout>> layout_;
 
 	pipeline();
 
@@ -54,7 +54,7 @@ public:
 
 	/// Allows access to the pipeline layout used by the pipeline.
 	const std::shared_ptr<vk::UniquePipelineLayout>& layout() const {
-		return layout_;
+		return *layout_;
 	}
 };
 

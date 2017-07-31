@@ -35,7 +35,9 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_
 					   return p;
 				   });
 	for(size_t i = 0; i < native_pipelines.size(); ++i) {
-		pipelines[i].layout_ = pipeline_configs[i].layout();
+		auto layout_handle = pipeline_configs[i].layout();
+		pipelines[i].layout_ =
+				queued_handle<std::shared_ptr<vk::UniquePipelineLayout>>(std::move(layout_handle), dqm);
 	}
 	return pipelines;
 }
