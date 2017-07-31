@@ -102,7 +102,7 @@ private:
 					   device_memory_handle, executor<std::function<void()>>, std::shared_ptr<void>>
 				data;
 		template <typename T>
-		element(T&& data) : data{std::move(data)} {}
+		explicit element(T&& data) : data{std::move(data)} {}
 		element(element&& other) noexcept {
 			try {
 				data = std::move(other.data);
