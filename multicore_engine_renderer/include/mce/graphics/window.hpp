@@ -48,6 +48,8 @@ public:
 	/// Releases the graphics window resources.
 	~window();
 
+	/// \brief Creates a framebuffer_config containing a swapchain image from the swapchain belonging to this
+	/// window as the first element.
 	framebuffer_config
 	make_framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments);
 
