@@ -103,7 +103,7 @@ private:
 					   device_memory_handle, executor<std::function<void()>>, std::shared_ptr<void>>
 				data;
 		template <typename T>
-		explicit element(T&& data) : data{std::move(data)} {}
+		explicit element(T&& data) : data{std::forward<T>(data)} {}
 		element(element&& other) noexcept {
 			try {
 				data = std::move(other.data);
@@ -146,7 +146,7 @@ public:
 	template <typename T>
 	void enqueue(T&& handle) { // TODO make noexcept because it is used in destructors.
 		std::lock_guard<std::mutex> lock(queue_mutex);
-		queues[current_ring_index].emplace_back(std::move(handle));
+		queues[current_ring_index].emplace_back(std::forward<T>(handle));
 	}
 
 	/// Advances the manager to the next queue and cleans it.
