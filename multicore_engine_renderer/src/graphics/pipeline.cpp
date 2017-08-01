@@ -16,7 +16,7 @@ namespace graphics {
 pipeline::pipeline(destruction_queue_manager* dqm, vk::UniquePipeline native_pipeline,
 				   std::shared_ptr<pipeline_layout> layout)
 		: native_pipeline_{queued_handle<vk::UniquePipeline>(std::move(native_pipeline), dqm)},
-		  layout_{queued_handle<std::shared_ptr<pipeline_layout>>(std::move(layout), dqm)} {}
+		  layout_{std::move(layout)} {}
 
 pipeline::~pipeline() {}
 
