@@ -166,7 +166,7 @@ class queued_handle {
 public:
 	/// Creates an empty queued_handle.
 	// cppcheck-suppress uninitMemberVar
-	queued_handle() noexcept : handle{}, qmgr{nullptr} {}
+	queued_handle() noexcept : qmgr{nullptr} {}
 	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
 	// cppcheck-suppress uninitMemberVar
 	queued_handle(T&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
