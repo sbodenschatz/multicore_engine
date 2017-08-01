@@ -25,10 +25,10 @@ class pipeline_cache;
 class pipeline {
 private:
 	queued_handle<vk::UniquePipeline> native_pipeline_;
-	queued_handle<std::shared_ptr<vk::UniquePipelineLayout>> layout_;
+	queued_handle<std::shared_ptr<pipeline_layout>> layout_;
 
 	pipeline(destruction_queue_manager* dqm, vk::UniquePipeline native_pipeline,
-			 std::shared_ptr<vk::UniquePipelineLayout> layout);
+			 std::shared_ptr<pipeline_layout> layout);
 
 public:
 	/// Allows move-construction.
@@ -54,7 +54,7 @@ public:
 	}
 
 	/// Allows access to the pipeline layout used by the pipeline.
-	const std::shared_ptr<vk::UniquePipelineLayout>& layout() const {
+	const std::shared_ptr<pipeline_layout>& layout() const {
 		return *layout_;
 	}
 };

@@ -23,6 +23,7 @@
 namespace mce {
 namespace graphics {
 class shader_module;
+class pipeline_layout;
 
 /// Bundles and owns all data required for creating a pipeline.
 class pipeline_config {
@@ -269,7 +270,7 @@ private:
 	boost::optional<vk::PipelineColorBlendStateCreateInfo> color_blend_state_ci;
 	boost::optional<std::vector<vk::DynamicState>> dynamic_states_;
 	boost::optional<vk::PipelineDynamicStateCreateInfo> dynamic_states_ci;
-	std::shared_ptr<vk::UniquePipelineLayout> layout_;
+	std::shared_ptr<pipeline_layout> layout_;
 	std::shared_ptr<render_pass> compatible_render_pass_;
 	uint32_t compatible_subpass_;
 
@@ -370,12 +371,12 @@ public:
 	}
 
 	/// Gets the pipeline layout for the pipeline.
-	const std::shared_ptr<vk::UniquePipelineLayout>& layout() const {
+	const std::shared_ptr<pipeline_layout>& layout() const {
 		return layout_;
 	}
 
 	/// Sets the pipeline layout for the pipeline.
-	void layout(const std::shared_ptr<vk::UniquePipelineLayout>& layout) {
+	void layout(const std::shared_ptr<pipeline_layout>& layout) {
 		this->layout_ = layout;
 	}
 
