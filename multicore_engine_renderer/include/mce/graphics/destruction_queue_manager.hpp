@@ -81,6 +81,7 @@ public:
 	}
 
 private:
+	// cppcheck-suppress copyCtorAndEqOperator
 	class element {
 		struct reset_visitor : boost::static_visitor<> {
 			void operator()(boost::blank&) {}
@@ -162,15 +163,19 @@ class queued_handle {
 
 public:
 	/// Creates an empty queued_handle.
-	queued_handle() noexcept : qmgr{nullptr} {}
+	// cppcheck-suppress uninitMemberVar
+	queued_handle() noexcept : handle{}, qmgr{nullptr} {}
 	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
+	// cppcheck-suppress uninitMemberVar
 	queued_handle(T&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
 			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
 	/// Allows move construction.
+	// cppcheck-suppress uninitMemberVar
 	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
 		other.qmgr = nullptr;
 	}
 	/// Allows move assignment.
+	// cppcheck-suppress operatorEqVarError
 	queued_handle& operator=(queued_handle&& other) noexcept {
 		if(qmgr) {
 			qmgr->enqueue(std::move(handle_));
@@ -224,6 +229,7 @@ public:
 /// \brief RAII wrapper to hold unique ownership of a resource managed by a vk::unique_handle<T> and release
 /// it to an associated destruction_queue_manager when the queued_handle goes out of scope or is reassigned.
 template <typename T, typename D>
+// cppcheck-suppress copyCtorAndEqOperator
 class queued_handle<vk::UniqueHandle<T, D>> {
 	vk::UniqueHandle<T, D> handle_;
 	destruction_queue_manager* qmgr;
