@@ -78,9 +78,11 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 	app_info.pEngineName = "mce";
 
 	std::vector<const char*> layer_names;
+	layer_names.reserve(layers.size());
 	std::transform(layers.begin(), layers.end(), std::back_inserter(layer_names),
 				   std::mem_fn(&std::string::c_str));
 	std::vector<const char*> extension_names;
+	extension_names.reserve(extensions.size());
 	std::transform(extensions.begin(), extensions.end(), std::back_inserter(extension_names),
 				   std::mem_fn(&std::string::c_str));
 	// for(const auto& e : extensions) std::cout << e << std::endl;

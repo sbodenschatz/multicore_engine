@@ -23,6 +23,7 @@ descriptor_set_layout::descriptor_set_layout(const device& dev, destruction_queu
 		throw mce::graphics_exception("Mismatching immutable samplers count specified.");
 	}
 	boost::container::small_vector<vk::DescriptorSetLayoutBinding, 32> binding_cis;
+	binding_cis.reserve(bindings_.size());
 	std::transform(bindings_.begin(), bindings_.end(), std::back_inserter(binding_cis),
 				   [](const binding_element& b) {
 					   return vk::DescriptorSetLayoutBinding(b.binding, b.descriptor_type, b.descriptor_count,

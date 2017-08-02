@@ -49,6 +49,7 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 									  "number of color attachments nor is 0.");
 	}
 	boost::container::small_vector<vk::SubpassDescription, 16> subpass_desc;
+	subpass_desc.reserve(subpasses_->subpasses().size());
 	std::transform(subpasses_->subpasses().begin(), subpasses_->subpasses().end(),
 				   std::back_inserter(subpass_desc), [](const subpass_entry& e) {
 					   return vk::SubpassDescription({}, vk::PipelineBindPoint::eGraphics,

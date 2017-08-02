@@ -20,6 +20,7 @@ pipeline_layout::pipeline_layout(const device& dev, destruction_queue_manager* d
 		: push_constant_ranges_{std::move(push_constant_ranges)}, descriptor_set_layouts_{
 																		  std::move(descriptor_set_layouts)} {
 	boost::container::small_vector<vk::DescriptorSetLayout, 32> dsls;
+	dsls.reserve(descriptor_set_layouts_.size());
 	std::transform(descriptor_set_layouts_.begin(), descriptor_set_layouts_.end(), std::back_inserter(dsls),
 				   [](const std::shared_ptr<descriptor_set_layout>& dsl) { return dsl->native_layout(); });
 	native_layout_ = queued_handle<vk::UniquePipelineLayout>(
