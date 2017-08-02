@@ -13,17 +13,18 @@
  */
 
 #include <mce/glfw/window.hpp>
+#include <mce/graphics/framebuffer_config.hpp>
 #include <memory>
 
 namespace mce {
 namespace graphics {
-class application_instance;
+class instance;
 class device;
 
 /// Implements the window handling for the graphics subsystem.
 class window {
 private:
-	application_instance& app_instance;
+	instance& instance_;
 	glfw::window& window_;
 	device& device_;
 	vk::UniqueSurfaceKHR surface_;
@@ -31,6 +32,9 @@ private:
 	vk::ColorSpaceKHR color_space_;
 	vk::Format surface_format_;
 	vk::PresentModeKHR present_mode_;
+	glm::uvec2 swapchain_size_;
+	std::vector<vk::Image> swapchain_images_;
+	std::vector<vk::UniqueImageView> swapchain_image_views_;
 
 	void create_surface();
 	void select_present_mode();
@@ -38,11 +42,16 @@ private:
 	void create_swapchain();
 
 public:
-	/// \brief Initializes a graphics window from the given graphics application_instance in the given
-	/// glfw::window using the given device.
-	window(application_instance& app_instance, glfw::window& win, device& dev);
+	/// \brief Initializes a graphics window from the given graphics instance in the given glfw::window using
+	/// the given device.
+	window(instance& app_instance, glfw::window& win, device& dev);
 	/// Releases the graphics window resources.
 	~window();
+
+	/// \brief Creates a framebuffer_config containing a swapchain image from the swapchain belonging to this
+	/// window as the first element.
+	framebuffer_config
+	make_framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments);
 
 	/// Returns the vulkan surface held by this window.
 	const vk::SurfaceKHR& surface() const {
@@ -62,6 +71,31 @@ public:
 	/// Returns a handle to the swapchain created for the window.
 	const vk::SwapchainKHR& swapchain() const {
 		return *swapchain_;
+	}
+
+	/// Returns the used color space.
+	vk::ColorSpaceKHR color_space() const {
+		return color_space_;
+	}
+
+	/// Returns the used present mode.
+	vk::PresentModeKHR present_mode() const {
+		return present_mode_;
+	}
+
+	/// Returns the size of the swapchain.
+	const glm::uvec2& swapchain_size() const {
+		return swapchain_size_;
+	}
+
+	/// Allows read access to the collection of swapchain images.
+	const std::vector<vk::Image>& swapchain_images() const {
+		return swapchain_images_;
+	}
+
+	/// Allows read access to the collection of views on the swapchain images.
+	const std::vector<vk::UniqueImageView>& swapchain_image_views() const {
+		return swapchain_image_views_;
 	}
 };
 

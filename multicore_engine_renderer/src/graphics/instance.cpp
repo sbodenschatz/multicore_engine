@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/src/graphics/application_instance.cpp
+ * File /multicore_engine_renderer/src/graphics/instance.cpp
  * Copyright 2016-2017 by Stefan Bodenschatz
  */
 
@@ -14,7 +14,7 @@
 #include <iterator>
 #include <mce/core/version.hpp>
 #include <mce/exceptions.hpp>
-#include <mce/graphics/application_instance.hpp>
+#include <mce/graphics/instance.hpp>
 #include <mce/util/unused.hpp>
 #include <sstream>
 #include <stdexcept>
@@ -51,8 +51,7 @@ VKAPI_ATTR void VKAPI_CALL vkDebugReportMessageEXT(VkInstance instance, VkDebugR
 namespace mce {
 namespace graphics {
 
-application_instance::application_instance(const std::vector<std::string>& exts,
-										   unsigned int validation_level)
+instance::instance(const std::vector<std::string>& exts, unsigned int validation_level)
 		: validation_level(validation_level) {
 
 	if(!glfw_instance.vulkan_supported())
@@ -78,9 +77,11 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 	app_info.pEngineName = "mce";
 
 	std::vector<const char*> layer_names;
+	layer_names.reserve(layers.size());
 	std::transform(layers.begin(), layers.end(), std::back_inserter(layer_names),
 				   std::mem_fn(&std::string::c_str));
 	std::vector<const char*> extension_names;
+	extension_names.reserve(extensions.size());
 	std::transform(extensions.begin(), extensions.end(), std::back_inserter(extension_names),
 				   std::mem_fn(&std::string::c_str));
 	// for(const auto& e : extensions) std::cout << e << std::endl;
@@ -91,13 +92,13 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 	instance_ci.ppEnabledExtensionNames = extension_names.data();
 	instance_ci.pApplicationInfo = &app_info;
 
-	instance_ = vk::createInstanceUnique(instance_ci);
+	native_instance_ = vk::createInstanceUnique(instance_ci);
 	fptr_vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(
-			instance_->getProcAddr("vkCreateDebugReportCallbackEXT"));
-	fptr_vkDebugReportMessageEXT =
-			reinterpret_cast<PFN_vkDebugReportMessageEXT>(instance_->getProcAddr("vkDebugReportMessageEXT"));
+			native_instance_->getProcAddr("vkCreateDebugReportCallbackEXT"));
+	fptr_vkDebugReportMessageEXT = reinterpret_cast<PFN_vkDebugReportMessageEXT>(
+			native_instance_->getProcAddr("vkDebugReportMessageEXT"));
 	fptr_vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(
-			instance_->getProcAddr("vkDestroyDebugReportCallbackEXT"));
+			native_instance_->getProcAddr("vkDestroyDebugReportCallbackEXT"));
 
 	if(validation_level > 0) {
 		vk::DebugReportFlagsEXT validation_report_levels =
@@ -109,26 +110,26 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 		PFN_vkDebugReportCallbackEXT cb = &validation_report_callback_static;
 		vk::DebugReportCallbackCreateInfoEXT debug_report_ci(validation_report_levels, cb,
 															 static_cast<void*>(this));
-		validation_report_cb = instance_->createDebugReportCallbackEXTUnique(debug_report_ci);
+		validation_report_cb = native_instance_->createDebugReportCallbackEXTUnique(debug_report_ci);
 	}
 }
 
-application_instance::~application_instance() {}
+instance::~instance() {}
 
-VkBool32 VKAPI_CALL application_instance::validation_report_callback_static(
-		VkDebugReportFlagsEXT flags_, VkDebugReportObjectTypeEXT objectType_, uint64_t object,
-		size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage,
-		void* pUserData) {
-	auto target = static_cast<const application_instance*>(pUserData);
+VkBool32 VKAPI_CALL instance::validation_report_callback_static(VkDebugReportFlagsEXT flags_,
+																VkDebugReportObjectTypeEXT objectType_,
+																uint64_t object, size_t location,
+																int32_t messageCode, const char* pLayerPrefix,
+																const char* pMessage, void* pUserData) {
+	auto target = static_cast<const instance*>(pUserData);
 	return target->validation_report_callback(flags_, objectType_, object, location, messageCode,
 											  pLayerPrefix, pMessage);
 }
 
-VkBool32 application_instance::validation_report_callback(VkDebugReportFlagsEXT flags_,
-														  VkDebugReportObjectTypeEXT objectType_,
-														  uint64_t object, size_t location,
-														  int32_t messageCode, const char* pLayerPrefix,
-														  const char* pMessage) const {
+VkBool32 instance::validation_report_callback(VkDebugReportFlagsEXT flags_,
+											  VkDebugReportObjectTypeEXT objectType_, uint64_t object,
+											  size_t location, int32_t messageCode, const char* pLayerPrefix,
+											  const char* pMessage) const {
 	vk::DebugReportFlagsEXT flags = vk::DebugReportFlagBitsEXT(flags_);
 	vk::DebugReportObjectTypeEXT object_type = static_cast<vk::DebugReportObjectTypeEXT>(objectType_);
 	vk::DebugReportFlagsEXT crit_report_levels = vk::DebugReportFlagBitsEXT::eError;

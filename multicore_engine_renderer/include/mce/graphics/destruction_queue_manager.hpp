@@ -43,12 +43,14 @@ class device;
  *   - vk::UniqueCommandPool
  *   - vk::UniqueDescriptorPool
  *   - vk::UniqueDescriptorSet
+ *   - vk::UniqueDescriptorSetLayout
  *   - vk::UniqueEvent
  *   - vk::UniqueFence
  *   - vk::UniqueFramebuffer
  *   - vk::UniqueImage
  *   - vk::UniqueImageView
  *   - vk::UniquePipeline
+ *   - vk::UniquePipelineLayout
  *   - vk::UniqueQueryPool
  *   - vk::UniqueRenderPass
  *   - vk::UniqueSampler
@@ -58,6 +60,7 @@ class device;
  *   - vk::UniqueSwapchainKHR
  *   - mce::graphics::device_memory_handle
  *   - mce::graphics::destruction_queue_manager::executor<std::function<void()>>
+ *   - std::shared_ptr<void>
  */
 class destruction_queue_manager {
 public:
@@ -80,6 +83,7 @@ public:
 	}
 
 private:
+	// cppcheck-suppress copyCtorAndEqOperator
 	class element {
 		struct reset_visitor : boost::static_visitor<> {
 			void operator()(boost::blank&) {}
@@ -92,13 +96,14 @@ private:
 	public:
 		boost::variant<boost::blank, vk::UniqueBuffer, vk::UniqueBufferView, vk::UniqueCommandBuffer,
 					   vk::UniqueCommandPool, vk::UniqueDescriptorPool, vk::UniqueDescriptorSet,
-					   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
-					   vk::UniqueImageView, vk::UniquePipeline, vk::UniqueQueryPool, vk::UniqueRenderPass,
-					   vk::UniqueSampler, vk::UniqueSemaphore, vk::UniqueShaderModule, vk::UniqueSurfaceKHR,
-					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>>
+					   vk::UniqueDescriptorSetLayout, vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer,
+					   vk::UniqueImage, vk::UniqueImageView, vk::UniquePipeline, vk::UniquePipelineLayout,
+					   vk::UniqueQueryPool, vk::UniqueRenderPass, vk::UniqueSampler, vk::UniqueSemaphore,
+					   vk::UniqueShaderModule, vk::UniqueSurfaceKHR, vk::UniqueSwapchainKHR,
+					   device_memory_handle, executor<std::function<void()>>, std::shared_ptr<void>>
 				data;
 		template <typename T>
-		element(T&& data) : data{std::move(data)} {}
+		explicit element(T&& data) : data{std::forward<T>(data)} {}
 		element(element&& other) noexcept {
 			try {
 				data = std::move(other.data);
@@ -141,7 +146,7 @@ public:
 	template <typename T>
 	void enqueue(T&& handle) { // TODO make noexcept because it is used in destructors.
 		std::lock_guard<std::mutex> lock(queue_mutex);
-		queues[current_ring_index].emplace_back(std::move(handle));
+		queues[current_ring_index].emplace_back(std::forward<T>(handle));
 	}
 
 	/// Advances the manager to the next queue and cleans it.
@@ -160,15 +165,19 @@ class queued_handle {
 
 public:
 	/// Creates an empty queued_handle.
+	// cppcheck-suppress uninitMemberVar
 	queued_handle() noexcept : qmgr{nullptr} {}
 	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
+	// cppcheck-suppress uninitMemberVar
 	queued_handle(T&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
 			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
 	/// Allows move construction.
+	// cppcheck-suppress uninitMemberVar
 	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
 		other.qmgr = nullptr;
 	}
 	/// Allows move assignment.
+	// cppcheck-suppress operatorEqVarError
 	queued_handle& operator=(queued_handle&& other) noexcept {
 		if(qmgr) {
 			qmgr->enqueue(std::move(handle_));
@@ -222,6 +231,7 @@ public:
 /// \brief RAII wrapper to hold unique ownership of a resource managed by a vk::unique_handle<T> and release
 /// it to an associated destruction_queue_manager when the queued_handle goes out of scope or is reassigned.
 template <typename T, typename D>
+// cppcheck-suppress copyCtorAndEqOperator
 class queued_handle<vk::UniqueHandle<T, D>> {
 	vk::UniqueHandle<T, D> handle_;
 	destruction_queue_manager* qmgr;

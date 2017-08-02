@@ -4,20 +4,20 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <iterator>
 #include <mce/asset_gen/static_model.hpp>
 #include <mce/asset_gen/static_model_exporter.hpp>
 #include <mce/bstream/iostream_bstream.hpp>
 #include <mce/bstream/vector_iobstream.hpp>
 #include <mce/exceptions.hpp>
-#include <fstream>
 #include <mce/model/model_format.hpp>
 #include <mce/util/offset_range.hpp>
 #include <mce/util/unused.hpp>
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <iostream>
-#include <iterator>
 #include <string>
 #include <vector>
 
@@ -30,6 +30,7 @@ void static_model_exporter::export_model(const static_model& model_data,
 	model_meta_data.vertex_data.length(model_data.vertices.size() *
 									   sizeof(decltype(model_data.vertices)::value_type));
 	auto next_offset = model_meta_data.vertex_data.length();
+	model_meta_data.meshes.reserve(model_data.meshes.size());
 	std::transform(model_data.meshes.begin(), model_data.meshes.end(),
 				   std::back_inserter(model_meta_data.meshes), [&next_offset](const static_model_mesh& mesh) {
 					   model::static_model_mesh_meta_data meta_data;

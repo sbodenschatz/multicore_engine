@@ -4,15 +4,15 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <iterator>
 #include <mce/asset_gen/load_unit_gen.hpp>
 #include <mce/bstream/iostream_bstream.hpp>
-#include <cstdint>
 #include <mce/exceptions.hpp>
 #include <mce/util/path_util.hpp>
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <iterator>
 
 namespace mce {
 namespace asset_gen {
@@ -31,6 +31,7 @@ uint64_t load_unit_gen::read_file_size(const std::string& path) {
 		throw path_not_found_exception("Couldn't open asset file '" + path + "'.");
 }
 void load_unit_gen::compile_meta_data() {
+	meta_data.assets.reserve(entries.size());
 	std::transform(entries.begin(), entries.end(), std::back_inserter(meta_data.assets),
 				   [](const auto& entry) { return entry.meta_data; });
 }

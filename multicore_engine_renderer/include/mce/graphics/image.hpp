@@ -14,6 +14,7 @@
  */
 
 #include <boost/optional.hpp>
+#include <boost/variant.hpp>
 #include <glm/glm.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
@@ -150,6 +151,41 @@ public:
 	base_image_view(base_image_view&& other) noexcept = default;
 	/// Allows move assignment.
 	base_image_view& operator=(base_image_view&& other) noexcept = default;
+
+	/// Returns the number of layers.
+	uint32_t base_layer() const {
+		return base_layer_;
+	}
+
+	/// Returns the base mipmap level.
+	uint32_t base_mip_level() const {
+		return base_mip_level_;
+	}
+
+	/// Returns the component mapping.
+	const vk::ComponentMapping& component_mapping() const {
+		return component_mapping_;
+	}
+
+	/// Returns the format.
+	vk::Format format() const {
+		return format_;
+	}
+
+	/// Returns the number of layers.
+	uint32_t layers() const {
+		return layers_;
+	}
+
+	/// Returns the number of mipmap levels.
+	uint32_t mip_levels() const {
+		return mip_levels_;
+	}
+
+	/// Returns the native vulkan view that is wrapped by this view.
+	vk::ImageView native_view() const {
+		return view_.get();
+	}
 };
 
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect>
@@ -274,6 +310,11 @@ protected:
 			   bool preinitialized_layout = false);
 
 public:
+	/// Allows move-construction and works around missing noexcept in vulkan-hpp wrappers.
+	base_image(base_image&& other) noexcept;
+	/// Allows move-assignment and works around missing noexcept in vulkan-hpp wrappers.
+	base_image& operator=(base_image&& other) noexcept;
+
 	/// Returns the aspect flags for the aspect mode of the image.
 	/**
 	 * For color, depth, and stencil only the respective flag is set.
@@ -618,6 +659,13 @@ using image_2d_layered = image<image_dimension::dim_2d, true, image_aspect_mode:
 using image_cube_layered = image<image_dimension::dim_cube, true, image_aspect_mode::color>;
 /// Type alias for 2d unlayered depth and stencil images.
 using image_2d_ds = image<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
+/// Type alias for 2d layered depth and stencil images.
+using image_2d_ds_layered = image<image_dimension::dim_2d, true, image_aspect_mode::depth_stencil>;
+
+/// Type alias for a variant that can contain any of the common image types.
+using image_var =
+		boost::variant<vk::Image, image_1d, image_1d_layered, image_2d, image_2d_ds, image_2d_ds_layered,
+					   image_2d_layered, image_3d, image_cube, image_cube_layered>;
 
 /// Type alias for 1d unlayered image views on color images.
 using image_view_1d = image_view<image_dimension::dim_1d, false, image_aspect_mode::color>;
@@ -635,6 +683,13 @@ using image_view_2d_layered = image_view<image_dimension::dim_2d, true, image_as
 using image_view_cube_layered = image_view<image_dimension::dim_cube, true, image_aspect_mode::color>;
 /// Type alias for 2d unlayered image views on depth stencil images.
 using image_view_2d_ds = image_view<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
+/// Type alias for 2d layered image views on depth stencil images.
+using image_view_2d_ds_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::depth_stencil>;
+
+/// Type alias for a variant that can contain any of the common image view types.
+using image_view_var = boost::variant<vk::ImageView, image_view_1d, image_view_1d_layered, image_view_2d,
+									  image_view_2d_ds, image_view_2d_ds_layered, image_view_2d_layered,
+									  image_view_3d, image_view_cube, image_view_cube_layered>;
 
 } // namespace graphics
 } // namespace mce

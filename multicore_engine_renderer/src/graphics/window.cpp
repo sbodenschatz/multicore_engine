@@ -12,8 +12,8 @@
 #include <cstdint>
 #include <iostream>
 #include <mce/exceptions.hpp>
-#include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/instance.hpp>
 #include <mce/graphics/window.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -21,8 +21,8 @@
 namespace mce {
 namespace graphics {
 
-window::window(application_instance& app_instance, glfw::window& win, device& dev)
-		: app_instance(app_instance), window_{win}, device_{dev},
+window::window(instance& app_instance, glfw::window& win, device& dev)
+		: instance_{app_instance}, window_{win}, device_{dev},
 		  color_space_{vk::ColorSpaceKHR::eSrgbNonlinear}, surface_format_{vk::Format::eUndefined},
 		  present_mode_{vk::PresentModeKHR::eFifo} {
 	create_surface();
@@ -35,11 +35,11 @@ window::~window() {}
 
 void window::create_surface() {
 	VkSurfaceKHR surface_tmp;
-	if(glfwCreateWindowSurface(app_instance.instance(), window_.window_.get(), nullptr, &surface_tmp) !=
+	if(glfwCreateWindowSurface(instance_.native_instance(), window_.window_.get(), nullptr, &surface_tmp) !=
 	   VK_SUCCESS) {
 		throw window_surface_creation_exception("Failed to create window surface.");
 	}
-	surface_ = vk::UniqueSurfaceKHR(surface_tmp, app_instance.instance());
+	surface_ = vk::UniqueSurfaceKHR(surface_tmp, instance_.native_instance());
 	if(!device_.physical_device().getSurfaceSupportKHR(device_.present_queue_index().first, surface_.get())) {
 		throw window_surface_creation_exception("Surface not supported by device.");
 	}
@@ -99,15 +99,17 @@ void window::create_swapchain() {
 	swapchain_ci.imageColorSpace = color_space_;
 
 	auto resolution = window_.framebuffer_size();
-	vk::Extent2D swapchain_size = vk::Extent2D{uint32_t(resolution.x), uint32_t(resolution.y)};
-	swapchain_size.width = std::min(surface_caps.maxImageExtent.width,
-									std::max(surface_caps.minImageExtent.width, swapchain_size.width));
-	swapchain_size.height = std::min(surface_caps.maxImageExtent.height,
-									 std::max(surface_caps.minImageExtent.height, swapchain_size.height));
+	vk::Extent2D swapchain_size_ext = vk::Extent2D{uint32_t(resolution.x), uint32_t(resolution.y)};
+	swapchain_size_ext.width =
+			std::min(surface_caps.maxImageExtent.width,
+					 std::max(surface_caps.minImageExtent.width, swapchain_size_ext.width));
+	swapchain_size_ext.height =
+			std::min(surface_caps.maxImageExtent.height,
+					 std::max(surface_caps.minImageExtent.height, swapchain_size_ext.height));
 	if(surface_caps.currentExtent.width != ~0u) {
-		swapchain_size = surface_caps.currentExtent;
+		swapchain_size_ext = surface_caps.currentExtent;
 	}
-	swapchain_ci.imageExtent = swapchain_size;
+	swapchain_ci.imageExtent = swapchain_size_ext;
 	swapchain_ci.imageArrayLayers = 1;
 	swapchain_ci.imageSharingMode = vk::SharingMode::eExclusive;
 	swapchain_ci.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
@@ -116,7 +118,23 @@ void window::create_swapchain() {
 	swapchain_ci.clipped = true;
 	swapchain_ci.presentMode = present_mode_;
 
-	swapchain_ = device_.native_device().createSwapchainKHRUnique(swapchain_ci);
+	swapchain_ = device_->createSwapchainKHRUnique(swapchain_ci);
+	swapchain_size_ = {swapchain_size_ext.width, swapchain_size_ext.height};
+	swapchain_images_ = device_->getSwapchainImagesKHR(swapchain_.get());
+	for(auto& sci : swapchain_images_) {
+		swapchain_image_views_.push_back(device_->createImageViewUnique(vk::ImageViewCreateInfo(
+				{}, sci, vk::ImageViewType::e2D, surface_format_, {},
+				vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1))));
+	}
+}
+
+framebuffer_config
+window::make_framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments) {
+	framebuffer_config res{additional_attachments};
+	framebuffer_attachment_config swapchain_attachment(surface_format_);
+	swapchain_attachment.is_swapchain_image_ = true;
+	res.attachment_configs_.insert(res.attachment_configs_.begin(), swapchain_attachment);
+	return res;
 }
 
 } /* namespace graphics */

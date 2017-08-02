@@ -26,14 +26,15 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 	for(uint32_t i = 0; i < ring_slots; ++i) {
 		transfer_command_bufers.push_back(transfer_cmd_pool.allocate_primary_command_buffer());
 		if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
-			pending_ownership_command_buffers.push_back(ownership_cmd_pool.allocate_primary_command_buffer());
+			pending_ownership_command_buffers.push_back(queued_handle<vk::UniqueCommandBuffer>(
+					ownership_cmd_pool.allocate_primary_command_buffer(), &dqm));
 		}
-		fences.push_back(dev.native_device().createFenceUnique({vk::FenceCreateFlagBits::eSignaled}));
+		fences.push_back(dev->createFenceUnique({vk::FenceCreateFlagBits::eSignaled}));
 	}
 }
 
 transfer_manager::~transfer_manager() {
-	dev.native_device().waitIdle();
+	dev->waitIdle();
 	transfer_command_bufers.clear();
 	pending_ownership_command_buffers.clear();
 }
@@ -142,8 +143,8 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
 		ready_ownership_command_buffers.push_back(
 				std::move(pending_ownership_command_buffers[current_ring_index]));
-		pending_ownership_command_buffers[current_ring_index] =
-				ownership_cmd_pool.allocate_primary_command_buffer();
+		pending_ownership_command_buffers[current_ring_index] = queued_handle<vk::UniqueCommandBuffer>(
+				ownership_cmd_pool.allocate_primary_command_buffer(), &dqm);
 		pending_ownership_command_buffers[current_ring_index]->begin(
 				{vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 	}
@@ -174,7 +175,7 @@ void transfer_manager::end_frame() {
 	vk::SubmitInfo si;
 	si.commandBufferCount = 1;
 	si.pCommandBuffers = &*transfer_command_bufers[current_ring_index];
-	dev.native_device().resetFences({fences[current_ring_index].get()});
+	dev->resetFences({fences[current_ring_index].get()});
 	dev.transfer_queue().submit({}, *fences[current_ring_index]);
 }
 void transfer_manager::process_waiting_jobs() {
@@ -249,8 +250,8 @@ void transfer_manager::process_ready_callbacks(std::vector<transfer_job>& jobs) 
 	}
 }
 
-std::vector<vk::UniqueCommandBuffer> transfer_manager::retrieve_ready_ownership_transfers() {
-	std::vector<vk::UniqueCommandBuffer> res;
+std::vector<queued_handle<vk::UniqueCommandBuffer>> transfer_manager::retrieve_ready_ownership_transfers() {
+	std::vector<queued_handle<vk::UniqueCommandBuffer>> res;
 	std::unique_lock<std::mutex> lock(manager_mutex);
 	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
 		using std::swap;

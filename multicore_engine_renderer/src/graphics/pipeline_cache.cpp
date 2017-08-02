@@ -59,16 +59,16 @@ pipeline_cache::pipeline_cache(device& dev, bool file_read_only)
 		pipeline_cache_ci.pInitialData = file.data();
 		pipeline_cache_ci.initialDataSize = file.size();
 	}
-	native_pipeline_cache_ = device_.native_device().createPipelineCacheUnique(pipeline_cache_ci);
+	native_pipeline_cache_ = device_->createPipelineCacheUnique(pipeline_cache_ci);
 }
 
 pipeline_cache::~pipeline_cache() {
 	if(!native_pipeline_cache_) return;
 	if(file_read_only_) return;
 	size_t data_size = 0;
-	device_.native_device().getPipelineCacheData(*native_pipeline_cache_, &data_size, nullptr);
+	device_->getPipelineCacheData(*native_pipeline_cache_, &data_size, nullptr);
 	std::vector<char> content(data_size);
-	device_.native_device().getPipelineCacheData(*native_pipeline_cache_, &data_size, content.data());
+	device_->getPipelineCacheData(*native_pipeline_cache_, &data_size, content.data());
 	if(!boost::filesystem::equivalent(boost::filesystem::current_path(), cache_path_))
 		boost::filesystem::create_directories(cache_path_);
 	write_file(cache_filename().string(), content);

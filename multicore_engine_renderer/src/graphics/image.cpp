@@ -26,13 +26,12 @@ base_image::base_image(image_dimension img_dim, bool layered, image_aspect_mode 
 					base_create_flags,
 			img_type, format, size, mip_levels, layers, vk::SampleCountFlagBits::e1, tiling, usage,
 			vk::SharingMode::eExclusive, 0, nullptr, layout_);
-	img_ = decltype(img_)(dev.native_device().createImageUnique(ci), destruction_manager);
+	img_ = decltype(img_)(dev->createImageUnique(ci), destruction_manager);
 	mem_handle_ = decltype(mem_handle_)(
 			make_device_memory_handle(
-					mem_mgr,
-					mem_mgr.allocate(dev.native_device().getImageMemoryRequirements(*img_), required_flags)),
+					mem_mgr, mem_mgr.allocate(dev->getImageMemoryRequirements(*img_), required_flags)),
 			destruction_manager);
-	dev.native_device().bindImageMemory(*img_, mem_handle_->memory(), mem_handle_->offset());
+	dev->bindImageMemory(*img_, mem_handle_->memory(), mem_handle_->offset());
 }
 
 vk::ImageAspectFlags base_image::default_aspect_flags() const {
@@ -76,6 +75,33 @@ any_image_view::any_image_view(queued_handle<vk::UniqueImageView> view, uint32_t
 							   uint32_t base_layer, uint32_t layers)
 		: base_image_view(std::move(view), base_mip_level, mip_levels, component_mapping, format, base_layer,
 						  layers) {}
+
+base_image::base_image(base_image&& other) noexcept
+		: img_dim_{other.img_dim_}, layered_{other.layered_}, aspect_mode_{other.aspect_mode_},
+		  img_type_{other.img_type_}, dev_{other.dev_}, mem_handle_{std::move(other.mem_handle_)},
+		  img_{std::move(other.img_)}, format_{other.format_}, size_{other.size_}, layers_{other.layers_},
+		  mip_levels_{other.mip_levels_}, usage_{other.usage_}, required_flags_{other.required_flags_},
+		  mutable_format_{other.mutable_format_}, tiling_{other.tiling_}, layout_{other.layout_} {}
+
+base_image& base_image::operator=(base_image&& other) noexcept {
+	img_dim_ = other.img_dim_;
+	layered_ = other.layered_;
+	aspect_mode_ = other.aspect_mode_;
+	img_type_ = other.img_type_;
+	dev_ = other.dev_;
+	mem_handle_ = std::move(other.mem_handle_);
+	img_ = std::move(other.img_);
+	format_ = other.format_;
+	size_ = other.size_;
+	layers_ = other.layers_;
+	mip_levels_ = other.mip_levels_;
+	usage_ = other.usage_;
+	required_flags_ = other.required_flags_;
+	mutable_format_ = other.mutable_format_;
+	tiling_ = other.tiling_;
+	layout_ = other.layout_;
+	return *this;
+}
 
 } /* namespace graphics */
 } /* namespace mce */
