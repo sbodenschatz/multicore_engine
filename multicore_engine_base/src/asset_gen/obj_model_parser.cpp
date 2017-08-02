@@ -4,21 +4,21 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <mce/asset_gen/obj_model_parser.hpp>
+#include <algorithm>
+#include <array>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/utility/string_view.hpp>
-#include <mce/exceptions.hpp>
-#include <glm/glm.hpp>
-#include <mce/util/string_tools.hpp>
-#include <mce/util/unused.hpp>
-#include <algorithm>
-#include <array>
 #include <cmath>
 #include <cstddef>
+#include <glm/glm.hpp>
 #include <initializer_list>
 #include <iterator>
 #include <limits>
+#include <mce/asset_gen/obj_model_parser.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/util/string_tools.hpp>
+#include <mce/util/unused.hpp>
 #include <numeric>
 #include <string>
 
@@ -202,6 +202,7 @@ model::model_index obj_model_parser::get_or_create_vertex(const glm::ivec3& trip
 }
 
 void obj_model_parser::create_face(const std::array<glm::ivec3, 3>& vertex_tripples) {
+	meshes.back().indices.reserve(vertex_tripples.size());
 	std::transform(vertex_tripples.begin(), vertex_tripples.end(), std::back_inserter(meshes.back().indices),
 				   [this](const glm::ivec3& tripple) {
 					   auto index = get_or_create_vertex(tripple);
@@ -235,11 +236,13 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 		mesh.collision_data.group_name = mesh.group_name;
 	}
 	model::static_model_collision_data model_colision_data;
+	model_colision_data.meshes.reserve(meshes.size());
 	std::transform(meshes.begin(), meshes.end(), std::back_inserter(model_colision_data.meshes),
 				   [](const auto& m) { return m.collision_data; });
 
 	static_model model;
 	model.vertices = vertices;
+	model.meshes.reserve(meshes.size());
 	std::transform(meshes.begin(), meshes.end(), std::back_inserter(model.meshes), [](const auto& m) {
 		static_model_mesh mesh;
 		mesh.object_name = m.object_name;

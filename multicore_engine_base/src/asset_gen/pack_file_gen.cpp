@@ -4,17 +4,17 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <iterator>
 #include <mce/asset_gen/pack_file_gen.hpp>
 #include <mce/bstream/iostream_bstream.hpp>
 #include <mce/bstream/vector_iobstream.hpp>
-#include <cstdint>
 #include <mce/exceptions.hpp>
-#include <fstream>
 #include <mce/util/compression.hpp>
 #include <mce/util/path_util.hpp>
-#include <algorithm>
-#include <iostream>
-#include <iterator>
 #include <tuple>
 #include <utility>
 
@@ -64,6 +64,7 @@ void pack_file_gen::update_content_offset(uint64_t new_content_offset) {
 }
 void pack_file_gen::compile_meta_data() {
 	meta_data.elements.clear();
+	meta_data.elements.reserve(entries.size());
 	std::transform(entries.begin(), entries.end(), std::back_inserter(meta_data.elements),
 				   [](const auto& entry) { return entry.meta_data; });
 }

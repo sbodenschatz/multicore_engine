@@ -27,10 +27,10 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 		} else {
 			switch(ac.aspect_mode()) {
 			case image_aspect_mode::color:
-				attachments_.emplace_back(image_2d(
-						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
-						vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eInputAttachment |
-								vk::ImageUsageFlagBits::eSampled));
+				attachments_.emplace_back(image_2d(dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
+												   vk::ImageUsageFlagBits::eColorAttachment |
+														   vk::ImageUsageFlagBits::eInputAttachment |
+														   vk::ImageUsageFlagBits::eSampled));
 				break;
 			case image_aspect_mode::depth:
 			case image_aspect_mode::depth_stencil:
@@ -46,6 +46,7 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 		}
 	}
 	std::vector<vk::ImageView> views;
+	views.reserve(attachment_views_.size());
 	std::transform(attachment_views_.begin(), attachment_views_.end(), std::back_inserter(views),
 				   [](image_view_var& view) {
 					   view_visitor v;

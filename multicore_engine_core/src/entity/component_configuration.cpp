@@ -4,14 +4,14 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <iterator>
 #include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/entity/component_configuration.hpp>
 #include <mce/entity/component_property_assignment.hpp>
 #include <mce/entity/component_type.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/reflection/property.hpp>
-#include <algorithm>
-#include <iterator>
 #include <memory>
 #include <string>
 
@@ -23,6 +23,7 @@ component_configuration::component_configuration(core::engine* engine, const abs
 
 component_configuration::component_configuration(const component_configuration& other)
 		: engine(other.engine), type_(other.type_) {
+	assignments.reserve(other.assignments.size());
 	std::transform(other.assignments.begin(), other.assignments.end(), std::back_inserter(assignments),
 				   [](const auto& assignment) { return assignment->make_copy(); });
 }
