@@ -30,7 +30,7 @@ descriptor_set_layout::descriptor_set_layout(const device& dev, destruction_queu
 				   });
 	native_layout_ = queued_handle<vk::UniqueDescriptorSetLayout>(
 			dev.native_device().createDescriptorSetLayoutUnique(
-					vk::DescriptorSetLayoutCreateInfo({}, binding_cis.size(), binding_cis.data())),
+					vk::DescriptorSetLayoutCreateInfo({}, uint32_t(binding_cis.size()), binding_cis.data())),
 			dqm);
 }
 
