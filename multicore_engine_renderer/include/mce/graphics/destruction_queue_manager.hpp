@@ -43,12 +43,14 @@ class device;
  *   - vk::UniqueCommandPool
  *   - vk::UniqueDescriptorPool
  *   - vk::UniqueDescriptorSet
+ *   - vk::UniqueDescriptorSetLayout
  *   - vk::UniqueEvent
  *   - vk::UniqueFence
  *   - vk::UniqueFramebuffer
  *   - vk::UniqueImage
  *   - vk::UniqueImageView
  *   - vk::UniquePipeline
+ *   - vk::UniquePipelineLayout
  *   - vk::UniqueQueryPool
  *   - vk::UniqueRenderPass
  *   - vk::UniqueSampler
@@ -94,11 +96,11 @@ private:
 	public:
 		boost::variant<boost::blank, vk::UniqueBuffer, vk::UniqueBufferView, vk::UniqueCommandBuffer,
 					   vk::UniqueCommandPool, vk::UniqueDescriptorPool, vk::UniqueDescriptorSet,
-					   vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer, vk::UniqueImage,
-					   vk::UniqueImageView, vk::UniquePipeline, vk::UniqueQueryPool, vk::UniqueRenderPass,
-					   vk::UniqueSampler, vk::UniqueSemaphore, vk::UniqueShaderModule, vk::UniqueSurfaceKHR,
-					   vk::UniqueSwapchainKHR, device_memory_handle, executor<std::function<void()>>,
-					   std::shared_ptr<void>>
+					   vk::UniqueDescriptorSetLayout, vk::UniqueEvent, vk::UniqueFence, vk::UniqueFramebuffer,
+					   vk::UniqueImage, vk::UniqueImageView, vk::UniquePipeline, vk::UniquePipelineLayout,
+					   vk::UniqueQueryPool, vk::UniqueRenderPass, vk::UniqueSampler, vk::UniqueSemaphore,
+					   vk::UniqueShaderModule, vk::UniqueSurfaceKHR, vk::UniqueSwapchainKHR,
+					   device_memory_handle, executor<std::function<void()>>, std::shared_ptr<void>>
 				data;
 		template <typename T>
 		explicit element(T&& data) : data{std::forward<T>(data)} {}

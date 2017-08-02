@@ -6,6 +6,7 @@
 
 #include <iterator>
 #include <mce/graphics/pipeline_config.hpp>
+#include <mce/graphics/pipeline_layout.hpp>
 #include <mce/graphics/shader_module.hpp>
 
 namespace mce {
@@ -90,7 +91,7 @@ vk::GraphicsPipelineCreateInfo pipeline_config::generate_create_info_structure()
 	} else {
 		dynamic_states_ci.reset();
 	}
-	ci.layout = layout_->get();
+	ci.layout = layout_->native_layout();
 	ci.renderPass = compatible_render_pass_->native_render_pass();
 	ci.subpass = compatible_subpass_;
 	return ci;
