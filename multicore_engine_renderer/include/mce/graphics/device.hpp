@@ -67,6 +67,11 @@ public:
 	/// Releases the resources associated with the device object.
 	~device();
 
+	/// Allows calling native device member function using the operator -> on the wrapper device.
+	const vk::Device* operator->() const {
+		return native_device_.operator->();
+	}
+
 	/// Returns the queue family index and queue index for the graphics queue.
 	const queue_index_t& graphics_queue_index() const {
 		return graphics_queue_index_;
