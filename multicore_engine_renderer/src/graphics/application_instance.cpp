@@ -93,13 +93,13 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 	instance_ci.ppEnabledExtensionNames = extension_names.data();
 	instance_ci.pApplicationInfo = &app_info;
 
-	instance_ = vk::createInstanceUnique(instance_ci);
+	native_instance_ = vk::createInstanceUnique(instance_ci);
 	fptr_vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(
-			instance_->getProcAddr("vkCreateDebugReportCallbackEXT"));
+			native_instance_->getProcAddr("vkCreateDebugReportCallbackEXT"));
 	fptr_vkDebugReportMessageEXT =
-			reinterpret_cast<PFN_vkDebugReportMessageEXT>(instance_->getProcAddr("vkDebugReportMessageEXT"));
+			reinterpret_cast<PFN_vkDebugReportMessageEXT>(native_instance_->getProcAddr("vkDebugReportMessageEXT"));
 	fptr_vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(
-			instance_->getProcAddr("vkDestroyDebugReportCallbackEXT"));
+			native_instance_->getProcAddr("vkDestroyDebugReportCallbackEXT"));
 
 	if(validation_level > 0) {
 		vk::DebugReportFlagsEXT validation_report_levels =
@@ -111,7 +111,7 @@ application_instance::application_instance(const std::vector<std::string>& exts,
 		PFN_vkDebugReportCallbackEXT cb = &validation_report_callback_static;
 		vk::DebugReportCallbackCreateInfoEXT debug_report_ci(validation_report_levels, cb,
 															 static_cast<void*>(this));
-		validation_report_cb = instance_->createDebugReportCallbackEXTUnique(debug_report_ci);
+		validation_report_cb = native_instance_->createDebugReportCallbackEXTUnique(debug_report_ci);
 	}
 }
 

@@ -38,7 +38,7 @@ device::find_queue_family(const std::vector<vk::QueueFamilyProperties>& queue_fa
 		if(excluded_families.count(queue_family_index) < 1 &&
 		   (queue_families[queue_family_index].queueFlags & required_flags) == required_flags &&
 		   (!present_required || glfwGetPhysicalDevicePresentationSupport(
-										 app_instance_.instance(), physical_device_, queue_family_index))) {
+										 app_instance_.native_instance(), physical_device_, queue_family_index))) {
 			return queue_family_index;
 		}
 	}
@@ -54,7 +54,7 @@ queue_index_t device::find_queue(const std::vector<vk::QueueFamilyProperties>& q
 		if(excluded_families.count(queue_family_index) < 1 &&
 		   (queue_families[queue_family_index].queueFlags & required_flags) == required_flags &&
 		   (!present_required || glfwGetPhysicalDevicePresentationSupport(
-										 app_instance_.instance(), physical_device_, queue_family_index))) {
+										 app_instance_.native_instance(), physical_device_, queue_family_index))) {
 			for(uint32_t queue_index = 0; queue_index < queue_families[queue_family_index].queueCount;
 				++queue_index) {
 				if(excluded_queues.count(std::make_pair(queue_family_index, queue_index)) < 1) {
@@ -67,12 +67,12 @@ queue_index_t device::find_queue(const std::vector<vk::QueueFamilyProperties>& q
 }
 
 void device::find_physical_device() {
-	std::vector<vk::PhysicalDevice> phy_devs = app_instance_.instance().enumeratePhysicalDevices();
+	std::vector<vk::PhysicalDevice> phy_devs = app_instance_.native_instance().enumeratePhysicalDevices();
 	// TODO Find better device selection heuristic or make it configurable.
 	for(const auto& phy_dev : phy_devs) {
 		uint32_t queue_family_count = uint32_t(phy_dev.getQueueFamilyProperties().size());
 		for(uint32_t queue_family = 0; queue_family < queue_family_count; ++queue_family) {
-			if(glfwGetPhysicalDevicePresentationSupport(app_instance_.instance(), phy_dev, queue_family)) {
+			if(glfwGetPhysicalDevicePresentationSupport(app_instance_.native_instance(), phy_dev, queue_family)) {
 				if(!physical_device_) {
 					// We have no useable device so far, accept any device that can present
 					physical_device_ = phy_dev;

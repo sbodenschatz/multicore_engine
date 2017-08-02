@@ -35,11 +35,11 @@ window::~window() {}
 
 void window::create_surface() {
 	VkSurfaceKHR surface_tmp;
-	if(glfwCreateWindowSurface(app_instance.instance(), window_.window_.get(), nullptr, &surface_tmp) !=
+	if(glfwCreateWindowSurface(app_instance.native_instance(), window_.window_.get(), nullptr, &surface_tmp) !=
 	   VK_SUCCESS) {
 		throw window_surface_creation_exception("Failed to create window surface.");
 	}
-	surface_ = vk::UniqueSurfaceKHR(surface_tmp, app_instance.instance());
+	surface_ = vk::UniqueSurfaceKHR(surface_tmp, app_instance.native_instance());
 	if(!device_.physical_device().getSurfaceSupportKHR(device_.present_queue_index().first, surface_.get())) {
 		throw window_surface_creation_exception("Surface not supported by device.");
 	}

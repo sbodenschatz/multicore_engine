@@ -33,7 +33,7 @@ private:
 	glfw::instance glfw_instance;
 	std::vector<std::string> layers;
 	std::vector<std::string> extensions;
-	vk::UniqueInstance instance_;
+	vk::UniqueInstance native_instance_;
 	vk::UniqueDebugReportCallbackEXT validation_report_cb;
 #ifdef DEBUG
 	static const unsigned int default_validation_level = 5;
@@ -67,13 +67,13 @@ public:
 	~application_instance();
 
 	/// Returns the vulkan instance managed by the application instance.
-	const vk::Instance& instance() const {
-		return *instance_;
+	const vk::Instance& native_instance() const {
+		return *native_instance_;
 	}
 
 	/// Returns the vulkan instance managed by the application instance.
 	vk::Instance instance() {
-		return instance_.get();
+		return native_instance_.get();
 	}
 };
 
