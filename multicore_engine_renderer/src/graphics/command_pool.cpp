@@ -16,30 +16,29 @@ command_pool::command_pool(device& dev, uint32_t queue_family_index, bool transi
 	ci.queueFamilyIndex = queue_family_index;
 	if(transient) ci.flags = ci.flags | vk::CommandPoolCreateFlagBits::eTransient;
 	if(buffer_resettable) ci.flags = ci.flags | vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
-	native_command_pool_ = dev.native_device().createCommandPoolUnique(ci);
+	native_command_pool_ = dev->createCommandPoolUnique(ci);
 }
 
 void command_pool::reset(bool release_resources) {
 	if(release_resources) {
-		owner_device_.native_device().resetCommandPool(native_command_pool_.get(),
-													   vk::CommandPoolResetFlagBits::eReleaseResources);
+		owner_device_->resetCommandPool(native_command_pool_.get(),
+										vk::CommandPoolResetFlagBits::eReleaseResources);
 	} else {
-		owner_device_.native_device().resetCommandPool(native_command_pool_.get(),
-													   vk::CommandPoolResetFlags());
+		owner_device_->resetCommandPool(native_command_pool_.get(), vk::CommandPoolResetFlags());
 	}
 }
 
 vk::UniqueCommandBuffer command_pool::allocate_primary_command_buffer() {
 	vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::ePrimary, 1);
 	vk::CommandBuffer buf;
-	vk::Result res = owner_device_.native_device().allocateCommandBuffers(&ai, &buf);
+	vk::Result res = owner_device_->allocateCommandBuffers(&ai, &buf);
 	vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
 	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"));
 }
 vk::UniqueCommandBuffer command_pool::allocate_secondary_command_buffer() {
 	vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::eSecondary, 1);
 	vk::CommandBuffer buf;
-	vk::Result res = owner_device_.native_device().allocateCommandBuffers(&ai, &buf);
+	vk::Result res = owner_device_->allocateCommandBuffers(&ai, &buf);
 	vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
 	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"));
 }

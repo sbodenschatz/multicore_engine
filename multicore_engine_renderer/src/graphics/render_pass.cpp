@@ -61,7 +61,7 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 				   });
 
 	native_render_pass_ = queued_handle<vk::UniqueRenderPass>(
-			device_.native_device().createRenderPassUnique(vk::RenderPassCreateInfo(
+			device_->createRenderPassUnique(vk::RenderPassCreateInfo(
 					{}, uint32_t(att_desc.size()), att_desc.data(), uint32_t(subpass_desc.size()),
 					subpass_desc.data(), uint32_t(subpasses_->dependencies().size()),
 					subpasses->dependencies().data())),
