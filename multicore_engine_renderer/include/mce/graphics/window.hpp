@@ -24,7 +24,7 @@ class device;
 /// Implements the window handling for the graphics subsystem.
 class window {
 private:
-	instance& app_instance;
+	instance& instance_;
 	glfw::window& window_;
 	device& device_;
 	vk::UniqueSurfaceKHR surface_;

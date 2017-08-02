@@ -34,7 +34,7 @@ class device {
 private:
 	static const queue_index_t no_queue_index;
 	static const queue_family_index_t no_queue_family_index;
-	instance& app_instance_;
+	instance& instance_;
 	vk::PhysicalDevice physical_device_;
 	vk::PhysicalDeviceProperties physical_device_properties_;
 	queue_index_t graphics_queue_index_ = no_queue_index;
