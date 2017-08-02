@@ -25,6 +25,38 @@ public:
 	descriptor_pool(device& dev, uint32_t max_sets, vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes,
 					bool set_freeable = false);
 	~descriptor_pool();
+
+	uint32_t available_descriptors(vk::DescriptorType type) const {
+		auto it = available_pool_sizes_.find(type);
+		if(it == available_pool_sizes_.end()) return 0;
+		return it->second;
+	}
+
+	uint32_t available_sets() const {
+		return available_sets_;
+	}
+
+	uint32_t max_descriptors(vk::DescriptorType type) const {
+		auto it = max_pool_sizes_.find(type);
+		if(it == max_pool_sizes_.end()) return 0;
+		return it->second;
+	}
+
+	uint32_t max_sets() const {
+		return max_sets_;
+	}
+
+	vk::DescriptorPool native_pool() const {
+		return native_pool_.get();
+	}
+
+	const boost::container::flat_map<vk::DescriptorType, uint32_t>& available_pool_sizes() const {
+		return available_pool_sizes_;
+	}
+
+	const boost::container::flat_map<vk::DescriptorType, uint32_t>& max_pool_sizes() const {
+		return max_pool_sizes_;
+	}
 };
 
 } /* namespace graphics */
