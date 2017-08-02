@@ -42,7 +42,7 @@ sampler::sampler(const device& dev, destruction_queue_manager* dqm, vk::Filter m
 	ci.maxLod = max_lod_;
 	ci.borderColor = border_color_;
 	ci.unnormalizedCoordinates = unnormalized_coordinates_;
-	native_sampler_ = queued_handle<vk::UniqueSampler>(dev.native_device().createSamplerUnique(ci), dqm);
+	native_sampler_ = queued_handle<vk::UniqueSampler>(dev->createSamplerUnique(ci), dqm);
 }
 
 sampler::~sampler() {}
