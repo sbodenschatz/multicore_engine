@@ -66,6 +66,11 @@ public:
 	/// Releases the instance resources.
 	~instance();
 
+	/// Allows calling native instance member function using the operator -> on the wrapper instance.
+	const vk::Instance* operator->() const {
+		return native_instance_.operator->();
+	}
+
 	/// Returns the vulkan instance managed by the instance.
 	const vk::Instance& native_instance() const {
 		return *native_instance_;
