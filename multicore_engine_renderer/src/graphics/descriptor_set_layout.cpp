@@ -30,7 +30,7 @@ descriptor_set_layout::descriptor_set_layout(const device& dev, destruction_queu
 															 b.stage_flags, b.immutable_samplers.data());
 				   });
 	native_layout_ = queued_handle<vk::UniqueDescriptorSetLayout>(
-			dev.native_device().createDescriptorSetLayoutUnique(
+			dev->createDescriptorSetLayoutUnique(
 					vk::DescriptorSetLayoutCreateInfo({}, uint32_t(binding_cis.size()), binding_cis.data())),
 			dqm);
 }

@@ -29,12 +29,12 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 			pending_ownership_command_buffers.push_back(queued_handle<vk::UniqueCommandBuffer>(
 					ownership_cmd_pool.allocate_primary_command_buffer(), &dqm));
 		}
-		fences.push_back(dev.native_device().createFenceUnique({vk::FenceCreateFlagBits::eSignaled}));
+		fences.push_back(dev->createFenceUnique({vk::FenceCreateFlagBits::eSignaled}));
 	}
 }
 
 transfer_manager::~transfer_manager() {
-	dev.native_device().waitIdle();
+	dev->waitIdle();
 	transfer_command_bufers.clear();
 	pending_ownership_command_buffers.clear();
 }
@@ -175,7 +175,7 @@ void transfer_manager::end_frame() {
 	vk::SubmitInfo si;
 	si.commandBufferCount = 1;
 	si.pCommandBuffers = &*transfer_command_bufers[current_ring_index];
-	dev.native_device().resetFences({fences[current_ring_index].get()});
+	dev->resetFences({fences[current_ring_index].get()});
 	dev.transfer_queue().submit({}, *fences[current_ring_index]);
 }
 void transfer_manager::process_waiting_jobs() {

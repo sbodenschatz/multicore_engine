@@ -16,12 +16,10 @@ buffer::buffer(device& dev, device_memory_manager_interface& mem_mgr,
 			   vk::BufferUsageFlags usage, vk::MemoryPropertyFlags required_flags)
 		: size_{size}, usage_{usage} {
 	vk::BufferCreateInfo ci({}, size, usage, vk::SharingMode::eExclusive);
-	buff_ = decltype(buff_)(dev.native_device().createBufferUnique(ci), destruction_manager);
+	buff_ = decltype(buff_)(dev->createBufferUnique(ci), destruction_manager);
 	memory_handle_ = decltype(memory_handle_)(
 			make_device_memory_handle(
-					mem_mgr,
-					mem_mgr.allocate(dev.native_device().getBufferMemoryRequirements(*buff_),
-									 required_flags)),
+					mem_mgr, mem_mgr.allocate(dev->getBufferMemoryRequirements(*buff_), required_flags)),
 			destruction_manager);
 }
 

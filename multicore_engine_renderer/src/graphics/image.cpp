@@ -26,13 +26,12 @@ base_image::base_image(image_dimension img_dim, bool layered, image_aspect_mode 
 					base_create_flags,
 			img_type, format, size, mip_levels, layers, vk::SampleCountFlagBits::e1, tiling, usage,
 			vk::SharingMode::eExclusive, 0, nullptr, layout_);
-	img_ = decltype(img_)(dev.native_device().createImageUnique(ci), destruction_manager);
+	img_ = decltype(img_)(dev->createImageUnique(ci), destruction_manager);
 	mem_handle_ = decltype(mem_handle_)(
 			make_device_memory_handle(
-					mem_mgr,
-					mem_mgr.allocate(dev.native_device().getImageMemoryRequirements(*img_), required_flags)),
+					mem_mgr, mem_mgr.allocate(dev->getImageMemoryRequirements(*img_), required_flags)),
 			destruction_manager);
-	dev.native_device().bindImageMemory(*img_, mem_handle_->memory(), mem_handle_->offset());
+	dev->bindImageMemory(*img_, mem_handle_->memory(), mem_handle_->offset());
 }
 
 vk::ImageAspectFlags base_image::default_aspect_flags() const {

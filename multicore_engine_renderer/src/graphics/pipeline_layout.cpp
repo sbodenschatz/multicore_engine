@@ -24,7 +24,7 @@ pipeline_layout::pipeline_layout(const device& dev, destruction_queue_manager* d
 	std::transform(descriptor_set_layouts_.begin(), descriptor_set_layouts_.end(), std::back_inserter(dsls),
 				   [](const std::shared_ptr<descriptor_set_layout>& dsl) { return dsl->native_layout(); });
 	native_layout_ = queued_handle<vk::UniquePipelineLayout>(
-			dev.native_device().createPipelineLayoutUnique(vk::PipelineLayoutCreateInfo(
+			dev->createPipelineLayoutUnique(vk::PipelineLayoutCreateInfo(
 					{}, uint32_t(dsls.size()), dsls.data(), uint32_t(push_constant_ranges_.size()),
 					push_constant_ranges_.data())),
 			dqm);

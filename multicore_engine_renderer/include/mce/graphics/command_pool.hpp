@@ -54,7 +54,7 @@ public:
 		vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::ePrimary,
 										 buffer_count);
 		std::array<vk::CommandBuffer, buffer_count> buf;
-		vk::Result res = owner_device_.native_device().allocateCommandBuffers(&ai, buf.data());
+		vk::Result res = owner_device_->allocateCommandBuffers(&ai, buf.data());
 		vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
 		if(res != vk::Result::eSuccess) {
 			throw std::system_error(res, "vk::Device::allocateCommandBuffers");
@@ -72,7 +72,7 @@ public:
 		vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::eSecondary,
 										 buffer_count);
 		std::array<vk::CommandBuffer, buffer_count> buf;
-		vk::Result res = owner_device_.native_device().allocateCommandBuffers(&ai, buf.data());
+		vk::Result res = owner_device_->allocateCommandBuffers(&ai, buf.data());
 		vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
 		if(res != vk::Result::eSuccess) {
 			throw std::system_error(res, "vk::Device::allocateCommandBuffers");
