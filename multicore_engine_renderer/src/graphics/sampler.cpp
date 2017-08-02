@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/graphics/device.hpp>
 #include <mce/graphics/sampler.hpp>
 
 namespace mce {
@@ -36,7 +37,7 @@ sampler::sampler(const device& dev, destruction_queue_manager* dqm, vk::Filter m
 		ci.compareEnable = true;
 		ci.compareOp = compare_op_.get();
 	} else {
-		ci.compareOp = false;
+		ci.compareEnable = false;
 	}
 	ci.minLod = min_lod_;
 	ci.maxLod = max_lod_;
