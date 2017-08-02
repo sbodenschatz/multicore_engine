@@ -12,8 +12,8 @@
 #include <cstdint>
 #include <iostream>
 #include <mce/exceptions.hpp>
-#include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/instance.hpp>
 #include <mce/graphics/window.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -21,8 +21,8 @@
 namespace mce {
 namespace graphics {
 
-window::window(application_instance& app_instance, glfw::window& win, device& dev)
-		: app_instance(app_instance), window_{win}, device_{dev},
+window::window(instance& app_instance, glfw::window& win, device& dev)
+		: instance_{app_instance}, window_{win}, device_{dev},
 		  color_space_{vk::ColorSpaceKHR::eSrgbNonlinear}, surface_format_{vk::Format::eUndefined},
 		  present_mode_{vk::PresentModeKHR::eFifo} {
 	create_surface();
@@ -35,11 +35,11 @@ window::~window() {}
 
 void window::create_surface() {
 	VkSurfaceKHR surface_tmp;
-	if(glfwCreateWindowSurface(app_instance.instance(), window_.window_.get(), nullptr, &surface_tmp) !=
+	if(glfwCreateWindowSurface(instance_.native_instance(), window_.window_.get(), nullptr, &surface_tmp) !=
 	   VK_SUCCESS) {
 		throw window_surface_creation_exception("Failed to create window surface.");
 	}
-	surface_ = vk::UniqueSurfaceKHR(surface_tmp, app_instance.instance());
+	surface_ = vk::UniqueSurfaceKHR(surface_tmp, instance_.native_instance());
 	if(!device_.physical_device().getSurfaceSupportKHR(device_.present_queue_index().first, surface_.get())) {
 		throw window_surface_creation_exception("Surface not supported by device.");
 	}

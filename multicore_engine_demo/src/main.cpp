@@ -6,14 +6,14 @@
 
 #include <mce/core/engine.hpp>
 #include <mce/glfw/window.hpp>
-#include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
+#include <mce/graphics/instance.hpp>
 #include <mce/graphics/pipeline_cache.hpp>
 #include <mce/graphics/window.hpp>
 
 int main() {
-	mce::graphics::application_instance ai;
+	mce::graphics::instance ai;
 	mce::graphics::device dev(ai);
 	mce::glfw::window w("Test", {800, 600});
 	mce::graphics::window win(ai, w, dev);
