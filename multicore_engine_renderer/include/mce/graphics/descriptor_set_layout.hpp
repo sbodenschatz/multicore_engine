@@ -13,6 +13,7 @@
 
 namespace mce {
 namespace graphics {
+class device;
 
 class descriptor_set_layout {
 public:
@@ -29,7 +30,8 @@ private:
 	queued_handle<vk::UniqueDescriptorSetLayout> native_layout_;
 
 public:
-	descriptor_set_layout();
+	descriptor_set_layout(const device& dev, destruction_queue_manager* dqm,
+						  std::vector<binding_element> bindings);
 	~descriptor_set_layout();
 
 	const std::vector<binding_element>& bindings() const {
