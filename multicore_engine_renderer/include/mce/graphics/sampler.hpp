@@ -59,6 +59,54 @@ public:
 			boost::optional<float> max_anisotropy, boost::optional<vk::CompareOp> compare_op, float min_lod,
 			float max_lod, vk::BorderColor border_color, bool unnormalized_coordinates);
 	~sampler();
+
+	const addressing_mode& address_mode() const {
+		return address_mode_;
+	}
+
+	vk::BorderColor border_color() const {
+		return border_color_;
+	}
+
+	const boost::optional<vk::CompareOp>& compare_op() const {
+		return compare_op_;
+	}
+
+	vk::Filter mag_filter() const {
+		return mag_filter_;
+	}
+
+	const boost::optional<float>& max_anisotropy() const {
+		return max_anisotropy_;
+	}
+
+	float max_lod() const {
+		return max_lod_;
+	}
+
+	vk::Filter min_filter() const {
+		return min_filter_;
+	}
+
+	float min_lod() const {
+		return min_lod_;
+	}
+
+	float mip_lod_bias() const {
+		return mip_lod_bias_;
+	}
+
+	vk::SamplerMipmapMode mipmap_mode() const {
+		return mipmap_mode_;
+	}
+
+	vk::Sampler native_sampler() const {
+		return native_sampler_.get();
+	}
+
+	bool unnormalized_coordinates() const {
+		return unnormalized_coordinates_;
+	}
 };
 
 } /* namespace graphics */
