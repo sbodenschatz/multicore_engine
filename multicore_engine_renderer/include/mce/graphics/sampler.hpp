@@ -22,7 +22,7 @@ public:
 		vk::SamplerAddressMode w_;
 
 	public:
-		addressing_mode(vk::SamplerAddressMode mode) : u_{mode}, v_{mode}, w_{mode} {}
+		explicit addressing_mode(vk::SamplerAddressMode mode) : u_{mode}, v_{mode}, w_{mode} {}
 		addressing_mode(vk::SamplerAddressMode u, vk::SamplerAddressMode v, vk::SamplerAddressMode w)
 				: u_{u}, v_{v}, w_{w} {}
 
