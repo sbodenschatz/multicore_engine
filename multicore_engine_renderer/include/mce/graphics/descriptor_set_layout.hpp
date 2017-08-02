@@ -18,10 +18,10 @@ class descriptor_set_layout {
 public:
 	struct binding_element {
 		uint32_t binding;
-		vk::DescriptorType descriptorType;
-		uint32_t descriptorCount;
-		vk::ShaderStageFlags stageFlags;
-		std::vector<vk::Sampler> pImmutableSamplers;
+		vk::DescriptorType descriptor_type;
+		uint32_t descriptor_count;
+		vk::ShaderStageFlags stage_flags;
+		std::vector<vk::Sampler> immutable_samplers;
 	};
 
 private:
