@@ -14,8 +14,8 @@
 
 #include <boost/container/flat_set.hpp>
 #include <glm/glm.hpp>
-#include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/graphics_defs.hpp>
+#include <mce/graphics/instance.hpp>
 #include <utility>
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -27,14 +27,14 @@
 namespace mce {
 namespace graphics {
 class window;
-class application_instance;
+class instance;
 
 /// Manages the vulkan device including associated queues.
 class device {
 private:
 	static const queue_index_t no_queue_index;
 	static const queue_family_index_t no_queue_family_index;
-	application_instance& app_instance_;
+	instance& app_instance_;
 	vk::PhysicalDevice physical_device_;
 	vk::PhysicalDeviceProperties physical_device_properties_;
 	queue_index_t graphics_queue_index_ = no_queue_index;
@@ -62,8 +62,8 @@ private:
 	void create_device();
 
 public:
-	/// Creates a device object from the given application_instance.
-	device(application_instance& app_inst);
+	/// Creates a device object from the given instance.
+	device(instance& app_inst);
 	/// Releases the resources associated with the device object.
 	~device();
 

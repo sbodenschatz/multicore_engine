@@ -18,13 +18,13 @@
 
 namespace mce {
 namespace graphics {
-class application_instance;
+class instance;
 class device;
 
 /// Implements the window handling for the graphics subsystem.
 class window {
 private:
-	application_instance& app_instance;
+	instance& app_instance;
 	glfw::window& window_;
 	device& device_;
 	vk::UniqueSurfaceKHR surface_;
@@ -42,9 +42,9 @@ private:
 	void create_swapchain();
 
 public:
-	/// \brief Initializes a graphics window from the given graphics application_instance in the given
-	/// glfw::window using the given device.
-	window(application_instance& app_instance, glfw::window& win, device& dev);
+	/// \brief Initializes a graphics window from the given graphics instance in the given glfw::window using
+	/// the given device.
+	window(instance& app_instance, glfw::window& win, device& dev);
 	/// Releases the graphics window resources.
 	~window();
 

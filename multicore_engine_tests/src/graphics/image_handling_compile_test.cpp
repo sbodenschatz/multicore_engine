@@ -6,11 +6,11 @@
 
 #include <gtest.hpp>
 #include <mce/glfw/window.hpp>
-#include <mce/graphics/application_instance.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
 #include <mce/graphics/image.hpp>
+#include <mce/graphics/instance.hpp>
 #include <mce/graphics/window.hpp>
 #include <mce/util/unused.hpp>
 
@@ -18,7 +18,7 @@ namespace mce {
 namespace graphics {
 
 static void test_image_handling_compilation() {
-	mce::graphics::application_instance ai;
+	mce::graphics::instance ai;
 	mce::graphics::device dev(ai);
 	mce::glfw::window w("Test", {800, 600});
 	mce::graphics::window win(ai, w, dev);

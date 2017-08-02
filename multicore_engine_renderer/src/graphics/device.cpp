@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <iostream>
 #include <mce/exceptions.hpp>
-#include <mce/graphics/application_instance.hpp>
+#include <mce/graphics/instance.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/util/unused.hpp>
 #include <vector>
@@ -23,7 +23,7 @@ namespace graphics {
 const std::pair<uint32_t, uint32_t> device::no_queue_index{~0u, ~0u};
 const uint32_t device::no_queue_family_index{~0u};
 
-device::device(application_instance& app_inst) : app_instance_(app_inst) {
+device::device(instance& app_inst) : app_instance_(app_inst) {
 	find_physical_device();
 	find_queue_indexes();
 	create_device();

@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <iostream>
 #include <mce/exceptions.hpp>
-#include <mce/graphics/application_instance.hpp>
+#include <mce/graphics/instance.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/window.hpp>
 #include <vector>
@@ -21,7 +21,7 @@
 namespace mce {
 namespace graphics {
 
-window::window(application_instance& app_instance, glfw::window& win, device& dev)
+window::window(instance& app_instance, glfw::window& win, device& dev)
 		: app_instance(app_instance), window_{win}, device_{dev},
 		  color_space_{vk::ColorSpaceKHR::eSrgbNonlinear}, surface_format_{vk::Format::eUndefined},
 		  present_mode_{vk::PresentModeKHR::eFifo} {
