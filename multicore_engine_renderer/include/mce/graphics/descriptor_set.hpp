@@ -8,6 +8,7 @@
 #define MCE_GRAPHICS_DESCRIPTOR_SET_HPP_
 
 #include <boost/optional.hpp>
+#include <mce/graphics/destruction_queue_manager.hpp>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
@@ -15,13 +16,13 @@ namespace graphics {
 class descriptor_set_layout;
 
 class descriptor_set {
-	boost::optional<vk::UniqueDescriptorSet> descriptor_set_unique;
+	boost::optional<queued_handle<vk::UniqueDescriptorSet>> descriptor_set_unique;
 	vk::DescriptorSet native_descriptor_set_;
 	std::shared_ptr<descriptor_set_layout> layout_;
 
 public:
 	descriptor_set(vk::DescriptorSet native_descriptor_set, std::shared_ptr<descriptor_set_layout> layout);
-	descriptor_set(vk::UniqueDescriptorSet native_descriptor_set,
+	descriptor_set(destruction_queue_manager* dqm, vk::UniqueDescriptorSet native_descriptor_set,
 				   std::shared_ptr<descriptor_set_layout> layout);
 	~descriptor_set();
 
