@@ -11,8 +11,9 @@ namespace mce {
 namespace graphics {
 
 descriptor_pool::descriptor_pool(device& dev, uint32_t max_sets,
-								 vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes, bool set_freeable)
-		: max_sets_{max_sets}, available_sets_{max_sets} {
+								 vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes,
+								 bool unique_allocation)
+		: unique_allocation_{unique_allocation}, max_sets_{max_sets}, available_sets_{max_sets} {
 	max_pool_sizes_.reserve(pool_sizes.size());
 	for(const vk::DescriptorPoolSize& dps : pool_sizes) {
 		max_pool_sizes_[dps.type] += dps.descriptorCount;
@@ -23,10 +24,10 @@ descriptor_pool::descriptor_pool(device& dev, uint32_t max_sets,
 				   [](const std::pair<vk::DescriptorType, uint32_t>& ps) {
 					   return vk::DescriptorPoolSize(ps.first, ps.second);
 				   });
-	native_pool_ = dev->createDescriptorPoolUnique(
-			vk::DescriptorPoolCreateInfo(set_freeable ? vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
-													  : vk::DescriptorPoolCreateFlags(),
-										 max_sets_, uint32_t(pool_size_sums.size()), pool_size_sums.data()));
+	native_pool_ = dev->createDescriptorPoolUnique(vk::DescriptorPoolCreateInfo(
+			unique_allocation ? vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
+							  : vk::DescriptorPoolCreateFlags(),
+			max_sets_, uint32_t(pool_size_sums.size()), pool_size_sums.data()));
 }
 
 descriptor_pool::~descriptor_pool() {}

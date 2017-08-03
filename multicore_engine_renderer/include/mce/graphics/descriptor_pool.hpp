@@ -15,6 +15,7 @@ namespace graphics {
 class device;
 
 class descriptor_pool {
+	bool unique_allocation_;
 	vk::UniqueDescriptorPool native_pool_;
 	uint32_t max_sets_;
 	uint32_t available_sets_;
@@ -23,7 +24,7 @@ class descriptor_pool {
 
 public:
 	descriptor_pool(device& dev, uint32_t max_sets, vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes,
-					bool set_freeable = false);
+					bool unique_allocation = false);
 	~descriptor_pool();
 
 	uint32_t available_descriptors(vk::DescriptorType type) const {
