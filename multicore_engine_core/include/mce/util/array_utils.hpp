@@ -29,16 +29,27 @@ std::array<T, N> array_transform_impl(T_In1& input1, T_In2& input2, F f, std::in
 	return {{f(std::get<I>(input1), std::get<I>(input2))...}};
 }
 
+template <typename T, size_t N, typename F, size_t... I>
+std::array<T, N> array_generate_impl(F f, std::index_sequence<I...>) {
+	return {{(static_cast<void>(I), f())...}};
+}
+
 } // namespace detail
 
 template <typename T, typename T_In, typename F, size_t N = std::tuple_size<T_In>::value>
 std::array<T, N> array_transform(T_In& input, F f) {
 	return detail::array_transform_impl<T, N>(input, f, std::make_index_sequence<N>{});
 }
+
 template <typename T, typename T_In1, typename T_In2, typename F,
 		  size_t N = std::min(std::tuple_size<T_In1>::value, std::tuple_size<T_In2>::value)>
 std::array<T, N> array_transform(T_In1& input1, T_In2& input2, F f) {
 	return detail::array_transform_impl<T, N>(input1, input2, f, std::make_index_sequence<N>{});
+}
+
+template <typename T, size_t N, typename F>
+std::array<T, N> array_generate(F f) {
+	return detail::array_generate_impl<T, N>(f, std::make_index_sequence<N>{});
 }
 
 } // namespace util
