@@ -6,6 +6,8 @@
 
 #include <mce/exceptions.hpp>
 #include <mce/graphics/descriptor_pool.hpp>
+#include <mce/graphics/descriptor_set.hpp>
+#include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/device.hpp>
 
 namespace mce {
@@ -38,6 +40,23 @@ void descriptor_pool::reset() {
 		throw mce::graphics_exception("Reset is not supported for unique_allocation enabled descriptor_pool "
 									  "because it would interfere with the freeing through unique handles.");
 	(*dev_)->resetDescriptorPool(native_pool_.get());
+}
+
+descriptor_set descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+														destruction_queue_manager* dqm) {
+	auto nlayout = layout->native_layout();
+	vk::DescriptorSetAllocateInfo ai(native_pool_.get(), 1, &nlayout);
+	vk::DescriptorSet set;
+	auto res = (*dev_)->allocateDescriptorSets(&ai, &set);
+	vk::DescriptorSetDeleter del(dev_->native_device(), native_pool_.get());
+	if(unique_allocation_) {
+		return descriptor_set(
+				dqm, vk::UniqueDescriptorSet(
+							 vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"), del),
+				layout);
+	} else {
+		return descriptor_set(vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"), layout);
+	}
 }
 
 } /* namespace graphics */
