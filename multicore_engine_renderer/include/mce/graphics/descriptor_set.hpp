@@ -20,7 +20,9 @@ class descriptor_set {
 	std::shared_ptr<descriptor_set_layout> layout_;
 
 public:
-	descriptor_set();
+	descriptor_set(vk::DescriptorSet native_descriptor_set, std::shared_ptr<descriptor_set_layout> layout);
+	descriptor_set(vk::UniqueDescriptorSet native_descriptor_set,
+				   std::shared_ptr<descriptor_set_layout> layout);
 	~descriptor_set();
 };
 
