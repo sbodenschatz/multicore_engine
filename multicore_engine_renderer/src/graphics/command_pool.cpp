@@ -33,14 +33,16 @@ vk::UniqueCommandBuffer command_pool::allocate_primary_command_buffer() {
 	vk::CommandBuffer buf;
 	vk::Result res = owner_device_->allocateCommandBuffers(&ai, &buf);
 	vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
-	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"));
+	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"),
+								   del);
 }
 vk::UniqueCommandBuffer command_pool::allocate_secondary_command_buffer() {
 	vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::eSecondary, 1);
 	vk::CommandBuffer buf;
 	vk::Result res = owner_device_->allocateCommandBuffers(&ai, &buf);
 	vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
-	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"));
+	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"),
+								   del);
 }
 
 } /* namespace graphics */
