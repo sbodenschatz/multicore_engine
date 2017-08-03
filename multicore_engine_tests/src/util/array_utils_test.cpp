@@ -76,27 +76,10 @@ TEST(util_array_utils, binary_array_transform_from_array_test) {
 	ASSERT_EQ(109, transformed[9].y);
 }
 
-TEST(util_array_utils, array_generate_test) {
-	int x = 0;
-	auto a = util::array_generate<int, 10>([&x]() { return x++; });
-	for(size_t i = 0; i < a.size(); ++i) {
-		ASSERT_EQ(i, a[i]);
-	}
-}
-
 struct array_generate_test_object_1 {
 	int val;
 	array_generate_test_object_1(int val) : val{val} {}
 };
-
-TEST(util_array_utils, array_generate_test_2) {
-	int x = 0;
-	auto a = util::array_generate<array_generate_test_object_1, 10>(
-			[&x]() { return array_generate_test_object_1(x++); });
-	for(size_t i = 0; i < a.size(); ++i) {
-		ASSERT_EQ(i, a[i].val);
-	}
-}
 
 TEST(util_array_utils, array_generate_indexed_test) {
 	auto a = util::array_generate_indexed<int, 10>([](int x) { return x; });
