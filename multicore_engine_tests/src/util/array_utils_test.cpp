@@ -84,5 +84,19 @@ TEST(util_array_utils, array_generate_test) {
 	}
 }
 
+struct array_generate_test_object_1 {
+	int val;
+	array_generate_test_object_1(int val) : val{val} {}
+};
+
+TEST(util_array_utils, array_generate_test_2) {
+	int x = 0;
+	auto a = util::array_generate<array_generate_test_object_1, 10>(
+			[&x]() { return array_generate_test_object_1(x++); });
+	for(size_t i = 0; i < a.size(); ++i) {
+		ASSERT_EQ(i, a[i].val);
+	}
+}
+
 } // namespace util
 } // namespace mce
