@@ -45,5 +45,14 @@ vk::UniqueCommandBuffer command_pool::allocate_secondary_command_buffer() {
 								   del);
 }
 
+std::vector<vk::UniqueCommandBuffer> command_pool::allocate_primary_command_buffers(uint32_t buffer_count) {
+	return owner_device_->allocateCommandBuffersUnique(vk::CommandBufferAllocateInfo(
+			native_command_pool_.get(), vk::CommandBufferLevel::ePrimary, buffer_count));
+}
+std::vector<vk::UniqueCommandBuffer> command_pool::allocate_secondary_command_buffers(uint32_t buffer_count) {
+	return owner_device_->allocateCommandBuffersUnique(vk::CommandBufferAllocateInfo(
+			native_command_pool_.get(), vk::CommandBufferLevel::eSecondary, buffer_count));
+}
+
 } /* namespace graphics */
 } /* namespace mce */

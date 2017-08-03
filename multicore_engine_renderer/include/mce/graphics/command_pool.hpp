@@ -64,8 +64,8 @@ public:
 		}
 		return ubuf;
 	}
-	/// \brief Allocates and returns multiple primary command buffers from the pool with a compile-time-fixed
-	/// number of buffers.
+	/// \brief Allocates and returns multiple secondary command buffers from the pool with a
+	/// compile-time-fixed number of buffers.
 	template <uint32_t buffer_count>
 	std::array<vk::UniqueCommandBuffer, buffer_count> allocate_secondary_command_buffers() {
 		std::array<vk::UniqueCommandBuffer, buffer_count> ubuf;
@@ -82,6 +82,12 @@ public:
 		}
 		return ubuf;
 	}
+
+	/// Allocates and returns multiple primary command buffers from the pool with a dynamic number of buffers.
+	std::vector<vk::UniqueCommandBuffer> allocate_primary_command_buffers(uint32_t buffer_count);
+	/// \brief Allocates and returns multiple secondary command buffers from the pool with a dynamic number of
+	/// buffers.
+	std::vector<vk::UniqueCommandBuffer> allocate_secondary_command_buffers(uint32_t buffer_count);
 };
 
 } /* namespace graphics */
