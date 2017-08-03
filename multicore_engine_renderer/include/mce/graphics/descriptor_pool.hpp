@@ -16,6 +16,7 @@ namespace graphics {
 class device;
 class descriptor_set;
 class descriptor_set_layout;
+class destruction_queue_manager;
 
 class descriptor_pool {
 	device* dev_;
@@ -63,9 +64,11 @@ public:
 		return max_pool_sizes_;
 	}
 
-	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout);
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+										   destruction_queue_manager* dqm = nullptr);
 	std::vector<descriptor_set>
-	allocate_descriptor_set(std::vector<std::shared_ptr<descriptor_set_layout>> layout);
+	allocate_descriptor_set(std::vector<std::shared_ptr<descriptor_set_layout>> layout,
+							destruction_queue_manager* dqm = nullptr);
 
 	void reset();
 };
