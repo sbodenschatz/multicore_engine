@@ -187,6 +187,12 @@ public:
 		other.qmgr = nullptr;
 		return *this;
 	}
+
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle(const queued_handle&) = delete;
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle& operator=(const queued_handle&) = delete;
+
 	/// Releases the held resource to the destruction_queue_manager.
 	~queued_handle() noexcept {
 		if(qmgr) {
@@ -256,6 +262,12 @@ public:
 		other.qmgr = nullptr;
 		return *this;
 	}
+
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle(const queued_handle&) = delete;
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle& operator=(const queued_handle&) = delete;
+
 	/// Releases the held resource to the destruction_queue_manager.
 	~queued_handle() noexcept {
 		if(qmgr) {
