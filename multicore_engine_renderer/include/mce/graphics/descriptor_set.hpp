@@ -24,6 +24,18 @@ public:
 	descriptor_set(vk::UniqueDescriptorSet native_descriptor_set,
 				   std::shared_ptr<descriptor_set_layout> layout);
 	~descriptor_set();
+
+	bool is_owner() const {
+		return bool(descriptor_set_unique);
+	}
+
+	const std::shared_ptr<descriptor_set_layout>& layout() const {
+		return layout_;
+	}
+
+	vk::DescriptorSet native_descriptor_set() const {
+		return native_descriptor_set_;
+	}
 };
 
 } /* namespace graphics */
