@@ -68,8 +68,8 @@ public:
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
 										   destruction_queue_manager* dqm = nullptr);
 	std::vector<descriptor_set>
-	allocate_descriptor_set(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
-							destruction_queue_manager* dqm = nullptr);
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+							 destruction_queue_manager* dqm = nullptr);
 
 	void reset();
 };

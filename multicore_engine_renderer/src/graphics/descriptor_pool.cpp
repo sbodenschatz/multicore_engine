@@ -63,8 +63,8 @@ descriptor_set descriptor_pool::allocate_descriptor_set(const std::shared_ptr<de
 }
 
 std::vector<descriptor_set>
-descriptor_pool::allocate_descriptor_set(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
-										 destruction_queue_manager* dqm) {
+descriptor_pool::allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+										  destruction_queue_manager* dqm) {
 	std::vector<descriptor_set> rv;
 	std::vector<vk::DescriptorSetLayout> nlayouts;
 	rv.reserve(layouts.size());
