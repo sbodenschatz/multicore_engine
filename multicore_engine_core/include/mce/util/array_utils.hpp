@@ -14,19 +14,19 @@ namespace util {
 
 template <typename... T>
 std::array<std::common_type_t<T...>, sizeof...(T)> make_array(T&&... args) {
-	return {std::forward<T>(args)...};
+	return {{std::forward<T>(args)...}};
 }
 
 namespace detail {
 
 template <typename T, size_t N, typename T_In, typename F, size_t... I>
 std::array<T, N> array_transform_impl(T_In& input, F f, std::index_sequence<I...>) {
-	return {f(std::get<I>(input))...};
+	return {{f(std::get<I>(input))...}};
 }
 
 template <typename T, size_t N, typename T_In1, typename T_In2, typename F, size_t... I>
 std::array<T, N> array_transform_impl(T_In1& input1, T_In2& input2, F f, std::index_sequence<I...>) {
-	return {f(std::get<I>(input1), std::get<I>(input2))...};
+	return {{f(std::get<I>(input1), std::get<I>(input2))...}};
 }
 
 } // namespace detail
