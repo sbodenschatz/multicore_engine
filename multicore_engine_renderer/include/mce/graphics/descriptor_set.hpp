@@ -26,6 +26,12 @@ public:
 	// cppcheck-suppress passedByValue
 	descriptor_set(destruction_queue_manager* dqm, vk::UniqueDescriptorSet native_descriptor_set,
 				   std::shared_ptr<descriptor_set_layout> layout);
+
+	descriptor_set(const descriptor_set&) = delete;
+	descriptor_set& operator=(const descriptor_set&) = delete;
+	descriptor_set(descriptor_set&&) noexcept = default;
+	descriptor_set& operator=(descriptor_set&&) noexcept = default;
+
 	~descriptor_set();
 
 	bool is_owner() const {
