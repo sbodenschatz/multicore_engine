@@ -76,5 +76,13 @@ TEST(util_array_utils, binary_array_transform_from_array_test) {
 	ASSERT_EQ(109, transformed[9].y);
 }
 
+TEST(util_array_utils, array_generate_test) {
+	int x = 0;
+	auto a = util::array_generate<int, 10>([&x]() { return x++; });
+	for(size_t i = 0; i < a.size(); ++i) {
+		ASSERT_EQ(i, a[i]);
+	}
+}
+
 } // namespace util
 } // namespace mce
