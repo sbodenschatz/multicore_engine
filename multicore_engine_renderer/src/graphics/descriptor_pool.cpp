@@ -4,6 +4,9 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <boost/iterator/zip_iterator.hpp>
+#include <iterator>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/descriptor_pool.hpp>
 #include <mce/graphics/descriptor_set.hpp>
@@ -57,6 +60,34 @@ descriptor_set descriptor_pool::allocate_descriptor_set(const std::shared_ptr<de
 	} else {
 		return descriptor_set(vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"), layout);
 	}
+}
+
+std::vector<descriptor_set>
+descriptor_pool::allocate_descriptor_set(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+										 destruction_queue_manager* dqm) {
+	std::vector<descriptor_set> rv;
+	std::vector<vk::DescriptorSetLayout> nlayouts;
+	rv.reserve(layouts.size());
+	nlayouts.reserve(layouts.size());
+	std::transform(layouts.begin(), layouts.end(), std::back_inserter(nlayouts),
+				   [](const std::shared_ptr<descriptor_set_layout>& l) { return l->native_layout(); });
+	if(unique_allocation_) {
+		auto tmp = (*dev_)->allocateDescriptorSetsUnique(vk::DescriptorSetAllocateInfo(
+				native_pool_.get(), uint32_t(nlayouts.size()), nlayouts.data()));
+		auto beg = boost::make_zip_iterator(boost::make_tuple(tmp.begin(), layouts.begin()));
+		auto end = boost::make_zip_iterator(boost::make_tuple(tmp.end(), layouts.end()));
+		std::transform(beg, end, std::back_inserter(rv), [dqm](auto tup) {
+			return descriptor_set(dqm, std::move(boost::get<0>(tup)), boost::get<1>(tup));
+		});
+	} else {
+		auto tmp = (*dev_)->allocateDescriptorSets(vk::DescriptorSetAllocateInfo(
+				native_pool_.get(), uint32_t(nlayouts.size()), nlayouts.data()));
+		auto beg = boost::make_zip_iterator(boost::make_tuple(tmp.begin(), layouts.begin()));
+		auto end = boost::make_zip_iterator(boost::make_tuple(tmp.end(), layouts.end()));
+		std::transform(beg, end, std::back_inserter(rv),
+					   [dqm](auto tup) { return descriptor_set(boost::get<0>(tup), boost::get<1>(tup)); });
+	}
+	return rv;
 }
 
 } /* namespace graphics */

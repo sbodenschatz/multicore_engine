@@ -8,6 +8,7 @@
 #define MCE_GRAPHICS_DESCRIPTOR_POOL_HPP_
 
 #include <boost/container/flat_map.hpp>
+#include <memory>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
@@ -67,7 +68,7 @@ public:
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
 										   destruction_queue_manager* dqm = nullptr);
 	std::vector<descriptor_set>
-	allocate_descriptor_set(std::vector<std::shared_ptr<descriptor_set_layout>> layout,
+	allocate_descriptor_set(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
 							destruction_queue_manager* dqm = nullptr);
 
 	void reset();
