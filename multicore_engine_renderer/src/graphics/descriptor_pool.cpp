@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/exceptions.hpp>
 #include <mce/graphics/descriptor_pool.hpp>
 #include <mce/graphics/device.hpp>
 
@@ -31,6 +32,13 @@ descriptor_pool::descriptor_pool(device& dev, uint32_t max_sets,
 }
 
 descriptor_pool::~descriptor_pool() {}
+
+void descriptor_pool::reset() {
+	if(unique_allocation_)
+		throw mce::graphics_exception("Reset is not supported for unique_allocation enabled descriptor_pool "
+									  "because it would interfere with the freeing through unique handles.");
+	(*dev_)->resetDescriptorPool(native_pool_.get());
+}
 
 } /* namespace graphics */
 } /* namespace mce */

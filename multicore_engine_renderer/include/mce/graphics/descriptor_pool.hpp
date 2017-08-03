@@ -66,6 +66,8 @@ public:
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout);
 	std::vector<descriptor_set>
 	allocate_descriptor_set(std::vector<std::shared_ptr<descriptor_set_layout>> layout);
+
+	void reset();
 };
 
 } /* namespace graphics */
