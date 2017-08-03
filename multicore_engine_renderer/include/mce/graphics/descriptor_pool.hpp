@@ -8,13 +8,17 @@
 #define MCE_GRAPHICS_DESCRIPTOR_POOL_HPP_
 
 #include <boost/container/flat_map.hpp>
+#include <vector>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
 class device;
+class descriptor_set;
+class descriptor_set_layout;
 
 class descriptor_pool {
+	device* dev_;
 	bool unique_allocation_;
 	vk::UniqueDescriptorPool native_pool_;
 	uint32_t max_sets_;
@@ -58,6 +62,10 @@ public:
 	const boost::container::flat_map<vk::DescriptorType, uint32_t>& max_pool_sizes() const {
 		return max_pool_sizes_;
 	}
+
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout);
+	std::vector<descriptor_set>
+	allocate_descriptor_set(std::vector<std::shared_ptr<descriptor_set_layout>> layout);
 };
 
 } /* namespace graphics */

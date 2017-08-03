@@ -13,7 +13,7 @@ namespace graphics {
 descriptor_pool::descriptor_pool(device& dev, uint32_t max_sets,
 								 vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes,
 								 bool unique_allocation)
-		: unique_allocation_{unique_allocation}, max_sets_{max_sets}, available_sets_{max_sets} {
+		: dev_{&dev}, unique_allocation_{unique_allocation}, max_sets_{max_sets}, available_sets_{max_sets} {
 	max_pool_sizes_.reserve(pool_sizes.size());
 	for(const vk::DescriptorPoolSize& dps : pool_sizes) {
 		max_pool_sizes_[dps.type] += dps.descriptorCount;
