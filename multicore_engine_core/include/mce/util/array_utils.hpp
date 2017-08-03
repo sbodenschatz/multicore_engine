@@ -17,6 +17,20 @@ std::array<std::common_type_t<T...>, sizeof...(T)> make_array(T&&... args) {
 	return {std::forward<T>(args)...};
 }
 
+namespace detail {
+
+template <typename T, size_t N, typename T_In, typename F, size_t... I>
+std::array<T, N> array_transform_impl(T_In& input, F f, std::index_sequence<I...>) {
+	return {f(std::get<I>(input))...};
+}
+
+} // namespace detail
+
+template <typename T, typename T_In, typename F, size_t N = std::tuple_size<T_In>::value>
+std::array<T, N> array_transform(T_In& input, F f) {
+	return detail::array_transform_impl<T, N>(input, f, std::make_index_sequence<N>{});
+}
+
 } // namespace util
 } // namespace mce
 
