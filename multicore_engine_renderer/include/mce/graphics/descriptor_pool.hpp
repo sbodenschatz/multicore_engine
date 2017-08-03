@@ -8,15 +8,17 @@
 #define MCE_GRAPHICS_DESCRIPTOR_POOL_HPP_
 
 #include <boost/container/flat_map.hpp>
+#include <mce/graphics/descriptor_set.hpp>
+#include <mce/graphics/descriptor_set_layout.hpp>
+#include <mce/graphics/device.hpp>
+#include <mce/util/array_utils.hpp>
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
-class device;
 class descriptor_set;
-class descriptor_set_layout;
 class destruction_queue_manager;
 
 class descriptor_pool {
@@ -70,6 +72,26 @@ public:
 	std::vector<descriptor_set>
 	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
 							 destruction_queue_manager* dqm = nullptr);
+
+	template <size_t size>
+	std::array<descriptor_set, size>
+	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
+							 destruction_queue_manager* dqm = nullptr) {
+		static_cast<void>(dqm);
+		std::array<vk::DescriptorSetLayout, size> nlayouts;
+		std::array<vk::DescriptorSet, size> nsets;
+		std::transform(layouts.begin(), layouts.end(), nlayouts.begin(),
+					   [](const std::shared_ptr<descriptor_set_layout>& l) { return l->native_layout(); });
+		vk::DescriptorSetAllocateInfo ai(native_pool_.get(), size, nlayouts.data());
+		auto res = (*dev_)->allocateDescriptorSets(&ai, nsets.data());
+		if(res != vk::Result::eSuccess) {
+			throw std::system_error(res, "vk::Device::allocateDescriptorSets");
+		}
+		return mce::util::array_transform<descriptor_set>(
+				nsets, layouts, [](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
+					return descriptor_set(ds, l);
+				});
+	}
 
 	void reset();
 };
