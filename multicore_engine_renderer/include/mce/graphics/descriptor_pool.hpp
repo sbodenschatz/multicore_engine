@@ -77,7 +77,6 @@ public:
 	std::array<descriptor_set, size>
 	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
 							 destruction_queue_manager* dqm = nullptr) {
-		static_cast<void>(dqm);
 		std::array<vk::DescriptorSetLayout, size> nlayouts;
 		std::array<vk::DescriptorSet, size> nsets;
 		std::transform(layouts.begin(), layouts.end(), nlayouts.begin(),
@@ -87,9 +86,15 @@ public:
 		if(res != vk::Result::eSuccess) {
 			throw std::system_error(res, "vk::Device::allocateDescriptorSets");
 		}
+		vk::DescriptorSetDeleter del(dev_->native_device(), native_pool_.get());
 		return mce::util::array_transform<descriptor_set>(
-				nsets, layouts, [](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
-					return descriptor_set(ds, l);
+				nsets, layouts,
+				[dqm, this, &del](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
+					if(unique_allocation_) {
+						return descriptor_set(dqm, vk::UniqueDescriptorSet(ds, del), l);
+					} else {
+						return descriptor_set(ds, l);
+					}
 				});
 	}
 
