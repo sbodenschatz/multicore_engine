@@ -86,10 +86,10 @@ stages:
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
     # These libraries are huge on release build due to LTCG and are therefore only included for tagged builds.
-    - IF %INCLUDE_LTCG_LIBS_ARTIFACTS%==1 (cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/mce_parsers.lib %BUILD_COMPILER_NAME%/mce_parsers.lib)
-    - IF %INCLUDE_LTCG_LIBS_ARTIFACTS%==1 (cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/mce_base.lib %BUILD_COMPILER_NAME%/mce_base.lib)
-    - IF %INCLUDE_LTCG_LIBS_ARTIFACTS%==1 (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core.lib %BUILD_COMPILER_NAME%/mce_core.lib)
-    - IF %INCLUDE_LTCG_LIBS_ARTIFACTS%==1 (cmake -E copy build/multicore_engine_renderer/%BUILD_TYPE%/mce_renderer.lib %BUILD_COMPILER_NAME%/mce_renderer.lib)
+    - IF %INCLUDE_LTCG_LIBS_ARTIFACTS%==1 (cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/mce_parsers.lib %BUILD_COMPILER_NAME%/mce_parsers.lib) ELSE (echo Skipping LTCG Lib)
+    - IF %INCLUDE_LTCG_LIBS_ARTIFACTS%==1 (cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/mce_base.lib %BUILD_COMPILER_NAME%/mce_base.lib) ELSE (echo Skipping LTCG Lib)
+    - IF %INCLUDE_LTCG_LIBS_ARTIFACTS%==1 (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core.lib %BUILD_COMPILER_NAME%/mce_core.lib) ELSE (echo Skipping LTCG Lib)
+    - IF %INCLUDE_LTCG_LIBS_ARTIFACTS%==1 (cmake -E copy build/multicore_engine_renderer/%BUILD_TYPE%/mce_renderer.lib %BUILD_COMPILER_NAME%/mce_renderer.lib) ELSE (echo Skipping LTCG Lib)
     - cmake -E copy build/multicore_engine_demo/%BUILD_TYPE%/mce_demo.exe %BUILD_COMPILER_NAME%/demo.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E copy build/multicore_engine_pack_file_gen/%BUILD_TYPE%/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
