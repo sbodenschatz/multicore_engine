@@ -34,6 +34,11 @@ std::array<T, N> array_generate_impl(F f, std::index_sequence<I...>) {
 	return {{(static_cast<void>(I), f())...}};
 }
 
+template <typename T, size_t N, typename F, size_t... I>
+std::array<T, N> array_generate_indexed_impl(F f, std::index_sequence<I...>) {
+	return {{f(I)...}};
+}
+
 } // namespace detail
 
 template <typename T, typename T_In, typename F, size_t N = std::tuple_size<T_In>::value>
@@ -50,6 +55,11 @@ std::array<T, N> array_transform(T_In1& input1, T_In2& input2, F f) {
 template <typename T, size_t N, typename F>
 std::array<T, N> array_generate(F f) {
 	return detail::array_generate_impl<T, N>(f, std::make_index_sequence<N>{});
+}
+
+template <typename T, size_t N, typename F>
+std::array<T, N> array_generate_indexed(F f) {
+	return detail::array_generate_indexed_impl<T, N>(f, std::make_index_sequence<N>{});
 }
 
 } // namespace util
