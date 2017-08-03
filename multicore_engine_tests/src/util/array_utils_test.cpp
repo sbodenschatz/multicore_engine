@@ -105,5 +105,13 @@ TEST(util_array_utils, array_generate_indexed_test) {
 	}
 }
 
+TEST(util_array_utils, array_generate_indexed_test_2) {
+	auto a = util::array_generate_indexed<array_generate_test_object_1, 10>(
+			[](int x) { return array_generate_test_object_1(x); });
+	for(size_t i = 0; i < a.size(); ++i) {
+		ASSERT_EQ(i, a[i].val);
+	}
+}
+
 } // namespace util
 } // namespace mce
