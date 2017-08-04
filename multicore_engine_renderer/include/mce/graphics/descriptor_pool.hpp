@@ -91,9 +91,9 @@ public:
 				nsets, layouts,
 				[dqm, this, &del](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
 					if(unique_allocation_) {
-						return descriptor_set(dqm, vk::UniqueDescriptorSet(ds, del), l);
+						return descriptor_set(*dev_, dqm, vk::UniqueDescriptorSet(ds, del), l);
 					} else {
-						return descriptor_set(ds, l);
+						return descriptor_set(*dev_, ds, l);
 					}
 				});
 	}

@@ -14,15 +14,18 @@
 namespace mce {
 namespace graphics {
 class descriptor_set_layout;
+class device;
 
 class descriptor_set {
+	device* dev_;
 	boost::optional<queued_handle<vk::UniqueDescriptorSet>> descriptor_set_unique;
 	vk::DescriptorSet native_descriptor_set_;
 	std::shared_ptr<descriptor_set_layout> layout_;
 
 	friend class descriptor_pool;
-	descriptor_set(vk::DescriptorSet native_descriptor_set, std::shared_ptr<descriptor_set_layout> layout);
-	descriptor_set(destruction_queue_manager* dqm, vk::UniqueDescriptorSet native_descriptor_set,
+	descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
+				   std::shared_ptr<descriptor_set_layout> layout);
+	descriptor_set(device& dev, destruction_queue_manager* dqm, vk::UniqueDescriptorSet native_descriptor_set,
 				   std::shared_ptr<descriptor_set_layout> layout);
 
 public:

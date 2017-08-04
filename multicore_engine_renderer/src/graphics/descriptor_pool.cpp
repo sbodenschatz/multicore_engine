@@ -54,11 +54,13 @@ descriptor_set descriptor_pool::allocate_descriptor_set(const std::shared_ptr<de
 	vk::DescriptorSetDeleter del(dev_->native_device(), native_pool_.get());
 	if(unique_allocation_) {
 		return descriptor_set(
-				dqm, vk::UniqueDescriptorSet(
-							 vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"), del),
+				*dev_, dqm,
+				vk::UniqueDescriptorSet(vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"),
+										del),
 				layout);
 	} else {
-		return descriptor_set(vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"), layout);
+		return descriptor_set(*dev_, vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"),
+							  layout);
 	}
 }
 
@@ -76,16 +78,17 @@ descriptor_pool::allocate_descriptor_sets(const std::vector<std::shared_ptr<desc
 				native_pool_.get(), uint32_t(nlayouts.size()), nlayouts.data()));
 		auto beg = boost::make_zip_iterator(boost::make_tuple(tmp.begin(), layouts.begin()));
 		auto end = boost::make_zip_iterator(boost::make_tuple(tmp.end(), layouts.end()));
-		std::transform(beg, end, std::back_inserter(rv), [dqm](auto tup) {
-			return descriptor_set(dqm, std::move(boost::get<0>(tup)), boost::get<1>(tup));
+		std::transform(beg, end, std::back_inserter(rv), [this, dqm](auto tup) {
+			return descriptor_set(*dev_, dqm, std::move(boost::get<0>(tup)), boost::get<1>(tup));
 		});
 	} else {
 		auto tmp = (*dev_)->allocateDescriptorSets(vk::DescriptorSetAllocateInfo(
 				native_pool_.get(), uint32_t(nlayouts.size()), nlayouts.data()));
 		auto beg = boost::make_zip_iterator(boost::make_tuple(tmp.begin(), layouts.begin()));
 		auto end = boost::make_zip_iterator(boost::make_tuple(tmp.end(), layouts.end()));
-		std::transform(beg, end, std::back_inserter(rv),
-					   [dqm](auto tup) { return descriptor_set(boost::get<0>(tup), boost::get<1>(tup)); });
+		std::transform(beg, end, std::back_inserter(rv), [this, dqm](auto tup) {
+			return descriptor_set(*dev_, boost::get<0>(tup), boost::get<1>(tup));
+		});
 	}
 	return rv;
 }
