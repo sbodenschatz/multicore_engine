@@ -17,16 +17,32 @@
 namespace mce {
 namespace util {
 
-/// \brief Creates a std::array from the given values using the std::common_type to determine the type of the
-/// array elements.
+namespace detail {
+
+template <typename T, typename...>
+struct make_array_element_type {
+	using type = T;
+};
+
+template <typename... Args>
+struct make_array_element_type<void, Args...> {
+	using type = std::common_type_t<Args...>;
+};
+
+} // namespace detail
+
+/// \brief Creates a std::array from the given values using either a given type T or the std::common_type of
+/// parameters to determine the type of the array elements.
 /**
  * Represents a simplified implementation of std::(experimental)::make_array (in Lib Fundamentals v2 which is
- * not generally available yet). The simplification is that this implementation does not support specifying
- * the array element type manually yet.
+ * not generally available yet).
+ * The simplification is that this implementation does not check for an attempt to use a reference_wrapper
+ * when the type is chosen automatically, which is not supported.
  */
-template <typename... T>
-std::array<std::common_type_t<T...>, sizeof...(T)> make_array(T&&... args) {
-	return {{std::forward<T>(args)...}};
+template <typename T = void, typename... Args>
+std::array<typename detail::make_array_element_type<T, Args...>::type, sizeof...(Args)>
+make_array(Args&&... args) {
+	return {{std::forward<Args>(args)...}};
 }
 
 namespace detail {
