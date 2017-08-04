@@ -11,12 +11,10 @@ namespace mce {
 namespace graphics {
 
 descriptor_set::descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
-							   // cppcheck-suppress passedByValue
 							   std::shared_ptr<descriptor_set_layout> layout)
 		: dev_{&dev}, native_descriptor_set_{native_descriptor_set}, layout_{std::move(layout)} {}
 descriptor_set::descriptor_set(device& dev, destruction_queue_manager* dqm,
 							   vk::UniqueDescriptorSet native_descriptor_set,
-							   // cppcheck-suppress passedByValue
 							   std::shared_ptr<descriptor_set_layout> layout)
 		: dev_{&dev}, descriptor_set_unique{queued_handle<vk::UniqueDescriptorSet>(
 							  std::move(native_descriptor_set), dqm)},
