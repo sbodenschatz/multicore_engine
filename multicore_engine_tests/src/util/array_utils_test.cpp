@@ -87,5 +87,23 @@ TEST(util_array_utils, array_generate_indexed_test_2) {
 	}
 }
 
+TEST(util_array_utils, to_array_rvalue_test) {
+	auto a = to_array({0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+	static_assert(std::is_same<decltype(a), std::array<int, 10>>::value,
+				  "Return value of to_array should have type std::array<int,10>.");
+	for(size_t i = 0; i < a.size(); ++i) {
+		ASSERT_EQ(i, a[i]);
+	}
+}
+TEST(util_array_utils, to_array_lvalue_test) {
+	int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	auto a = to_array(arr);
+	static_assert(std::is_same<decltype(a), std::array<int, 10>>::value,
+				  "Return value of to_array should have type std::array<int,10>.");
+	for(size_t i = 0; i < a.size(); ++i) {
+		ASSERT_EQ(i, a[i]);
+	}
+}
+
 } // namespace util
 } // namespace mce
