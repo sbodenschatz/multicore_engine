@@ -15,6 +15,7 @@ namespace mce {
 namespace graphics {
 class descriptor_set_layout;
 class device;
+class pipeline_layout;
 
 class descriptor_set {
 	device* dev_;
@@ -52,6 +53,10 @@ public:
 					   vk::ArrayProxy<const vk::DescriptorImageInfo> data);
 	void update_buffers(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,
 						vk::ArrayProxy<const vk::DescriptorBufferInfo> data);
+
+	static void bind(vk::CommandBuffer cb, const std::shared_ptr<pipeline_layout>& layout, uint32_t first_set,
+					 vk::ArrayProxy<const descriptor_set> sets,
+					 vk::ArrayProxy<const uint32_t> dynamic_offsets = {});
 };
 
 } /* namespace graphics */
