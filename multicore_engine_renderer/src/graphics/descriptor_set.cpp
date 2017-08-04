@@ -5,6 +5,7 @@
  */
 
 #include <mce/graphics/descriptor_set.hpp>
+#include <mce/graphics/device.hpp>
 
 namespace mce {
 namespace graphics {
@@ -39,5 +40,12 @@ descriptor_set& descriptor_set::operator=(descriptor_set&& other) noexcept {
 
 descriptor_set::~descriptor_set() {}
 
+void descriptor_set::update_images(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,
+								   vk::ArrayProxy<const vk::DescriptorImageInfo> data) {
+	(*dev_)->updateDescriptorSets(
+			{vk::WriteDescriptorSet(native_descriptor_set_, binding, array_start_element, data.size(), type,
+									data.data(), nullptr, nullptr)},
+			{});
+}
 } /* namespace graphics */
 } /* namespace mce */
