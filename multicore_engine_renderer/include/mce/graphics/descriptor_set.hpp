@@ -20,11 +20,12 @@ class descriptor_set {
 	vk::DescriptorSet native_descriptor_set_;
 	std::shared_ptr<descriptor_set_layout> layout_;
 
-public:
+	friend class descriptor_pool;
 	descriptor_set(vk::DescriptorSet native_descriptor_set, std::shared_ptr<descriptor_set_layout> layout);
 	descriptor_set(destruction_queue_manager* dqm, vk::UniqueDescriptorSet native_descriptor_set,
 				   std::shared_ptr<descriptor_set_layout> layout);
 
+public:
 	descriptor_set(const descriptor_set&) = delete;
 	descriptor_set& operator=(const descriptor_set&) = delete;
 	descriptor_set(descriptor_set&&) noexcept;
