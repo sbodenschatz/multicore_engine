@@ -19,6 +19,23 @@ TEST(util_array_utils, make_array_test) {
 	}
 }
 
+struct make_array_test_object_a {};
+struct make_array_test_object_b : make_array_test_object_a {};
+struct make_array_test_object_c : make_array_test_object_a {};
+struct make_array_test_object_d : make_array_test_object_a {};
+
+TEST(util_array_utils, make_array_set_type_test) {
+	make_array_test_object_b b;
+	make_array_test_object_c c;
+	make_array_test_object_d d;
+	auto r = make_array<make_array_test_object_a*>(&b, &c, &d);
+	static_assert(std::is_same<decltype(r), std::array<make_array_test_object_a*, 3>>::value,
+				  "Return value of make_array should have type std::array<make_array_test_object_a*, 3>.");
+	ASSERT_EQ(&b, r[0]);
+	ASSERT_EQ(&c, r[1]);
+	ASSERT_EQ(&d, r[2]);
+}
+
 struct array_transform_test_object_1 {
 	int val;
 	array_transform_test_object_1(int val) : val{val} {}
