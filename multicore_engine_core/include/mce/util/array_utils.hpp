@@ -30,12 +30,12 @@ struct make_array_element_type<void, Args...> {
 };
 
 template <typename T, size_t N, size_t... I>
-std::array<std::remove_cv_t<T>, N> to_array_impl(T (&raw_array)[N], std::index_sequence<I...>) {
+constexpr std::array<std::remove_cv_t<T>, N> to_array_impl(T (&raw_array)[N], std::index_sequence<I...>) {
 	return {{raw_array[I]...}};
 }
 
 template <typename T, size_t N, size_t... I>
-std::array<std::remove_cv_t<T>, N> to_array_impl(T(&&raw_array)[N], std::index_sequence<I...>) {
+constexpr std::array<std::remove_cv_t<T>, N> to_array_impl(T(&&raw_array)[N], std::index_sequence<I...>) {
 	return {{std::move(raw_array[I])...}};
 }
 
@@ -50,7 +50,7 @@ std::array<std::remove_cv_t<T>, N> to_array_impl(T(&&raw_array)[N], std::index_s
  * when the type is chosen automatically, which is not supported.
  */
 template <typename T = void, typename... Args>
-std::array<typename detail::make_array_element_type<T, Args...>::type, sizeof...(Args)>
+constexpr std::array<typename detail::make_array_element_type<T, Args...>::type, sizeof...(Args)>
 make_array(Args&&... args) {
 	return {{std::forward<Args>(args)...}};
 }
@@ -61,7 +61,7 @@ make_array(Args&&... args) {
  * generally available yet).
  */
 template <typename T, size_t N>
-std::array<std::remove_cv_t<T>, N> to_array(T (&raw_array)[N]) {
+constexpr std::array<std::remove_cv_t<T>, N> to_array(T (&raw_array)[N]) {
 	return detail::to_array_impl(raw_array, std::make_index_sequence<N>{});
 }
 
@@ -70,29 +70,30 @@ std::array<std::remove_cv_t<T>, N> to_array(T (&raw_array)[N]) {
  * Works similar to the L-value version but takes R-values and moves the elements into the std::array.
  */
 template <typename T, size_t N>
-std::array<std::remove_cv_t<T>, N> to_array(T(&&raw_array)[N]) {
+constexpr std::array<std::remove_cv_t<T>, N> to_array(T(&&raw_array)[N]) {
 	return detail::to_array_impl(std::move(raw_array), std::make_index_sequence<N>{});
 }
 
 namespace detail {
 
 template <typename T, size_t N, typename T_In, typename F, size_t... I>
-std::array<T, N> array_transform_impl(T_In& input, F f, std::index_sequence<I...>) {
+constexpr std::array<T, N> array_transform_impl(T_In& input, F f, std::index_sequence<I...>) {
 	return {{f(std::get<I>(input))...}};
 }
 
 template <typename T, size_t N, typename T_In1, typename T_In2, typename F, size_t... I>
-std::array<T, N> array_transform_impl(T_In1& input1, T_In2& input2, F f, std::index_sequence<I...>) {
+constexpr std::array<T, N> array_transform_impl(T_In1& input1, T_In2& input2, F f,
+												std::index_sequence<I...>) {
 	return {{f(std::get<I>(input1), std::get<I>(input2))...}};
 }
 
 template <typename T, size_t N, typename F, size_t... I>
-std::array<T, N> array_generate_impl(F f, std::index_sequence<I...>) {
+constexpr std::array<T, N> array_generate_impl(F f, std::index_sequence<I...>) {
 	return {{(static_cast<void>(I), f())...}};
 }
 
 template <typename T, size_t N, typename F, size_t... I>
-std::array<T, N> array_generate_indexed_impl(F f, std::index_sequence<I...>) {
+constexpr std::array<T, N> array_generate_indexed_impl(F f, std::index_sequence<I...>) {
 	return {{f(I)...}};
 }
 
@@ -109,7 +110,7 @@ std::array<T, N> array_generate_indexed_impl(F f, std::index_sequence<I...>) {
  * order is unspecified.
  */
 template <typename T, typename T_In, typename F, size_t N = std::tuple_size<T_In>::value>
-std::array<T, N> array_transform(T_In& input, F f) {
+constexpr std::array<T, N> array_transform(T_In& input, F f) {
 	return detail::array_transform_impl<T, N>(input, f, std::make_index_sequence<N>{});
 }
 
@@ -128,7 +129,7 @@ std::array<T, N> array_transform(T_In& input, F f) {
  */
 template <typename T, typename T_In1, typename T_In2, typename F,
 		  size_t N = std::min(std::tuple_size<T_In1>::value, std::tuple_size<T_In2>::value)>
-std::array<T, N> array_transform(T_In1& input1, T_In2& input2, F f) {
+constexpr std::array<T, N> array_transform(T_In1& input1, T_In2& input2, F f) {
 	return detail::array_transform_impl<T, N>(input1, input2, f, std::make_index_sequence<N>{});
 }
 
@@ -142,7 +143,7 @@ std::array<T, N> array_transform(T_In1& input1, T_In2& input2, F f) {
  * order is unspecified.
  */
 template <typename T, size_t N, typename F>
-std::array<T, N> array_generate_indexed(F f) {
+constexpr std::array<T, N> array_generate_indexed(F f) {
 	return detail::array_generate_indexed_impl<T, N>(f, std::make_index_sequence<N>{});
 }
 
