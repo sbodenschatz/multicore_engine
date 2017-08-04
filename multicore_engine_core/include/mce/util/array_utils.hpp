@@ -29,6 +29,16 @@ struct make_array_element_type<void, Args...> {
 	using type = std::common_type_t<Args...>;
 };
 
+template <typename T, size_t N, size_t... I>
+std::array<std::remove_cv_t<T>, N> to_array_impl(T (&raw_array)[N], std::index_sequence<I...>) {
+	return {{raw_array[I]...}};
+}
+
+template <typename T, size_t N, size_t... I>
+std::array<std::remove_cv_t<T>, N> to_array_impl(T(&&raw_array)[N], std::index_sequence<I...>) {
+	return {{std::move(raw_array[I])...}};
+}
+
 } // namespace detail
 
 /// \brief Creates a std::array from the given values using either a given type T or the std::common_type of
@@ -43,6 +53,25 @@ template <typename T = void, typename... Args>
 std::array<typename detail::make_array_element_type<T, Args...>::type, sizeof...(Args)>
 make_array(Args&&... args) {
 	return {{std::forward<Args>(args)...}};
+}
+
+/// Creates a std::array from the given built-in array (taken as a L-value).
+/**
+ * Represents an implementation of std::(experimental)::to_array (in Lib Fundamentals v2 which is not
+ * generally available yet).
+ */
+template <typename T, size_t N>
+std::array<std::remove_cv_t<T>, N> to_array(T (&raw_array)[N]) {
+	return detail::to_array_impl(raw_array, std::make_index_sequence<N>{});
+}
+
+/// Creates a std::array from the given built-in array (taken as a R-value).
+/**
+ * Works similar to the L-value version but takes R-values and moves the elements into the std::array.
+ */
+template <typename T, size_t N>
+std::array<std::remove_cv_t<T>, N> to_array(T(&&raw_array)[N]) {
+	return detail::to_array_impl(std::move(raw_array), std::make_index_sequence<N>{});
 }
 
 namespace detail {
