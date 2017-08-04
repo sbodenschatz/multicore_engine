@@ -24,6 +24,7 @@ class descriptor_set {
 	std::shared_ptr<descriptor_set_layout> layout_;
 
 	friend class descriptor_pool;
+	friend class simple_descriptor_pool;
 	descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
 				   std::shared_ptr<descriptor_set_layout> layout);
 	descriptor_set(device& dev, destruction_queue_manager* dqm, vk::UniqueDescriptorSet native_descriptor_set,
