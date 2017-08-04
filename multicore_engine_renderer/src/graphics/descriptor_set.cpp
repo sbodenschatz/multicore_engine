@@ -6,6 +6,7 @@
 
 #include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/pipeline_layout.hpp>
 
 namespace mce {
 namespace graphics {
@@ -51,6 +52,17 @@ void descriptor_set::update_buffers(uint32_t binding, uint32_t array_start_eleme
 			{vk::WriteDescriptorSet(native_descriptor_set_, binding, array_start_element, data.size(), type,
 									nullptr, data.data(), nullptr)},
 			{});
+}
+
+void descriptor_set::bind(vk::CommandBuffer cb, const std::shared_ptr<pipeline_layout>& layout,
+						  uint32_t first_set, vk::ArrayProxy<const descriptor_set> sets,
+						  vk::ArrayProxy<const uint32_t> dynamic_offsets) {
+	boost::container::small_vector<vk::DescriptorSet, 8> native_sets;
+	native_sets.reserve(sets.size());
+	std::transform(sets.begin(), sets.end(), std::back_inserter(native_sets),
+				   [](const descriptor_set& set) { return set.native_descriptor_set(); });
+	cb.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, layout->native_layout(), first_set,
+						  {uint32_t(native_sets.size()), native_sets.data()}, dynamic_offsets);
 }
 
 } /* namespace graphics */
