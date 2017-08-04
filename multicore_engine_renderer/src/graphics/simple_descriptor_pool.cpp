@@ -37,6 +37,8 @@ simple_descriptor_pool::~simple_descriptor_pool() {}
 
 void simple_descriptor_pool::reset() {
 	(*dev_)->resetDescriptorPool(native_pool_.get());
+	available_sets_ = max_sets_;
+	available_pool_sizes_ = max_pool_sizes_;
 }
 
 descriptor_set
@@ -45,6 +47,10 @@ simple_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor
 	vk::DescriptorSetAllocateInfo ai(native_pool_.get(), 1, &nlayout);
 	vk::DescriptorSet set;
 	auto res = (*dev_)->allocateDescriptorSets(&ai, &set);
+	for(const auto& elem : layout->bindings()) {
+		available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
+	}
+	available_sets_--;
 	return descriptor_set(*dev_, vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"),
 						  layout);
 }
@@ -60,6 +66,12 @@ std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
 
 	auto tmp = (*dev_)->allocateDescriptorSets(
 			vk::DescriptorSetAllocateInfo(native_pool_.get(), uint32_t(nlayouts.size()), nlayouts.data()));
+	for(const auto& layout : layouts) {
+		for(const auto& elem : layout->bindings()) {
+			available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
+		}
+	}
+	available_sets_ -= uint32_t(layouts.size());
 	auto beg = boost::make_zip_iterator(boost::make_tuple(tmp.begin(), layouts.begin()));
 	auto end = boost::make_zip_iterator(boost::make_tuple(tmp.end(), layouts.end()));
 	std::transform(beg, end, std::back_inserter(rv), [this](auto tup) {
