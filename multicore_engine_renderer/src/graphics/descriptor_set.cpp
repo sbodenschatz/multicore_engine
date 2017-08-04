@@ -47,5 +47,13 @@ void descriptor_set::update_images(uint32_t binding, uint32_t array_start_elemen
 									data.data(), nullptr, nullptr)},
 			{});
 }
+void descriptor_set::update_buffers(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,
+									vk::ArrayProxy<const vk::DescriptorBufferInfo> data) {
+	(*dev_)->updateDescriptorSets(
+			{vk::WriteDescriptorSet(native_descriptor_set_, binding, array_start_element, data.size(), type,
+									nullptr, data.data(), nullptr)},
+			{});
+}
+
 } /* namespace graphics */
 } /* namespace mce */
