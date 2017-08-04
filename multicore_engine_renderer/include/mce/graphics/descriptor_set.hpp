@@ -43,6 +43,11 @@ public:
 	vk::DescriptorSet native_descriptor_set() const {
 		return native_descriptor_set_;
 	}
+
+	void update_images(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,
+					   vk::ArrayProxy<const vk::DescriptorImageInfo> data);
+	void update_buffers(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,
+						vk::ArrayProxy<const vk::DescriptorBufferInfo> data);
 };
 
 } /* namespace graphics */
