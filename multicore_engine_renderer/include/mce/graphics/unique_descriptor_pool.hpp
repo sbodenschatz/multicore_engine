@@ -150,6 +150,33 @@ public:
 	}
 };
 
+class growing_unique_descriptor_pool {
+	mutable std::mutex blocks_mutex_;
+	device* dev_;
+	uint32_t block_sets_;
+	std::vector<vk::DescriptorPoolSize> block_pool_sizes_;
+	std::vector<simple_descriptor_pool> blocks_;
+
+public:
+	growing_unique_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
+								   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes_per_block);
+	growing_unique_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
+								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block);
+
+	uint32_t available_descriptors(vk::DescriptorType type) const;
+	uint32_t available_sets() const;
+
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+										   destruction_queue_manager* dqm = nullptr);
+	std::vector<descriptor_set>
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+							 destruction_queue_manager* dqm = nullptr);
+	template <size_t size>
+	std::array<descriptor_set, size>
+	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
+							 destruction_queue_manager* dqm = nullptr);
+};
+
 } /* namespace graphics */
 } /* namespace mce */
 
