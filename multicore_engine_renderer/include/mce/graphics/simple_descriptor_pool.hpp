@@ -7,6 +7,11 @@
 #ifndef MCE_GRAPHICS_SIMPLE_DESCRIPTOR_POOL_HPP_
 #define MCE_GRAPHICS_SIMPLE_DESCRIPTOR_POOL_HPP_
 
+/**
+ * \file
+ * Defines the simple_descriptor_pool class.
+ */
+
 #include <boost/container/flat_map.hpp>
 #include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
@@ -21,6 +26,17 @@ namespace graphics {
 class descriptor_set;
 class destruction_queue_manager;
 
+/// \brief Encapsulates a bounded pool for allocating descriptors for vulkan descriptor sets (represented by
+/// descriptor_set objects).
+/**
+ * The simple variation of the descriptor pool works with non-owning descriptor sets. This means that the
+ * objects are allocated from the pool but are not RAII-owners of the underlying resources but are invalidated
+ * when all resources are taken back to the pool by resetting the pool. Additionally the
+ * simple_descriptor_pool is not thread-safe.
+ *
+ * This variation is intended for per-thread and per-frame usage and provides lower overhead for this scenario
+ * than the other variation unique_descriptor_pool.
+ */
 class simple_descriptor_pool {
 	device* dev_;
 	vk::UniqueDescriptorPool native_pool_;
@@ -30,42 +46,62 @@ class simple_descriptor_pool {
 	boost::container::flat_map<vk::DescriptorType, uint32_t> available_pool_sizes_;
 
 public:
+	/// \brief Creates a simple_descriptor_pool for the given device with the given number sets and the given
+	/// numbers descriptors for each type.
 	simple_descriptor_pool(device& dev, uint32_t max_sets,
 						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes);
+	/// \brief Destroys the simple_descriptor_pool, releases the underlying resources and makes all descriptor
+	/// sets allocated from it invalid.
 	~simple_descriptor_pool();
 
+	/// Explicitly forbids copying.
 	simple_descriptor_pool(const simple_descriptor_pool&) = delete;
+	/// Explicitly forbids copying.
 	simple_descriptor_pool& operator=(const simple_descriptor_pool&) = delete;
+	/// Allows move-construction.
 	simple_descriptor_pool(simple_descriptor_pool&&) noexcept;
+	/// Allows mode-assignment.
 	simple_descriptor_pool& operator=(simple_descriptor_pool&&) noexcept;
 
+	/// Returns the number of available descriptors for the given type in the pool.
 	uint32_t available_descriptors(vk::DescriptorType type) const {
 		auto it = available_pool_sizes_.find(type);
 		if(it == available_pool_sizes_.end()) return 0;
 		return it->second;
 	}
 
+	/// Returns the number of available descriptor sets in the pool.
 	uint32_t available_sets() const {
 		return available_sets_;
 	}
 
+	/// Returns the total number of descriptors for the given type in the pool.
 	uint32_t max_descriptors(vk::DescriptorType type) const {
 		auto it = max_pool_sizes_.find(type);
 		if(it == max_pool_sizes_.end()) return 0;
 		return it->second;
 	}
 
+	/// Returns the total number of descriptor sets in the pool.
 	uint32_t max_sets() const {
 		return max_sets_;
 	}
 
+	/// \brief Returns the remaining number of resources (sets or descriptors) for the resource that is
+	/// closest to being depleted.
 	uint32_t min_available_resource_amount() const;
 
+	/// Allocates a descriptor set of the given layout.
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout);
 
+	/// Allocates descriptor sets for each of the given layouts.
 	std::vector<descriptor_set>
 	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts);
 
+	/// Allocates descriptor sets for each of the given layouts.
+	/**
+	 * Avoids heap allocations in the wrapper by statically determining the number of sets.
+	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
 	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts) {
@@ -92,6 +128,8 @@ public:
 				});
 	}
 
+	/// \brief Resets the descriptor_pool, invalidating all descriptor sets allocated from it and returning
+	/// the resources to the pool.
 	void reset();
 };
 
