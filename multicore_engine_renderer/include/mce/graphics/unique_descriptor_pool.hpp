@@ -69,6 +69,8 @@ public:
 		return max_sets_;
 	}
 
+	uint32_t min_available_resource_amount() const;
+
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
 										   destruction_queue_manager* dqm = nullptr);
 

@@ -97,5 +97,16 @@ void unique_descriptor_pool::free(vk::DescriptorSet set,
 	available_sets_++;
 }
 
+uint32_t unique_descriptor_pool::min_available_resource_amount() const {
+	std::lock_guard<std::mutex> lock(pool_mutex_);
+	if(available_pool_sizes_.empty()) return available_sets_;
+	return std::min(
+			available_sets_,
+			std::min_element(available_pool_sizes_.begin(), available_pool_sizes_.end(), [](const auto& a,
+																							const auto& b) {
+				return a.second < b.second;
+			})->second);
+}
+
 } /* namespace graphics */
 } /* namespace mce */
