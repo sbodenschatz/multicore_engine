@@ -84,6 +84,12 @@ public:
 			if(res != vk::Result::eSuccess) {
 				throw std::system_error(res, "vk::Device::allocateDescriptorSets");
 			}
+			for(const auto& layout : layouts) {
+				for(const auto& elem : layout->bindings()) {
+					available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
+				}
+			}
+			available_sets_ -= uint32_t(layouts.size());
 		}
 		vk::DescriptorSetDeleter del(dev_->native_device(), native_pool_.get());
 		return mce::util::array_transform<descriptor_set>(
