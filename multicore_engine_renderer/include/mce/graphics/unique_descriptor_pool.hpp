@@ -31,7 +31,7 @@ class unique_descriptor_pool {
 	boost::container::flat_map<vk::DescriptorType, uint32_t> max_pool_sizes_;
 	boost::container::flat_map<vk::DescriptorType, uint32_t> available_pool_sizes_;
 
-	void free(vk::DescriptorSet set);
+	void free(vk::DescriptorSet set, const std::shared_ptr<descriptor_set_layout>& layout);
 
 public:
 	unique_descriptor_pool(device& dev, uint32_t max_sets,

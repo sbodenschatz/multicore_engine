@@ -83,5 +83,15 @@ std::vector<descriptor_set> unique_descriptor_pool::allocate_descriptor_sets(
 	return rv;
 }
 
+void unique_descriptor_pool::free(vk::DescriptorSet set,
+								  const std::shared_ptr<descriptor_set_layout>& layout) {
+	std::lock_guard<std::mutex> lock(pool_mutex_);
+	(*dev_)->freeDescriptorSets(native_pool_.get(), set);
+	for(const auto& elem : layout->bindings()) {
+		available_pool_sizes_.at(elem.descriptor_type) += elem.descriptor_count;
+	}
+	available_sets_++;
+}
+
 } /* namespace graphics */
 } /* namespace mce */
