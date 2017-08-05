@@ -7,6 +7,11 @@
 #ifndef MCE_GRAPHICS_UNIQUE_DESCRIPTOR_POOL_HPP_
 #define MCE_GRAPHICS_UNIQUE_DESCRIPTOR_POOL_HPP_
 
+/**
+ * \file
+ * Defines the simple_descriptor_pool class.
+ */
+
 #include <boost/container/flat_map.hpp>
 #include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
@@ -22,6 +27,16 @@ namespace graphics {
 class descriptor_set;
 class destruction_queue_manager;
 
+/// \brief Encapsulates a bounded pool for allocating descriptors for vulkan descriptor sets (represented by
+/// descriptor_set objects).
+/**
+ * The unique variation of descriptor pools allocates the descriptor sets as RAII-owners and manages resources
+ * in a thread-safe manner. To not interfere with RAII-ownership this variation doesn't support explicitly
+ * resetting the pool. For thread-safety of the descriptor set destruction this variation also doesn't support
+ * move operations.
+ *
+ * This variation is intended for long-lived and / or not thread-specific descriptors.
+ */
 class unique_descriptor_pool {
 	mutable std::mutex pool_mutex_;
 	device* dev_;
@@ -36,15 +51,26 @@ class unique_descriptor_pool {
 	void free(vk::DescriptorSet set, const std::shared_ptr<descriptor_set_layout>& layout);
 
 public:
+	/// \brief Creates a unique_descriptor_pool for the given device with the given number sets and the given
+	/// numbers descriptors for each type.
 	unique_descriptor_pool(device& dev, uint32_t max_sets,
 						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes);
+	/// \brief Destroys the unique_descriptor_pool and releases the underlying resources.
+	/**
+	 * Requires that all descriptor_set objects allocated from this pool must be destroyed before it.
+	 */
 	~unique_descriptor_pool();
 
+	/// Explicitly forbids copying.
 	unique_descriptor_pool(const unique_descriptor_pool&) = delete;
+	/// Explicitly forbids copying.
 	unique_descriptor_pool& operator=(const unique_descriptor_pool&) = delete;
+	/// Explicitly forbids moving.
 	unique_descriptor_pool(unique_descriptor_pool&&) = delete;
+	/// Explicitly forbids moving.
 	unique_descriptor_pool& operator=(unique_descriptor_pool&&) = delete;
 
+	/// Returns the number of available descriptors for the given type in the pool.
 	uint32_t available_descriptors(vk::DescriptorType type) const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
 		auto it = available_pool_sizes_.find(type);
@@ -52,11 +78,13 @@ public:
 		return it->second;
 	}
 
+	/// Returns the number of available descriptor sets in the pool.
 	uint32_t available_sets() const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
 		return available_sets_;
 	}
 
+	/// Returns the total number of descriptors for the given type in the pool.
 	uint32_t max_descriptors(vk::DescriptorType type) const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
 		auto it = max_pool_sizes_.find(type);
@@ -64,20 +92,29 @@ public:
 		return it->second;
 	}
 
+	/// Returns the total number of descriptor sets in the pool.
 	uint32_t max_sets() const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
 		return max_sets_;
 	}
 
+	/// \brief Returns the remaining number of resources (sets or descriptors) for the resource that is
+	/// closest to being depleted.
 	uint32_t min_available_resource_amount() const;
 
+	/// Allocates a descriptor set of the given layout.
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
 										   destruction_queue_manager* dqm = nullptr);
 
+	/// Allocates descriptor sets for each of the given layouts.
 	std::vector<descriptor_set>
 	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
 							 destruction_queue_manager* dqm = nullptr);
 
+	/// Allocates descriptor sets for each of the given layouts.
+	/**
+	 * Avoids heap allocations in the wrapper by statically determining the number of sets.
+	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
 	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
