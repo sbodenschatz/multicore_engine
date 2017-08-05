@@ -155,7 +155,7 @@ class growing_unique_descriptor_pool {
 	device* dev_;
 	uint32_t block_sets_;
 	std::vector<vk::DescriptorPoolSize> block_pool_sizes_;
-	std::vector<simple_descriptor_pool> blocks_;
+	std::vector<std::unique_ptr<unique_descriptor_pool>> blocks_;
 
 public:
 	growing_unique_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
