@@ -23,7 +23,6 @@ class descriptor_set {
 	vk::DescriptorSet native_descriptor_set_;
 	std::shared_ptr<descriptor_set_layout> layout_;
 
-	friend class descriptor_pool;
 	friend class simple_descriptor_pool;
 	friend class unique_descriptor_pool;
 	descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
