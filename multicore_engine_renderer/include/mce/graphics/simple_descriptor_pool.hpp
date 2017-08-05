@@ -141,8 +141,6 @@ class growing_simple_descriptor_pool {
 
 public:
 	growing_simple_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
-								   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes_per_block);
-	growing_simple_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
 								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block);
 
 	uint32_t available_descriptors(vk::DescriptorType type) const;
