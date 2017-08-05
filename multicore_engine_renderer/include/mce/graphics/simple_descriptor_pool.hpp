@@ -133,6 +133,30 @@ public:
 	void reset();
 };
 
+class growing_simple_descriptor_pool {
+	device* dev_;
+	uint32_t block_sets_;
+	std::vector<vk::DescriptorPoolSize> block_pool_sizes_;
+	std::vector<simple_descriptor_pool> blocks_;
+
+public:
+	growing_simple_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
+								   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes_per_block);
+	growing_simple_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
+								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block);
+
+	uint32_t available_descriptors(vk::DescriptorType type) const;
+	uint32_t available_sets() const;
+
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout);
+	std::vector<descriptor_set>
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts);
+	template <size_t size>
+	std::array<descriptor_set, size>
+	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts);
+	void reset();
+};
+
 } /* namespace graphics */
 } /* namespace mce */
 
