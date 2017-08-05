@@ -68,15 +68,15 @@ public:
 					   [](const std::shared_ptr<descriptor_set_layout>& l) { return l->native_layout(); });
 		vk::DescriptorSetAllocateInfo ai(native_pool_.get(), size, nlayouts.data());
 		auto res = (*dev_)->allocateDescriptorSets(&ai, nsets.data());
+		if(res != vk::Result::eSuccess) {
+			throw std::system_error(res, "vk::Device::allocateDescriptorSets");
+		}
 		for(const auto& layout : layouts) {
 			for(const auto& elem : layout->bindings()) {
 				available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
 			}
 		}
 		available_sets_ -= uint32_t(layouts.size());
-		if(res != vk::Result::eSuccess) {
-			throw std::system_error(res, "vk::Device::allocateDescriptorSets");
-		}
 		return mce::util::array_transform<descriptor_set>(
 				nsets, layouts,
 				[this](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
