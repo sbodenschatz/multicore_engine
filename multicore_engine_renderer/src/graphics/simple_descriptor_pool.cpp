@@ -35,6 +35,27 @@ simple_descriptor_pool::simple_descriptor_pool(device& dev, uint32_t max_sets,
 
 simple_descriptor_pool::~simple_descriptor_pool() {}
 
+simple_descriptor_pool::simple_descriptor_pool(simple_descriptor_pool&& other) noexcept
+		: dev_{other.dev_}, native_pool_{std::move(other.native_pool_)}, max_sets_{other.max_sets_},
+		  available_sets_{other.available_sets_}, max_pool_sizes_{std::move(other.max_pool_sizes_)},
+		  available_pool_sizes_{std::move(other.available_pool_sizes_)} {
+	other.dev_ = nullptr;
+	other.max_sets_ = 0;
+	other.available_sets_ = 0;
+}
+simple_descriptor_pool& simple_descriptor_pool::operator=(simple_descriptor_pool&& other) noexcept {
+	dev_ = other.dev_;
+	native_pool_ = std::move(other.native_pool_);
+	max_sets_ = other.max_sets_;
+	available_sets_ = other.available_sets_;
+	max_pool_sizes_ = std::move(other.max_pool_sizes_);
+	available_pool_sizes_ = std::move(other.available_pool_sizes_);
+	other.dev_ = nullptr;
+	other.max_sets_ = 0;
+	other.available_sets_ = 0;
+	return *this;
+}
+
 void simple_descriptor_pool::reset() {
 	(*dev_)->resetDescriptorPool(native_pool_.get());
 	available_sets_ = max_sets_;
