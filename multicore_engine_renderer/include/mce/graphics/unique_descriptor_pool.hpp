@@ -38,6 +38,11 @@ public:
 						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes);
 	~unique_descriptor_pool();
 
+	unique_descriptor_pool(const unique_descriptor_pool&) = delete;
+	unique_descriptor_pool& operator=(const unique_descriptor_pool&) = delete;
+	unique_descriptor_pool(unique_descriptor_pool&&) = delete;
+	unique_descriptor_pool& operator=(unique_descriptor_pool&&) = delete;
+
 	uint32_t available_descriptors(vk::DescriptorType type) const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
 		auto it = available_pool_sizes_.find(type);
