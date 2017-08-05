@@ -102,5 +102,15 @@ std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
 	return rv;
 }
 
+uint32_t simple_descriptor_pool::min_available_resource_amount() const {
+	if(available_pool_sizes_.empty()) return available_sets_;
+	return std::min(
+			available_sets_,
+			std::min_element(available_pool_sizes_.begin(), available_pool_sizes_.end(), [](const auto& a,
+																							const auto& b) {
+				return a.second < b.second;
+			})->second);
+}
+
 } /* namespace graphics */
 } /* namespace mce */
