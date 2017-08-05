@@ -34,6 +34,11 @@ public:
 						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes);
 	~simple_descriptor_pool();
 
+	simple_descriptor_pool(const simple_descriptor_pool&) = delete;
+	simple_descriptor_pool& operator=(const simple_descriptor_pool&) = delete;
+	simple_descriptor_pool(simple_descriptor_pool&&) = default;
+	simple_descriptor_pool& operator=(simple_descriptor_pool&&) = default;
+
 	uint32_t available_descriptors(vk::DescriptorType type) const {
 		auto it = available_pool_sizes_.find(type);
 		if(it == available_pool_sizes_.end()) return 0;
