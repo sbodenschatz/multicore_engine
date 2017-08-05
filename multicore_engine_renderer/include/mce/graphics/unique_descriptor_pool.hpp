@@ -32,8 +32,8 @@ class destruction_queue_manager;
 /**
  * The unique variation of descriptor pools allocates the descriptor sets as RAII-owners and manages resources
  * in a thread-safe manner. To not interfere with RAII-ownership this variation doesn't support explicitly
- * resetting the pool. For thread-safety of the descriptor set destruction this variation also doesn't support
- * move operations.
+ * resetting the pool. For thread-safety and reference integrity of the descriptor set destruction this
+ * variation also doesn't support move operations.
  *
  * This variation is intended for long-lived and / or not thread-specific descriptors.
  */
