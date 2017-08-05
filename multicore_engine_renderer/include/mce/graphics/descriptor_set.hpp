@@ -8,6 +8,7 @@
 #define MCE_GRAPHICS_DESCRIPTOR_SET_HPP_
 
 #include <boost/optional.hpp>
+#include <mce/graphics/descriptor_set_deleter.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <vulkan/vulkan.hpp>
 
@@ -16,38 +17,33 @@ namespace graphics {
 class descriptor_set_layout;
 class device;
 class pipeline_layout;
+class unique_descriptor_pool;
 
 class descriptor_set {
 	device* dev_;
-	boost::optional<queued_handle<vk::UniqueDescriptorSet>> descriptor_set_unique;
-	vk::DescriptorSet native_descriptor_set_;
-	std::shared_ptr<descriptor_set_layout> layout_;
+	queued_handle<descriptor_set_unique_handle> native_descriptor_set_;
 
 	friend class simple_descriptor_pool;
 	friend class unique_descriptor_pool;
 	descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
 				   std::shared_ptr<descriptor_set_layout> layout);
-	descriptor_set(device& dev, destruction_queue_manager* dqm, vk::UniqueDescriptorSet native_descriptor_set,
-				   std::shared_ptr<descriptor_set_layout> layout);
+	descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set, unique_descriptor_pool* pool,
+				   destruction_queue_manager* dqm, std::shared_ptr<descriptor_set_layout> layout);
 
 public:
 	descriptor_set(const descriptor_set&) = delete;
 	descriptor_set& operator=(const descriptor_set&) = delete;
-	descriptor_set(descriptor_set&&) noexcept;
-	descriptor_set& operator=(descriptor_set&&) noexcept;
+	descriptor_set(descriptor_set&&) noexcept = default;
+	descriptor_set& operator=(descriptor_set&&) noexcept = default;
 
 	~descriptor_set();
 
-	bool is_owner() const {
-		return bool(descriptor_set_unique);
-	}
-
 	const std::shared_ptr<descriptor_set_layout>& layout() const {
-		return layout_;
+		return native_descriptor_set_.get_deleter().layout();
 	}
 
 	vk::DescriptorSet native_descriptor_set() const {
-		return native_descriptor_set_;
+		return native_descriptor_set_.get();
 	}
 
 	void update_images(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,

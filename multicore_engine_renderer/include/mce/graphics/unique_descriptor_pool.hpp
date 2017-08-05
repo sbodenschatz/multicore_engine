@@ -31,6 +31,8 @@ class unique_descriptor_pool {
 	boost::container::flat_map<vk::DescriptorType, uint32_t> max_pool_sizes_;
 	boost::container::flat_map<vk::DescriptorType, uint32_t> available_pool_sizes_;
 
+	friend class descriptor_set_deleter;
+
 	void free(vk::DescriptorSet set, const std::shared_ptr<descriptor_set_layout>& layout);
 
 public:
@@ -89,18 +91,22 @@ public:
 			if(res != vk::Result::eSuccess) {
 				throw std::system_error(res, "vk::Device::allocateDescriptorSets");
 			}
-			for(const auto& layout : layouts) {
-				for(const auto& elem : layout->bindings()) {
-					available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
+			try {
+				for(const auto& layout : layouts) {
+					for(const auto& elem : layout->bindings()) {
+						available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
+					}
 				}
+			} catch(...) {
+				(*dev_)->freeDescriptorSets(native_pool_.get(), nsets);
+				throw;
 			}
 			available_sets_ -= uint32_t(layouts.size());
 		}
-		vk::DescriptorSetDeleter del(dev_->native_device(), native_pool_.get());
 		return mce::util::array_transform<descriptor_set>(
 				nsets, layouts,
-				[dqm, this, &del](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
-					return descriptor_set(*dev_, dqm, vk::UniqueDescriptorSet(ds, del), l);
+				[dqm, this](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
+					return descriptor_set(*dev_, ds, this, dqm, l);
 				});
 	}
 };

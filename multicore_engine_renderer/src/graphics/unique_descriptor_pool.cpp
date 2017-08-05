@@ -48,13 +48,17 @@ unique_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor
 		if(res != vk::Result::eSuccess) {
 			throw std::system_error(res, "vk::Device::allocateDescriptorSets");
 		}
-		for(const auto& elem : layout->bindings()) {
-			available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
+		try {
+			for(const auto& elem : layout->bindings()) {
+				available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
+			}
+		} catch(...) {
+			(*dev_)->freeDescriptorSets(native_pool_.get(), set);
+			throw;
 		}
 		available_sets_--;
 	}
-	vk::DescriptorSetDeleter del(dev_->native_device(), native_pool_.get());
-	return descriptor_set(*dev_, dqm, vk::UniqueDescriptorSet(set, del), layout);
+	return descriptor_set(*dev_, set, this, dqm, layout);
 }
 
 std::vector<descriptor_set> unique_descriptor_pool::allocate_descriptor_sets(
@@ -78,7 +82,7 @@ std::vector<descriptor_set> unique_descriptor_pool::allocate_descriptor_sets(
 	auto beg = boost::make_zip_iterator(boost::make_tuple(tmp.begin(), layouts.begin()));
 	auto end = boost::make_zip_iterator(boost::make_tuple(tmp.end(), layouts.end()));
 	std::transform(beg, end, std::back_inserter(rv), [this, dqm](auto tup) {
-		return descriptor_set(*dev_, dqm, std::move(boost::get<0>(tup)), boost::get<1>(tup));
+		return descriptor_set(*dev_, boost::get<0>(tup).release(), this, dqm, boost::get<1>(tup));
 	});
 	return rv;
 }

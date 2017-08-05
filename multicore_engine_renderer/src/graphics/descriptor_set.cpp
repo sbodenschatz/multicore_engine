@@ -7,50 +7,40 @@
 #include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
+#include <mce/graphics/unique_descriptor_pool.hpp>
 
 namespace mce {
 namespace graphics {
 
 descriptor_set::descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
 							   std::shared_ptr<descriptor_set_layout> layout)
-		: dev_{&dev}, native_descriptor_set_{native_descriptor_set}, layout_{std::move(layout)} {}
-descriptor_set::descriptor_set(device& dev, destruction_queue_manager* dqm,
-							   vk::UniqueDescriptorSet native_descriptor_set,
+		: dev_{&dev}, native_descriptor_set_{queued_handle<descriptor_set_unique_handle>(
+							  descriptor_set_unique_handle(
+									  native_descriptor_set,
+									  descriptor_set_deleter(nullptr, std::move(layout))),
+							  nullptr)} {}
+descriptor_set::descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
+							   unique_descriptor_pool* pool, destruction_queue_manager* dqm,
 							   std::shared_ptr<descriptor_set_layout> layout)
-		: dev_{&dev}, descriptor_set_unique{queued_handle<vk::UniqueDescriptorSet>(
-							  std::move(native_descriptor_set), dqm)},
-		  native_descriptor_set_{native_descriptor_set.get()}, layout_{std::move(layout)} {}
-
-descriptor_set::descriptor_set(descriptor_set&& other) noexcept
-		: dev_{other.dev_}, descriptor_set_unique{std::move(other.descriptor_set_unique)},
-		  native_descriptor_set_{std::move(other.native_descriptor_set_)}, layout_{std::move(other.layout_)} {
-	other.native_descriptor_set_ = nullptr;
-	other.dev_ = nullptr;
-}
-descriptor_set& descriptor_set::operator=(descriptor_set&& other) noexcept {
-	dev_ = other.dev_;
-	descriptor_set_unique = std::move(other.descriptor_set_unique);
-	native_descriptor_set_ = std::move(other.native_descriptor_set_);
-	layout_ = std::move(other.layout_);
-	other.native_descriptor_set_ = nullptr;
-	other.dev_ = nullptr;
-	return *this;
-}
+		: dev_{&dev}, native_descriptor_set_{queued_handle<descriptor_set_unique_handle>(
+							  descriptor_set_unique_handle(native_descriptor_set,
+														   descriptor_set_deleter(pool, std::move(layout))),
+							  dqm)} {}
 
 descriptor_set::~descriptor_set() {}
 
 void descriptor_set::update_images(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,
 								   vk::ArrayProxy<const vk::DescriptorImageInfo> data) {
 	(*dev_)->updateDescriptorSets(
-			{vk::WriteDescriptorSet(native_descriptor_set_, binding, array_start_element, data.size(), type,
-									data.data(), nullptr, nullptr)},
+			{vk::WriteDescriptorSet(native_descriptor_set_.get(), binding, array_start_element, data.size(),
+									type, data.data(), nullptr, nullptr)},
 			{});
 }
 void descriptor_set::update_buffers(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,
 									vk::ArrayProxy<const vk::DescriptorBufferInfo> data) {
 	(*dev_)->updateDescriptorSets(
-			{vk::WriteDescriptorSet(native_descriptor_set_, binding, array_start_element, data.size(), type,
-									nullptr, data.data(), nullptr)},
+			{vk::WriteDescriptorSet(native_descriptor_set_.get(), binding, array_start_element, data.size(),
+									type, nullptr, data.data(), nullptr)},
 			{});
 }
 
@@ -65,5 +55,11 @@ void descriptor_set::bind(vk::CommandBuffer cb, const std::shared_ptr<pipeline_l
 						  {uint32_t(native_sets.size()), native_sets.data()}, dynamic_offsets);
 }
 
+void descriptor_set_deleter::operator()(vk::DescriptorSet set) const {
+	if(unique_pool_) {
+		unique_pool_->free(set, layout_);
+	}
+	// unique_pool==false -> Non-owning descriptor set.
+}
 } /* namespace graphics */
 } /* namespace mce */
