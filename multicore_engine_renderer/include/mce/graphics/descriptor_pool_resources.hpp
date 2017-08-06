@@ -38,6 +38,7 @@ public:
 		}
 	}
 
+	// cppcheck-suppress noExplicitConstructor
 	descriptor_set_resources(const descriptor_set_layout& layout, uint32_t descriptor_sets = 1)
 			: descriptor_sets_{descriptor_sets} {
 		for(const auto& d : layout.bindings()) {
