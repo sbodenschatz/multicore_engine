@@ -114,6 +114,9 @@ uint32_t growing_simple_descriptor_pool::available_sets() const {
 descriptor_set growing_simple_descriptor_pool::allocate_descriptor_set(
 		const std::shared_ptr<descriptor_set_layout>& layout) {
 	descriptor_set_resources req = *layout;
+	if(!block_resources_.sufficient_for(req)) {
+		throw mce::graphics_exception("Insufficient resources per block for requested allocation.");
+	}
 	auto it = std::find_if(blocks_.begin(), blocks_.end(), [&req](const simple_descriptor_pool& blk) {
 		return blk.available_resources().sufficient_for(req);
 	});
@@ -130,6 +133,9 @@ std::vector<descriptor_set> growing_simple_descriptor_pool::allocate_descriptor_
 	descriptor_set_resources req;
 	for(const auto& layout : layouts) {
 		req += *layout;
+	}
+	if(!block_resources_.sufficient_for(req)) {
+		throw mce::graphics_exception("Insufficient resources per block for requested allocation.");
 	}
 	auto it = std::find_if(blocks_.begin(), blocks_.end(), [&req](const simple_descriptor_pool& blk) {
 		return blk.available_resources().sufficient_for(req);

@@ -201,6 +201,9 @@ public:
 		for(const auto& layout : layouts) {
 			req += *layout;
 		}
+		if(!block_resources_.sufficient_for(req)) {
+			throw mce::graphics_exception("Insufficient resources per block for requested allocation.");
+		}
 		auto it = std::find_if(blocks_.begin(), blocks_.end(), [&req](const simple_descriptor_pool& blk) {
 			return blk.available_resources().sufficient_for(req);
 		});
