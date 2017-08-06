@@ -17,10 +17,8 @@
 namespace mce {
 namespace graphics {
 
-simple_descriptor_pool::simple_descriptor_pool(device& dev, uint32_t max_sets,
-											   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes)
-		: dev_{&dev}, max_resources_{pool_sizes, max_sets}, available_resources_{max_resources_} {
-
+simple_descriptor_pool::simple_descriptor_pool(device& dev, descriptor_set_resources capacity)
+		: dev_{&dev}, max_resources_{std::move(capacity)}, available_resources_{max_resources_} {
 	boost::container::small_vector<vk::DescriptorPoolSize, 16> pool_size_sums;
 	std::transform(max_resources_.descriptors().begin(), max_resources_.descriptors().end(),
 				   std::back_inserter(pool_size_sums), [](const std::pair<vk::DescriptorType, uint32_t>& ps) {

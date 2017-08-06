@@ -48,7 +48,11 @@ public:
 	/// \brief Creates a simple_descriptor_pool for the given device with the given number sets and the given
 	/// numbers descriptors for each type.
 	simple_descriptor_pool(device& dev, uint32_t max_sets,
-						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes);
+						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes)
+			: simple_descriptor_pool(dev, descriptor_set_resources{pool_sizes, max_sets}) {}
+
+	simple_descriptor_pool(device& dev, descriptor_set_resources capacity);
+
 	/// \brief Destroys the simple_descriptor_pool, releases the underlying resources and makes all descriptor
 	/// sets allocated from it invalid.
 	~simple_descriptor_pool();
