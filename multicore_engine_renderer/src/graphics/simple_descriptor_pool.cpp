@@ -12,6 +12,7 @@
 #include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/simple_descriptor_pool.hpp>
+#include <numeric>
 
 namespace mce {
 namespace graphics {
@@ -118,6 +119,18 @@ growing_simple_descriptor_pool::growing_simple_descriptor_pool(
 		: dev_{&dev}, block_sets_{descriptor_sets_per_block}, block_pool_sizes_{
 																	  std::move(pool_sizes_per_block)} {
 	blocks_.emplace_back(*dev_, block_sets_, block_pool_sizes_);
+}
+
+uint32_t growing_simple_descriptor_pool::available_descriptors(vk::DescriptorType type) const {
+	return std::accumulate(blocks_.begin(), blocks_.end(), 0u,
+						   [type](uint32_t s, const simple_descriptor_pool& p) {
+							   return s + p.available_descriptors(type);
+						   });
+}
+uint32_t growing_simple_descriptor_pool::available_sets() const {
+	return std::accumulate(
+			blocks_.begin(), blocks_.end(), 0u,
+			[](uint32_t s, const simple_descriptor_pool& p) { return s + p.available_sets(); });
 }
 
 } /* namespace graphics */
