@@ -139,6 +139,22 @@ public:
 		return *this;
 	}
 
+	/// Returns the per-resource maximum of the given descriptor_set_resource objects.
+	/**
+	 * This function can for example be used to construct a pool that supports an amount of descriptor sets of
+	 * different layouts.
+	 */
+	friend descriptor_set_resources max(const descriptor_set_resources& a,
+										const descriptor_set_resources& b) {
+		descriptor_set_resources rv = a;
+		if(b.descriptor_sets_ > rv.descriptor_sets_) rv.descriptor_sets_ = b.descriptor_sets_;
+		for(const auto& d : b.descriptors_) {
+			auto& rvd = rv.descriptors_[d.first];
+			if(d.second > rvd) rvd = d.second;
+		}
+		return rv;
+	}
+
 	/// Returns the smallest present resource amount in this object.
 	uint32_t min_resource() const {
 		if(descriptors_.empty()) return descriptor_sets_;
