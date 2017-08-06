@@ -146,25 +146,54 @@ public:
 	void reset();
 };
 
+/// \brief Extends the functionality of simple_description_pool by using multiple of them to implement
+/// block-wise growth of the pool.
+/**
+ * Otherwise follows the same principles as in relying on on explicit reset for reclaiming resources instead
+ * of using RAII-ownership and also providing no thread-safety by itself.
+ */
 class growing_simple_descriptor_pool {
 	device* dev_;
 	descriptor_set_resources block_resources_;
 	std::vector<simple_descriptor_pool> blocks_;
 
 public:
+	/// Creates a pool for the given device with the given resource amounts per block.
 	growing_simple_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
 								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block)
 			: growing_simple_descriptor_pool(
 					  dev, descriptor_set_resources{pool_sizes_per_block, descriptor_sets_per_block}) {}
 
+	/// Creates a pool for the given device with the given resource amounts per block.
 	growing_simple_descriptor_pool(device& dev, descriptor_set_resources block_resources);
 
+	/// \brief Returns the total amount of descriptors available in the pool before another block needs to be
+	/// allocated.
 	uint32_t available_descriptors(vk::DescriptorType type) const;
+	/// \brief Returns the total amount of descriptor sets available in the pool before another block needs to
+	/// be allocated.
 	uint32_t available_sets() const;
 
+	/// Allocates a descriptor set of the given layout.
+	/**
+	 * The required resources must not exceed the resources per block.
+	 */
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout);
+
+	/// Allocates descriptor sets for each of the given layouts.
+	/**
+	 * The required resources must not exceed the resources per block. Splitting the requests over multiple
+	 * blocks is not supported to reduce overhead.
+	 */
 	std::vector<descriptor_set>
 	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts);
+	/// Allocates descriptor sets for each of the given layouts.
+	/**
+	 * Reduces heap allocations in the wrapper by statically determining the number of sets.
+	 *
+	 * The required resources must not exceed the resources per block. Splitting the requests over multiple
+	 * blocks is not supported to reduce overhead.
+	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
 	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts) {
@@ -182,7 +211,11 @@ public:
 			return blocks_.back().allocate_descriptor_sets(layouts);
 		}
 	}
+	/// \brief Resets all blocks in the pool, invalidating all allocated descriptor sets and reclaiming all
+	/// resources.
 	void reset();
+	/// \brief Releases all blocks except one in the pool, invalidating all allocated descriptor sets and
+	/// releasing resources while keeping one block for future allocations.
 	void reset_and_shrink();
 };
 
