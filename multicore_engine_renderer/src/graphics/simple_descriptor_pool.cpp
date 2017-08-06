@@ -19,81 +19,72 @@ namespace graphics {
 
 simple_descriptor_pool::simple_descriptor_pool(device& dev, uint32_t max_sets,
 											   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes)
-		: dev_{&dev}, max_sets_{max_sets}, available_sets_{max_sets} {
-	max_pool_sizes_.reserve(pool_sizes.size());
-	for(const vk::DescriptorPoolSize& dps : pool_sizes) {
-		if(dps.descriptorCount) max_pool_sizes_[dps.type] += dps.descriptorCount;
-	}
-	available_pool_sizes_ = max_pool_sizes_;
+		: dev_{&dev}, max_resources_{pool_sizes, max_sets}, available_resources_{max_resources_} {
+
 	boost::container::small_vector<vk::DescriptorPoolSize, 16> pool_size_sums;
-	std::transform(max_pool_sizes_.begin(), max_pool_sizes_.end(), std::back_inserter(pool_size_sums),
-				   [](const std::pair<vk::DescriptorType, uint32_t>& ps) {
+	std::transform(max_resources_.descriptors().begin(), max_resources_.descriptors().end(),
+				   std::back_inserter(pool_size_sums), [](const std::pair<vk::DescriptorType, uint32_t>& ps) {
 					   return vk::DescriptorPoolSize(ps.first, ps.second);
 				   });
 	native_pool_ = dev->createDescriptorPoolUnique(vk::DescriptorPoolCreateInfo(
-			{}, max_sets_, uint32_t(pool_size_sums.size()), pool_size_sums.data()));
+			{}, max_resources_.descriptor_sets(), uint32_t(pool_size_sums.size()), pool_size_sums.data()));
 }
 
 simple_descriptor_pool::~simple_descriptor_pool() {}
 
 simple_descriptor_pool::simple_descriptor_pool(simple_descriptor_pool&& other) noexcept
-		: dev_{other.dev_}, native_pool_{std::move(other.native_pool_)}, max_sets_{other.max_sets_},
-		  available_sets_{other.available_sets_}, max_pool_sizes_{std::move(other.max_pool_sizes_)},
-		  available_pool_sizes_{std::move(other.available_pool_sizes_)} {
+		: dev_{other.dev_}, native_pool_{std::move(other.native_pool_)},
+		  max_resources_{std::move(other.max_resources_)}, available_resources_{
+																   std::move(other.available_resources_)} {
 	other.dev_ = nullptr;
-	other.max_sets_ = 0;
-	other.available_sets_ = 0;
 }
 simple_descriptor_pool& simple_descriptor_pool::operator=(simple_descriptor_pool&& other) noexcept {
 	dev_ = other.dev_;
 	native_pool_ = std::move(other.native_pool_);
-	max_sets_ = other.max_sets_;
-	available_sets_ = other.available_sets_;
-	max_pool_sizes_ = std::move(other.max_pool_sizes_);
-	available_pool_sizes_ = std::move(other.available_pool_sizes_);
+	max_resources_ = std::move(other.max_resources_);
+	available_resources_ = std::move(other.available_resources_);
 	other.dev_ = nullptr;
-	other.max_sets_ = 0;
-	other.available_sets_ = 0;
 	return *this;
 }
 
 void simple_descriptor_pool::reset() {
 	(*dev_)->resetDescriptorPool(native_pool_.get());
-	available_sets_ = max_sets_;
-	available_pool_sizes_ = max_pool_sizes_;
+	available_resources_ = max_resources_;
 }
 
 descriptor_set
 simple_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout) {
+	descriptor_set_resources req(*layout);
 	auto nlayout = layout->native_layout();
 	vk::DescriptorSetAllocateInfo ai(native_pool_.get(), 1, &nlayout);
 	vk::DescriptorSet set;
-	auto res = (*dev_)->allocateDescriptorSets(&ai, &set);
-	for(const auto& elem : layout->bindings()) {
-		available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
+	if(!available_resources_.sufficient_for(req)) {
+		throw mce::graphics_exception("Insufficient resources in pool for requested allocation.");
 	}
-	available_sets_--;
+	auto res = (*dev_)->allocateDescriptorSets(&ai, &set);
+	available_resources_ -= req;
 	return descriptor_set(*dev_, vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"),
 						  layout);
 }
 
 std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
 		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts) {
+	descriptor_set_resources req;
+	for(const auto& layout : layouts) {
+		req += *layout;
+	}
+	if(!available_resources_.sufficient_for(req)) {
+		throw mce::graphics_exception("Insufficient resources in pool for requested allocation.");
+	}
 	std::vector<descriptor_set> rv;
 	std::vector<vk::DescriptorSetLayout> nlayouts;
 	rv.reserve(layouts.size());
 	nlayouts.reserve(layouts.size());
 	std::transform(layouts.begin(), layouts.end(), std::back_inserter(nlayouts),
 				   [](const std::shared_ptr<descriptor_set_layout>& l) { return l->native_layout(); });
-
 	auto tmp = (*dev_)->allocateDescriptorSets(
 			vk::DescriptorSetAllocateInfo(native_pool_.get(), uint32_t(nlayouts.size()), nlayouts.data()));
-	for(const auto& layout : layouts) {
-		for(const auto& elem : layout->bindings()) {
-			available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
-		}
-	}
-	available_sets_ -= uint32_t(layouts.size());
+	available_resources_ -= req;
 	auto beg = boost::make_zip_iterator(boost::make_tuple(tmp.begin(), layouts.begin()));
 	auto end = boost::make_zip_iterator(boost::make_tuple(tmp.end(), layouts.end()));
 	std::transform(beg, end, std::back_inserter(rv), [this](auto tup) {
@@ -101,16 +92,6 @@ std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
 	});
 
 	return rv;
-}
-
-uint32_t simple_descriptor_pool::min_available_resource_amount() const {
-	if(available_pool_sizes_.empty()) return available_sets_;
-	return std::min(
-			available_sets_,
-			std::min_element(available_pool_sizes_.begin(), available_pool_sizes_.end(), [](const auto& a,
-																							const auto& b) {
-				return a.second < b.second;
-			})->second);
 }
 
 growing_simple_descriptor_pool::growing_simple_descriptor_pool(
