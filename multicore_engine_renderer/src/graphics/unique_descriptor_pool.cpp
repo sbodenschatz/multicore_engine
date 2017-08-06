@@ -12,6 +12,7 @@
 #include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/unique_descriptor_pool.hpp>
+#include <numeric>
 
 namespace mce {
 namespace graphics {
@@ -85,6 +86,64 @@ void unique_descriptor_pool::free(vk::DescriptorSet set,
 	std::lock_guard<std::mutex> lock(pool_mutex_);
 	(*dev_)->freeDescriptorSets(native_pool_.get(), set);
 	available_resources_ += alloc;
+}
+
+growing_unique_descriptor_pool::growing_unique_descriptor_pool(device& dev,
+															   descriptor_set_resources block_resources)
+		: dev_{&dev}, block_resources_{std::move(block_resources)} {
+	blocks_.emplace_back(std::make_unique<unique_descriptor_pool>(*dev_, block_resources_));
+}
+
+uint32_t growing_unique_descriptor_pool::available_descriptors(vk::DescriptorType type) const {
+	std::lock_guard<std::mutex> lock(blocks_mutex_);
+	return std::accumulate(blocks_.begin(), blocks_.end(), 0u,
+						   [type](uint32_t s, const std::unique_ptr<unique_descriptor_pool>& p) {
+							   return s + p->available_descriptors(type);
+						   });
+}
+
+uint32_t growing_unique_descriptor_pool::available_sets() const {
+	std::lock_guard<std::mutex> lock(blocks_mutex_);
+	return std::accumulate(blocks_.begin(), blocks_.end(), 0u,
+						   [](uint32_t s, const std::unique_ptr<unique_descriptor_pool>& p) {
+							   return s + p->available_sets();
+						   });
+}
+
+descriptor_set
+growing_unique_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+														destruction_queue_manager* dqm) {
+	descriptor_set_resources req = *layout;
+	std::lock_guard<std::mutex> lock(blocks_mutex_);
+	auto it = std::find_if(blocks_.begin(), blocks_.end(),
+						   [&req](const std::unique_ptr<unique_descriptor_pool>& blk) {
+							   return blk->available_resources().sufficient_for(req);
+						   });
+	if(it != blocks_.end()) {
+		return (*it)->allocate_descriptor_set(layout, dqm);
+	} else {
+		blocks_.emplace_back(std::make_unique<unique_descriptor_pool>(*dev_, block_resources_));
+		return blocks_.back()->allocate_descriptor_set(layout, dqm);
+	}
+}
+
+std::vector<descriptor_set> growing_unique_descriptor_pool::allocate_descriptor_sets(
+		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts, destruction_queue_manager* dqm) {
+	descriptor_set_resources req;
+	for(const auto& layout : layouts) {
+		req += *layout;
+	}
+	std::lock_guard<std::mutex> lock(blocks_mutex_);
+	auto it = std::find_if(blocks_.begin(), blocks_.end(),
+						   [&req](const std::unique_ptr<unique_descriptor_pool>& blk) {
+							   return blk->available_resources().sufficient_for(req);
+						   });
+	if(it != blocks_.end()) {
+		return (*it)->allocate_descriptor_sets(layouts, dqm);
+	} else {
+		blocks_.emplace_back(std::make_unique<unique_descriptor_pool>(*dev_, block_resources_));
+		return blocks_.back()->allocate_descriptor_sets(layouts, dqm);
+	}
 }
 
 } /* namespace graphics */

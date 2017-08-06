@@ -165,13 +165,16 @@ public:
 class growing_unique_descriptor_pool {
 	mutable std::mutex blocks_mutex_;
 	device* dev_;
-	uint32_t block_sets_;
-	std::vector<vk::DescriptorPoolSize> block_pool_sizes_;
+	descriptor_set_resources block_resources_;
 	std::vector<std::unique_ptr<unique_descriptor_pool>> blocks_;
 
 public:
 	growing_unique_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
-								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block);
+								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block)
+			: growing_unique_descriptor_pool(
+					  dev, descriptor_set_resources{pool_sizes_per_block, descriptor_sets_per_block}) {}
+
+	growing_unique_descriptor_pool(device& dev, descriptor_set_resources block_resources);
 
 	uint32_t available_descriptors(vk::DescriptorType type) const;
 	uint32_t available_sets() const;
@@ -184,7 +187,23 @@ public:
 	template <size_t size>
 	std::array<descriptor_set, size>
 	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
-							 destruction_queue_manager* dqm = nullptr);
+							 destruction_queue_manager* dqm = nullptr) {
+		descriptor_set_resources req;
+		for(const auto& layout : layouts) {
+			req += *layout;
+		}
+		std::lock_guard<std::mutex> lock(blocks_mutex_);
+		auto it = std::find_if(blocks_.begin(), blocks_.end(),
+							   [&req](const std::unique_ptr<unique_descriptor_pool>& blk) {
+								   return blk->available_resources().sufficient_for(req);
+							   });
+		if(it != blocks_.end()) {
+			return (*it)->allocate_descriptor_sets(layouts, dqm);
+		} else {
+			blocks_.emplace_back(std::make_unique<unique_descriptor_pool>(*dev_, block_resources_));
+			return blocks_.back()->allocate_descriptor_sets(layouts, dqm);
+		}
+	}
 };
 
 } /* namespace graphics */
