@@ -46,6 +46,21 @@ public:
 		}
 	}
 
+	descriptor_set_resources(const descriptor_set_resources&) = default;
+	descriptor_set_resources& operator=(const descriptor_set_resources&) = default;
+	descriptor_set_resources(descriptor_set_resources&& other) noexcept
+			: descriptors_{std::move(other.descriptors_)}, descriptor_sets_{other.descriptor_sets_} {
+		other.descriptor_sets_ = 0;
+		other.descriptors_ = decltype(other.descriptors_)();
+	}
+	descriptor_set_resources& operator=(descriptor_set_resources&& other) noexcept {
+		descriptors_ = std::move(other.descriptors_);
+		descriptor_sets_ = other.descriptor_sets_;
+		other.descriptors_ = decltype(other.descriptors_)();
+		other.descriptor_sets_ = 0;
+		return *this;
+	}
+
 	bool operator==(const descriptor_set_resources& other) const {
 		return std::tie(descriptors_, descriptor_sets_) ==
 			   std::tie(other.descriptors_, other.descriptor_sets_);
