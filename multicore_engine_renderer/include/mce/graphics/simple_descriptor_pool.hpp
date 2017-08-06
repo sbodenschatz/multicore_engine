@@ -148,13 +148,16 @@ public:
 
 class growing_simple_descriptor_pool {
 	device* dev_;
-	uint32_t block_sets_;
-	std::vector<vk::DescriptorPoolSize> block_pool_sizes_;
+	descriptor_set_resources block_resources_;
 	std::vector<simple_descriptor_pool> blocks_;
 
 public:
 	growing_simple_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
-								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block);
+								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block)
+			: growing_simple_descriptor_pool(
+					  dev, descriptor_set_resources{pool_sizes_per_block, descriptor_sets_per_block}) {}
+
+	growing_simple_descriptor_pool(device& dev, descriptor_set_resources block_resources);
 
 	uint32_t available_descriptors(vk::DescriptorType type) const;
 	uint32_t available_sets() const;

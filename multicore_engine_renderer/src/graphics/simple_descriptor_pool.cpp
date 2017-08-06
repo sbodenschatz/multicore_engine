@@ -92,12 +92,10 @@ std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
 	return rv;
 }
 
-growing_simple_descriptor_pool::growing_simple_descriptor_pool(
-		device& dev, uint32_t descriptor_sets_per_block,
-		std::vector<vk::DescriptorPoolSize> pool_sizes_per_block)
-		: dev_{&dev}, block_sets_{descriptor_sets_per_block}, block_pool_sizes_{
-																	  std::move(pool_sizes_per_block)} {
-	blocks_.emplace_back(*dev_, block_sets_, block_pool_sizes_);
+growing_simple_descriptor_pool::growing_simple_descriptor_pool(device& dev,
+															   descriptor_set_resources block_resources)
+		: dev_{&dev}, block_resources_{std::move(block_resources)} {
+	blocks_.emplace_back(*dev_, block_resources_);
 }
 
 uint32_t growing_simple_descriptor_pool::available_descriptors(vk::DescriptorType type) const {
