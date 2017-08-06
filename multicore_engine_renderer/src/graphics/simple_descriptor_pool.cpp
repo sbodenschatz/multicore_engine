@@ -67,6 +67,7 @@ simple_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor
 
 std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
 		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts) {
+	std::vector<descriptor_set> rv;
 	descriptor_set_resources req;
 	for(const auto& layout : layouts) {
 		req += *layout;
@@ -74,7 +75,6 @@ std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
 	if(!available_resources_.sufficient_for(req)) {
 		throw mce::graphics_exception("Insufficient resources in pool for requested allocation.");
 	}
-	std::vector<descriptor_set> rv;
 	std::vector<vk::DescriptorSetLayout> nlayouts;
 	rv.reserve(layouts.size());
 	nlayouts.reserve(layouts.size());
