@@ -117,16 +117,19 @@ public:
 		return available_resources_.min_resource();
 	}
 
-	/// Allocates a descriptor set of the given layout.
+	/// \brief Allocates a descriptor set of the given layout optionally using the given
+	/// destruction_queue_manager for queued destruction.
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
 										   destruction_queue_manager* dqm = nullptr);
 
-	/// Allocates descriptor sets for each of the given layouts.
+	///\brief Allocates descriptor sets for each of the given layouts optionally using the given
+	/// destruction_queue_manager for queued destruction.
 	std::vector<descriptor_set>
 	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
 							 destruction_queue_manager* dqm = nullptr);
 
-	/// Allocates descriptor sets for each of the given layouts.
+	/// \brief Allocates descriptor sets for each of the given layouts optionally using the given
+	/// destruction_queue_manager for queued destruction.
 	/**
 	 * Avoids heap allocations in the wrapper by statically determining the number of sets.
 	 */
