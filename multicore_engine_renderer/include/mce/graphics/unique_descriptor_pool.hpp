@@ -9,7 +9,7 @@
 
 /**
  * \file
- * Defines the simple_descriptor_pool class.
+ * Defines the simple_descriptor_pool and growing_unique_descriptor_pool classes.
  */
 
 #include <boost/container/flat_map.hpp>
@@ -165,6 +165,11 @@ public:
 	}
 };
 
+/// \brief Extends the functionality of unique_description_pool by using multiple of them to implement
+/// block-wise growth of the pool.
+/**
+ * Otherwise follows the same principles as in relying on RAII-ownership and providing thread-safety.
+ */
 class growing_unique_descriptor_pool {
 	mutable std::mutex blocks_mutex_;
 	device* dev_;
@@ -172,21 +177,75 @@ class growing_unique_descriptor_pool {
 	std::vector<std::unique_ptr<unique_descriptor_pool>> blocks_;
 
 public:
+	/// Creates a pool for the given device with the given resource amounts per block.
 	growing_unique_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
 								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block)
 			: growing_unique_descriptor_pool(
 					  dev, descriptor_set_resources{pool_sizes_per_block, descriptor_sets_per_block}) {}
 
+	/// Creates a pool for the given device with the given resource amounts per block.
 	growing_unique_descriptor_pool(device& dev, descriptor_set_resources block_resources);
 
+	/// \brief Returns the approximate total amount of descriptors available in the pool before another block
+	/// needs to be allocated.
+	/**
+	 * The amount is only approximate because concurrent descriptor_set destructions only lock the block from
+	 * which they were allocated and not the growing pool.
+	 * Because this function locks the growing pool for the full duration and each block separately while
+	 * iterating over them the actual amount allocations can not take place concurrently with this function
+	 * but free operations can. As a result the reported amount can be lower but not higher than the actual
+	 * amount.
+	 *
+	 * However since anything can happen immediately after dropping the growing pool lock, checking this e.g.
+	 * to make allocation decisions is problematic even if this were not just approximate.
+	 *
+	 * Therefore this function is mainly useful for statistic purposes.
+	 */
 	uint32_t available_descriptors(vk::DescriptorType type) const;
+
+	/// \brief Returns the approximate total amount of descriptor sets available in the pool before another
+	/// block needs to be allocated.
+	/**
+	 * The amount is only approximate because concurrent descriptor_set destructions only lock the block from
+	 * which they were allocated and not the growing pool.
+	 * Because this function locks the growing pool for the full duration and each block separately while
+	 * iterating over them the actual amount allocations can not take place concurrently with this function
+	 * but free operations can. As a result the reported amount can be lower but not higher than the actual
+	 * amount.
+	 *
+	 * However since anything can happen immediately after dropping the growing pool lock, checking this e.g.
+	 * to make allocation decisions is problematic even if this were not just approximate.
+	 *
+	 * Therefore this function is mainly useful for statistic purposes.
+	 */
 	uint32_t available_sets() const;
 
+	/// \brief Allocates a descriptor set of the given layout optionally using the given
+	/// destruction_queue_manager for queued destruction.
+	/**
+	 * The required resources must not exceed the resources per block.
+	 */
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
 										   destruction_queue_manager* dqm = nullptr);
+
+	/// \brief Allocates descriptor sets for each of the given layouts optionally using the given
+	/// destruction_queue_manager for queued destruction.
+	/**
+	 * The required resources must not exceed the resources per block. Splitting the requests over multiple
+	 * blocks is not supported to reduce overhead.
+	 */
 	std::vector<descriptor_set>
 	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
 							 destruction_queue_manager* dqm = nullptr);
+
+	/// \brief Allocates descriptor sets for each of the given layouts optionally using the given
+	/// destruction_queue_manager for queued destruction.
+	/**
+	 * Reduces heap allocations in the wrapper by statically determining the number of sets.
+	 *
+	 * The required resources must not exceed the resources per block. Splitting the requests over multiple
+	 * blocks is not supported to reduce overhead.
+	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
 	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
