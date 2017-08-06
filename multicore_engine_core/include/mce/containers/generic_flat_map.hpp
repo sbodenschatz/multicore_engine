@@ -575,6 +575,16 @@ public:
 		std::stable_sort(values.begin(), values.end(),
 						 [this](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
+
+	/// Compares *this and other for equality of the key-value-pairs stored in them.
+	bool operator==(const generic_flat_map_base& other) const {
+		return values == other.values;
+	}
+
+	/// Compares *this and other for inequality of the key-value-pairs stored in them.
+	bool operator!=(const generic_flat_map_base& other) const {
+		return !(*this == other);
+	}
 };
 
 /// \brief Provides a non-member ADL swap by calling the member generic_flat_map_base::swap.
