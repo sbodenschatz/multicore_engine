@@ -105,14 +105,27 @@ public:
 	/// Subtracts the resources in other from the resource amount in this object.
 	/**
 	 * Boost.Operators provides operator- based on this operator.
+	 *
+	 * Underflows of resource amounts are prevented by throwing a mce::out_of_range_exception if the operation
+	 * would cause an underflow. In this case the resource amounts of this object are not changed.
 	 */
 	descriptor_set_resources& operator-=(const descriptor_set_resources& other) {
+		if(descriptor_sets_ < other.descriptor_sets_) {
+			throw mce::out_of_range_exception("Descriptor amounts would underflow.");
+		}
 		for(const auto& od : other.descriptors_) {
-			descriptors_[od.first] -= od.second;
+			auto it = descriptors_.find(od.first);
+			if(it == descriptors_.end() || it->second < od.second) {
+				throw mce::out_of_range_exception("Descriptor amounts would underflow.");
+			}
+		}
+		for(const auto& od : other.descriptors_) {
+			descriptors_.at(od.first) -= od.second;
 		}
 		descriptor_sets_ -= other.descriptor_sets_;
 		return *this;
 	}
+
 	/// Multiplies the resource amounts in the this object by factor.
 	/**
 	 * Boost.Operators provides operator*(descriptor_set_resources,uint32_t) and
