@@ -12,6 +12,7 @@
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/pipeline_cache.hpp>
 #include <mce/graphics/simple_descriptor_pool.hpp>
+#include <mce/graphics/unique_descriptor_pool.hpp>
 #include <mce/graphics/window.hpp>
 #include <mce/util/array_utils.hpp>
 #include <vulkan/vulkan.hpp>
@@ -26,5 +27,8 @@ int main() {
 
 	mce::graphics::simple_descriptor_pool dp(dev, 128, {{vk::DescriptorType::eUniformBuffer, 128}});
 	auto sets = dp.allocate_descriptor_sets(
+			mce::util::make_array(std::shared_ptr<mce::graphics::descriptor_set_layout>()));
+	mce::graphics::unique_descriptor_pool dp2(dev, 128, {{vk::DescriptorType::eUniformBuffer, 128}});
+	auto sets2 = dp2.allocate_descriptor_sets(
 			mce::util::make_array(std::shared_ptr<mce::graphics::descriptor_set_layout>()));
 }
