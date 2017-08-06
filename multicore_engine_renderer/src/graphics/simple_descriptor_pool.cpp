@@ -104,11 +104,25 @@ uint32_t growing_simple_descriptor_pool::available_descriptors(vk::DescriptorTyp
 							   return s + p.available_descriptors(type);
 						   });
 }
+
 uint32_t growing_simple_descriptor_pool::available_sets() const {
 	return std::accumulate(
 			blocks_.begin(), blocks_.end(), 0u,
 			[](uint32_t s, const simple_descriptor_pool& p) { return s + p.available_sets(); });
 }
 
+descriptor_set growing_simple_descriptor_pool::allocate_descriptor_set(
+		const std::shared_ptr<descriptor_set_layout>& layout) {
+	descriptor_set_resources req = *layout;
+	auto it = std::find_if(blocks_.begin(), blocks_.end(), [&req](const simple_descriptor_pool& blk) {
+		return blk.available_resources().sufficient_for(req);
+	});
+	if(it != blocks_.end()) {
+		return it->allocate_descriptor_set(layout);
+	} else {
+		blocks_.emplace_back(*dev_, block_resources_);
+		return blocks_.back().allocate_descriptor_set(layout);
+	}
+}
 } /* namespace graphics */
 } /* namespace mce */
