@@ -14,9 +14,9 @@
 
 #include <boost/container/flat_map.hpp>
 #include <mce/exceptions.hpp>
-#include <mce/graphics/descriptor_pool_resources.hpp>
 #include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
+#include <mce/graphics/descriptor_set_resources.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/util/array_utils.hpp>
 #include <memory>

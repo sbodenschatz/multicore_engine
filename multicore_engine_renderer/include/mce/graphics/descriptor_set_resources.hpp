@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef MCE_GRAPHICS_DESCRIPTOR_POOL_RESOURCES_HPP_
-#define MCE_GRAPHICS_DESCRIPTOR_POOL_RESOURCES_HPP_
+#ifndef MCE_GRAPHICS_DESCRIPTOR_SET_RESOURCES_HPP_
+#define MCE_GRAPHICS_DESCRIPTOR_SET_RESOURCES_HPP_
 
 /**
  * \file
@@ -171,4 +171,4 @@ public:
 } // namespace graphics
 } // namespace mce
 
-#endif /* MCE_GRAPHICS_DESCRIPTOR_POOL_RESOURCES_HPP_ */
+#endif /* MCE_GRAPHICS_DESCRIPTOR_SET_RESOURCES_HPP_ */
