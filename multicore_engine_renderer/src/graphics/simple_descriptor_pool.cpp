@@ -124,5 +124,23 @@ descriptor_set growing_simple_descriptor_pool::allocate_descriptor_set(
 		return blocks_.back().allocate_descriptor_set(layout);
 	}
 }
+
+std::vector<descriptor_set> growing_simple_descriptor_pool::allocate_descriptor_sets(
+		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts) {
+	descriptor_set_resources req;
+	for(const auto& layout : layouts) {
+		req += *layout;
+	}
+	auto it = std::find_if(blocks_.begin(), blocks_.end(), [&req](const simple_descriptor_pool& blk) {
+		return blk.available_resources().sufficient_for(req);
+	});
+	if(it != blocks_.end()) {
+		return it->allocate_descriptor_sets(layouts);
+	} else {
+		blocks_.emplace_back(*dev_, block_resources_);
+		return blocks_.back().allocate_descriptor_sets(layouts);
+	}
+}
+
 } /* namespace graphics */
 } /* namespace mce */
