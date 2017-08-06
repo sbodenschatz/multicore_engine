@@ -16,6 +16,7 @@
 #include <condition_variable>
 #include <functional>
 #include <mce/containers/scratch_pad_pool.hpp>
+#include <mce/graphics/descriptor_set_deleter.hpp>
 #include <mce/graphics/device_memory_handle.hpp>
 #include <mutex>
 #include <vector>
@@ -61,6 +62,7 @@ class device;
  *   - mce::graphics::device_memory_handle
  *   - mce::graphics::destruction_queue_manager::executor<std::function<void()>>
  *   - std::shared_ptr<void>
+ *   - descriptor_set_unique_handle
  */
 class destruction_queue_manager {
 public:
@@ -100,7 +102,8 @@ private:
 					   vk::UniqueImage, vk::UniqueImageView, vk::UniquePipeline, vk::UniquePipelineLayout,
 					   vk::UniqueQueryPool, vk::UniqueRenderPass, vk::UniqueSampler, vk::UniqueSemaphore,
 					   vk::UniqueShaderModule, vk::UniqueSurfaceKHR, vk::UniqueSwapchainKHR,
-					   device_memory_handle, executor<std::function<void()>>, std::shared_ptr<void>>
+					   device_memory_handle, executor<std::function<void()>>, std::shared_ptr<void>,
+					   descriptor_set_unique_handle>
 				data;
 		template <typename T>
 		explicit element(T&& data) : data{std::forward<T>(data)} {}
@@ -187,6 +190,12 @@ public:
 		other.qmgr = nullptr;
 		return *this;
 	}
+
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle(const queued_handle&) = delete;
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle& operator=(const queued_handle&) = delete;
+
 	/// Releases the held resource to the destruction_queue_manager.
 	~queued_handle() noexcept {
 		if(qmgr) {
@@ -256,6 +265,12 @@ public:
 		other.qmgr = nullptr;
 		return *this;
 	}
+
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle(const queued_handle&) = delete;
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle& operator=(const queued_handle&) = delete;
+
 	/// Releases the held resource to the destruction_queue_manager.
 	~queued_handle() noexcept {
 		if(qmgr) {
@@ -281,6 +296,10 @@ public:
 	/// Allows access to the held resource.
 	T get() const {
 		return handle_.get();
+	}
+	/// Allows access to the deleter for the held resource.
+	const D& get_deleter() const {
+		return handle_.getDeleter();
 	}
 	/// \brief Releases the ownership of the held resource and makes the queued_handle empty, the ownership is
 	/// transferred to the returned handle.
