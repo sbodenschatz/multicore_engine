@@ -9,7 +9,7 @@
 
 /**
  * \file
- * Defines the simple_descriptor_pool class.
+ * Defines the simple_descriptor_pool and growing_simple_descriptor_pool classes.
  */
 
 #include <boost/container/flat_map.hpp>
@@ -99,7 +99,7 @@ public:
 	/// \brief Returns the remaining number of resources (sets or descriptors) for the resource that is
 	/// closest to being depleted.
 	uint32_t min_available_resource_amount() const {
-		return available_resources_.min();
+		return available_resources_.min_resource();
 	}
 
 	/// Allocates a descriptor set of the given layout.

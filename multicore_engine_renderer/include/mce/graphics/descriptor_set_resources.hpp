@@ -140,7 +140,7 @@ public:
 	}
 
 	/// Returns the smallest present resource amount in this object.
-	uint32_t min() const {
+	uint32_t min_resource() const {
 		if(descriptors_.empty()) return descriptor_sets_;
 		return std::min(
 				descriptor_sets_,

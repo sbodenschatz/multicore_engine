@@ -114,7 +114,7 @@ public:
 	/// closest to being depleted.
 	uint32_t min_available_resource_amount() const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
-		return available_resources_.min();
+		return available_resources_.min_resource();
 	}
 
 	/// Allocates a descriptor set of the given layout.
