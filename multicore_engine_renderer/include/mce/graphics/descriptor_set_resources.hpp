@@ -144,6 +144,24 @@ public:
 	 * This function can for example be used to construct a pool that supports an amount of descriptor sets of
 	 * different layouts.
 	 */
+	friend descriptor_set_resources
+	max(std::initializer_list<std::reference_wrapper<const descriptor_set_resources>> resources) {
+		descriptor_set_resources rv;
+		for(const descriptor_set_resources& res : resources) {
+			if(res.descriptor_sets_ > rv.descriptor_sets_) rv.descriptor_sets_ = res.descriptor_sets_;
+			for(const auto& d : res.descriptors_) {
+				auto& rvd = rv.descriptors_[d.first];
+				if(d.second > rvd) rvd = d.second;
+			}
+		}
+		return rv;
+	}
+
+	/// Returns the per-resource maximum of the given descriptor_set_resource objects.
+	/**
+	 * This function can for example be used to construct a pool that supports an amount of descriptor sets of
+	 * different layouts.
+	 */
 	friend descriptor_set_resources max(const descriptor_set_resources& a,
 										const descriptor_set_resources& b) {
 		descriptor_set_resources rv = a;
