@@ -146,5 +146,36 @@ std::vector<descriptor_set> growing_unique_descriptor_pool::allocate_descriptor_
 	}
 }
 
+uint32_t growing_unique_descriptor_pool::descriptors_capacity(vk::DescriptorType type) const {
+	std::lock_guard<std::mutex> lock(blocks_mutex_);
+	return std::accumulate(blocks_.begin(), blocks_.end(), 0u,
+						   [type](uint32_t s, const std::unique_ptr<unique_descriptor_pool>& p) {
+							   return s + p->max_descriptors(type);
+						   });
+}
+uint32_t growing_unique_descriptor_pool::sets_capacity() const {
+	std::lock_guard<std::mutex> lock(blocks_mutex_);
+	return std::accumulate(
+			blocks_.begin(), blocks_.end(), 0u,
+			[](uint32_t s, const std::unique_ptr<unique_descriptor_pool>& p) { return s + p->max_sets(); });
+}
+
+descriptor_set_resources growing_unique_descriptor_pool::available_resources() const {
+	descriptor_set_resources rv;
+	std::lock_guard<std::mutex> lock(blocks_mutex_);
+	for(const auto& blk : blocks_) {
+		rv += blk->available_resources();
+	}
+	return rv;
+}
+descriptor_set_resources growing_unique_descriptor_pool::resource_capacity() const {
+	descriptor_set_resources rv;
+	std::lock_guard<std::mutex> lock(blocks_mutex_);
+	for(const auto& blk : blocks_) {
+		rv += blk->max_resources();
+	}
+	return rv;
+}
+
 } /* namespace graphics */
 } /* namespace mce */

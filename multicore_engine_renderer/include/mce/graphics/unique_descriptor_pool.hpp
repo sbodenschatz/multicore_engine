@@ -220,6 +220,69 @@ public:
 	 */
 	uint32_t available_sets() const;
 
+	/// Returns the approximate current total capacity for descriptors of the given type.
+	/**
+	 * The amount is only approximate because concurrent descriptor_set destructions only lock the block from
+	 * which they were allocated and not the growing pool.
+	 * Because this function locks the growing pool for the full duration and each block separately while
+	 * iterating over them the actual amount allocations can not take place concurrently with this function
+	 * but free operations can. As a result the reported amount can be lower but not higher than the actual
+	 * amount.
+	 *
+	 * However since anything can happen immediately after dropping the growing pool lock, checking this e.g.
+	 * to make allocation decisions is problematic even if this were not just approximate.
+	 *
+	 * Therefore this function is mainly useful for statistic purposes.
+	 */
+	uint32_t descriptors_capacity(vk::DescriptorType type) const;
+	/// Returns the approximate current total capacity for descriptor sets.
+	/**
+	 * The amount is only approximate because concurrent descriptor_set destructions only lock the block from
+	 * which they were allocated and not the growing pool.
+	 * Because this function locks the growing pool for the full duration and each block separately while
+	 * iterating over them the actual amount allocations can not take place concurrently with this function
+	 * but free operations can. As a result the reported amount can be lower but not higher than the actual
+	 * amount.
+	 *
+	 * However since anything can happen immediately after dropping the growing pool lock, checking this e.g.
+	 * to make allocation decisions is problematic even if this were not just approximate.
+	 *
+	 * Therefore this function is mainly useful for statistic purposes.
+	 */
+	uint32_t sets_capacity() const;
+
+	/// \brief Returns the approximate total amount of resources available in the pool before another block
+	/// needs to be allocated.
+	/**
+	 * The amount is only approximate because concurrent descriptor_set destructions only lock the block from
+	 * which they were allocated and not the growing pool.
+	 * Because this function locks the growing pool for the full duration and each block separately while
+	 * iterating over them the actual amount allocations can not take place concurrently with this function
+	 * but free operations can. As a result the reported amount can be lower but not higher than the actual
+	 * amount.
+	 *
+	 * However since anything can happen immediately after dropping the growing pool lock, checking this e.g.
+	 * to make allocation decisions is problematic even if this were not just approximate.
+	 *
+	 * Therefore this function is mainly useful for statistic purposes.
+	 */
+	descriptor_set_resources available_resources() const;
+	/// Returns the approximate current total resource capacity of the pool.
+	/**
+	 * The amount is only approximate because concurrent descriptor_set destructions only lock the block from
+	 * which they were allocated and not the growing pool.
+	 * Because this function locks the growing pool for the full duration and each block separately while
+	 * iterating over them the actual amount allocations can not take place concurrently with this function
+	 * but free operations can. As a result the reported amount can be lower but not higher than the actual
+	 * amount.
+	 *
+	 * However since anything can happen immediately after dropping the growing pool lock, checking this e.g.
+	 * to make allocation decisions is problematic even if this were not just approximate.
+	 *
+	 * Therefore this function is mainly useful for statistic purposes.
+	 */
+	descriptor_set_resources resource_capacity() const;
+
 	/// \brief Allocates a descriptor set of the given layout optionally using the given
 	/// destruction_queue_manager for queued destruction.
 	/**
