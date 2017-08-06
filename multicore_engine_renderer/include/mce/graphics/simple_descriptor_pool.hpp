@@ -169,6 +169,7 @@ public:
 	std::array<descriptor_set, size>
 	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts);
 	void reset();
+	void reset_and_shrink();
 };
 
 } /* namespace graphics */

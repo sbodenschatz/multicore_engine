@@ -148,5 +148,10 @@ void growing_simple_descriptor_pool::reset() {
 	}
 }
 
+void growing_simple_descriptor_pool::reset_and_shrink() {
+	blocks_.erase(blocks_.begin() + 1, blocks_.end());
+	blocks_.front().reset();
+}
+
 } /* namespace graphics */
 } /* namespace mce */
