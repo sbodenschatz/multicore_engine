@@ -13,6 +13,8 @@
  */
 
 #include <boost/container/flat_map.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/graphics/descriptor_pool_resources.hpp>
 #include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/device.hpp>
@@ -41,10 +43,8 @@ class unique_descriptor_pool {
 	mutable std::mutex pool_mutex_;
 	device* dev_;
 	vk::UniqueDescriptorPool native_pool_;
-	uint32_t max_sets_;
-	uint32_t available_sets_;
-	boost::container::flat_map<vk::DescriptorType, uint32_t> max_pool_sizes_;
-	boost::container::flat_map<vk::DescriptorType, uint32_t> available_pool_sizes_;
+	descriptor_set_resources max_resources_;
+	descriptor_set_resources available_resources_;
 
 	friend class descriptor_set_deleter;
 
@@ -54,7 +54,11 @@ public:
 	/// \brief Creates a unique_descriptor_pool for the given device with the given number sets and the given
 	/// numbers descriptors for each type.
 	unique_descriptor_pool(device& dev, uint32_t max_sets,
-						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes);
+						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes)
+			: unique_descriptor_pool(dev, descriptor_set_resources{pool_sizes, max_sets}) {}
+
+	unique_descriptor_pool(device& dev, descriptor_set_resources capacity);
+
 	/// \brief Destroys the unique_descriptor_pool and releases the underlying resources.
 	/**
 	 * Requires that all descriptor_set objects allocated from this pool must be destroyed before it.
@@ -73,34 +77,45 @@ public:
 	/// Returns the number of available descriptors for the given type in the pool.
 	uint32_t available_descriptors(vk::DescriptorType type) const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
-		auto it = available_pool_sizes_.find(type);
-		if(it == available_pool_sizes_.end()) return 0;
-		return it->second;
+		return available_resources_.descriptors(type);
 	}
 
 	/// Returns the number of available descriptor sets in the pool.
 	uint32_t available_sets() const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
-		return available_sets_;
+		return available_resources_.descriptor_sets();
 	}
 
 	/// Returns the total number of descriptors for the given type in the pool.
 	uint32_t max_descriptors(vk::DescriptorType type) const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
-		auto it = max_pool_sizes_.find(type);
-		if(it == max_pool_sizes_.end()) return 0;
-		return it->second;
+		return max_resources_.descriptors(type);
 	}
 
 	/// Returns the total number of descriptor sets in the pool.
 	uint32_t max_sets() const {
 		std::lock_guard<std::mutex> lock(pool_mutex_);
-		return max_sets_;
+		return max_resources_.descriptor_sets();
+	}
+
+	/// Returns a description of all available resources in the pool.
+	descriptor_set_resources available_resources() const {
+		std::lock_guard<std::mutex> lock(pool_mutex_);
+		return available_resources_;
+	}
+
+	/// Returns a description of the resource capacity of the pool.
+	descriptor_set_resources max_resources() const {
+		std::lock_guard<std::mutex> lock(pool_mutex_);
+		return max_resources_;
 	}
 
 	/// \brief Returns the remaining number of resources (sets or descriptors) for the resource that is
 	/// closest to being depleted.
-	uint32_t min_available_resource_amount() const;
+	uint32_t min_available_resource_amount() const {
+		std::lock_guard<std::mutex> lock(pool_mutex_);
+		return available_resources_.min();
+	}
 
 	/// Allocates a descriptor set of the given layout.
 	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
@@ -119,6 +134,10 @@ public:
 	std::array<descriptor_set, size>
 	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
 							 destruction_queue_manager* dqm = nullptr) {
+		descriptor_set_resources req;
+		for(const auto& layout : layouts) {
+			req += *layout;
+		}
 		std::array<vk::DescriptorSetLayout, size> nlayouts;
 		std::array<vk::DescriptorSet, size> nsets;
 		std::transform(layouts.begin(), layouts.end(), nlayouts.begin(),
@@ -126,21 +145,14 @@ public:
 		vk::DescriptorSetAllocateInfo ai(native_pool_.get(), size, nlayouts.data());
 		{
 			std::lock_guard<std::mutex> lock(pool_mutex_);
+			if(!available_resources_.sufficient_for(req)) {
+				throw mce::graphics_exception("Insufficient resources in pool for requested allocation.");
+			}
 			auto res = (*dev_)->allocateDescriptorSets(&ai, nsets.data());
 			if(res != vk::Result::eSuccess) {
 				throw std::system_error(res, "vk::Device::allocateDescriptorSets");
 			}
-			try {
-				for(const auto& layout : layouts) {
-					for(const auto& elem : layout->bindings()) {
-						available_pool_sizes_.at(elem.descriptor_type) -= elem.descriptor_count;
-					}
-				}
-			} catch(...) {
-				(*dev_)->freeDescriptorSets(native_pool_.get(), nsets);
-				throw;
-			}
-			available_sets_ -= uint32_t(layouts.size());
+			available_resources_ -= req;
 		}
 		return mce::util::array_transform<descriptor_set>(
 				nsets, layouts,
