@@ -132,8 +132,8 @@ public:
 	 * operator*(uint32_t,descriptor_set_resources) based on this operator.
 	 */
 	descriptor_set_resources& operator*=(uint32_t factor) {
-		for(const auto& d : descriptors_) {
-			descriptors_[d.first] *= factor;
+		for(auto& d : descriptors_) {
+			d.second *= factor;
 		}
 		descriptor_sets_ *= factor;
 		return *this;
