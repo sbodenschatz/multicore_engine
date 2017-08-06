@@ -174,6 +174,17 @@ public:
 	/// be allocated.
 	uint32_t available_sets() const;
 
+	/// Returns the current total capacity for descriptors of the given type.
+	uint32_t descriptors_capacity(vk::DescriptorType type) const;
+	/// Returns the current total capacity for descriptor sets.
+	uint32_t sets_capacity() const;
+
+	/// \brief Returns the total amount of resources available in the pool before another block needs to be
+	/// allocated.
+	descriptor_set_resources available_resources() const;
+	/// Returns the current total resource capacity of the pool.
+	descriptor_set_resources resource_capacity() const;
+
 	/// Allocates a descriptor set of the given layout.
 	/**
 	 * The required resources must not exceed the resources per block.

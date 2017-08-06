@@ -159,5 +159,30 @@ void growing_simple_descriptor_pool::reset_and_shrink() {
 	blocks_.front().reset();
 }
 
+uint32_t growing_simple_descriptor_pool::descriptors_capacity(vk::DescriptorType type) const {
+	return std::accumulate(
+			blocks_.begin(), blocks_.end(), 0u,
+			[type](uint32_t s, const simple_descriptor_pool& p) { return s + p.max_descriptors(type); });
+}
+uint32_t growing_simple_descriptor_pool::sets_capacity() const {
+	return std::accumulate(blocks_.begin(), blocks_.end(), 0u,
+						   [](uint32_t s, const simple_descriptor_pool& p) { return s + p.max_sets(); });
+}
+
+descriptor_set_resources growing_simple_descriptor_pool::available_resources() const {
+	descriptor_set_resources rv;
+	for(const auto& blk : blocks_) {
+		rv += blk.available_resources();
+	}
+	return rv;
+}
+descriptor_set_resources growing_simple_descriptor_pool::resource_capacity() const {
+	descriptor_set_resources rv;
+	for(const auto& blk : blocks_) {
+		rv += blk.max_resources();
+	}
+	return rv;
+}
+
 } /* namespace graphics */
 } /* namespace mce */
