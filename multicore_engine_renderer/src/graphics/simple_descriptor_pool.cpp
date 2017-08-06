@@ -142,5 +142,11 @@ std::vector<descriptor_set> growing_simple_descriptor_pool::allocate_descriptor_
 	}
 }
 
+void growing_simple_descriptor_pool::reset() {
+	for(auto& blk : blocks_) {
+		blk.reset();
+	}
+}
+
 } /* namespace graphics */
 } /* namespace mce */
