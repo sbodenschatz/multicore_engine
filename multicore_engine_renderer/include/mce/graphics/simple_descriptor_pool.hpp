@@ -82,6 +82,16 @@ public:
 		return max_resources_.descriptor_sets();
 	}
 
+	/// Returns a description of all available resources in the pool.
+	const descriptor_set_resources& available_resources() const {
+		return available_resources_;
+	}
+
+	/// Returns a description of the resource capacity of the pool.
+	const descriptor_set_resources& max_resources() const {
+		return max_resources_;
+	}
+
 	/// \brief Returns the remaining number of resources (sets or descriptors) for the resource that is
 	/// closest to being depleted.
 	uint32_t min_available_resource_amount() const {
