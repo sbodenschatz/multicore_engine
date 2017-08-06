@@ -772,9 +772,9 @@ public:
 		if(it != this->values.end())
 			if(comp(key, *it)) it = this->values.end();
 		if(it == this->values.end()) {
-			std::tie(it, std::ignore) = insert(std::forward<K>(key), Value());
+			it = insert(std::forward<K>(key), Value()).first.iterator;
 		}
-		return *it;
+		return it->second;
 	}
 
 	/// Swaps the contents of *this with other by swapping their components.
