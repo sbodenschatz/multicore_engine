@@ -167,7 +167,21 @@ public:
 	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts);
 	template <size_t size>
 	std::array<descriptor_set, size>
-	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts);
+	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts) {
+		descriptor_set_resources req;
+		for(const auto& layout : layouts) {
+			req += *layout;
+		}
+		auto it = std::find_if(blocks_.begin(), blocks_.end(), [&req](const simple_descriptor_pool& blk) {
+			return blk.available_resources().sufficient_for(req);
+		});
+		if(it != blocks_.end()) {
+			return it->allocate_descriptor_sets(layouts);
+		} else {
+			blocks_.emplace_back(*dev_, block_resources_);
+			return blocks_.back().allocate_descriptor_sets(layouts);
+		}
+	}
 	void reset();
 	void reset_and_shrink();
 };
