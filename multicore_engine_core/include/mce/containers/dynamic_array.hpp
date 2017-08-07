@@ -9,6 +9,7 @@
 
 #include <iterator>
 #include <mce/memory/align.hpp>
+#include <mce/util/traits.hpp>
 #include <memory>
 #include <type_traits>
 
@@ -84,7 +85,8 @@ public:
 			}
 		}
 	}
-	template <typename... F, typename = std::tuple<decltype(std::declval<F>()(std::declval<size_type>()))...>>
+	template <typename... F,
+			  typename = std::enable_if_t<util::conjunction<util::is_callable<F, size_t>...>::value>>
 	dynamic_array(size_type size, F... init_func) : data_{nullptr}, size_{0} {
 		allocate(size);
 		for(size_type i = 0; size_ < size; ++size_, ++i) {
@@ -108,7 +110,8 @@ public:
 			++size_;
 		}
 	}
-	template <typename... Args>
+	template <typename... Args,
+			  typename = std::enable_if_t<!util::conjunction<util::is_callable<Args, size_t>...>::value>>
 	dynamic_array(size_type size, Args&&... args) : data_{nullptr}, size_{0} {
 		allocate(size);
 		for(size_type i = 0; size_ < size; ++size_, ++i) {
