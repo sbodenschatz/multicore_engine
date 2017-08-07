@@ -43,6 +43,13 @@ struct dynamic_array_index_switch_helper<index_constructor_parameter_tag<Integra
 
 } // namespace detail
 
+/// Provides an array of type T with a runtime-determined size.
+/**
+ * In contrast to std::vector dynamic_array doen't support resizing and can thus avoid to impose the
+ * requirements needed for reallocation on T.
+ * The complete array can be move and copy assigned and constructed but the object doesn't support resizing
+ * without replacing.
+ */
 template <typename T>
 class dynamic_array {
 	std::unique_ptr<char[]> raw_data_;
@@ -65,19 +72,31 @@ class dynamic_array {
 	}
 
 public:
+	/// The type of the values in the container.
 	using value_type = T;
+	/// The type used for sizes and indices.
 	using size_type = std::size_t;
-	using difference_type = std::ptrdiff_t;
+	/// The type used for references to the contents.
 	using reference = value_type&;
+	/// The type used for read-only references to the contents.
 	using const_reference = const value_type&;
+	/// The type used for pointers to the contents.
 	using pointer = value_type*;
+	/// The type used for read-only pointers to the contents.
 	using const_pointer = const value_type*;
+	/// The type of read-write iterators over the contents.
 	using iterator = pointer;
+	/// The type of read-only iterators over the contents.
 	using const_iterator = const_pointer;
+	/// The type of read-write iterators over the contents with reversed traversal.
 	using reverse_iterator = std::reverse_iterator<iterator>;
+	/// The type of read-only iterators over the contents with reversed traversal.
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+	/// Creates an empty dynamic_array.
 	dynamic_array() : size_{0}, data_{nullptr} {}
+
+	/// Creates a dynamic_array containing the given number of copies of the given value.
 	dynamic_array(size_type size, const_reference value) : data_{nullptr}, size_{0} {
 		allocate(size);
 		for(; size_ < size; ++size_) {
@@ -89,6 +108,9 @@ public:
 			}
 		}
 	}
+
+	/// \brief Creates a dynamic_array containing the given number of values constructed from a constructor
+	/// parameter list created by applying the given function objects to the index of the value.
 	template <typename... F,
 			  typename = std::enable_if_t<util::conjunction<util::is_callable<F, size_t>...>::value>>
 	dynamic_array(size_type size, F... init_func) : data_{nullptr}, size_{0} {
@@ -102,6 +124,8 @@ public:
 			}
 		}
 	}
+
+	/// Creates a dynamic_array containing the values from the given std::initializer_list.
 	dynamic_array(std::initializer_list<value_type> values) : data_{nullptr}, size_{0} {
 		allocate(values.size());
 		for(const auto& val : values) {
@@ -114,6 +138,13 @@ public:
 			++size_;
 		}
 	}
+
+	/// \brief Creates a dynamic_array with the given number of values constructed by forwarding the given
+	/// constructor arguments.
+	/**
+	 * Any of the parameters can be given as a place holder index_constructor_parameter_tag<Integral> to pass
+	 * the element index casted to Integral in it's place.
+	 */
 	template <typename... Args,
 			  typename = std::enable_if_t<!util::conjunction<util::is_callable<Args, size_t>...>::value>>
 	dynamic_array(size_type size, Args&&... args) : data_{nullptr}, size_{0} {
@@ -127,6 +158,8 @@ public:
 			}
 		}
 	}
+
+	/// Constructs a dynamic_array by copying the given dynamic_array and it's contents.
 	dynamic_array(const dynamic_array& other) : data_{nullptr}, size_{0} {
 		allocate(other.size());
 		for(const auto& val : other) {
@@ -139,6 +172,8 @@ public:
 			++size_;
 		}
 	}
+
+	/// Replaces this dynamic_array with a copy of the given array.
 	dynamic_array& operator=(const dynamic_array& other) {
 		if(this == std::addressof(other)) return *this;
 		free();
@@ -157,11 +192,15 @@ public:
 		}
 		return *this;
 	}
+
+	/// Allows move-construction.
 	dynamic_array(dynamic_array&& other) noexcept
 			: raw_data_{std::move(other.raw_data_)}, data_{other.data_}, size_{other.size_} {
 		other.data_ = nullptr;
 		other.size_ = 0;
 	}
+
+	/// Replaces this dynamic_array by moving the given array into it.
 	dynamic_array& operator=(dynamic_array&& other) noexcept {
 		free();
 		raw_data_ = std::move(other.raw_data_);
@@ -171,90 +210,154 @@ public:
 		other.size_ = 0;
 		return *this;
 	}
+
+	/// Destroys the array and it's contents.
 	~dynamic_array() noexcept {
 		free();
 	}
+
+	/// Allows read-write access to the element with the given index with bounds check.
 	reference at(size_type pos) {
 		if(pos < size_)
 			return data_[pos];
 		else
 			throw std::out_of_range("Position out of bounds.");
 	}
+
+	/// Allows read-only access to the element with the given index with bounds check.
 	const_reference at(size_type pos) const {
 		if(pos < size_)
 			return data_[pos];
 		else
 			throw std::out_of_range("Position out of bounds.");
 	}
+
+	/// Allows read-write access to the element with the given index without bounds check.
 	reference operator[](size_type pos) {
 		return data_[pos];
 	}
+
+	/// Allows read-only access to the element with the given index without bounds check.
 	const_reference operator[](size_type pos) const {
 		return data_[pos];
 	}
+
+	/// Allows access to the first element of the dynamic_array.
+	/**
+	 * Calling this on an empty container invokes undefined behavior.
+	 */
 	reference front() {
 		return *data_;
 	}
+
+	/// Allows read-only access to the first element of the dynamic_array.
+	/**
+	 * Calling this on an empty container invokes undefined behavior.
+	 */
 	const_reference front() const {
 		return *data_;
 	}
+
+	/// Allows access to the last element of the dynamic_array.
+	/**
+	 * Calling this on an empty container invokes undefined behavior.
+	 */
 	reference back() {
 		return data_[size_ - 1];
 	}
+
+	/// Allows read-only access to the last element of the dynamic_array.
+	/**
+	 * Calling this on an empty container invokes undefined behavior.
+	 */
 	const_reference back() const {
 		return data_[size_ - 1];
 	}
-	T* data() noexcept {
+
+	/// Returns a pointer to the contents of the container.
+	pointer data() noexcept {
 		return data_;
 	}
-	const T* data() const noexcept {
+
+	/// Returns a read-only pointer to the contents of the container.
+	const_pointer data() const noexcept {
 		return data_;
 	}
+
+	/// Returns an read-write iterator referring to the beginning of the container.
 	iterator begin() noexcept {
 		return data_;
 	}
+
+	/// Returns an read-only iterator referring to the beginning of the container.
 	const_iterator begin() const noexcept {
 		return data_;
 	}
+
+	/// Returns an read-only iterator referring to the beginning of the container.
 	const_iterator cbegin() const noexcept {
 		return data_;
 	}
+
+	/// Returns an read-write iterator referring to the end of the container.
 	iterator end() noexcept {
 		return data_ + size_;
 	}
+
+	/// Returns an read-only iterator referring to the end of the container.
 	const_iterator end() const noexcept {
 		return data_ + size_;
 	}
+
+	/// Returns an read-only iterator referring to the end of the container.
 	const_iterator cend() const noexcept {
 		return data_ + size_;
 	}
+
+	/// Returns an read-write iterator referring to the beginning of the container in reverse order.
 	reverse_iterator rbegin() noexcept {
 		return data_ + size_;
 	}
+
+	/// Returns an read-only iterator referring to the beginning of the container in reverse order.
 	const_reverse_iterator rbegin() const noexcept {
 		return data_ + size_;
 	}
+
+	/// Returns an read-only iterator referring to the beginning of the container in reverse order.
 	const_reverse_iterator crbegin() const noexcept {
 		return data_ + size_;
 	}
+
+	/// Returns an read-write iterator referring to the end of the container in reverse order.
 	reverse_iterator rend() noexcept {
 		return data_;
 	}
+
+	/// Returns an read-only iterator referring to the end of the container in reverse order.
 	const_reverse_iterator rend() const noexcept {
 		return data_;
 	}
+
+	/// Returns an read-only iterator referring to the end of the container in reverse order.
 	const_reverse_iterator crend() const {
 		return data_;
 	}
+
+	/// Returns the number of elements in the dynamic_array.
 	size_type size() const noexcept {
 		return size_;
 	}
+
+	/// Swaps the contents of *this and other.
 	void swap(dynamic_array& other) noexcept {
 		using std::swap;
 		swap(raw_data_, other.raw_data_);
 		swap(data_, other.data_);
 		swap(size_, other.size_);
 	}
+
+	/// Swaps the contents of both given dynamic_array objects.
 	friend void swap(dynamic_array& a, dynamic_array& b) noexcept {
 		a.swap(b);
 	}
