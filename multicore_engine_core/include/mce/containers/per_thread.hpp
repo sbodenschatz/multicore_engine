@@ -18,7 +18,7 @@ template <typename T>
 class per_thread {
 	size_t total_slots_;
 	std::atomic<size_t> used_slots_;
-	dynamic_array<std::thread::id> owners_;
+	dynamic_array<std::atomic<std::thread::id>> owners_;
 	dynamic_array<T> values_;
 
 public:
