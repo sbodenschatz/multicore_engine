@@ -35,7 +35,7 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	template <typename... Args>
-	per_thread(size_type slots, Args&& args);
+	per_thread(size_type slots, Args&&... args);
 
 	per_thread(const per_thread&) = delete;
 	per_thread& operator=(const per_thread&) = delete;
@@ -47,22 +47,22 @@ public:
 	const T& get() const;
 
 	iterator begin() noexcept {
-		return data_;
+		return owners_.begin();
 	}
 	const_iterator begin() const noexcept {
-		return data_;
+		return owners_.begin();
 	}
 	const_iterator cbegin() const noexcept {
-		return data_;
+		return owners_.begin();
 	}
 	iterator end() noexcept {
-		return data_ + used_slots_.load();
+		return owners_.begin() + used_slots_.load();
 	}
 	const_iterator end() const noexcept {
-		return data_ + used_slots_.load();
+		return owners_.begin() + used_slots_.load();
 	}
 	const_iterator cend() const noexcept {
-		return data_ + used_slots_.load();
+		return owners_.begin() + used_slots_.load();
 	}
 	reverse_iterator rbegin() noexcept {
 		return end();
