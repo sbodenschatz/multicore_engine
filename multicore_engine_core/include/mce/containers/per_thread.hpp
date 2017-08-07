@@ -44,9 +44,21 @@ public:
 	per_thread(per_thread&&) = delete;
 	per_thread& operator=(per_thread&&) = delete;
 
-	size_t slot_index();
+	size_t slot_index() {
+		auto used = used_slots_.load();
+		auto my_id = std::this_thread::get_id();
+		for(size_type i = 0; i < used; ++i) {
+			if(owners_[i].load() == my_id) return i;
+		}
+		auto my_index = used_slots_.load();
+		do {
+			if(my_index == total_slots_) {
+				throw std::runtime_error("No slot available."); // TODO Use custom exception type.
+			}
+		} while(used_slots_.compare_exchange_weak(my_index, my_index + 1));
+		return my_index;
+	}
 	T& get();
-	const T& get() const;
 
 	iterator begin() noexcept {
 		return owners_.begin();
