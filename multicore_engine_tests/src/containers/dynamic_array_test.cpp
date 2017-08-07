@@ -27,6 +27,17 @@ TEST(containers_dynamic_array_test, construct_from_value) {
 	}
 }
 
+TEST(containers_dynamic_array_test, construct_from_args) {
+	dynamic_array<dynamic_array_test_object_1> a(10, 123, 456);
+	ASSERT_EQ(10, a.size());
+	for(int i = 0; i < 10; ++i) {
+		ASSERT_EQ(123, a[i].x);
+		ASSERT_EQ(456, a[i].y);
+		ASSERT_EQ(123, a.at(i).x);
+		ASSERT_EQ(456, a.at(i).y);
+	}
+}
+
 TEST(containers_dynamic_array_test, construct_from_function) {
 	dynamic_array<dynamic_array_test_object_1> a(10, [](size_t i) { return int(i); },
 												 [](size_t i) { return int(i * i); });
