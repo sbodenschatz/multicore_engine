@@ -141,6 +141,9 @@ public:
 		other.size_ = 0;
 		return *this;
 	}
+	~dynamic_array() noexcept {
+		free();
+	}
 	reference at(size_type pos);
 	const_reference at(size_type pos) const;
 	reference operator[](size_type pos);
