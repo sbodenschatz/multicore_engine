@@ -103,5 +103,33 @@ TEST(util_traits_test, callable_positive) {
 	ASSERT_TRUE(res_D);
 }
 
+TEST(util_traits_test, callable_negative) {
+	struct A {
+		void operator()() {}
+	};
+	static_assert(!is_callable<A, int, float>::value, "!is_callable<A,int,float>::value");
+	auto res_A = !is_callable<A, int, float>::value;
+	ASSERT_TRUE(res_A);
+
+	struct B {
+		void operator()(int&) {}
+	};
+	static_assert(!is_callable<B, int&&>::value, "!is_callable<B,int&&>::value");
+	auto res_B = !is_callable<B, int&&>::value;
+	ASSERT_TRUE(res_B);
+
+	struct C {
+		void operator()(int&) {}
+	};
+	static_assert(!is_callable<C, const int&>::value, "!is_callable<C,const int&>::value");
+	auto res_C = !is_callable<C, const int&>::value;
+	ASSERT_TRUE(res_C);
+
+	struct D {};
+	static_assert(!is_callable<D>::value, "!is_callable<D>::value");
+	auto res_D = !is_callable<D>::value;
+	ASSERT_TRUE(res_D);
+}
+
 } // namespace util
 } // namespace mce
