@@ -7,11 +7,36 @@
 #ifndef MCE_CONTAINERS_PER_THREAD_HPP_
 #define MCE_CONTAINERS_PER_THREAD_HPP_
 
+#include <atomic>
+#include <mce/containers/dynamic_array.hpp>
+#include <thread>
+
 namespace mce {
 namespace containers {
 
 template <typename T>
 class per_thread {
+	size_t total_slots_;
+	std::atomic<size_t> used_slots_;
+	dynamic_array<std::thread::id> owners_;
+	dynamic_array<T> values_;
+
+public:
+	using value_type = T;
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
+	using reference = value_type&;
+	using const_reference = const value_type&;
+	using pointer = value_type*;
+	using const_pointer = const value_type*;
+	using iterator = pointer;
+	using const_iterator = const_pointer;
+	using reverse_iterator = std::reverse_iterator<iterator>;
+	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+	size_t slot_index();
+	T& get();
+	const T& get() const;
 
 };
 
