@@ -72,5 +72,28 @@ TEST(containers_dynamic_array_test, copy_construct) {
 	}
 }
 
+TEST(containers_dynamic_array_test, copy_assign) {
+	dynamic_array<dynamic_array_test_object_1> o_a(
+			{{0, 0}, {1, 1}, {2, 4}, {3, 9}, {4, 16}, {5, 25}, {6, 36}});
+	dynamic_array<dynamic_array_test_object_1> a(10, {123, 456});
+
+	a = o_a;
+
+	ASSERT_EQ(7, a.size());
+	for(int i = 0; i < 7; ++i) {
+		ASSERT_EQ(i, a[i].x);
+		ASSERT_EQ(i * i, a[i].y);
+		ASSERT_EQ(i, a.at(i).x);
+		ASSERT_EQ(i * i, a.at(i).y);
+	}
+	ASSERT_EQ(7, o_a.size());
+	for(int i = 0; i < 7; ++i) {
+		ASSERT_EQ(i, o_a[i].x);
+		ASSERT_EQ(i * i, o_a[i].y);
+		ASSERT_EQ(i, o_a.at(i).x);
+		ASSERT_EQ(i * i, o_a.at(i).y);
+	}
+}
+
 } // namespace containers
 } // namespace mce
