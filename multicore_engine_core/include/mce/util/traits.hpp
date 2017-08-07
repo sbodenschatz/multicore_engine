@@ -85,6 +85,28 @@ struct accessor_value_type {
 template <typename T>
 using accessor_value_type_t = typename accessor_value_type<T>::type;
 
+namespace detail {
+
+template <typename T, typename... Args>
+struct callable_trait_impl {
+	struct not_callable_t;
+	template <typename U = T, typename V = decltype(std::declval<U>()(std::declval<Args>()...))>
+	static V test_func(const Args&...);
+	template <typename... Args2>
+	static not_callable_t test_func(const Args2&...);
+
+	static constexpr bool value =
+			!std::is_same<not_callable_t, decltype(test_func(std::declval<Args>()...))>::value;
+};
+
+} // namespace detail
+
+template <typename T, typename... Args>
+struct is_callable {
+	static constexpr bool value = detail::callable_trait_impl<T, Args...>::value;
+};
+
+
 } // namespace util
 } // namespace mce
 
