@@ -103,6 +103,7 @@ public:
 		if(size_ != other.size_) {
 			allocate(other.size_);
 		}
+		size_ = 0;
 		for(const auto& val : other) {
 			try {
 				new(data_ + size_) T(val);
