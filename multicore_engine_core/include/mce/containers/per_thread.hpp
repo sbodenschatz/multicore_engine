@@ -44,7 +44,7 @@ public:
 	per_thread(per_thread&&) = delete;
 	per_thread& operator=(per_thread&&) = delete;
 
-	size_t slot_index() {
+	size_type slot_index() {
 		auto used = used_slots_.load();
 		auto my_id = std::this_thread::get_id();
 		for(size_type i = 0; i < used; ++i) {
@@ -58,7 +58,7 @@ public:
 		} while(used_slots_.compare_exchange_weak(my_index, my_index + 1));
 		return my_index;
 	}
-	T& get() {
+	reference get() {
 		return values_[slot_index()];
 	}
 
