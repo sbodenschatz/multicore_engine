@@ -66,7 +66,9 @@ public:
 	const_reverse_iterator crend() const;
 	size_type size() const noexcept;
 	void swap(dynamic_array& other) noexcept;
-	friend void swap(dynamic_array& a, dynamic_array& b) noexcept {}
+	friend void swap(dynamic_array& a, dynamic_array& b) noexcept {
+		a.swap(b);
+	}
 };
 
 } // namespace containers
