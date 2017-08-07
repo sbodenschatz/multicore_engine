@@ -16,8 +16,24 @@ namespace containers {
 
 template <typename T>
 class dynamic_array {
-	std::unique_ptr<char[]> data_;
+	std::unique_ptr<char[]> raw_data_;
+	T* data_;
 	size_t size_;
+
+	void allocate(size_t size) {
+		auto space = size * sizeof(T) + alignof(T);
+		raw_data_ = std::make_unique<char[]>(space);
+		void* aptr = raw_data_.get();
+		if(!memory::align(alignof(T), size * sizeof(T), aptr, space)) {
+			throw std::bad_alloc();
+		}
+		data_ = reinterpret_cast<T*>(aptr);
+	}
+	void free() {
+		for(size_t i = 0; i < size_; ++i) {
+			data_[i].~T();
+		}
+	}
 
 public:
 	using value_type = T;
