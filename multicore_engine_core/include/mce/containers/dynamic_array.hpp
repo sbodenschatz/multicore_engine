@@ -174,8 +174,12 @@ public:
 	const_reference back() const {
 		return data_[size_ - 1];
 	}
-	T* data() noexcept;
-	const T* data() const noexcept;
+	T* data() noexcept {
+		return data_;
+	}
+	const T* data() const noexcept {
+		return data_;
+	}
 	iterator begin() noexcept;
 	const_iterator begin() const noexcept;
 	const_iterator cbegin() const noexcept;
@@ -188,7 +192,9 @@ public:
 	reverse_iterator rend() noexcept;
 	const_reverse_iterator rend() const noexcept;
 	const_reverse_iterator crend() const;
-	size_type size() const noexcept;
+	size_type size() const noexcept {
+		return size_;
+	}
 	void swap(dynamic_array& other) noexcept;
 	friend void swap(dynamic_array& a, dynamic_array& b) noexcept {
 		a.swap(b);
