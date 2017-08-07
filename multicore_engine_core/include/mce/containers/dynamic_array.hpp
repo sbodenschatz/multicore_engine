@@ -16,7 +16,11 @@
 namespace mce {
 namespace containers {
 
-struct index_constructor_parameter_tag {};
+template <typename Integral>
+struct index_constructor_parameter_tag {
+	static_assert(std::is_integral<Integral>::value,
+				  "index_constructor_parameter_tag must be parameterized on an integral type.");
+};
 
 namespace detail {
 
@@ -30,10 +34,10 @@ struct dynamic_array_index_switch_helper {
 	}
 };
 
-template <>
-struct dynamic_array_index_switch_helper<index_constructor_parameter_tag> {
-	static size_t pass(index_constructor_parameter_tag, size_t index) {
-		return index;
+template <typename Integral>
+struct dynamic_array_index_switch_helper<index_constructor_parameter_tag<Integral>> {
+	static Integral pass(index_constructor_parameter_tag<Integral>, size_t index) {
+		return Integral(index);
 	}
 };
 

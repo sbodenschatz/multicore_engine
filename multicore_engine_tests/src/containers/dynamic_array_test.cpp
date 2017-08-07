@@ -39,7 +39,7 @@ TEST(containers_dynamic_array_test, construct_from_args) {
 }
 
 TEST(containers_dynamic_array_test, construct_from_args_index_tag) {
-	dynamic_array<dynamic_array_test_object_1> a(10, index_constructor_parameter_tag{}, 456);
+	dynamic_array<dynamic_array_test_object_1> a(10, index_constructor_parameter_tag<int>{}, 456);
 	ASSERT_EQ(10, a.size());
 	for(int i = 0; i < 10; ++i) {
 		ASSERT_EQ(i, a[i].x);
