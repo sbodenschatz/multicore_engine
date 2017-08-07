@@ -13,6 +13,7 @@ namespace containers {
 struct dynamic_array_test_object_1 {
 	int x;
 	int y;
+	dynamic_array_test_object_1(int x, int y) : x{x}, y{y} {}
 };
 
 TEST(containers_dynamic_array_test, construct_from_value) {
@@ -26,5 +27,16 @@ TEST(containers_dynamic_array_test, construct_from_value) {
 	}
 }
 
+TEST(containers_dynamic_array_test, construct_from_function) {
+	dynamic_array<dynamic_array_test_object_1> a(10, [](size_t i) { return i; },
+												 [](size_t i) { return i * i; });
+	ASSERT_EQ(10, a.size());
+	for(int i = 0; i < 10; ++i) {
+		ASSERT_EQ(i, a[i].x);
+		ASSERT_EQ(i * i, a[i].y);
+		ASSERT_EQ(i, a.at(i).x);
+		ASSERT_EQ(i * i, a.at(i).y);
+	}
+}
 } // namespace containers
 } // namespace mce
