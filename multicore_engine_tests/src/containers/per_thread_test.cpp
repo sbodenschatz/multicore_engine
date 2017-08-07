@@ -6,3 +6,11 @@
 
 #include <gtest.hpp>
 #include <mce/containers/per_thread.hpp>
+
+namespace mce {
+namespace containers {
+
+static per_thread<int> per_thread_test_instance{16, 42};
+
+} // namespace containers
+} // namespace mce
