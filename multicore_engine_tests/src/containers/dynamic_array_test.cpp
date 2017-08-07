@@ -28,8 +28,8 @@ TEST(containers_dynamic_array_test, construct_from_value) {
 }
 
 TEST(containers_dynamic_array_test, construct_from_function) {
-	dynamic_array<dynamic_array_test_object_1> a(10, [](size_t i) { return i; },
-												 [](size_t i) { return i * i; });
+	dynamic_array<dynamic_array_test_object_1> a(10, [](size_t i) { return int(i); },
+												 [](size_t i) { return int(i * i); });
 	ASSERT_EQ(10, a.size());
 	for(int i = 0; i < 10; ++i) {
 		ASSERT_EQ(i, a[i].x);
