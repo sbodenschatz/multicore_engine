@@ -34,6 +34,11 @@ public:
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+	per_thread(const per_thread&) = delete;
+	per_thread& operator=(const per_thread&) = delete;
+	per_thread(per_thread&&) = delete;
+	per_thread& operator=(per_thread&&) = delete;
+
 	size_t slot_index();
 	T& get();
 	const T& get() const;
