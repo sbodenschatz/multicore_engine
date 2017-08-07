@@ -61,6 +61,18 @@ TEST(containers_dynamic_array_test, construct_from_function) {
 	}
 }
 
+TEST(containers_dynamic_array_test, construct_tags_combined) {
+	dynamic_array<dynamic_array_test_object_1> a(10, index_param_tag<int>{},
+												 generator_param([](size_t i) { return int(i * i); }));
+	ASSERT_EQ(10, a.size());
+	for(int i = 0; i < 10; ++i) {
+		ASSERT_EQ(i, a[i].x);
+		ASSERT_EQ(i * i, a[i].y);
+		ASSERT_EQ(i, a.at(i).x);
+		ASSERT_EQ(i * i, a.at(i).y);
+	}
+}
+
 TEST(containers_dynamic_array_test, construct_from_initlist) {
 	dynamic_array<dynamic_array_test_object_1> a({{0, 0}, {1, 1}, {2, 4}, {3, 9}, {4, 16}, {5, 25}, {6, 36}});
 	ASSERT_EQ(7, a.size());
