@@ -180,18 +180,42 @@ public:
 	const T* data() const noexcept {
 		return data_;
 	}
-	iterator begin() noexcept;
-	const_iterator begin() const noexcept;
-	const_iterator cbegin() const noexcept;
-	iterator end() noexcept;
-	const_iterator end() const noexcept;
-	const_iterator cend() const noexcept;
-	reverse_iterator rbegin() noexcept;
-	const_reverse_iterator rbegin() const noexcept;
-	const_reverse_iterator crbegin() const noexcept;
-	reverse_iterator rend() noexcept;
-	const_reverse_iterator rend() const noexcept;
-	const_reverse_iterator crend() const;
+	iterator begin() noexcept {
+		return data_;
+	}
+	const_iterator begin() const noexcept {
+		return data_;
+	}
+	const_iterator cbegin() const noexcept {
+		return data_;
+	}
+	iterator end() noexcept {
+		return data_ + size_;
+	}
+	const_iterator end() const noexcept {
+		return data_ + size_;
+	}
+	const_iterator cend() const noexcept {
+		return data_ + size_;
+	}
+	reverse_iterator rbegin() noexcept {
+		return data_ + size_;
+	}
+	const_reverse_iterator rbegin() const noexcept {
+		return data_ + size_;
+	}
+	const_reverse_iterator crbegin() const noexcept {
+		return data_ + size_;
+	}
+	reverse_iterator rend() noexcept {
+		return data_;
+	}
+	const_reverse_iterator rend() const noexcept {
+		return data_;
+	}
+	const_reverse_iterator crend() const {
+		return data_;
+	}
 	size_type size() const noexcept {
 		return size_;
 	}
