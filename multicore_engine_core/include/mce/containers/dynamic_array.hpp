@@ -219,7 +219,12 @@ public:
 	size_type size() const noexcept {
 		return size_;
 	}
-	void swap(dynamic_array& other) noexcept;
+	void swap(dynamic_array& other) noexcept {
+		using std::swap;
+		swap(raw_data_, other.raw_data_);
+		swap(data_, other.data_);
+		swap(size_, other.size_);
+	}
 	friend void swap(dynamic_array& a, dynamic_array& b) noexcept {
 		a.swap(b);
 	}
