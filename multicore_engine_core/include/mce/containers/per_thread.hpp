@@ -34,6 +34,9 @@ public:
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+	template <typename... Args>
+	per_thread(size_type slots, Args&& args);
+
 	per_thread(const per_thread&) = delete;
 	per_thread& operator=(const per_thread&) = delete;
 	per_thread(per_thread&&) = delete;
