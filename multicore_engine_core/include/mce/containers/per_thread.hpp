@@ -98,6 +98,14 @@ public:
 	const_reverse_iterator crend() const {
 		return begin();
 	}
+
+	size_type total_slots() const {
+		return total_slots_;
+	}
+
+	size_type used_slots() const {
+		return used_slots_.load();
+	}
 };
 
 } // namespace containers
