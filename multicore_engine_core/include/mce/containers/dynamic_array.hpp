@@ -98,10 +98,49 @@ public:
 			++size_;
 		}
 	}
-	dynamic_array(const dynamic_array& other);
-	dynamic_array& operator=(const dynamic_array& other);
-	dynamic_array(dynamic_array&&) noexcept;
-	dynamic_array& operator=(dynamic_array&&) noexcept;
+	dynamic_array(const dynamic_array& other) : data_{nullptr}, size_{0} {
+		allocate(other.size());
+		for(const auto& val : other) {
+			try {
+				new(data_ + size_) T(val);
+			} catch(...) {
+				free();
+				throw;
+			}
+			++size_;
+		}
+	}
+	dynamic_array& operator=(const dynamic_array& other) {
+		if(this == std::addressof(other)) return *this;
+		free();
+		if(size_ != other.size_) {
+			allocate(other.size_);
+		}
+		for(const auto& val : other) {
+			try {
+				new(data_ + size_) T(val);
+			} catch(...) {
+				free();
+				throw;
+			}
+			++size_;
+		}
+		return *this;
+	}
+	dynamic_array(dynamic_array&& other) noexcept
+			: raw_data_{std::move(other.raw_data_)}, data_{other.data_}, size_{other.size_} {
+		other.data_ = nullptr;
+		other.size_ = 0;
+	}
+	dynamic_array& operator=(dynamic_array&& other) noexcept {
+		free();
+		raw_data_ = std::move(other.raw_data_);
+		data_ = other.data_;
+		size_ = other.size_;
+		other.data_ = nullptr;
+		other.size_ = 0;
+		return *this;
+	}
 	reference at(size_type pos);
 	const_reference at(size_type pos) const;
 	reference operator[](size_type pos);
