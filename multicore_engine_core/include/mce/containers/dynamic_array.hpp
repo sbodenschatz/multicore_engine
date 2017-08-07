@@ -49,12 +49,55 @@ public:
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-	dynamic_array();
-	dynamic_array(size_type size, const_reference value);
-	template <typename F>
-	dynamic_array(size_type size, F initialization_function);
-	dynamic_array(std::initializer_list<value_type> values);
-	dynamic_array(std::initializer_list<std::reference_wrapper<const value_type>> values);
+	dynamic_array() : size_{0}, data_{nullptr} {}
+	dynamic_array(size_type size, const_reference value) : data_{nullptr}, size_{0} {
+		allocate(size);
+		for(; size_ < size; ++size_) {
+			try {
+				new(data_ + size_) T(value);
+			} catch(...) {
+				free();
+				throw;
+			}
+		}
+	}
+	template <typename... F>
+	dynamic_array(size_type size, F... init_func) : data_{nullptr}, size_{0} {
+		allocate(size);
+		for(size_type i = 0; size_ < size; ++size_, ++i) {
+			try {
+				new(data_ + size_) T(init_func(i)...);
+			} catch(...) {
+				free();
+				throw;
+			}
+		}
+	}
+	dynamic_array(std::initializer_list<value_type> values) : data_{nullptr}, size_{0} {
+		allocate(values.size());
+		for(const auto& val : values) {
+			try {
+				new(data_ + size_) T(val);
+			} catch(...) {
+				free();
+				throw;
+			}
+			++size_;
+		}
+	}
+	dynamic_array(std::initializer_list<std::reference_wrapper<const value_type>> values)
+			: data_{nullptr}, size_{0} {
+		allocate(values.size());
+		for(const value_type& val : values) {
+			try {
+				new(data_ + size_) T(val);
+			} catch(...) {
+				free();
+				throw;
+			}
+			++size_;
+		}
+	}
 	dynamic_array(const dynamic_array& other);
 	dynamic_array& operator=(const dynamic_array& other);
 	dynamic_array(dynamic_array&&) noexcept;
