@@ -39,7 +39,7 @@ TEST(containers_dynamic_array_test, construct_from_args) {
 }
 
 TEST(containers_dynamic_array_test, construct_from_args_index_tag) {
-	dynamic_array<dynamic_array_test_object_1> a(10, index_constructor_parameter_tag<int>{}, 456);
+	dynamic_array<dynamic_array_test_object_1> a(10, index_param_tag<int>{}, 456);
 	ASSERT_EQ(10, a.size());
 	for(int i = 0; i < 10; ++i) {
 		ASSERT_EQ(i, a[i].x);
@@ -50,8 +50,8 @@ TEST(containers_dynamic_array_test, construct_from_args_index_tag) {
 }
 
 TEST(containers_dynamic_array_test, construct_from_function) {
-	dynamic_array<dynamic_array_test_object_1> a(10, [](size_t i) { return int(i); },
-												 [](size_t i) { return int(i * i); });
+	dynamic_array<dynamic_array_test_object_1> a(10, generator_param([](size_t i) { return int(i); }),
+												 generator_param([](size_t i) { return int(i * i); }));
 	ASSERT_EQ(10, a.size());
 	for(int i = 0; i < 10; ++i) {
 		ASSERT_EQ(i, a[i].x);

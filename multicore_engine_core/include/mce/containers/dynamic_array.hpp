@@ -17,15 +17,28 @@ namespace mce {
 namespace containers {
 
 template <typename Integral>
-struct index_constructor_parameter_tag {
+struct index_param_tag {
 	static_assert(std::is_integral<Integral>::value,
-				  "index_constructor_parameter_tag must be parameterized on an integral type.");
+				  "index_param_tag must be parameterized on an integral type.");
 };
+
+template <typename Functor>
+struct generator_param_tag {
+	Functor f;
+	static_assert(util::is_callable<Functor, size_t>::value,
+				  "generator_param_tag must be parameterized on a function object type callable with "
+				  "a single size_t parameter.");
+};
+
+template <typename F>
+generator_param_tag<std::remove_reference_t<F>> generator_param(F&& f) {
+	return {std::forward<F>(f)};
+}
 
 namespace detail {
 
 template <typename T>
-struct dynamic_array_index_switch_helper {
+struct dynamic_array_ctor_param_switch_helper {
 	static T&& pass(std::remove_reference_t<T>& t, size_t) {
 		return std::forward<T>(t);
 	}
@@ -35,9 +48,16 @@ struct dynamic_array_index_switch_helper {
 };
 
 template <typename Integral>
-struct dynamic_array_index_switch_helper<index_constructor_parameter_tag<Integral>> {
-	static Integral pass(index_constructor_parameter_tag<Integral>, size_t index) {
+struct dynamic_array_ctor_param_switch_helper<index_param_tag<Integral>> {
+	static Integral pass(index_param_tag<Integral>, size_t index) {
 		return Integral(index);
+	}
+};
+
+template <typename Functor>
+struct dynamic_array_ctor_param_switch_helper<generator_param_tag<Functor>> {
+	static decltype(auto) pass(generator_param_tag<Functor> gt, size_t index) {
+		return gt.f(index);
 	}
 };
 
@@ -109,22 +129,6 @@ public:
 		}
 	}
 
-	/// \brief Creates a dynamic_array containing the given number of values constructed from a constructor
-	/// parameter list created by applying the given function objects to the index of the value.
-	template <typename... F,
-			  typename = std::enable_if_t<util::conjunction<util::is_callable<F, size_t>...>::value>>
-	dynamic_array(size_type size, F... init_func) : data_{nullptr}, size_{0} {
-		allocate(size);
-		for(size_type i = 0; size_ < size; ++size_, ++i) {
-			try {
-				new(data_ + size_) T(init_func(i)...);
-			} catch(...) {
-				free();
-				throw;
-			}
-		}
-	}
-
 	/// Creates a dynamic_array containing the values from the given std::initializer_list.
 	dynamic_array(std::initializer_list<value_type> values) : data_{nullptr}, size_{0} {
 		allocate(values.size());
@@ -142,16 +146,18 @@ public:
 	/// \brief Creates a dynamic_array with the given number of values constructed by forwarding the given
 	/// constructor arguments.
 	/**
-	 * Any of the parameters can be given as a place holder index_constructor_parameter_tag<Integral> to pass
-	 * the element index casted to Integral in it's place.
+	 * Any of the parameters can be given as one of the following place holder tags.
+	 * - index_param_tag<Integral> to pass the element index casted to Integral in it's place.
+	 * - generator_param_tag<Functor> to pass in it's place the return value of calling operator()(size_t) of
+	 * Functor with the element index. Such a generator_param tag can be created with template argument
+	 * deduction using generator_param(F).
 	 */
-	template <typename... Args,
-			  typename = std::enable_if_t<!util::conjunction<util::is_callable<Args, size_t>...>::value>>
+	template <typename... Args>
 	dynamic_array(size_type size, Args&&... args) : data_{nullptr}, size_{0} {
 		allocate(size);
 		for(size_type i = 0; size_ < size; ++size_, ++i) {
 			try {
-				new(data_ + size_) T(detail::dynamic_array_index_switch_helper<Args>::pass(args, i)...);
+				new(data_ + size_) T(detail::dynamic_array_ctor_param_switch_helper<Args>::pass(args, i)...);
 			} catch(...) {
 				free();
 				throw;
