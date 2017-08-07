@@ -15,6 +15,29 @@
 namespace mce {
 namespace containers {
 
+struct index_constructor_parameter_tag {};
+
+namespace detail {
+
+template <typename T>
+struct dynamic_array_index_switch_helper {
+	static T&& pass(std::remove_reference_t<T>& t, size_t) {
+		return std::forward<T>(t);
+	}
+	static T&& pass(std::remove_reference_t<T>&& t, size_t) {
+		return std::forward<T>(t);
+	}
+};
+
+template <>
+struct dynamic_array_index_switch_helper<index_constructor_parameter_tag> {
+	static size_t pass(index_constructor_parameter_tag, size_t index) {
+		return index;
+	}
+};
+
+} // namespace detail
+
 template <typename T>
 class dynamic_array {
 	std::unique_ptr<char[]> raw_data_;
@@ -90,7 +113,7 @@ public:
 		allocate(size);
 		for(size_type i = 0; size_ < size; ++size_, ++i) {
 			try {
-				new(data_ + size_) T(std::forward<Args>(args)...);
+				new(data_ + size_) T(detail::dynamic_array_index_switch_helper<Args>::pass(args, i)...);
 			} catch(...) {
 				free();
 				throw;
