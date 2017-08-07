@@ -8,6 +8,7 @@
 #define MCE_CONTAINERS_DYNAMIC_ARRAY_HPP_
 
 #include <iterator>
+#include <mce/memory/align.hpp>
 #include <memory>
 #include <type_traits>
 
