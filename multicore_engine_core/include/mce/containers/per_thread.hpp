@@ -58,7 +58,9 @@ public:
 		} while(used_slots_.compare_exchange_weak(my_index, my_index + 1));
 		return my_index;
 	}
-	T& get();
+	T& get() {
+		return values_[slot_index()];
+	}
 
 	iterator begin() noexcept {
 		return owners_.begin();
