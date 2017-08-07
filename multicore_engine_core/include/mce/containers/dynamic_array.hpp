@@ -85,19 +85,6 @@ public:
 			++size_;
 		}
 	}
-	dynamic_array(std::initializer_list<std::reference_wrapper<const value_type>> values)
-			: data_{nullptr}, size_{0} {
-		allocate(values.size());
-		for(const value_type& val : values) {
-			try {
-				new(data_ + size_) T(val);
-			} catch(...) {
-				free();
-				throw;
-			}
-			++size_;
-		}
-	}
 	dynamic_array(const dynamic_array& other) : data_{nullptr}, size_{0} {
 		allocate(other.size());
 		for(const auto& val : other) {
