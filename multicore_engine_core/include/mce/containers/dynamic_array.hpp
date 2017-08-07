@@ -144,14 +144,36 @@ public:
 	~dynamic_array() noexcept {
 		free();
 	}
-	reference at(size_type pos);
-	const_reference at(size_type pos) const;
-	reference operator[](size_type pos);
-	const_reference operator[](size_type pos) const;
-	reference front();
-	const_reference front() const;
-	reference back();
-	const_reference back() const;
+	reference at(size_type pos) {
+		if(pos < size_)
+			return data_[pos];
+		else
+			throw std::out_of_range("Position out of bounds.");
+	}
+	const_reference at(size_type pos) const {
+		if(pos < size_)
+			return data_[pos];
+		else
+			throw std::out_of_range("Position out of bounds.");
+	}
+	reference operator[](size_type pos) {
+		return data_[pos];
+	}
+	const_reference operator[](size_type pos) const {
+		return data_[pos];
+	}
+	reference front() {
+		return *data_;
+	}
+	const_reference front() const {
+		return *data_;
+	}
+	reference back() {
+		return data_[size_ - 1];
+	}
+	const_reference back() const {
+		return data_[size_ - 1];
+	}
 	T* data() noexcept;
 	const T* data() const noexcept;
 	iterator begin() noexcept;
