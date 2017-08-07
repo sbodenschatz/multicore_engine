@@ -61,7 +61,7 @@ public:
 			}
 		}
 	}
-	template <typename... F>
+	template <typename... F, typename = std::tuple<decltype(std::declval<F>()(std::declval<size_type>()))...>>
 	dynamic_array(size_type size, F... init_func) : data_{nullptr}, size_{0} {
 		allocate(size);
 		for(size_type i = 0; size_ < size; ++size_, ++i) {
@@ -83,6 +83,18 @@ public:
 				throw;
 			}
 			++size_;
+		}
+	}
+	template <typename... Args>
+	dynamic_array(size_type size, Args&&... args) : data_{nullptr}, size_{0} {
+		allocate(size);
+		for(size_type i = 0; size_ < size; ++size_, ++i) {
+			try {
+				new(data_ + size_) T(std::forward<Args>(args)...);
+			} catch(...) {
+				free();
+				throw;
+			}
 		}
 	}
 	dynamic_array(const dynamic_array& other) : data_{nullptr}, size_{0} {
