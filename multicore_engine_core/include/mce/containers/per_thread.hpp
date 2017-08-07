@@ -43,6 +43,42 @@ public:
 	T& get();
 	const T& get() const;
 
+	iterator begin() noexcept {
+		return data_;
+	}
+	const_iterator begin() const noexcept {
+		return data_;
+	}
+	const_iterator cbegin() const noexcept {
+		return data_;
+	}
+	iterator end() noexcept {
+		return data_ + used_slots_.load();
+	}
+	const_iterator end() const noexcept {
+		return data_ + used_slots_.load();
+	}
+	const_iterator cend() const noexcept {
+		return data_ + used_slots_.load();
+	}
+	reverse_iterator rbegin() noexcept {
+		return end();
+	}
+	const_reverse_iterator rbegin() const noexcept {
+		return end();
+	}
+	const_reverse_iterator crbegin() const noexcept {
+		return end();
+	}
+	reverse_iterator rend() noexcept {
+		return begin();
+	}
+	const_reverse_iterator rend() const noexcept {
+		return begin();
+	}
+	const_reverse_iterator crend() const {
+		return begin();
+	}
 };
 
 } // namespace containers
