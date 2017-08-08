@@ -55,7 +55,7 @@ public:
 			if(my_index == total_slots_) {
 				throw std::runtime_error("No slot available."); // TODO Use custom exception type.
 			}
-		} while(used_slots_.compare_exchange_weak(my_index, my_index + 1));
+		} while(!used_slots_.compare_exchange_weak(my_index, my_index + 1));
 		owners_[my_index] = my_id;
 		return my_index;
 	}
