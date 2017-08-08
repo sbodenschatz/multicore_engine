@@ -101,8 +101,11 @@ struct callable_trait_impl {
 
 } // namespace detail
 
+/// \brief Type trait to test if <code>T</code> is callable using a parameter list with an argument list of
+/// types <code>Args</code>.
 template <typename T, typename... Args>
 struct is_callable {
+	/// Indicates whether <code>T</code> can be called with a parameter list of types <code>Args...</code>.
 	static constexpr bool value = detail::callable_trait_impl<T, Args...>::value;
 };
 
