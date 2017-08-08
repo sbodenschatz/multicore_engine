@@ -15,22 +15,35 @@
 namespace mce {
 namespace containers {
 
+/// \brief Provides functionality to assign indexes from a fixed-size range of index slots to threads in a
+/// lock-free way.
 class per_thread_index {
 	size_t total_slots_;
 	std::atomic<size_t> used_slots_;
 	dynamic_array<std::atomic<std::thread::id>> owners_;
 
 public:
+	/// The type used for sizes and indices.
 	using size_type = std::size_t;
 
+	/// Creates a per_thread with the given number of slots for the threads.
 	per_thread_index(size_type slots)
 			: total_slots_{slots}, used_slots_{0}, owners_(slots, std::thread::id()) {}
 
+	/// Forbids copying.
 	per_thread_index(const per_thread_index&) = delete;
+	/// Forbids copying.
 	per_thread_index& operator=(const per_thread_index&) = delete;
+	/// Forbids moving.
 	per_thread_index(per_thread_index&&) = delete;
+	/// Forbids moving.
 	per_thread_index& operator=(per_thread_index&&) = delete;
 
+	/// Looks up and returns the index for the calling thread.
+	/**
+	 * If there are no slots left and the thread has no associated slot yet, an exception of type
+	 * mce::resource_depleted_exception is thrown.
+	 */
 	size_type slot_index() {
 		auto used = used_slots_.load();
 		auto my_id = std::this_thread::get_id();
@@ -47,10 +60,12 @@ public:
 		return my_index;
 	}
 
+	/// Returns the total number of slots in the pool.
 	size_type total_slots() const {
 		return total_slots_;
 	}
 
+	/// Returns the number of slots used by / assigned to a thread.
 	size_type used_slots() const {
 		return used_slots_.load();
 	}
