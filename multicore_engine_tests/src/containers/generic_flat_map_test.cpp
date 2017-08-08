@@ -41,12 +41,28 @@ struct containers_generic_flat_multimap_test : public ::testing::Test {
 // containers_generic_flat_map_test
 
 TEST_F(containers_generic_flat_map_test, insert) {
+	for(const auto& e : gfm) {
+		std::cout << e.first << "," << e.second << "\n";
+	}
+	std::cout << "--------\n";
 	gfm.insert(123, "ABCD");
 	stdmap.emplace(123, "ABCD");
+	for(const auto& e : gfm) {
+		std::cout << e.first << "," << e.second << "\n";
+	}
+	std::cout << "--------\n";
 	gfm.insert(456, "XYZ");
 	stdmap.emplace(456, "XYZ");
+	for(const auto& e : gfm) {
+		std::cout << e.first << "," << e.second << "\n";
+	}
+	std::cout << "--------\n";
 	gfm.insert(42, "hello");
 	stdmap.emplace(42, "hello");
+	for(const auto& e : gfm) {
+		std::cout << e.first << "," << e.second << "\n";
+	}
+	std::cout << "--------\n";
 	gfm.insert(43, "world");
 	stdmap.emplace(43, "world");
 	for(const auto& e : gfm) {
