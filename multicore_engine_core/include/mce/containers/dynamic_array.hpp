@@ -67,6 +67,22 @@ struct dynamic_array_ctor_param_switch_helper<generator_param_tag<Functor>> {
 	}
 };
 
+template <typename T, bool>
+struct construct_helper {
+	template <typename... Args>
+	static void construct(void* ptr, Args&&... args) {
+		new(ptr) T(std::forward<Args>(args)...);
+	}
+};
+
+template <typename T>
+struct construct_helper<T, false> {
+	template <typename... Args>
+	static void construct(void* ptr, Args&&... args) {
+		new(ptr) T{std::forward<Args>(args)...};
+	}
+};
+
 } // namespace detail
 
 /// Provides an array of type T with a runtime-determined size.
@@ -95,6 +111,11 @@ class dynamic_array {
 		for(size_t i = 0; i < size_; ++i) {
 			data_[i].~T();
 		}
+	}
+	template <typename... Args, typename U = T>
+	void construct(void* ptr, Args&&... args) {
+		detail::construct_helper<U, std::is_constructible<U, Args...>::value>::construct(
+				ptr, std::forward<Args>(args)...);
 	}
 
 public:
@@ -127,7 +148,7 @@ public:
 		allocate(size);
 		for(; size_ < size; ++size_) {
 			try {
-				new(data_ + size_) T(value);
+				construct(data_ + size_, value);
 			} catch(...) {
 				free();
 				throw;
@@ -140,7 +161,7 @@ public:
 		allocate(values.size());
 		for(const auto& val : values) {
 			try {
-				new(data_ + size_) T(val);
+				construct(data_ + size_, val);
 			} catch(...) {
 				free();
 				throw;
@@ -163,7 +184,8 @@ public:
 		allocate(size);
 		for(size_type i = 0; size_ < size; ++size_, ++i) {
 			try {
-				new(data_ + size_) T(detail::dynamic_array_ctor_param_switch_helper<Args>::pass(args, i)...);
+				construct(data_ + size_,
+						  detail::dynamic_array_ctor_param_switch_helper<Args>::pass(args, i)...);
 			} catch(...) {
 				free();
 				throw;
@@ -176,7 +198,7 @@ public:
 		allocate(other.size());
 		for(const auto& val : other) {
 			try {
-				new(data_ + size_) T(val);
+				construct(data_ + size_, val);
 			} catch(...) {
 				free();
 				throw;
@@ -195,7 +217,7 @@ public:
 		size_ = 0;
 		for(const auto& val : other) {
 			try {
-				new(data_ + size_) T(val);
+				construct(data_ + size_, val);
 			} catch(...) {
 				free();
 				throw;
