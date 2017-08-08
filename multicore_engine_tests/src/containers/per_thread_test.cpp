@@ -10,7 +10,21 @@
 namespace mce {
 namespace containers {
 
-static per_thread<int> per_thread_test_instance{16, 42};
+struct per_thread_test_object_1 {
+	int index;
+	int val;
+	int sqr;
+};
+
+TEST(containers_per_thread_test, construction) {
+	per_thread<per_thread_test_object_1> pt(32, index_param_tag<int>{}, 42,
+											generator_param([](size_t i) { return int(i * i); }));
+	for(size_t i = 0; i < 32; ++i) {
+		ASSERT_EQ(i, (pt.begin() + i)->index);
+		ASSERT_EQ(42, (pt.begin() + i)->val);
+		ASSERT_EQ(i * i, (pt.begin() + i)->sqr);
+	}
+}
 
 } // namespace containers
 } // namespace mce
