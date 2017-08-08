@@ -64,22 +64,22 @@ public:
 	}
 
 	iterator begin() noexcept {
-		return owners_.begin();
+		return values_.begin();
 	}
 	const_iterator begin() const noexcept {
-		return owners_.begin();
+		return values_.begin();
 	}
 	const_iterator cbegin() const noexcept {
-		return owners_.begin();
+		return values_.begin();
 	}
 	iterator end() noexcept {
-		return owners_.begin() + used_slots_.load();
+		return values_.begin() + used_slots_.load();
 	}
 	const_iterator end() const noexcept {
-		return owners_.begin() + used_slots_.load();
+		return values_.begin() + used_slots_.load();
 	}
 	const_iterator cend() const noexcept {
-		return owners_.begin() + used_slots_.load();
+		return values_.begin() + used_slots_.load();
 	}
 	reverse_iterator rbegin() noexcept {
 		return end();
