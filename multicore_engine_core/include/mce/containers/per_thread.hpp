@@ -54,7 +54,7 @@ public:
 		auto my_index = used_slots_.load();
 		do {
 			if(my_index == total_slots_) {
-				throw mce::resource_depleted_exception("No more slot available.");
+				throw mce::resource_depleted_exception("No more slots available.");
 			}
 		} while(!used_slots_.compare_exchange_weak(my_index, my_index + 1));
 		owners_[my_index] = my_id;
