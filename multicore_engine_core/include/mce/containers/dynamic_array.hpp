@@ -173,7 +173,8 @@ public:
 	/// \brief Creates a dynamic_array with the given number of values constructed by forwarding the given
 	/// constructor arguments.
 	/**
-	 * Any of the parameters can be given as one of the following place holder tags.
+	 * Additionally to simply passing values, any of the parameters can be given as one of the following place
+	 * holder tags:
 	 * - index_param_tag<Integral> to pass the element index casted to Integral in it's place.
 	 * - generator_param_tag<Functor> to pass in it's place the return value of calling operator()(size_t) of
 	 * Functor with the element index. Such a generator_param tag can be created with template argument
