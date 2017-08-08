@@ -16,20 +16,26 @@
 namespace mce {
 namespace containers {
 
+/// \brief Place holder tag for element constructor parameter lists that is replaced with the element index
+/// casted to type <code>Integral</code>.
 template <typename Integral>
 struct index_param_tag {
 	static_assert(std::is_integral<Integral>::value,
 				  "index_param_tag must be parameterized on an integral type.");
 };
 
+/// \brief Place holder tag for element constructor parameter lists that is replaced with the result of
+/// calling a <code>Functor</code> function object with the element index as the single parameter of type
+/// size_t.
 template <typename Functor>
 struct generator_param_tag {
-	Functor f;
+	Functor f; ///< The function object to call.
 	static_assert(util::is_callable<Functor, size_t>::value,
 				  "generator_param_tag must be parameterized on a function object type callable with "
 				  "a single size_t parameter.");
 };
 
+/// Template argument deduction helper function for generator_param_tag.
 template <typename F>
 generator_param_tag<std::remove_reference_t<F>> generator_param(F&& f) {
 	return {std::forward<F>(f)};
