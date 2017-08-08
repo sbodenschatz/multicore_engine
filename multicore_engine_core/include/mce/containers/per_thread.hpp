@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include <mce/containers/dynamic_array.hpp>
+#include <mce/exceptions.hpp>
 #include <thread>
 
 namespace mce {
@@ -53,7 +54,7 @@ public:
 		auto my_index = used_slots_.load();
 		do {
 			if(my_index == total_slots_) {
-				throw std::runtime_error("No slot available."); // TODO Use custom exception type.
+				throw mce::resource_depleted_exception("No more slot available.");
 			}
 		} while(!used_slots_.compare_exchange_weak(my_index, my_index + 1));
 		owners_[my_index] = my_id;
