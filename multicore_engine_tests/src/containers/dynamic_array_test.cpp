@@ -164,5 +164,65 @@ TEST(containers_dynamic_array_test, move_assign) {
 	ASSERT_EQ(nullptr, o_a.data());
 }
 
+struct dynamic_array_test_object_2 {
+	struct A {
+		int v;
+	};
+	struct B {
+		int v;
+	};
+};
+
+struct dynamic_array_test_object_2a {
+	dynamic_array_test_object_2::A a;
+	dynamic_array_test_object_2::B b;
+};
+
+struct dynamic_array_test_object_2b {
+	dynamic_array_test_object_2::A a;
+	dynamic_array_test_object_2::B b;
+	dynamic_array_test_object_2b(dynamic_array_test_object_2::A a, dynamic_array_test_object_2::B b)
+			: a{a}, b{b} {}
+	dynamic_array_test_object_2b(std::initializer_list<dynamic_array_test_object_2::A>) {}
+};
+
+struct dynamic_array_test_object_2c {
+	size_t a;
+	int b;
+	dynamic_array_test_object_2c(size_t, int) : a(1), b(2) {}
+	dynamic_array_test_object_2c(std::initializer_list<int>) : a(0), b(0) {}
+};
+
+struct dynamic_array_test_object_2d {
+	size_t a;
+	int b;
+};
+
+TEST(containers_dynamic_array_test, construct_aggregate_init) {
+	dynamic_array<dynamic_array_test_object_2a> da(10, dynamic_array_test_object_2::A{1},
+												   dynamic_array_test_object_2::B{2});
+	ASSERT_EQ(1, da[0].a.v);
+	ASSERT_EQ(2, da[0].b.v);
+}
+TEST(containers_dynamic_array_test, construct_constructor_init) {
+	dynamic_array<dynamic_array_test_object_2b> da(10, dynamic_array_test_object_2::A{1},
+												   dynamic_array_test_object_2::B{2});
+	ASSERT_EQ(1, da[0].a.v);
+	ASSERT_EQ(2, da[0].b.v);
+}
+TEST(containers_dynamic_array_test, construct_constructor_init2) {
+	dynamic_array<dynamic_array_test_object_2c> da(10, size_t(42), int(123));
+	ASSERT_EQ(1, da[0].a);
+	ASSERT_EQ(2, da[0].b);
+	dynamic_array<dynamic_array_test_object_2c> da2(10, int(42), int(123), int(456));
+	ASSERT_EQ(0, da2[0].a);
+	ASSERT_EQ(0, da2[0].b);
+}
+TEST(containers_dynamic_array_test, construct_aggregate_init2) {
+	dynamic_array<dynamic_array_test_object_2d> da(10, size_t(42), int(123));
+	ASSERT_EQ(42, da[0].a);
+	ASSERT_EQ(123, da[0].b);
+}
+
 } // namespace containers
 } // namespace mce
