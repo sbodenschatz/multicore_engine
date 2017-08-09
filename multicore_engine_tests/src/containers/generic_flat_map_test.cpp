@@ -6,11 +6,11 @@
 
 #include <algorithm>
 #include <boost/container/small_vector.hpp>
+#include <mce/containers/generic_flat_map.hpp>
 #include <future>
 #include <gtest.hpp>
 #include <iostream>
 #include <map>
-#include <mce/containers/generic_flat_map.hpp>
 #include <string>
 
 namespace mce {
@@ -49,21 +49,6 @@ TEST_F(containers_generic_flat_map_test, insert) {
 	stdmap.emplace(42, "hello");
 	gfm.insert(43, "world");
 	stdmap.emplace(43, "world");
-	ASSERT_EQ(stdmap.size(), gfm.size());
-	ASSERT_EQ(stdmap.at(123), gfm.at(123));
-	ASSERT_EQ(stdmap[123], gfm[123]);
-	ASSERT_EQ(stdmap.at(456), gfm.at(456));
-	ASSERT_EQ(stdmap[456], gfm[456]);
-	ASSERT_EQ(stdmap.at(42), gfm.at(42));
-	ASSERT_EQ(stdmap[42], gfm[42]);
-	auto it1 = stdmap.begin();
-	auto it2 = gfm.begin();
-	while(it1 != stdmap.end() && it2 != gfm.end()) {
-		ASSERT_EQ(it1->first, it2->first);
-		ASSERT_EQ(it1->second, it2->second);
-		++it1;
-		++it2;
-	}
 	ASSERT_TRUE(std::equal(gfm.begin(), gfm.end(), stdmap.begin(), stdmap.end(), [](auto&& v1, auto&& v2) {
 		return v1.first == v2.first && v1.second == v2.second;
 	}));
