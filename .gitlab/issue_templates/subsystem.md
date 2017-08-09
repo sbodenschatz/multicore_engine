@@ -1,2 +1,2 @@
-/label ~subsystem
-/milestone
+/label ~subsystem ~
+/milestone %

@@ -1,2 +1,2 @@
-/label ~feature 
-/milestone
+/label ~feature ~
+/milestone %

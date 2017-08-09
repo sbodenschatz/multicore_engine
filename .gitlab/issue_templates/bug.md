@@ -1,2 +1,2 @@
-/label ~bug
-/milestone
+/label ~bug ~
+/milestone %
