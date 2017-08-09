@@ -51,6 +51,7 @@ public:
 						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes)
 			: simple_descriptor_pool(dev, descriptor_set_resources{pool_sizes, max_sets}) {}
 
+	/// Creates a simple_descriptor_pool for the given device with the given resource amounts.
 	simple_descriptor_pool(device& dev, descriptor_set_resources capacity);
 
 	/// \brief Destroys the simple_descriptor_pool, releases the underlying resources and makes all descriptor
@@ -103,19 +104,36 @@ public:
 	}
 
 	/// Allocates a descriptor set of the given layout.
-	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout);
+	/**
+	 * By default stores a null shared_ptr for the layout in the descriptor_set object to avoid ref count
+	 * overhead. If the layout information is needed in the descriptor_set object, storing it can be enabled
+	 * using the store_layout parameter.
+	 */
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+										   bool store_layout = false);
 
 	/// Allocates descriptor sets for each of the given layouts.
+	/**
+	 * By default stores a null shared_ptr for the layout in the descriptor_set objects to avoid ref count
+	 * overhead. If the layout information is needed in the descriptor_set objects, storing it can be enabled
+	 * using the store_layout parameter.
+	 */
 	std::vector<descriptor_set>
-	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts);
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+							 bool store_layout = false);
 
 	/// Allocates descriptor sets for each of the given layouts.
 	/**
 	 * Avoids heap allocations in the wrapper by statically determining the number of sets.
+	 *
+	 * By default stores a null shared_ptr for the layout in the descriptor_set objects to avoid ref count
+	 * overhead. If the layout information is needed in the descriptor_set objects, storing it can be enabled
+	 * using the store_layout parameter.
 	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
-	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts) {
+	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
+							 bool store_layout = false) {
 		descriptor_set_resources req;
 		for(const auto& layout : layouts) {
 			req += *layout;
@@ -135,8 +153,9 @@ public:
 		available_resources_ -= req;
 		return mce::util::array_transform<descriptor_set>(
 				nsets, layouts,
-				[this](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
-					return descriptor_set(*dev_, ds, l);
+				[this, store_layout](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
+					return descriptor_set(*dev_, ds,
+										  store_layout ? l : std::shared_ptr<descriptor_set_layout>());
 
 				});
 	}
@@ -188,26 +207,41 @@ public:
 	/// Allocates a descriptor set of the given layout.
 	/**
 	 * The required resources must not exceed the resources per block.
+	 *
+	 * By default stores a null shared_ptr for the layout in the descriptor_set object to avoid ref count
+	 * overhead. If the layout information is needed in the descriptor_set object, storing it can be enabled
+	 * using the store_layout parameter.
 	 */
-	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout);
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+										   bool store_layout = false);
 
 	/// Allocates descriptor sets for each of the given layouts.
 	/**
 	 * The required resources must not exceed the resources per block. Splitting the requests over multiple
 	 * blocks is not supported to reduce overhead.
+	 *
+	 * By default stores a null shared_ptr for the layout in the descriptor_set objects to avoid ref count
+	 * overhead. If the layout information is needed in the descriptor_set objects, storing it can be enabled
+	 * using the store_layout parameter.
 	 */
 	std::vector<descriptor_set>
-	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts);
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+							 bool store_layout = false);
 	/// Allocates descriptor sets for each of the given layouts.
 	/**
 	 * Reduces heap allocations in the wrapper by statically determining the number of sets.
 	 *
 	 * The required resources must not exceed the resources per block. Splitting the requests over multiple
 	 * blocks is not supported to reduce overhead.
+	 *
+	 * By default stores a null shared_ptr for the layout in the descriptor_set objects to avoid ref count
+	 * overhead. If the layout information is needed in the descriptor_set objects, storing it can be enabled
+	 * using the store_layout parameter.
 	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
-	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts) {
+	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
+							 bool store_layout = false) {
 		descriptor_set_resources req;
 		for(const auto& layout : layouts) {
 			req += *layout;
@@ -219,10 +253,10 @@ public:
 			return blk.available_resources().sufficient_for(req);
 		});
 		if(it != blocks_.end()) {
-			return it->allocate_descriptor_sets(layouts);
+			return it->allocate_descriptor_sets(layouts, store_layout);
 		} else {
 			blocks_.emplace_back(*dev_, block_resources_);
-			return blocks_.back().allocate_descriptor_sets(layouts);
+			return blocks_.back().allocate_descriptor_sets(layouts, store_layout);
 		}
 	}
 	/// \brief Resets all blocks in the pool, invalidating all allocated descriptor sets and reclaiming all
