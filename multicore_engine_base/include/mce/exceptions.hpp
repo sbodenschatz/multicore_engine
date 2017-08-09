@@ -127,6 +127,11 @@ struct device_memory_allocation_exception : graphics_exception {
 	using graphics_exception::graphics_exception;
 };
 
+/// Exception used to signal that a requested resource (e.g. from a pool) is depleted.
+struct resource_depleted_exception : std::runtime_error {
+	using std::runtime_error::runtime_error;
+};
+
 } // namespace mce
 
 #endif /* CORE_EXCEPTIONS_HPP_ */

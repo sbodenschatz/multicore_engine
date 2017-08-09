@@ -6,9 +6,9 @@
 
 #include <glm/glm.hpp>
 #include <gtest.hpp>
+#include <mce/util/traits.hpp>
 #include <string>
 #include <type_traits>
-#include <mce/util/traits.hpp>
 #include <vector>
 
 namespace mce {
@@ -71,6 +71,64 @@ TEST(util_traits_test, accessor_value_type_test) {
 	ASSERT_TRUE((std::is_same<util::accessor_value_type_t<glm::vec2>, const glm::vec2&>::value));
 	ASSERT_TRUE(
 			(std::is_same<util::accessor_value_type_t<std::vector<int>>, const std::vector<int>&>::value));
+}
+
+TEST(util_traits_test, callable_positive) {
+	struct A {
+		void operator()(int, float) {}
+	};
+	static_assert(is_callable<A, int, float>::value, "is_callable<A,int,float>::value");
+	auto res_A = is_callable<A, int, float>::value;
+	ASSERT_TRUE(res_A);
+
+	struct B {
+		void operator()(int&) {}
+	};
+	static_assert(is_callable<B, int&>::value, "is_callable<B,int&>::value");
+	auto res_B = is_callable<B, int&>::value;
+	ASSERT_TRUE(res_B);
+
+	struct C {
+		void operator()(const int&) {}
+	};
+	static_assert(is_callable<C, int>::value, "is_callable<C,int>::value");
+	auto res_C = is_callable<C, int>::value;
+	ASSERT_TRUE(res_C);
+
+	struct D {
+		void operator()(const int&&) {}
+	};
+	static_assert(is_callable<D, int>::value, "is_callable<D,int>::value");
+	auto res_D = is_callable<D, int>::value;
+	ASSERT_TRUE(res_D);
+}
+
+TEST(util_traits_test, callable_negative) {
+	struct A {
+		void operator()() {}
+	};
+	static_assert(!is_callable<A, int, float>::value, "!is_callable<A,int,float>::value");
+	auto res_A = !is_callable<A, int, float>::value;
+	ASSERT_TRUE(res_A);
+
+	struct B {
+		void operator()(int&) {}
+	};
+	static_assert(!is_callable<B, int&&>::value, "!is_callable<B,int&&>::value");
+	auto res_B = !is_callable<B, int&&>::value;
+	ASSERT_TRUE(res_B);
+
+	struct C {
+		void operator()(int&) {}
+	};
+	static_assert(!is_callable<C, const int&>::value, "!is_callable<C,const int&>::value");
+	auto res_C = !is_callable<C, const int&>::value;
+	ASSERT_TRUE(res_C);
+
+	struct D {};
+	static_assert(!is_callable<D>::value, "!is_callable<D>::value");
+	auto res_D = !is_callable<D>::value;
+	ASSERT_TRUE(res_D);
 }
 
 } // namespace util
