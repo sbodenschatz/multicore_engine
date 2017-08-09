@@ -49,9 +49,6 @@ TEST_F(containers_generic_flat_map_test, insert) {
 	stdmap.emplace(42, "hello");
 	gfm.insert(43, "world");
 	stdmap.emplace(43, "world");
-	for(const auto& e : gfm) {
-		std::cout << e.first << "," << e.second << "\n";
-	}
 	ASSERT_EQ(stdmap.size(), gfm.size());
 	ASSERT_EQ(stdmap.at(123), gfm.at(123));
 	ASSERT_EQ(stdmap[123], gfm[123]);
