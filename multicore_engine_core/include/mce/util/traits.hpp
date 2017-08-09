@@ -85,6 +85,51 @@ struct accessor_value_type {
 template <typename T>
 using accessor_value_type_t = typename accessor_value_type<T>::type;
 
+namespace detail {
+
+template <typename T, typename... Args>
+struct callable_trait_impl {
+	struct not_callable_t;
+	template <typename U = T, typename V = decltype(std::declval<U>()(std::declval<Args>()...))>
+	static V test_func(const Args&...);
+	template <typename... Args2>
+	static not_callable_t test_func(const Args2&...);
+
+	static constexpr bool value =
+			!std::is_same<not_callable_t, decltype(test_func(std::declval<Args>()...))>::value;
+};
+
+} // namespace detail
+
+/// \brief Type trait to test if <code>T</code> is callable using a parameter list with an argument list of
+/// types <code>Args</code>.
+template <typename T, typename... Args>
+struct is_callable {
+	/// Indicates whether <code>T</code> can be called with a parameter list of types <code>Args...</code>.
+	static constexpr bool value = detail::callable_trait_impl<T, Args...>::value;
+};
+
+// TODO cite in sources: http://en.cppreference.com/w/cpp/types/conjunction
+
+/// Implements C++17 std::conjunction because not all compilers provide it yet.
+/**
+ * The implementation was taken from: http://en.cppreference.com/w/cpp/types/conjunction
+ */
+template <class...>
+struct conjunction : std::true_type {};
+/// Implements C++17 std::conjunction because not all compilers provide it yet.
+/**
+ * The implementation was taken from: http://en.cppreference.com/w/cpp/types/conjunction
+ */
+template <class B1>
+struct conjunction<B1> : B1 {};
+/// Implements C++17 std::conjunction because not all compilers provide it yet.
+/**
+ * The implementation was taken from: http://en.cppreference.com/w/cpp/types/conjunction
+ */
+template <class B1, class... Bn>
+struct conjunction<B1, Bn...> : std::conditional_t<bool(B1::value), conjunction<Bn...>, B1> {};
+
 } // namespace util
 } // namespace mce
 
