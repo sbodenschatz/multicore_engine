@@ -51,6 +51,7 @@ public:
 						   vk::ArrayProxy<const vk::DescriptorPoolSize> pool_sizes)
 			: simple_descriptor_pool(dev, descriptor_set_resources{pool_sizes, max_sets}) {}
 
+	/// Creates a simple_descriptor_pool for the given device with the given resource amounts.
 	simple_descriptor_pool(device& dev, descriptor_set_resources capacity);
 
 	/// \brief Destroys the simple_descriptor_pool, releases the underlying resources and makes all descriptor
