@@ -51,7 +51,8 @@ void simple_descriptor_pool::reset() {
 }
 
 descriptor_set
-simple_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout) {
+simple_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+												bool store_layout) {
 	descriptor_set_resources req(*layout);
 	auto nlayout = layout->native_layout();
 	vk::DescriptorSetAllocateInfo ai(native_pool_.get(), 1, &nlayout);
@@ -62,11 +63,11 @@ simple_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor
 	auto res = (*dev_)->allocateDescriptorSets(&ai, &set);
 	available_resources_ -= req;
 	return descriptor_set(*dev_, vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"),
-						  layout);
+						  store_layout ? layout : std::shared_ptr<descriptor_set_layout>());
 }
 
 std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
-		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts) {
+		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts, bool store_layout) {
 	std::vector<descriptor_set> rv;
 	descriptor_set_resources req;
 	for(const auto& layout : layouts) {
@@ -85,8 +86,9 @@ std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(
 	available_resources_ -= req;
 	auto beg = boost::make_zip_iterator(boost::make_tuple(tmp.begin(), layouts.begin()));
 	auto end = boost::make_zip_iterator(boost::make_tuple(tmp.end(), layouts.end()));
-	std::transform(beg, end, std::back_inserter(rv), [this](auto tup) {
-		return descriptor_set(*dev_, boost::get<0>(tup), boost::get<1>(tup));
+	std::transform(beg, end, std::back_inserter(rv), [this, store_layout](auto tup) {
+		return descriptor_set(*dev_, boost::get<0>(tup),
+							  store_layout ? boost::get<1>(tup) : std::shared_ptr<descriptor_set_layout>());
 	});
 
 	return rv;
@@ -111,8 +113,9 @@ uint32_t growing_simple_descriptor_pool::available_sets() const {
 			[](uint32_t s, const simple_descriptor_pool& p) { return s + p.available_sets(); });
 }
 
-descriptor_set growing_simple_descriptor_pool::allocate_descriptor_set(
-		const std::shared_ptr<descriptor_set_layout>& layout) {
+descriptor_set
+growing_simple_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+														bool store_layout) {
 	descriptor_set_resources req = *layout;
 	if(!block_resources_.sufficient_for(req)) {
 		throw mce::graphics_exception("Insufficient resources per block for requested allocation.");
@@ -121,15 +124,15 @@ descriptor_set growing_simple_descriptor_pool::allocate_descriptor_set(
 		return blk.available_resources().sufficient_for(req);
 	});
 	if(it != blocks_.end()) {
-		return it->allocate_descriptor_set(layout);
+		return it->allocate_descriptor_set(layout, store_layout);
 	} else {
 		blocks_.emplace_back(*dev_, block_resources_);
-		return blocks_.back().allocate_descriptor_set(layout);
+		return blocks_.back().allocate_descriptor_set(layout, store_layout);
 	}
 }
 
 std::vector<descriptor_set> growing_simple_descriptor_pool::allocate_descriptor_sets(
-		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts) {
+		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts, bool store_layout) {
 	descriptor_set_resources req;
 	for(const auto& layout : layouts) {
 		req += *layout;
@@ -141,10 +144,10 @@ std::vector<descriptor_set> growing_simple_descriptor_pool::allocate_descriptor_
 		return blk.available_resources().sufficient_for(req);
 	});
 	if(it != blocks_.end()) {
-		return it->allocate_descriptor_sets(layouts);
+		return it->allocate_descriptor_sets(layouts, store_layout);
 	} else {
 		blocks_.emplace_back(*dev_, block_resources_);
-		return blocks_.back().allocate_descriptor_sets(layouts);
+		return blocks_.back().allocate_descriptor_sets(layouts, store_layout);
 	}
 }
 

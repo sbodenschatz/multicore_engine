@@ -52,6 +52,10 @@ public:
 	~descriptor_set();
 
 	/// Allows access to the descriptor_set_layout that the descriptor_set uses.
+	/**
+	 * May be null if the descriptor_set was allocated from a simple_descriptor_pool and the store_layout
+	 * parameter of the allocation member function was false.
+	 */
 	const std::shared_ptr<descriptor_set_layout>& layout() const {
 		return native_descriptor_set_.get_deleter().layout();
 	}
