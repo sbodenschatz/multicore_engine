@@ -674,9 +674,11 @@ public:
 		auto it_after = std::upper_bound(this->values.begin(), this->values.end(), key, comp);
 		auto it = it_after;
 		if(it != this->values.begin()) --it;
-		if(!comp(*it, key) && !comp(key, *it)) return std::make_pair(iterator(it), false);
+		if(it != this->values.end() && !comp(*it, key) && !comp(key, *it))
+			return std::make_pair(iterator(it), false);
+		auto pos = std::distance(this->values.begin(), it_after);
 		this->values.reserve(this->values.size() + 1);
-		it = this->values.emplace(it_after, std::forward<K>(key), std::forward<V>(value));
+		it = this->values.emplace(this->values.begin() + pos, std::forward<K>(key), std::forward<V>(value));
 		return std::make_pair(iterator(it), true);
 	}
 
@@ -691,12 +693,13 @@ public:
 		auto it_after = std::upper_bound(this->values.begin(), this->values.end(), key, comp);
 		auto it = it_after;
 		if(it != this->values.begin()) --it;
-		if(!comp(*it, key) && !comp(key, *it)) {
+		if(it != this->values.end() && !comp(*it, key) && !comp(key, *it)) {
 			it->second = std::forward<V>(value);
 			return std::make_pair(iterator(it), false);
 		}
+		auto pos = std::distance(this->values.begin(), it_after);
 		this->values.reserve(this->values.size() + 1);
-		it = this->values.emplace(it_after, std::forward<K>(key), std::forward<V>(value));
+		it = this->values.emplace(this->values.begin() + pos, std::forward<K>(key), std::forward<V>(value));
 		return std::make_pair(iterator(it), true);
 	}
 
@@ -881,8 +884,10 @@ public:
 	iterator insert(K&& key, V&& value) {
 		key_compare comp(this->compare);
 		auto it_after = std::upper_bound(this->values.begin(), this->values.end(), key, comp);
+		auto pos = std::distance(this->values.begin(), it_after);
 		this->values.reserve(this->values.size() + 1);
-		auto it = this->values.emplace(it_after, std::forward<K>(key), std::forward<V>(value));
+		auto it = this->values.emplace(this->values.begin() + pos, std::forward<K>(key),
+									   std::forward<V>(value));
 		return iterator(it);
 	}
 
