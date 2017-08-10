@@ -25,9 +25,8 @@
 namespace mce {
 namespace graphics {
 
-graphics_manager::graphics_manager(device& dev, destruction_queue_manager* dqm) : dev_{&dev}, dqm_{dqm} {
-	// TODO Auto-generated constructor stub
-}
+graphics_manager::graphics_manager(device& dev, destruction_queue_manager* dqm)
+		: dev_{&dev}, dqm_{dqm}, pipeline_cache_{std::make_unique<pipeline_cache>(dev)} {}
 
 graphics_manager::~graphics_manager() {}
 
