@@ -134,5 +134,20 @@ graphics_manager::create_shader_module(const std::string& name,
 	return entry;
 }
 
+std::shared_ptr<sampler>
+graphics_manager::create_sampler(const std::string& name, vk::Filter mag_filter, vk::Filter min_filter,
+								 vk::SamplerMipmapMode mipmap_mode, sampler_addressing_mode address_mode,
+								 float mip_lod_bias, boost::optional<float> max_anisotropy,
+								 boost::optional<vk::CompareOp> compare_op, float min_lod, float max_lod,
+								 vk::BorderColor border_color, bool unnormalized_coordinates) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = samplers_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	entry = std::make_shared<sampler>(*dev_, dqm_, mag_filter, min_filter, mipmap_mode, address_mode,
+									  mip_lod_bias, max_anisotropy, compare_op, min_lod, max_lod,
+									  border_color, unnormalized_coordinates);
+	return entry;
+}
+
 } /* namespace graphics */
 } /* namespace mce */
