@@ -57,6 +57,43 @@ public:
 	graphics_manager(device& dev);
 	~graphics_manager();
 
+	void add_pending_pipeline(const std::string& name, std::shared_ptr<pipeline_config> cfg);
+	void compile_pending_pipelines();
+
+	std::shared_ptr<descriptor_set_layout>
+	create_descriptor_set_layout(const std::string& name,
+								 std::vector<descriptor_set_layout_binding_element> bindings);
+	std::shared_ptr<framebuffer_config>
+	create_framebuffer_config(const std::string& name,
+							  vk::ArrayProxy<framebuffer_attachment_config> attachment_configs);
+	std::shared_ptr<pipeline_layout>
+	create_pipeline_layout(const std::string& name,
+						   std::vector<std::shared_ptr<descriptor_set_layout>> descriptor_set_layouts,
+						   std::vector<vk::PushConstantRange> push_constant_ranges = {});
+	std::shared_ptr<pipeline_layout>
+	create_pipeline_layout(const std::string& name, vk::ArrayProxy<std::string> descriptor_set_layout_names,
+						   std::vector<vk::PushConstantRange> push_constant_ranges = {});
+	std::shared_ptr<sampler> create_sampler(const std::string& name, vk::Filter mag_filter,
+											vk::Filter min_filter, vk::SamplerMipmapMode mipmap_mode,
+											sampler_addressing_mode address_mode, float mip_lod_bias,
+											boost::optional<float> max_anisotropy,
+											boost::optional<vk::CompareOp> compare_op, float min_lod,
+											float max_lod, vk::BorderColor border_color,
+											bool unnormalized_coordinates);
+	std::shared_ptr<subpass_graph> create_subpass_graph(const std::string& name,
+														std::vector<subpass_entry> subpasses,
+														std::vector<vk::SubpassDependency> dependencies);
+	std::shared_ptr<shader_module> create_shader_module(const std::string& name,
+														const asset::asset& ready_shader_binary_asset);
+	std::shared_ptr<render_pass>
+	create_render_pass(const std::string& name, std::shared_ptr<subpass_graph> subpasses,
+					   std::shared_ptr<framebuffer_config> fb_config,
+					   vk::ArrayProxy<render_pass_attachment_access> attachment_access_modes);
+	std::shared_ptr<render_pass>
+	create_render_pass(const std::string& name, const std::string& subpass_graph_name,
+					   const std::string& fb_config_name,
+					   vk::ArrayProxy<render_pass_attachment_access> attachment_access_modes);
+
 	std::shared_ptr<descriptor_set_layout> find_descriptor_set_layout(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = descriptor_set_layouts_.find(name);
