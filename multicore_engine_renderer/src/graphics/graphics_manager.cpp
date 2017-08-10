@@ -53,5 +53,16 @@ graphics_manager::create_framebuffer_config(const std::string& name,
 	return entry;
 }
 
+std::shared_ptr<pipeline_layout> graphics_manager::create_pipeline_layout(
+		const std::string& name, std::vector<std::shared_ptr<descriptor_set_layout>> descriptor_set_layouts,
+		std::vector<vk::PushConstantRange> push_constant_ranges) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = pipeline_layouts_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	entry = std::make_shared<pipeline_layout>(*dev_, dqm_, std::move(descriptor_set_layouts),
+											  std::move(push_constant_ranges));
+	return entry;
+}
+
 } /* namespace graphics */
 } /* namespace mce */
