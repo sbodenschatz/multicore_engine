@@ -13,6 +13,7 @@
  */
 
 #include <mce/graphics/destruction_queue_manager.hpp>
+#include <mce/graphics/graphics_defs.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
@@ -22,31 +23,20 @@ class device;
 
 /// Encapsulates a vulkan descriptor set layout and the associated data.
 class descriptor_set_layout {
-public:
-	/// Represents the data for a binding specification in the descriptor set layout.
-	struct binding_element {
-		uint32_t binding;					///< The index of the specified bindings.
-		vk::DescriptorType descriptor_type; ///< The descriptor type of binding specified.
-		uint32_t descriptor_count;			///< The number of descriptors in this binding.
-		vk::ShaderStageFlags stage_flags;   ///< The pipeline stages to which the binding should be available.
-		std::vector<vk::Sampler> immutable_samplers; ///< Optional immutable samplers for sampler bindings.
-	};
-
-private:
-	std::vector<binding_element> bindings_;
+	std::vector<descriptor_set_layout_binding_element> bindings_;
 	queued_handle<vk::UniqueDescriptorSetLayout> native_layout_;
 
 public:
 	/// \brief Creates a descriptor_set_layout on the given device containing the given bindings using the
 	/// given destruction manager.
 	descriptor_set_layout(const device& dev, destruction_queue_manager* dqm,
-						  std::vector<binding_element> bindings);
+						  std::vector<descriptor_set_layout_binding_element> bindings);
 	/// \brief Destroys the descriptor_set_layout wrapper and releases the native resources to the
 	/// destruction_queue_manager given at construction.
 	~descriptor_set_layout();
 
 	/// Allows access to the binding data contained in this descriptor_set_layout.
-	const std::vector<binding_element>& bindings() const {
+	const std::vector<descriptor_set_layout_binding_element>& bindings() const {
 		return bindings_;
 	}
 
