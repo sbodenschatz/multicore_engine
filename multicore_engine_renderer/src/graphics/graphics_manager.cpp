@@ -111,6 +111,15 @@ std::shared_ptr<render_pass> graphics_manager::create_render_pass(
 										  attachment_access_modes);
 	return entry;
 }
+std::shared_ptr<subpass_graph>
+graphics_manager::create_subpass_graph(const std::string& name, std::vector<subpass_entry> subpasses,
+									   std::vector<vk::SubpassDependency> dependencies) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = subpass_graphs_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	entry = std::make_shared<subpass_graph>(std::move(subpasses), std::move(subpasses));
+	return entry;
+}
 
 } /* namespace graphics */
 } /* namespace mce */
