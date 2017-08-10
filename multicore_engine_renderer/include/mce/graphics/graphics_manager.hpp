@@ -90,7 +90,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<render_pass> find_render_passe(const std::string& name) const {
+	std::shared_ptr<render_pass> find_render_pass(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = render_passes_.find(name);
 		if(it != render_passes_.end())
