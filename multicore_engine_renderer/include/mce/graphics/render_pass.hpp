@@ -23,6 +23,23 @@ namespace graphics {
 class device;
 class window;
 
+/// Describes a subpass in the subpass_graph.
+struct subpass_entry {
+	/// Describes the attachments used by this subpass as inputs and their layout.
+	std::vector<vk::AttachmentReference> input;
+	/// Describes the attachments used by this subpass as color outputs and their layout.
+	std::vector<vk::AttachmentReference> color;
+	/// \brief Describes the attachments used to resolve multisample attachments of the subpass into and their
+	/// layout.
+	std::vector<vk::AttachmentReference> resolve;
+	/// \brief Describes the optional attachment the is used by the subpass as a depth and/or stencil buffer
+	/// and the corresponding layout.
+	boost::optional<vk::AttachmentReference> depth_stencil;
+	/// \brief Describes the attachments that are not used by this subpass but must have their contents
+	/// preseved through the subpass.
+	std::vector<uint32_t> preserve;
+};
+
 /// Describes the structure of the subpasses for a render_pass.
 class subpass_graph {
 	std::vector<subpass_entry> subpasses_;
@@ -42,6 +59,22 @@ public:
 	const std::vector<subpass_entry>& subpasses() const {
 		return subpasses_;
 	}
+};
+
+/// Describes how a framebuffer attachment is accessed by a render_pass.
+struct render_pass_attachment_access {
+	/// The layout the render_pass will expect the attachment to be in when it begins.
+	vk::ImageLayout initial_layout = vk::ImageLayout::eUndefined;
+	/// The layout the render_pass will leave the attachment in when it is finished.
+	vk::ImageLayout final_layout = vk::ImageLayout::ePresentSrcKHR;
+	/// The operation / behavior used to load data from this attachment.
+	vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eDontCare;
+	/// The operation / behavior used to store data to this attachment.
+	vk::AttachmentStoreOp store_op = vk::AttachmentStoreOp::eDontCare;
+	/// The operation / behavior used to load data from the stencil data of this attachment.
+	vk::AttachmentLoadOp stencil_load_op = vk::AttachmentLoadOp::eDontCare;
+	/// The operation / behavior used to store data to the stencil data of this attachment.
+	vk::AttachmentStoreOp stencil_store_op = vk::AttachmentStoreOp::eDontCare;
 };
 
 /// Abstracts a vulkan render pass consisting of multiple rendering steps (subpasses).

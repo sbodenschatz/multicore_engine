@@ -21,6 +21,15 @@ namespace mce {
 namespace graphics {
 class device;
 
+/// Represents the data for a binding specification in the descriptor set layout.
+struct descriptor_set_layout_binding_element {
+	uint32_t binding;					///< The index of the specified bindings.
+	vk::DescriptorType descriptor_type; ///< The descriptor type of binding specified.
+	uint32_t descriptor_count;			///< The number of descriptors in this binding.
+	vk::ShaderStageFlags stage_flags;   ///< The pipeline stages to which the binding should be available.
+	std::vector<vk::Sampler> immutable_samplers; ///< Optional immutable samplers for sampler bindings.
+};
+
 /// Encapsulates a vulkan descriptor set layout and the associated data.
 class descriptor_set_layout {
 	std::vector<descriptor_set_layout_binding_element> bindings_;

@@ -8,10 +8,10 @@
 #define MCE_GRAPHICS_GRAPHICS_MANAGER_HPP_
 
 #include <boost/container/flat_map.hpp>
-#include <mce/graphics/graphics_defs.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace asset {
@@ -31,6 +31,11 @@ class pipeline_config;
 class descriptor_set_layout;
 class sampler;
 class destruction_queue_manager;
+class framebuffer_attachment_config;
+struct descriptor_set_layout_binding_element;
+class sampler_addressing_mode;
+struct subpass_entry;
+struct render_pass_attachment_access;
 
 class graphics_manager {
 private:

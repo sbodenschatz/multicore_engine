@@ -20,6 +20,35 @@
 namespace mce {
 namespace graphics {
 
+/// Bundles the addressing modes for the three dimensions of texel space for a sampler.
+class sampler_addressing_mode {
+	vk::SamplerAddressMode u_;
+	vk::SamplerAddressMode v_;
+	vk::SamplerAddressMode w_;
+
+public:
+	/// Creates an addressing_mode with the given mode for all dimensions.
+	explicit sampler_addressing_mode(vk::SamplerAddressMode mode) : u_{mode}, v_{mode}, w_{mode} {}
+	/// Creates an addressing_mode with the given modes for each of the dimensions.
+	sampler_addressing_mode(vk::SamplerAddressMode u, vk::SamplerAddressMode v, vk::SamplerAddressMode w)
+			: u_{u}, v_{v}, w_{w} {}
+
+	/// Returns the sampler address mode for the u dimension.
+	vk::SamplerAddressMode u() const {
+		return u_;
+	}
+
+	/// Returns the sampler address mode for the v dimension.
+	vk::SamplerAddressMode v() const {
+		return v_;
+	}
+
+	/// Returns the sampler address mode for the w dimension.
+	vk::SamplerAddressMode w() const {
+		return w_;
+	}
+};
+
 /// Encapsulates a vulkan sampler object and the associated data.
 class sampler {
 	vk::Filter mag_filter_;
