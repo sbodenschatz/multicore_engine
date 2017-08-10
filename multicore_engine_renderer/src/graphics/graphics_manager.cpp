@@ -148,6 +148,10 @@ graphics_manager::create_sampler(const std::string& name, vk::Filter mag_filter,
 									  border_color, unnormalized_coordinates);
 	return entry;
 }
+void graphics_manager::add_pending_pipeline(const std::string& name, std::shared_ptr<pipeline_config> cfg) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	pending_pipeline_configs_.push_back(pending_pipeline_task{name, std::move(cfg), nullptr});
+}
 
 } /* namespace graphics */
 } /* namespace mce */
