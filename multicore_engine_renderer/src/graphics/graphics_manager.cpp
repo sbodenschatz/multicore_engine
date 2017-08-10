@@ -19,7 +19,8 @@
 #include <mce/graphics/sampler.hpp>
 #include <mce/graphics/shader_module.hpp>
 #include <mce/util/finally.hpp>
-#include <tbb/parallel_for_each.h>
+#include <tbb/blocked_range.h>
+#include <tbb/parallel_for.h>
 
 namespace mce {
 namespace graphics {
