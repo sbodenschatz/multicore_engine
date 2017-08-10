@@ -63,6 +63,27 @@ std::shared_ptr<pipeline_layout> graphics_manager::create_pipeline_layout(
 											  std::move(push_constant_ranges));
 	return entry;
 }
+std::shared_ptr<pipeline_layout>
+graphics_manager::create_pipeline_layout(const std::string& name,
+										 vk::ArrayProxy<const std::string> descriptor_set_layout_names,
+										 std::vector<vk::PushConstantRange> push_constant_ranges) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = pipeline_layouts_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	std::vector<std::shared_ptr<descriptor_set_layout>> layouts;
+	layouts.reserve(descriptor_set_layout_names.size());
+	for(const auto& dsl_name : descriptor_set_layout_names) {
+		auto it = descriptor_set_layouts_.find(dsl_name);
+		if(it != descriptor_set_layouts_.end()) {
+			layouts.push_back(it->second);
+		} else {
+			throw mce::key_not_found_exception("Descriptor set layout '" + dsl_name + "' not found.");
+		}
+	}
+	entry = std::make_shared<pipeline_layout>(*dev_, dqm_, std::move(layouts),
+											  std::move(push_constant_ranges));
+	return entry;
+}
 
 } /* namespace graphics */
 } /* namespace mce */
