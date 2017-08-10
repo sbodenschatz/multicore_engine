@@ -39,6 +39,12 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_
 				   });
 	return pipelines;
 }
+pipeline pipeline::create_pipeline(const device& dev, destruction_queue_manager* dqm,
+								   pipeline_cache& pipeline_cache, pipeline_config pipeline_cfg) {
+	vk::GraphicsPipelineCreateInfo ci = pipeline_cfg.generate_create_info_structure();
+	return pipeline(dqm, dev->createGraphicsPipelineUnique(pipeline_cache.native_pipeline_cache(), ci),
+					pipeline_cfg.layout());
+}
 
 void pipeline::bind(vk::CommandBuffer cb) const {
 	cb.bindPipeline(vk::PipelineBindPoint::eGraphics, native_pipeline_.get());
