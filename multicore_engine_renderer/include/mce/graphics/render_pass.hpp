@@ -72,7 +72,7 @@ public:
 	 */
 	render_pass(device& device_, destruction_queue_manager* dqm, std::shared_ptr<subpass_graph> subpasses,
 				std::shared_ptr<framebuffer_config> fb_config,
-				vk::ArrayProxy<render_pass_attachment_access> attachment_access_modes);
+				vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 	/// Destroys the render_pass and releases the wrapped native render_pass to the destruction_queue_manager.
 	~render_pass();
 
@@ -93,7 +93,7 @@ public:
 
 	/// \brief Begins the render_pass in the given command buffer using the given framebuffer_frame, clear
 	/// values and mode for the subpass contents.
-	void begin(vk::CommandBuffer cb, framebuffer_frame& fb, vk::ArrayProxy<vk::ClearValue> clear_values,
+	void begin(vk::CommandBuffer cb, framebuffer_frame& fb, vk::ArrayProxy<const vk::ClearValue> clear_values,
 			   vk::SubpassContents subpass_contents) const;
 };
 

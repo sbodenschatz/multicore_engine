@@ -73,7 +73,8 @@ public:
 						   std::vector<std::shared_ptr<descriptor_set_layout>> descriptor_set_layouts,
 						   std::vector<vk::PushConstantRange> push_constant_ranges = {});
 	std::shared_ptr<pipeline_layout>
-	create_pipeline_layout(const std::string& name, vk::ArrayProxy<std::string> descriptor_set_layout_names,
+	create_pipeline_layout(const std::string& name,
+						   vk::ArrayProxy<const std::string> descriptor_set_layout_names,
 						   std::vector<vk::PushConstantRange> push_constant_ranges = {});
 	std::shared_ptr<sampler> create_sampler(const std::string& name, vk::Filter mag_filter,
 											vk::Filter min_filter, vk::SamplerMipmapMode mipmap_mode,
@@ -90,11 +91,11 @@ public:
 	std::shared_ptr<render_pass>
 	create_render_pass(const std::string& name, std::shared_ptr<subpass_graph> subpasses,
 					   std::shared_ptr<framebuffer_config> fb_config,
-					   vk::ArrayProxy<render_pass_attachment_access> attachment_access_modes);
+					   vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 	std::shared_ptr<render_pass>
 	create_render_pass(const std::string& name, const std::string& subpass_graph_name,
 					   const std::string& fb_config_name,
-					   vk::ArrayProxy<render_pass_attachment_access> attachment_access_modes);
+					   vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 
 	void release_descriptor_set_layout(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
