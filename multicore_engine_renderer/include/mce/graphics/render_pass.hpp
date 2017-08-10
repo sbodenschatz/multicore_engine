@@ -23,22 +23,6 @@ namespace graphics {
 class device;
 class window;
 
-/// Describes how a framebuffer attachment is accessed by a render_pass.
-struct attachment_access {
-	/// The layout the render_pass will expect the attachment to be in when it begins.
-	vk::ImageLayout initial_layout = vk::ImageLayout::eUndefined;
-	/// The layout the render_pass will leave the attachment in when it is finished.
-	vk::ImageLayout final_layout = vk::ImageLayout::ePresentSrcKHR;
-	/// The operation / behavior used to load data from this attachment.
-	vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eDontCare;
-	/// The operation / behavior used to store data to this attachment.
-	vk::AttachmentStoreOp store_op = vk::AttachmentStoreOp::eDontCare;
-	/// The operation / behavior used to load data from the stencil data of this attachment.
-	vk::AttachmentLoadOp stencil_load_op = vk::AttachmentLoadOp::eDontCare;
-	/// The operation / behavior used to store data to the stencil data of this attachment.
-	vk::AttachmentStoreOp stencil_store_op = vk::AttachmentStoreOp::eDontCare;
-};
-
 /// Describes the structure of the subpasses for a render_pass.
 class subpass_graph {
 	std::vector<subpass_entry> subpasses_;
@@ -88,7 +72,7 @@ public:
 	 */
 	render_pass(device& device_, destruction_queue_manager* dqm, std::shared_ptr<subpass_graph> subpasses,
 				std::shared_ptr<framebuffer_config> fb_config,
-				vk::ArrayProxy<attachment_access> attachment_access_modes);
+				vk::ArrayProxy<render_pass_attachment_access> attachment_access_modes);
 	/// Destroys the render_pass and releases the wrapped native render_pass to the destruction_queue_manager.
 	~render_pass();
 

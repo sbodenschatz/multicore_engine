@@ -19,7 +19,7 @@ namespace graphics {
 render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 						 std::shared_ptr<subpass_graph> subpasses,
 						 std::shared_ptr<framebuffer_config> fb_config,
-						 vk::ArrayProxy<attachment_access> attachment_access_modes)
+						 vk::ArrayProxy<render_pass_attachment_access> attachment_access_modes)
 		: device_(device_), subpasses_{std::move(subpasses)}, fb_config_{std::move(fb_config)} {
 
 	if(attachment_access_modes.size() != fb_config_->attachment_configs().size()) {
