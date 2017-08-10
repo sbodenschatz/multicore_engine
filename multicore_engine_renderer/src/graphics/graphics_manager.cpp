@@ -18,6 +18,8 @@
 #include <mce/graphics/render_pass.hpp>
 #include <mce/graphics/sampler.hpp>
 #include <mce/graphics/shader_module.hpp>
+#include <mce/util/finally.hpp>
+#include <tbb/parallel_for_each.h>
 
 namespace mce {
 namespace graphics {
@@ -160,6 +162,24 @@ void graphics_manager::add_pending_pipeline(const std::string& name, std::shared
 		throw mce::key_already_used_exception("The given name is already in use.");
 	}
 	pending_pipeline_configs_.push_back(pending_pipeline_task{name, std::move(cfg), nullptr});
+}
+
+void graphics_manager::compile_pending_pipelines() {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	static std::vector<pending_pipeline_task> processing_pipeline_configs;
+	auto clear_processing = util::finally([&]() { processing_pipeline_configs.clear(); });
+	using std::swap;
+	swap(processing_pipeline_configs, pending_pipeline_configs_);
+	// TODO Implement
+	/*
+	tbb::parallel_for_each(processing_pipeline_configs.begin(), processing_pipeline_configs.end(),
+						   [this](pending_pipeline_task& task) {
+
+						   });*/
+	for(auto& task : processing_pipeline_configs) {
+		pipeline_configs_[task.name] = std::move(task.config);
+		pipelines_[task.name] = std::move(task.result);
+	}
 }
 
 } /* namespace graphics */
