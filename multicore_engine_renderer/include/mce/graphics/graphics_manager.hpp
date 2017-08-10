@@ -8,11 +8,16 @@
 #define MCE_GRAPHICS_GRAPHICS_MANAGER_HPP_
 
 #include <boost/container/flat_map.hpp>
+#include <mce/graphics/graphics_defs.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
 
 namespace mce {
+namespace asset {
+class asset;
+} // namespace asset
+
 namespace graphics {
 class shader_module;
 class device;
@@ -28,12 +33,19 @@ class sampler;
 
 class graphics_manager {
 private:
+	struct pending_pipeline_task {
+		std::string name;
+		std::shared_ptr<pipeline_config> config;
+		std::shared_ptr<pipeline> result;
+	};
+
 	mutable std::mutex manager_mutex_;
 	device* dev_;
 	std::unique_ptr<pipeline_cache> pipeline_cache_;
 	boost::container::flat_map<std::string, std::shared_ptr<descriptor_set_layout>> descriptor_set_layouts_;
 	boost::container::flat_map<std::string, std::shared_ptr<pipeline_layout>> pipeline_layouts_;
 	boost::container::flat_map<std::string, std::shared_ptr<shader_module>> shader_modules_;
+	std::vector<pending_pipeline_task> pending_pipeline_configs_;
 	boost::container::flat_map<std::string, std::shared_ptr<pipeline_config>> pipelines_configs_;
 	boost::container::flat_map<std::string, std::shared_ptr<framebuffer_config>> framebuffer_configs_;
 	boost::container::flat_map<std::string, std::shared_ptr<subpass_graph>> subpass_graphs_;
