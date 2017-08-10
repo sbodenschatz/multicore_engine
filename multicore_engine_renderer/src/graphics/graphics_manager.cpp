@@ -192,7 +192,8 @@ void graphics_manager::compile_pending_pipelines() {
 								  tasks.begin()[i].result = std::make_shared<pipeline>(std::move(res[i]));
 							  }
 						  }
-					  });
+					  },
+					  tbb::auto_partitioner());
 	for(auto& task : processing_pipeline_configs) {
 		pipeline_configs_[task.name] = std::move(task.config);
 		pipelines_[task.name] = std::move(task.result);
