@@ -45,7 +45,7 @@ std::shared_ptr<framebuffer_config> graphics_manager::create_framebuffer_config(
 }
 std::shared_ptr<framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name,
-											vk::vector<framebuffer_attachment_config>&& attachment_configs) {
+											std::vector<framebuffer_attachment_config>&& attachment_configs) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
