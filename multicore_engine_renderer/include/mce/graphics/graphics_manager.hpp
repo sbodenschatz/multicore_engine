@@ -8,6 +8,7 @@
 #define MCE_GRAPHICS_GRAPHICS_MANAGER_HPP_
 
 #include <boost/container/flat_map.hpp>
+#include <boost/optional.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
