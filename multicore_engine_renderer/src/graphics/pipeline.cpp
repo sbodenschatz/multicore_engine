@@ -22,13 +22,13 @@ pipeline::~pipeline() {}
 
 std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_queue_manager* dqm,
 												 pipeline_cache& pipeline_cache,
-												 vk::ArrayProxy<const pipeline_config> pipeline_configs) {
+												 std::vector<pipeline_config> pipeline_configs) {
 	std::vector<pipeline> pipelines;
 	vk::Device owner_dev = dev.native_device();
 	std::vector<vk::GraphicsPipelineCreateInfo> pipelines_ci;
 	pipelines_ci.reserve(pipeline_configs.size());
 	std::transform(pipeline_configs.begin(), pipeline_configs.end(), std::back_inserter(pipelines_ci),
-				   [&, owner_dev](pipeline_config pcfg) { return pcfg.generate_create_info_structure(); });
+				   [&, owner_dev](pipeline_config& pcfg) { return pcfg.generate_create_info_structure(); });
 	auto native_pipelines =
 			owner_dev.createGraphicsPipelinesUnique(pipeline_cache.native_pipeline_cache(), pipelines_ci);
 	pipelines.reserve(native_pipelines.size());
