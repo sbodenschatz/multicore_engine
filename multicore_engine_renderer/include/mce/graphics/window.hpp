@@ -51,7 +51,7 @@ public:
 	/// \brief Creates a framebuffer_config containing a swapchain image from the swapchain belonging to this
 	/// window as the first element.
 	framebuffer_config
-	make_framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments);
+	make_framebuffer_config(vk::ArrayProxy<const framebuffer_attachment_config> additional_attachments);
 
 	/// Returns the vulkan surface held by this window.
 	const vk::SurfaceKHR& surface() const {

@@ -73,7 +73,7 @@ public:
 	/**
 	 * General copying version of the constructor.
 	 */
-	framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> attachment_configs)
+	framebuffer_config(vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs)
 			: attachment_configs_{attachment_configs.begin(), attachment_configs.end()} {}
 	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
 	/**
