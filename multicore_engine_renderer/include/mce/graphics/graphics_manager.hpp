@@ -54,7 +54,7 @@ private:
 	boost::container::flat_map<std::string, std::shared_ptr<pipeline_layout>> pipeline_layouts_;
 	boost::container::flat_map<std::string, std::shared_ptr<shader_module>> shader_modules_;
 	std::vector<pending_pipeline_task> pending_pipeline_configs_;
-	boost::container::flat_map<std::string, std::shared_ptr<pipeline_config>> pipelines_configs_;
+	boost::container::flat_map<std::string, std::shared_ptr<pipeline_config>> pipeline_configs_;
 	boost::container::flat_map<std::string, std::shared_ptr<framebuffer_config>> framebuffer_configs_;
 	boost::container::flat_map<std::string, std::shared_ptr<subpass_graph>> subpass_graphs_;
 	boost::container::flat_map<std::string, std::shared_ptr<render_pass>> render_passes_;
@@ -132,7 +132,7 @@ public:
 	}
 	void release_pipeline_and_config(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
-		pipelines_configs_.erase(name);
+		pipeline_configs_.erase(name);
 		pipelines_.erase(name);
 	}
 	void release_render_pass(const std::string& name) {
@@ -176,10 +176,10 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<pipeline_config> find_pipelines_config(const std::string& name) const {
+	std::shared_ptr<pipeline_config> find_pipeline_config(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
-		auto it = pipelines_configs_.find(name);
-		if(it != pipelines_configs_.end())
+		auto it = pipeline_configs_.find(name);
+		if(it != pipeline_configs_.end())
 			return it->second;
 		else
 			return {};
