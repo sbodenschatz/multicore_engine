@@ -22,7 +22,7 @@ pipeline::~pipeline() {}
 
 std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_queue_manager* dqm,
 												 pipeline_cache& pipeline_cache,
-												 const std::vector<pipeline_config>& pipeline_configs) {
+												 vk::ArrayProxy<const pipeline_config> pipeline_configs) {
 	std::vector<pipeline> pipelines;
 	vk::Device owner_dev = dev.native_device();
 	std::vector<vk::GraphicsPipelineCreateInfo> pipelines_ci;

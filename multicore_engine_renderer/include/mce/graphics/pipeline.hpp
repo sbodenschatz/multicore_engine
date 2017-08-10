@@ -43,7 +43,7 @@ public:
 	/// improvement.
 	static std::vector<pipeline> create_pipelines(const device& dev, destruction_queue_manager* dqm,
 												  pipeline_cache& pipeline_cache,
-												  const std::vector<pipeline_config>& pipeline_configs);
+												  vk::ArrayProxy<const pipeline_config> pipeline_configs);
 
 	/// Bind this pipeline in the given command buffer.
 	void bind(vk::CommandBuffer cb) const;
