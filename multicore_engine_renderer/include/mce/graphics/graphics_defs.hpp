@@ -62,6 +62,23 @@ public:
 	}
 };
 
+/// Describes a subpass in the subpass_graph.
+struct subpass_entry {
+	/// Describes the attachments used by this subpass as inputs and their layout.
+	std::vector<vk::AttachmentReference> input;
+	/// Describes the attachments used by this subpass as color outputs and their layout.
+	std::vector<vk::AttachmentReference> color;
+	/// \brief Describes the attachments used to resolve multisample attachments of the subpass into and their
+	/// layout.
+	std::vector<vk::AttachmentReference> resolve;
+	/// \brief Describes the optional attachment the is used by the subpass as a depth and/or stencil buffer
+	/// and the corresponding layout.
+	boost::optional<vk::AttachmentReference> depth_stencil;
+	/// \brief Describes the attachments that are not used by this subpass but must have their contents
+	/// preseved through the subpass.
+	std::vector<uint32_t> preserve;
+};
+
 } // namespace graphics
 } // namespace mce
 
