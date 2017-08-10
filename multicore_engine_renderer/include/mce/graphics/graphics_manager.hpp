@@ -45,7 +45,7 @@ public:
 	graphics_manager(device& dev);
 	~graphics_manager();
 
-	std::shared_ptr<descriptor_set_layout> descriptor_set_layout(const std::string& name) const {
+	std::shared_ptr<descriptor_set_layout> find_descriptor_set_layout(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = descriptor_set_layouts_.find(name);
 		if(it != descriptor_set_layouts_.end())
@@ -54,7 +54,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<framebuffer_config> framebuffer_config(const std::string& name) const {
+	std::shared_ptr<framebuffer_config> find_framebuffer_config(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = framebuffer_configs_.find(name);
 		if(it != framebuffer_configs_.end())
@@ -63,7 +63,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<pipeline_layout> pipeline_layout(const std::string& name) const {
+	std::shared_ptr<pipeline_layout> find_pipeline_layout(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = pipeline_layouts_.find(name);
 		if(it != pipeline_layouts_.end())
@@ -72,7 +72,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<pipeline> pipeline(const std::string& name) const {
+	std::shared_ptr<pipeline> find_pipeline(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = pipelines_.find(name);
 		if(it != pipelines_.end())
@@ -81,7 +81,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<pipeline_config> pipelines_config(const std::string& name) const {
+	std::shared_ptr<pipeline_config> find_pipelines_config(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = pipelines_configs_.find(name);
 		if(it != pipelines_configs_.end())
@@ -90,7 +90,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<render_pass> render_passe(const std::string& name) const {
+	std::shared_ptr<render_pass> find_render_passe(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = render_passes_.find(name);
 		if(it != render_passes_.end())
@@ -99,7 +99,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<sampler> sampler(const std::string& name) const {
+	std::shared_ptr<sampler> find_sampler(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = samplers_.find(name);
 		if(it != samplers_.end())
@@ -108,7 +108,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<shader_module> shader_module(const std::string& name) const {
+	std::shared_ptr<shader_module> find_shader_module(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = shader_modules_.find(name);
 		if(it != shader_modules_.end())
@@ -117,7 +117,7 @@ public:
 			return {};
 	}
 
-	std::shared_ptr<subpass_graph> subpass_graph(const std::string& name) const {
+	std::shared_ptr<subpass_graph> find_subpass_graph(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = subpass_graphs_.find(name);
 		if(it != subpass_graphs_.end())
