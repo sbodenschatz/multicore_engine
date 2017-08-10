@@ -74,7 +74,7 @@ graphics_manager::create_pipeline_layout(const std::string& name,
 	layouts.reserve(descriptor_set_layout_names.size());
 	for(const auto& dsl_name : descriptor_set_layout_names) {
 		auto it = descriptor_set_layouts_.find(dsl_name);
-		if(it != descriptor_set_layouts_.end()) {
+		if(it != descriptor_set_layouts_.end() && it->second) {
 			layouts.push_back(it->second);
 		} else {
 			throw mce::key_not_found_exception("Descriptor set layout '" + dsl_name + "' not found.");
