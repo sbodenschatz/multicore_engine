@@ -117,7 +117,7 @@ graphics_manager::create_subpass_graph(const std::string& name, std::vector<subp
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = subpass_graphs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
-	entry = std::make_shared<subpass_graph>(std::move(subpasses), std::move(subpasses));
+	entry = std::make_shared<subpass_graph>(std::move(subpasses), std::move(dependencies));
 	return entry;
 }
 
