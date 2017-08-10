@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/asset/asset.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/device.hpp>
@@ -15,6 +16,7 @@
 #include <mce/graphics/pipeline_layout.hpp>
 #include <mce/graphics/render_pass.hpp>
 #include <mce/graphics/sampler.hpp>
+#include <mce/graphics/shader_module.hpp>
 
 namespace mce {
 namespace graphics {
@@ -118,6 +120,17 @@ graphics_manager::create_subpass_graph(const std::string& name, std::vector<subp
 	auto& entry = subpass_graphs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
 	entry = std::make_shared<subpass_graph>(std::move(subpasses), std::move(dependencies));
+	return entry;
+}
+std::shared_ptr<shader_module>
+graphics_manager::create_shader_module(const std::string& name,
+									   const asset::asset& ready_shader_binary_asset) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	if(!ready_shader_binary_asset.ready())
+		throw mce::async_state_exception("Given asset '" + ready_shader_binary_asset.name() + "' not ready.");
+	auto& entry = shader_modules_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	entry = std::make_shared<shader_module>(*dev_, ready_shader_binary_asset);
 	return entry;
 }
 
