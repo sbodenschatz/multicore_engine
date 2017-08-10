@@ -30,6 +30,7 @@ class pipeline_cache;
 class pipeline_config;
 class descriptor_set_layout;
 class sampler;
+class destruction_queue_manager;
 
 class graphics_manager {
 private:
@@ -41,6 +42,7 @@ private:
 
 	mutable std::mutex manager_mutex_;
 	device* dev_;
+	destruction_queue_manager* dqm_;
 	std::unique_ptr<pipeline_cache> pipeline_cache_;
 	boost::container::flat_map<std::string, std::shared_ptr<descriptor_set_layout>> descriptor_set_layouts_;
 	boost::container::flat_map<std::string, std::shared_ptr<pipeline_layout>> pipeline_layouts_;
@@ -54,7 +56,7 @@ private:
 	boost::container::flat_map<std::string, std::shared_ptr<sampler>> samplers_;
 
 public:
-	graphics_manager(device& dev);
+	graphics_manager(device& dev, destruction_queue_manager* dqm);
 	~graphics_manager();
 
 	void add_pending_pipeline(const std::string& name, std::shared_ptr<pipeline_config> cfg);

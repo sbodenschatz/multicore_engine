@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/exceptions.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/framebuffer_config.hpp>
@@ -15,26 +16,24 @@
 #include <mce/graphics/render_pass.hpp>
 #include <mce/graphics/sampler.hpp>
 
-class shader_module;
-class device;
-class pipeline_layout;
-class pipeline;
-class framebuffer_config;
-class subpass_graph;
-class render_pass;
-class pipeline_cache;
-class pipeline_config;
-class descriptor_set_layout;
-class sampler;
-
 namespace mce {
 namespace graphics {
 
-graphics_manager::graphics_manager(device& dev) : dev_{&dev} {
+graphics_manager::graphics_manager(device& dev, destruction_queue_manager* dqm) : dev_{&dev}, dqm_{dqm} {
 	// TODO Auto-generated constructor stub
 }
 
 graphics_manager::~graphics_manager() {}
+
+std::shared_ptr<descriptor_set_layout>
+graphics_manager::create_descriptor_set_layout(const std::string& name,
+											   std::vector<descriptor_set_layout_binding_element> bindings) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = descriptor_set_layouts_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	entry = std::make_shared<descriptor_set_layout>(*dev_, dqm_, std::move(bindings));
+	return entry;
+}
 
 } /* namespace graphics */
 } /* namespace mce */
