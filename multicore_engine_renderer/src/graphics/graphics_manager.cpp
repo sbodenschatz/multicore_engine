@@ -173,14 +173,21 @@ void graphics_manager::compile_pending_pipelines() {
 	using range = tbb::blocked_range<decltype(processing_pipeline_configs.begin())>;
 	tbb::parallel_for(range(processing_pipeline_configs.begin(), processing_pipeline_configs.end()),
 					  [this](range tasks) {
-						  std::vector<pipeline_config> configs;
-						  configs.reserve(tasks.size());
-						  std::transform(tasks.begin(), tasks.end(), std::back_inserter(configs),
-										 [](const pending_pipeline_task& task) { return *task.config; });
-						  auto res = pipeline::create_pipelines(*dev_, dqm_, *pipeline_cache_,
-																std::move(configs));
-						  for(size_t i = 0; i < tasks.size(); ++i) {
-							  tasks.begin()[i].result = std::make_shared<pipeline>(std::move(res[i]));
+						  if(tasks.empty()) {
+							  return;
+						  } else if(tasks.size() == 1) {
+							  tasks.begin()->result = std::make_shared<pipeline>(pipeline::create_pipeline(
+									  *dev_, dqm_, *pipeline_cache_, *(tasks.begin()->config)));
+						  } else {
+							  std::vector<pipeline_config> configs;
+							  configs.reserve(tasks.size());
+							  std::transform(tasks.begin(), tasks.end(), std::back_inserter(configs),
+											 [](const pending_pipeline_task& task) { return *task.config; });
+							  auto res = pipeline::create_pipelines(*dev_, dqm_, *pipeline_cache_,
+																	std::move(configs));
+							  for(size_t i = 0; i < tasks.size(); ++i) {
+								  tasks.begin()[i].result = std::make_shared<pipeline>(std::move(res[i]));
+							  }
 						  }
 					  });
 	for(auto& task : processing_pipeline_configs) {
