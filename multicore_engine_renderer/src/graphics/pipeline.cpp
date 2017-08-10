@@ -32,9 +32,9 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_
 	auto native_pipelines =
 			owner_dev.createGraphicsPipelinesUnique(pipeline_cache.native_pipeline_cache(), pipelines_ci);
 	pipelines.reserve(native_pipelines.size());
-	std::transform(native_pipelines.begin(), native_pipelines.end(), pipeline_configs.begin(),
+	std::transform(pipeline_configs.begin(), pipeline_configs.end(), native_pipelines.begin(),
 				   std::back_inserter(pipelines),
-				   [owner_dev, dqm](vk::UniquePipeline& native_pipeline, const pipeline_config& config) {
+				   [owner_dev, dqm](const pipeline_config& config, vk::UniquePipeline& native_pipeline) {
 					   return pipeline(dqm, std::move(native_pipeline), config.layout());
 				   });
 	return pipelines;
