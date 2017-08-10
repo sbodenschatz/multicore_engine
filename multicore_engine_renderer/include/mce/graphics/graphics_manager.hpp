@@ -94,6 +94,40 @@ public:
 					   const std::string& fb_config_name,
 					   vk::ArrayProxy<render_pass_attachment_access> attachment_access_modes);
 
+	void release_descriptor_set_layout(const std::string& name) {
+		std::lock_guard<std::mutex> lock(manager_mutex_);
+		descriptor_set_layouts_.erase(name);
+	}
+	void release_framebuffer_config(const std::string& name) {
+		std::lock_guard<std::mutex> lock(manager_mutex_);
+		framebuffer_configs_.erase(name);
+	}
+	void release_pipeline_layout(const std::string& name) {
+		std::lock_guard<std::mutex> lock(manager_mutex_);
+		pipeline_layouts_.erase(name);
+	}
+	void release_sampler(const std::string& name) {
+		std::lock_guard<std::mutex> lock(manager_mutex_);
+		samplers_.erase(name);
+	}
+	void release_subpass_graph(const std::string& name) {
+		std::lock_guard<std::mutex> lock(manager_mutex_);
+		subpass_graphs_.erase(name);
+	}
+	void release_shader_module(const std::string& name) {
+		std::lock_guard<std::mutex> lock(manager_mutex_);
+		shader_modules_.erase(name);
+	}
+	void release_pipeline_and_config(const std::string& name) {
+		std::lock_guard<std::mutex> lock(manager_mutex_);
+		pipelines_configs_.erase(name);
+		pipelines_.erase(name);
+	}
+	void release_render_pass(const std::string& name) {
+		std::lock_guard<std::mutex> lock(manager_mutex_);
+		render_passes_.erase(name);
+	}
+
 	std::shared_ptr<descriptor_set_layout> find_descriptor_set_layout(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = descriptor_set_layouts_.find(name);
