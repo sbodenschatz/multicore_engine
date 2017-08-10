@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <mce/asset/asset.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
@@ -150,6 +151,14 @@ graphics_manager::create_sampler(const std::string& name, vk::Filter mag_filter,
 }
 void graphics_manager::add_pending_pipeline(const std::string& name, std::shared_ptr<pipeline_config> cfg) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto it = pipelines_.find(name);
+	auto it_cfg = pipeline_configs_.find(name);
+	auto it_pending = std::find_if(pending_pipeline_configs_.begin(), pending_pipeline_configs_.end(),
+								   [&name](const auto& v) { return v.name == name; });
+	if(it != pipelines_.end() || it_cfg != pipeline_configs_.end() ||
+	   it_pending != pending_pipeline_configs_.end()) {
+		throw mce::key_already_used_exception("The given name is already in use.");
+	}
 	pending_pipeline_configs_.push_back(pending_pipeline_task{name, std::move(cfg), nullptr});
 }
 
