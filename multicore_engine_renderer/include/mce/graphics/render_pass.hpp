@@ -94,8 +94,8 @@ class render_pass {
 private:
 	device& device_;
 	queued_handle<vk::UniqueRenderPass> native_render_pass_;
-	std::shared_ptr<subpass_graph> subpasses_;
-	std::shared_ptr<framebuffer_config> fb_config_;
+	std::shared_ptr<const subpass_graph> subpasses_;
+	std::shared_ptr<const framebuffer_config> fb_config_;
 
 public:
 	/// \brief Creates a render_pass on the given device with the given subpass and framebuffer structure and
@@ -103,14 +103,15 @@ public:
 	/**
 	 * The created object participates in ownership of the given subpass_graph and framebuffer_config.
 	 */
-	render_pass(device& device_, destruction_queue_manager* dqm, std::shared_ptr<subpass_graph> subpasses,
-				std::shared_ptr<framebuffer_config> fb_config,
+	render_pass(device& device_, destruction_queue_manager* dqm,
+				std::shared_ptr<const subpass_graph> subpasses,
+				std::shared_ptr<const framebuffer_config> fb_config,
 				vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 	/// Destroys the render_pass and releases the wrapped native render_pass to the destruction_queue_manager.
 	~render_pass();
 
 	/// Allows access to used framebuffer_config.
-	const std::shared_ptr<framebuffer_config>& fb_config() const {
+	const std::shared_ptr<const framebuffer_config>& fb_config() const {
 		return fb_config_;
 	}
 
@@ -120,7 +121,7 @@ public:
 	}
 
 	/// Allows access to the used subpass_graph.
-	const std::shared_ptr<subpass_graph>& subpasses() const {
+	const std::shared_ptr<const subpass_graph>& subpasses() const {
 		return subpasses_;
 	}
 
