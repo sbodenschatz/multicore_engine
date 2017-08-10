@@ -12,6 +12,7 @@
  * Provides general definitions for the graphics subsystem.
  */
 
+#include <boost/optional.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
