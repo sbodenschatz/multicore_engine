@@ -74,6 +74,9 @@ public:
 	std::shared_ptr<framebuffer_config>
 	create_framebuffer_config(const std::string& name,
 							  vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs);
+	std::shared_ptr<framebuffer_config>
+	create_framebuffer_config(const std::string& name,
+							  vk::vector<framebuffer_attachment_config>&& attachment_configs);
 	std::shared_ptr<pipeline_layout>
 	create_pipeline_layout(const std::string& name,
 						   std::vector<std::shared_ptr<descriptor_set_layout>> descriptor_set_layouts,
