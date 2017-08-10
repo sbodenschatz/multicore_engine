@@ -84,6 +84,17 @@ graphics_manager::create_pipeline_layout(const std::string& name,
 											  std::move(push_constant_ranges));
 	return entry;
 }
+std::shared_ptr<render_pass> graphics_manager::create_render_pass(
+		const std::string& name, std::shared_ptr<subpass_graph> subpasses,
+		std::shared_ptr<framebuffer_config> fb_config,
+		vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = render_passes_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	entry = std::make_shared<render_pass>(*dev_, dqm_, std::move(subpasses), std::move(fb_config),
+										  attachment_access_modes);
+	return entry;
+}
 
 } /* namespace graphics */
 } /* namespace mce */
