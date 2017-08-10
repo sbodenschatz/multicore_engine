@@ -95,6 +95,22 @@ std::shared_ptr<render_pass> graphics_manager::create_render_pass(
 										  attachment_access_modes);
 	return entry;
 }
+std::shared_ptr<render_pass> graphics_manager::create_render_pass(
+		const std::string& name, const std::string& subpass_graph_name, const std::string& fb_config_name,
+		vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = render_passes_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	auto subpasses_it = subpass_graphs_.find(subpass_graph_name);
+	if(subpasses_it == subpass_graphs_.end() || !(subpasses_it->second))
+		throw mce::key_not_found_exception("Subpass graph '" + subpass_graph_name + "' not found.");
+	auto fbcfg_it = framebuffer_configs_.find(fb_config_name);
+	if(fbcfg_it == framebuffer_configs_.end() || !(fbcfg_it->second))
+		throw mce::key_not_found_exception("Framebuffer config '" + fb_config_name + "' not found.");
+	entry = std::make_shared<render_pass>(*dev_, dqm_, subpasses_it->second, fbcfg_it->second,
+										  attachment_access_modes);
+	return entry;
+}
 
 } /* namespace graphics */
 } /* namespace mce */
