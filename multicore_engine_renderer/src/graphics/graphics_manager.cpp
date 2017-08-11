@@ -18,6 +18,7 @@
 #include <mce/graphics/render_pass.hpp>
 #include <mce/graphics/sampler.hpp>
 #include <mce/graphics/shader_module.hpp>
+#include <mce/graphics/window.hpp>
 #include <mce/util/finally.hpp>
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
@@ -55,6 +56,27 @@ graphics_manager::create_framebuffer_config(const std::string& name,
 	auto& entry = framebuffer_configs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
 	entry = std::make_shared<framebuffer_config>(std::move(attachment_configs));
+	return entry;
+}
+
+std::shared_ptr<const framebuffer_config> graphics_manager::create_framebuffer_config(
+		const std::string& name, window& swapchain_window,
+		vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = framebuffer_configs_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	entry = std::make_shared<framebuffer_config>(
+			swapchain_window.make_framebuffer_config(attachment_configs));
+	return entry;
+}
+std::shared_ptr<const framebuffer_config>
+graphics_manager::create_framebuffer_config(const std::string& name, window& swapchain_window,
+											std::vector<framebuffer_attachment_config>&& attachment_configs) {
+	std::lock_guard<std::mutex> lock(manager_mutex_);
+	auto& entry = framebuffer_configs_[name];
+	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
+	entry = std::make_shared<framebuffer_config>(
+			swapchain_window.make_framebuffer_config(std::move(attachment_configs)));
 	return entry;
 }
 

@@ -37,6 +37,7 @@ struct descriptor_set_layout_binding_element;
 class sampler_addressing_mode;
 struct subpass_entry;
 struct render_pass_attachment_access;
+class window;
 
 class graphics_manager {
 private:
@@ -78,6 +79,14 @@ public:
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name,
 							  std::vector<framebuffer_attachment_config>&& attachment_configs);
+
+	std::shared_ptr<const framebuffer_config>
+	create_framebuffer_config(const std::string& name, window& swapchain_window,
+							  vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs);
+	std::shared_ptr<const framebuffer_config>
+	create_framebuffer_config(const std::string& name, window& swapchain_window,
+							  std::vector<framebuffer_attachment_config>&& attachment_configs);
+
 	std::shared_ptr<const pipeline_layout>
 	create_pipeline_layout(const std::string& name,
 						   std::vector<std::shared_ptr<const descriptor_set_layout>> descriptor_set_layouts,
