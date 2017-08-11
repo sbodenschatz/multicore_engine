@@ -7,6 +7,10 @@
 #ifndef MCE_GRAPHICS_GRAPHICS_MANAGER_HPP_
 #define MCE_GRAPHICS_GRAPHICS_MANAGER_HPP_
 
+/**
+ * Defines the graphics_manager class.
+ */
+
 #include <boost/container/flat_map.hpp>
 #include <boost/optional.hpp>
 #include <memory>
@@ -39,6 +43,25 @@ struct subpass_entry;
 struct render_pass_attachment_access;
 class window;
 
+/// Manages global configuration state objects for the graphics subsystem.
+/**
+ * The managed types of objects are:
+ * - Descriptor set layouts
+ * - Pipeline layouts
+ * - Shader modules
+ * - Pipelines and pipeline configs
+ * - Framebuffer configs
+ * - Subpass graphs
+ * - Render passes
+ * - Samplers
+ *
+ * These objects are managed by unique names per type and are held in shared ownership.
+ * User code that retrieves objects from the manager participate in ownership.
+ * Therefore objects can be released from a name without worrying about invalidation for users as long as the
+ * users hold on to the shared pointer.
+ *
+ * Additionally holds a pipeline_cache for compiling pipelines.
+ */
 class graphics_manager {
 private:
 	struct pending_pipeline_task {
@@ -64,12 +87,19 @@ private:
 	boost::container::flat_map<std::string, std::shared_ptr<const sampler>> samplers_;
 
 public:
+	/// \brief Creates a graphics_manager for the given device and using the given destruction_queue_manager
+	/// for the managed resources.
 	graphics_manager(device& dev, destruction_queue_manager* dqm);
+	/// Releases ownership of all registered resources, destroying now unused objects.
 	~graphics_manager();
 
+	/// Forbids copying.
 	graphics_manager(const graphics_manager&) = delete;
+	/// Forbids copying.
 	graphics_manager& operator=(const graphics_manager&) = delete;
+	/// Forbids moving.
 	graphics_manager(graphics_manager&&) = delete;
+	/// Forbids moving.
 	graphics_manager& operator=(graphics_manager&&) = delete;
 
 	void add_pending_pipeline(const std::string& name, std::shared_ptr<const pipeline_config> cfg);
