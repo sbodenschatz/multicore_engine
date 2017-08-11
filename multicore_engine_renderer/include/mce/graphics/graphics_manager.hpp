@@ -61,6 +61,8 @@ class window;
  * users hold on to the shared pointer.
  *
  * Additionally holds a pipeline_cache for compiling pipelines.
+ *
+ * The member functions of this class are implemented in a thread-safe manner.
  */
 class graphics_manager {
 private:
