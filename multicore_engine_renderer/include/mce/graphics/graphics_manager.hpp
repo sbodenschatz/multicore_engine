@@ -121,16 +121,33 @@ public:
 	std::shared_ptr<const descriptor_set_layout>
 	create_descriptor_set_layout(const std::string& name,
 								 std::vector<descriptor_set_layout_binding_element> bindings);
+
+	/// \brief Creates a framebuffer_config containing the given attachment configurations and stores it under
+	/// the given name.
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name,
 							  vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs);
+	/// \brief Creates a framebuffer_config containing the given attachment configurations and stores it under
+	/// the given name.
+	/**
+	 * This overload optimizes cases where the attachment configs are already stored in a vector that can be
+	 * moved from, therefore avoiding an additional heap allocation.
+	 */
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name,
 							  std::vector<framebuffer_attachment_config>&& attachment_configs);
 
+	/// \brief Creates a framebuffer_config containing a config for a swapchain attachment from the given
+	/// window and the given attachment configurations and stores it under the given name.
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name, window& swapchain_window,
 							  vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs);
+	/// \brief Creates a framebuffer_config containing a config for a swapchain attachment from the given
+	/// window and the given attachment configurations and stores it under the given name.
+	/**
+	 * This overload optimizes cases where the attachment configs are already stored in a vector that can be
+	 * moved from, therefore avoiding an additional heap allocation.
+	 */
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name, window& swapchain_window,
 							  std::vector<framebuffer_attachment_config>&& attachment_configs);
@@ -169,6 +186,7 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		descriptor_set_layouts_.erase(name);
 	}
+	/// Releases ownership of the framebuffer_config object with the given name.
 	void release_framebuffer_config(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		framebuffer_configs_.erase(name);
@@ -210,6 +228,7 @@ public:
 			return {};
 	}
 
+	/// Returns the framebuffer_config with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const framebuffer_config> find_framebuffer_config(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = framebuffer_configs_.find(name);
