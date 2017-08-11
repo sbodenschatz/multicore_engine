@@ -168,6 +168,7 @@ public:
 						   vk::ArrayProxy<const std::string> descriptor_set_layout_names,
 						   std::vector<vk::PushConstantRange> push_constant_ranges = {});
 
+	/// Creates a sampler object with the given parameters and stores it under the given name.
 	std::shared_ptr<const sampler> create_sampler(const std::string& name, vk::Filter mag_filter,
 												  vk::Filter min_filter, vk::SamplerMipmapMode mipmap_mode,
 												  sampler_addressing_mode address_mode, float mip_lod_bias,
@@ -210,6 +211,7 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		pipeline_layouts_.erase(name);
 	}
+	/// Releases ownership of the sampler object with the given name.
 	void release_sampler(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		samplers_.erase(name);
@@ -293,6 +295,7 @@ public:
 			return {};
 	}
 
+	/// Returns the sampler object with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const sampler> find_sampler(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = samplers_.find(name);
