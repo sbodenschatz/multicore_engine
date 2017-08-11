@@ -190,10 +190,19 @@ public:
 	 */
 	std::shared_ptr<const shader_module> create_shader_module(const std::string& name,
 															  const asset::asset& ready_shader_binary_asset);
+
+	/// \brief Creates a render_pass using the given subpass_graph, framebuffer_config and attachment access
+	/// modes and stores it under the given name.
 	std::shared_ptr<const render_pass>
 	create_render_pass(const std::string& name, std::shared_ptr<const subpass_graph> subpasses,
 					   std::shared_ptr<const framebuffer_config> fb_config,
 					   vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
+	/// \brief Creates a render_pass using the subpass_graph and framebuffer_config with the given names and
+	/// the given attachment access modes and stores it under the given name.
+	/**
+	 * Avoids the overhead of separately retrieving the subpass_graph and framebuffer_config up-front, taking
+	 * a lock for each access.
+	 */
 	std::shared_ptr<const render_pass>
 	create_render_pass(const std::string& name, const std::string& subpass_graph_name,
 					   const std::string& fb_config_name,
@@ -235,6 +244,7 @@ public:
 		pipeline_configs_.erase(name);
 		pipelines_.erase(name);
 	}
+	/// Releases ownership of the render_pass with the given name.
 	void release_render_pass(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		render_passes_.erase(name);
@@ -290,6 +300,7 @@ public:
 			return {};
 	}
 
+	/// Returns the render_pass object with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const render_pass> find_render_pass(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = render_passes_.find(name);
