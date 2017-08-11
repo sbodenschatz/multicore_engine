@@ -102,7 +102,19 @@ public:
 	/// Forbids moving.
 	graphics_manager& operator=(graphics_manager&&) = delete;
 
+	/// \brief Adds a task to create a pipeline from the given pipeline_config and register the pipeline and
+	/// the pipeline_config under the given name.
+	/**
+	 * Only stores the task. The actual compilation of all pending tasks is done in parallel in
+	 * compile_pending_pipelines().
+	 */
 	void add_pending_pipeline(const std::string& name, std::shared_ptr<const pipeline_config> cfg);
+	/// Compiles all pipelines that were prepared using add_pending_pipeline().
+	/**
+	 * The compilation is done in parallel over the available hardware threads.
+	 * After completion the pipelines are made available under the names that were specified when they were
+	 * added to the pending list.
+	 */
 	void compile_pending_pipelines();
 
 	std::shared_ptr<const descriptor_set_layout>
@@ -175,6 +187,7 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		shader_modules_.erase(name);
 	}
+	/// Releases ownership of the pipeline and pipeline_config with the given name.
 	void release_pipeline_and_config(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		pipeline_configs_.erase(name);
@@ -212,6 +225,7 @@ public:
 			return {};
 	}
 
+	/// Returns the pipeline object with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const pipeline> find_pipeline(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = pipelines_.find(name);
@@ -221,6 +235,7 @@ public:
 			return {};
 	}
 
+	/// Returns the pipeline_config object with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const pipeline_config> find_pipeline_config(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = pipeline_configs_.find(name);
