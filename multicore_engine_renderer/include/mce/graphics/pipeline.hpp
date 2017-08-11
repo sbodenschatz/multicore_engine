@@ -38,12 +38,18 @@ public:
 	/// \brief Destroys the pipeline and releases the associated resources to the destruction_queue_manager
 	/// given to the create_pipelines function.
 	~pipeline();
-	/// \brief Creates a pipeline for each of the given pipeline_config on the given device using the given
-	/// destruction_queue_manager to free native resources and the given pipeline_cache for build time
+	/// \brief Creates a pipeline for each of the given pipeline_config objects on the given device using the
+	/// given destruction_queue_manager to free native resources and the given pipeline_cache for build time
 	/// improvement.
 	static std::vector<pipeline> create_pipelines(const device& dev, destruction_queue_manager* dqm,
 												  pipeline_cache& pipeline_cache,
-												  const std::vector<pipeline_config>& pipeline_configs);
+												  std::vector<pipeline_config> pipeline_configs);
+
+	/// \brief Creates a pipeline for the given pipeline_config on the given device using the given
+	/// destruction_queue_manager to free native resources and the given pipeline_cache for build time
+	/// improvement.
+	static pipeline create_pipeline(const device& dev, destruction_queue_manager* dqm,
+									pipeline_cache& pipeline_cache, pipeline_config pipeline_cfg);
 
 	/// Bind this pipeline in the given command buffer.
 	void bind(vk::CommandBuffer cb) const;

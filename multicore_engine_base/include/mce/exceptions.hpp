@@ -132,6 +132,16 @@ struct resource_depleted_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
 
+/// Exception used to signal that a resource with the key given for creation already exists.
+struct key_already_used_exception : std::runtime_error {
+	using std::runtime_error::runtime_error;
+};
+
+/// Exception used to signal that a resource with the given key was not found but is required.
+struct key_not_found_exception : std::runtime_error {
+	using std::runtime_error::runtime_error;
+};
+
 } // namespace mce
 
 #endif /* CORE_EXCEPTIONS_HPP_ */

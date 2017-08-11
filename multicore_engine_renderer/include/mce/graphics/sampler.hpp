@@ -14,48 +14,47 @@
 
 #include <boost/optional.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
+#include <mce/graphics/graphics_defs.hpp>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
 
+/// Bundles the addressing modes for the three dimensions of texel space for a sampler.
+class sampler_addressing_mode {
+	vk::SamplerAddressMode u_;
+	vk::SamplerAddressMode v_;
+	vk::SamplerAddressMode w_;
+
+public:
+	/// Creates an addressing_mode with the given mode for all dimensions.
+	explicit sampler_addressing_mode(vk::SamplerAddressMode mode) : u_{mode}, v_{mode}, w_{mode} {}
+	/// Creates an addressing_mode with the given modes for each of the dimensions.
+	sampler_addressing_mode(vk::SamplerAddressMode u, vk::SamplerAddressMode v, vk::SamplerAddressMode w)
+			: u_{u}, v_{v}, w_{w} {}
+
+	/// Returns the sampler address mode for the u dimension.
+	vk::SamplerAddressMode u() const {
+		return u_;
+	}
+
+	/// Returns the sampler address mode for the v dimension.
+	vk::SamplerAddressMode v() const {
+		return v_;
+	}
+
+	/// Returns the sampler address mode for the w dimension.
+	vk::SamplerAddressMode w() const {
+		return w_;
+	}
+};
+
 /// Encapsulates a vulkan sampler object and the associated data.
 class sampler {
-public:
-	/// Bundles the addressing modes for the three dimensions of texel space for a sampler.
-	class addressing_mode {
-		vk::SamplerAddressMode u_;
-		vk::SamplerAddressMode v_;
-		vk::SamplerAddressMode w_;
-
-	public:
-		/// Creates an addressing_mode with the given mode for all dimensions.
-		explicit addressing_mode(vk::SamplerAddressMode mode) : u_{mode}, v_{mode}, w_{mode} {}
-		/// Creates an addressing_mode with the given modes for each of the dimensions.
-		addressing_mode(vk::SamplerAddressMode u, vk::SamplerAddressMode v, vk::SamplerAddressMode w)
-				: u_{u}, v_{v}, w_{w} {}
-
-		/// Returns the sampler address mode for the u dimension.
-		vk::SamplerAddressMode u() const {
-			return u_;
-		}
-
-		/// Returns the sampler address mode for the v dimension.
-		vk::SamplerAddressMode v() const {
-			return v_;
-		}
-
-		/// Returns the sampler address mode for the w dimension.
-		vk::SamplerAddressMode w() const {
-			return w_;
-		}
-	};
-
-private:
 	vk::Filter mag_filter_;
 	vk::Filter min_filter_;
 	vk::SamplerMipmapMode mipmap_mode_;
-	addressing_mode address_mode_;
+	sampler_addressing_mode address_mode_;
 	float mip_lod_bias_;
 	boost::optional<float> max_anisotropy_;
 	boost::optional<vk::CompareOp> compare_op_;
@@ -69,7 +68,7 @@ public:
 	/// \brief Creates a sampler on the given device with the given parameters using the given
 	/// destruction_queue_manager for resource disposal.
 	sampler(const device& dev, destruction_queue_manager* dqm, vk::Filter mag_filter, vk::Filter min_filter,
-			vk::SamplerMipmapMode mipmap_mode, addressing_mode address_mode, float mip_lod_bias,
+			vk::SamplerMipmapMode mipmap_mode, sampler_addressing_mode address_mode, float mip_lod_bias,
 			boost::optional<float> max_anisotropy, boost::optional<vk::CompareOp> compare_op, float min_lod,
 			float max_lod, vk::BorderColor border_color, bool unnormalized_coordinates);
 	/// \brief Destroys the sampler wrapper and releases the underlying resources to the
@@ -77,7 +76,7 @@ public:
 	~sampler();
 
 	/// Returns the used address mode.
-	const addressing_mode& address_mode() const {
+	const sampler_addressing_mode& address_mode() const {
 		return address_mode_;
 	}
 

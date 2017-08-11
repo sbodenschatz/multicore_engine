@@ -12,6 +12,8 @@
  * Provides general definitions for the graphics subsystem.
  */
 
+#include <vector>
+
 namespace mce {
 namespace graphics {
 

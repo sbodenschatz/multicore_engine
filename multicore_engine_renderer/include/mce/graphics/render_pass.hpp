@@ -23,22 +23,6 @@ namespace graphics {
 class device;
 class window;
 
-/// Describes how a framebuffer attachment is accessed by a render_pass.
-struct attachment_access {
-	/// The layout the render_pass will expect the attachment to be in when it begins.
-	vk::ImageLayout initial_layout = vk::ImageLayout::eUndefined;
-	/// The layout the render_pass will leave the attachment in when it is finished.
-	vk::ImageLayout final_layout = vk::ImageLayout::ePresentSrcKHR;
-	/// The operation / behavior used to load data from this attachment.
-	vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eDontCare;
-	/// The operation / behavior used to store data to this attachment.
-	vk::AttachmentStoreOp store_op = vk::AttachmentStoreOp::eDontCare;
-	/// The operation / behavior used to load data from the stencil data of this attachment.
-	vk::AttachmentLoadOp stencil_load_op = vk::AttachmentLoadOp::eDontCare;
-	/// The operation / behavior used to store data to the stencil data of this attachment.
-	vk::AttachmentStoreOp stencil_store_op = vk::AttachmentStoreOp::eDontCare;
-};
-
 /// Describes a subpass in the subpass_graph.
 struct subpass_entry {
 	/// Describes the attachments used by this subpass as inputs and their layout.
@@ -77,6 +61,22 @@ public:
 	}
 };
 
+/// Describes how a framebuffer attachment is accessed by a render_pass.
+struct render_pass_attachment_access {
+	/// The layout the render_pass will expect the attachment to be in when it begins.
+	vk::ImageLayout initial_layout = vk::ImageLayout::eUndefined;
+	/// The layout the render_pass will leave the attachment in when it is finished.
+	vk::ImageLayout final_layout = vk::ImageLayout::ePresentSrcKHR;
+	/// The operation / behavior used to load data from this attachment.
+	vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eDontCare;
+	/// The operation / behavior used to store data to this attachment.
+	vk::AttachmentStoreOp store_op = vk::AttachmentStoreOp::eDontCare;
+	/// The operation / behavior used to load data from the stencil data of this attachment.
+	vk::AttachmentLoadOp stencil_load_op = vk::AttachmentLoadOp::eDontCare;
+	/// The operation / behavior used to store data to the stencil data of this attachment.
+	vk::AttachmentStoreOp stencil_store_op = vk::AttachmentStoreOp::eDontCare;
+};
+
 /// Abstracts a vulkan render pass consisting of multiple rendering steps (subpasses).
 /**
  * The subpasses in a render pass work on a common set of (framebuffer) attachment images.
@@ -94,8 +94,8 @@ class render_pass {
 private:
 	device& device_;
 	queued_handle<vk::UniqueRenderPass> native_render_pass_;
-	std::shared_ptr<subpass_graph> subpasses_;
-	std::shared_ptr<framebuffer_config> fb_config_;
+	std::shared_ptr<const subpass_graph> subpasses_;
+	std::shared_ptr<const framebuffer_config> fb_config_;
 
 public:
 	/// \brief Creates a render_pass on the given device with the given subpass and framebuffer structure and
@@ -103,14 +103,15 @@ public:
 	/**
 	 * The created object participates in ownership of the given subpass_graph and framebuffer_config.
 	 */
-	render_pass(device& device_, destruction_queue_manager* dqm, std::shared_ptr<subpass_graph> subpasses,
-				std::shared_ptr<framebuffer_config> fb_config,
-				vk::ArrayProxy<attachment_access> attachment_access_modes);
+	render_pass(device& device_, destruction_queue_manager* dqm,
+				std::shared_ptr<const subpass_graph> subpasses,
+				std::shared_ptr<const framebuffer_config> fb_config,
+				vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 	/// Destroys the render_pass and releases the wrapped native render_pass to the destruction_queue_manager.
 	~render_pass();
 
 	/// Allows access to used framebuffer_config.
-	const std::shared_ptr<framebuffer_config>& fb_config() const {
+	const std::shared_ptr<const framebuffer_config>& fb_config() const {
 		return fb_config_;
 	}
 
@@ -120,13 +121,13 @@ public:
 	}
 
 	/// Allows access to the used subpass_graph.
-	const std::shared_ptr<subpass_graph>& subpasses() const {
+	const std::shared_ptr<const subpass_graph>& subpasses() const {
 		return subpasses_;
 	}
 
 	/// \brief Begins the render_pass in the given command buffer using the given framebuffer_frame, clear
 	/// values and mode for the subpass contents.
-	void begin(vk::CommandBuffer cb, framebuffer_frame& fb, vk::ArrayProxy<vk::ClearValue> clear_values,
+	void begin(vk::CommandBuffer cb, framebuffer_frame& fb, vk::ArrayProxy<const vk::ClearValue> clear_values,
 			   vk::SubpassContents subpass_contents) const;
 };
 

@@ -28,6 +28,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1459155580" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -41,8 +42,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.708417641" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.708417641" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1005330771" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -56,8 +58,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.362269587" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.362269587" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.906289021" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
@@ -107,6 +110,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2072545442" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -120,8 +124,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.494437666" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.494437666" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033980625" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -135,8 +140,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.458810890" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.458810890" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.851904731" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
@@ -186,6 +192,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.365241325" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -199,6 +206,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.809694774" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -214,6 +222,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_renderer/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1584369689" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>

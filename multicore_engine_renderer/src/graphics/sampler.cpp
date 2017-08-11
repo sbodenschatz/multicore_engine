@@ -11,7 +11,7 @@ namespace mce {
 namespace graphics {
 
 sampler::sampler(const device& dev, destruction_queue_manager* dqm, vk::Filter mag_filter,
-				 vk::Filter min_filter, vk::SamplerMipmapMode mipmap_mode, addressing_mode address_mode,
+				 vk::Filter min_filter, vk::SamplerMipmapMode mipmap_mode, sampler_addressing_mode address_mode,
 				 float mip_lod_bias, boost::optional<float> max_anisotropy,
 				 boost::optional<vk::CompareOp> compare_op, float min_lod, float max_lod,
 				 vk::BorderColor border_color, bool unnormalized_coordinates)
