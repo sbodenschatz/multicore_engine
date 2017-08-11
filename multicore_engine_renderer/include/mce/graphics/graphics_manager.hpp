@@ -176,6 +176,9 @@ public:
 												  boost::optional<vk::CompareOp> compare_op, float min_lod,
 												  float max_lod, vk::BorderColor border_color,
 												  bool unnormalized_coordinates);
+
+	/// \brief Creates a subpass_graph from the given subpass configurations and dependencies between the
+	/// subpasses and stores it under the given name.
 	std::shared_ptr<const subpass_graph>
 	create_subpass_graph(const std::string& name, std::vector<subpass_entry> subpasses,
 						 std::vector<vk::SubpassDependency> dependencies);
@@ -216,6 +219,7 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		samplers_.erase(name);
 	}
+	/// Releases ownership of the subpass_graph object with the given name.
 	void release_subpass_graph(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		subpass_graphs_.erase(name);
@@ -315,6 +319,7 @@ public:
 			return {};
 	}
 
+	/// Returns the subpass_graph object with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const subpass_graph> find_subpass_graph(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = subpass_graphs_.find(name);
