@@ -117,6 +117,7 @@ public:
 	 */
 	void compile_pending_pipelines();
 
+	/// Creates a descriptor_set_layout with the given bindings and stores it under the given name.
 	std::shared_ptr<const descriptor_set_layout>
 	create_descriptor_set_layout(const std::string& name,
 								 std::vector<descriptor_set_layout_binding_element> bindings);
@@ -163,6 +164,7 @@ public:
 					   const std::string& fb_config_name,
 					   vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 
+	/// Releases ownership of the descriptor_set_layout object with the given name.
 	void release_descriptor_set_layout(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		descriptor_set_layouts_.erase(name);
@@ -198,6 +200,7 @@ public:
 		render_passes_.erase(name);
 	}
 
+	/// Returns the descriptor_set_layout with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const descriptor_set_layout> find_descriptor_set_layout(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = descriptor_set_layouts_.find(name);
