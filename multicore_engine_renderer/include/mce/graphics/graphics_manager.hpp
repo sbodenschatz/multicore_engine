@@ -67,6 +67,11 @@ public:
 	graphics_manager(device& dev, destruction_queue_manager* dqm);
 	~graphics_manager();
 
+	graphics_manager(const graphics_manager&) = delete;
+	graphics_manager& operator=(const graphics_manager&) = delete;
+	graphics_manager(graphics_manager&&) = delete;
+	graphics_manager& operator=(graphics_manager&&) = delete;
+
 	void add_pending_pipeline(const std::string& name, std::shared_ptr<const pipeline_config> cfg);
 	void compile_pending_pipelines();
 
