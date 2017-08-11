@@ -152,14 +152,22 @@ public:
 	create_framebuffer_config(const std::string& name, window& swapchain_window,
 							  std::vector<framebuffer_attachment_config>&& attachment_configs);
 
+	/// \brief Creates a pipeline_layout consisting of the given descriptor_set_layout objects and using the
+	/// given push_constant_ranges and stores it under the given name.
 	std::shared_ptr<const pipeline_layout>
 	create_pipeline_layout(const std::string& name,
 						   std::vector<std::shared_ptr<const descriptor_set_layout>> descriptor_set_layouts,
 						   std::vector<vk::PushConstantRange> push_constant_ranges = {});
+	/// \brief Creates a pipeline_layout consisting of the given descriptor_set_layout objects with the given
+	/// names and using the given push_constant_ranges and stores it under the given name.
+	/**
+	 * Avoids the overhead of separately retrieving each descriptor_set_layout taking a lock for each access.
+	 */
 	std::shared_ptr<const pipeline_layout>
 	create_pipeline_layout(const std::string& name,
 						   vk::ArrayProxy<const std::string> descriptor_set_layout_names,
 						   std::vector<vk::PushConstantRange> push_constant_ranges = {});
+
 	std::shared_ptr<const sampler> create_sampler(const std::string& name, vk::Filter mag_filter,
 												  vk::Filter min_filter, vk::SamplerMipmapMode mipmap_mode,
 												  sampler_addressing_mode address_mode, float mip_lod_bias,
@@ -191,6 +199,7 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		framebuffer_configs_.erase(name);
 	}
+	/// Releases ownership of the pipeline_layout with the given name.
 	void release_pipeline_layout(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		pipeline_layouts_.erase(name);
@@ -238,6 +247,7 @@ public:
 			return {};
 	}
 
+	/// Returns the pipeline_layout with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const pipeline_layout> find_pipeline_layout(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = pipeline_layouts_.find(name);
