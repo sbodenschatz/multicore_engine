@@ -178,6 +178,12 @@ public:
 	std::shared_ptr<const subpass_graph>
 	create_subpass_graph(const std::string& name, std::vector<subpass_entry> subpasses,
 						 std::vector<vk::SubpassDependency> dependencies);
+
+	/// \brief Creates a shader_module from the given asset containing a SPIR-V binary and stores it under the
+	/// given name.
+	/**
+	 * Requires that the asset is ready, i.e. has finished loading.
+	 */
 	std::shared_ptr<const shader_module> create_shader_module(const std::string& name,
 															  const asset::asset& ready_shader_binary_asset);
 	std::shared_ptr<const render_pass>
@@ -212,6 +218,7 @@ public:
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		subpass_graphs_.erase(name);
 	}
+	/// Releases ownership of the shader_module with the given name.
 	void release_shader_module(const std::string& name) {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		shader_modules_.erase(name);
@@ -295,6 +302,7 @@ public:
 			return {};
 	}
 
+	/// Returns the shader_module object with the given name or an empty shared_ptr if it doesn't exist.
 	std::shared_ptr<const shader_module> find_shader_module(const std::string& name) const {
 		std::lock_guard<std::mutex> lock(manager_mutex_);
 		auto it = shader_modules_.find(name);
