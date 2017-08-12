@@ -47,9 +47,12 @@ public:
 		vk::DeviceSize space = data_buffer_.size() - current_offset_;
 		if(memory::align(alignof(T), sizeof(T), addr, space)) {
 			std::memcpy(addr, &value, sizeof(T));
+			auto offset =
+					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
 			addr += sizeof(T);
 			current_offset_ =
 					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
+			return {data_buffer_.native_buffer(), offset, sizeof(T)};
 		} else {
 			return {};
 		}
@@ -60,9 +63,12 @@ public:
 		vk::DeviceSize space = data_buffer_.size() - current_offset_;
 		if(memory::align(alignof(T), sizeof(T), addr, space)) {
 			std::memcpy(addr, &value, sizeof(T));
+			auto offset =
+					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
 			addr += sizeof(T);
 			current_offset_ =
 					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
+			return {data_buffer_.native_buffer(), offset, sizeof(T)};
 		} else {
 			throw mce::resource_depleted_exception("Space in uniform buffer depleted.");
 		}
