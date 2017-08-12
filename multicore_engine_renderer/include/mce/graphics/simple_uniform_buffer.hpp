@@ -14,6 +14,15 @@
 namespace mce {
 namespace graphics {
 
+namespace detail {
+
+template <typename T>
+struct uniform_buffer_is_element_compatible {
+	static constexpr bool value = std::is_trivially_copyable<T>::value && std::is_standard_layout<T>::value;
+};
+
+} // namespace detail
+
 class simple_uniform_buffer {
 	buffer data_buffer_;
 	vk::DeviceSize current_offset_;
@@ -23,9 +32,9 @@ public:
 						  destruction_queue_manager* destruction_manager, vk::DeviceSize size);
 	~simple_uniform_buffer();
 
-	template <typename T, typename = std::enable_if<std::is_pod<T>::value>>
+	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	bool can_fit(const T&) const;
-	template <typename T, typename = std::enable_if<std::is_pod<T>::value>>
+	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	vk::DescriptorBufferInfo store(const T& value);
 	void reset();
 	void flush();
