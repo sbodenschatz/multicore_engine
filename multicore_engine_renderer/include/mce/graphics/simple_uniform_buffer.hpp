@@ -8,6 +8,7 @@
 #define MCE_GRAPHICS_SIMPLE_UNIFORM_BUFFER_HPP_
 
 #include <mce/graphics/buffer.hpp>
+#include <mce/memory/align.hpp>
 #include <type_traits>
 #include <vulkan/vulkan.hpp>
 
