@@ -35,6 +35,11 @@ public:
 						  destruction_queue_manager* destruction_manager, vk::DeviceSize size);
 	~simple_uniform_buffer() = default;
 
+	simple_uniform_buffer(const simple_uniform_buffer&) = delete;
+	simple_uniform_buffer& operator=(const simple_uniform_buffer&) = delete;
+	simple_uniform_buffer(simple_uniform_buffer&&) noexcept = default;
+	simple_uniform_buffer& operator=(simple_uniform_buffer&&) noexcept = default;
+
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	bool can_fit(const T&) noexcept {
 		void* addr = reinterpret_cast<char*>(data_buffer_.mapped_pointer()) + current_offset_;
