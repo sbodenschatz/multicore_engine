@@ -18,17 +18,21 @@
 #include <vulkan/vulkan.hpp>
 
 int main() {
+	mce::glfw::instance glfwi;
 	mce::graphics::instance ai;
 	mce::graphics::device dev(ai);
 	mce::glfw::window w("Test", {800, 600});
 	mce::graphics::window win(ai, w, dev);
-	mce::graphics::device_memory_manager mm(&dev, 1u << 26);
 	mce::graphics::pipeline_cache pc(dev);
+	while(!w.should_close()) {
+		glfwi.poll_events();
+	}
+	/*	mce::graphics::device_memory_manager mm(&dev, 1u << 26);
 
-	mce::graphics::simple_descriptor_pool dp(dev, 128, {{vk::DescriptorType::eUniformBuffer, 128}});
-	auto sets = dp.allocate_descriptor_sets(
-			mce::util::make_array(std::shared_ptr<mce::graphics::descriptor_set_layout>()));
-	mce::graphics::unique_descriptor_pool dp2(dev, 128, {{vk::DescriptorType::eUniformBuffer, 128}});
-	auto sets2 = dp2.allocate_descriptor_sets(
-			mce::util::make_array(std::shared_ptr<mce::graphics::descriptor_set_layout>()));
+		mce::graphics::simple_descriptor_pool dp(dev, 128, {{vk::DescriptorType::eUniformBuffer, 128}});
+		auto sets = dp.allocate_descriptor_sets(
+				mce::util::make_array(std::shared_ptr<mce::graphics::descriptor_set_layout>()));
+		mce::graphics::unique_descriptor_pool dp2(dev, 128, {{vk::DescriptorType::eUniformBuffer, 128}});
+		auto sets2 = dp2.allocate_descriptor_sets(
+				mce::util::make_array(std::shared_ptr<mce::graphics::descriptor_set_layout>()));*/
 }
