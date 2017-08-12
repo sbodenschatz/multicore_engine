@@ -84,6 +84,9 @@ public:
 	void flush() {
 		data_buffer_.flush_mapped(dev_);
 	}
+	vk::DeviceSize available_space() const {
+		return data_buffer_.size() - current_offset_;
+	}
 };
 
 } /* namespace graphics */
