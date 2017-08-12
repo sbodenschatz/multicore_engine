@@ -26,11 +26,12 @@ struct uniform_buffer_is_element_compatible {
 class simple_uniform_buffer {
 	buffer data_buffer_;
 	vk::DeviceSize current_offset_;
+	vk::Device dev_;
 
 public:
 	simple_uniform_buffer(device& dev, device_memory_manager_interface& mem_mgr,
 						  destruction_queue_manager* destruction_manager, vk::DeviceSize size);
-	~simple_uniform_buffer();
+	~simple_uniform_buffer() = default;
 
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	bool can_fit(const T&) const;

@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/graphics/device.hpp>
 #include <mce/graphics/simple_uniform_buffer.hpp>
 
 #include <glm/gtc/quaternion.hpp>
@@ -25,11 +26,7 @@ simple_uniform_buffer::simple_uniform_buffer(device& dev, device_memory_manager_
 											 vk::DeviceSize size)
 		: data_buffer_(dev, mem_mgr, destruction_manager, size, vk::BufferUsageFlagBits::eUniformBuffer,
 					   vk::MemoryPropertyFlagBits::eHostVisible),
-		  current_offset_{0} {
-	// TODO Auto-generated constructor stub
-}
-
-simple_uniform_buffer::~simple_uniform_buffer() {}
+		  current_offset_{0}, dev_{dev.native_device()} {}
 
 } /* namespace graphics */
 } /* namespace mce */
