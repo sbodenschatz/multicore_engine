@@ -49,7 +49,11 @@ public:
 		}
 	}
 	void flush();
-	vk::DeviceSize available_space() const;
+	vk::DeviceSize available_space() const {
+		return std::accumulate(
+				buffers_.begin(), buffers_.end(), 0ull,
+				[](vk::DeviceSize s, const simple_uniform_buffer& b) { return s + b.available_space(); });
+	}
 };
 
 } /* namespace graphics */
