@@ -54,10 +54,10 @@ public:
 			std::memcpy(addr, &value, sizeof(T));
 			auto offset =
 					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
-			addr += sizeof(T);
+			addr = reinterpret_cast<char*>(addr) + sizeof(T);
 			current_offset_ =
 					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
-			return {data_buffer_.native_buffer(), offset, sizeof(T)};
+			return {data_buffer_.native_buffer(), vk::DeviceSize(offset), sizeof(T)};
 		} else {
 			return {};
 		}
@@ -70,10 +70,10 @@ public:
 			std::memcpy(addr, &value, sizeof(T));
 			auto offset =
 					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
-			addr += sizeof(T);
+			addr = reinterpret_cast<char*>(addr) + sizeof(T);
 			current_offset_ =
 					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
-			return {data_buffer_.native_buffer(), offset, sizeof(T)};
+			return {data_buffer_.native_buffer(), vk::DeviceSize(offset), sizeof(T)};
 		} else {
 			throw mce::resource_depleted_exception("Space in uniform buffer depleted.");
 		}
