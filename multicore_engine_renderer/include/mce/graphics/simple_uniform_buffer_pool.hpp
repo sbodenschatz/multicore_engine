@@ -7,6 +7,7 @@
 #ifndef MCE_GRAPHICS_SIMPLE_UNIFORM_BUFFER_POOL_HPP_
 #define MCE_GRAPHICS_SIMPLE_UNIFORM_BUFFER_POOL_HPP_
 
+#include <algorithm>
 #include <mce/graphics/simple_uniform_buffer.hpp>
 #include <vector>
 
@@ -31,7 +32,15 @@ public:
 	simple_uniform_buffer_pool& operator=(simple_uniform_buffer_pool&&) noexcept = default;
 
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
-	vk::DescriptorBufferInfo store(const T& value);
+	vk::DescriptorBufferInfo store(const T& value) {
+		auto it = std::find_if(buffers_.begin(), buffers_.end(),
+							   [&value](simple_uniform_buffer& b) { return b.can_fit(value); });
+		if(it == buffers_.end()) {
+			buffers_.emplace_back(*dev_, *mem_mgr_, dqm_, buffer_size);
+			it = buffers_.end() - 1;
+		}
+		return it->store(value);
+	}
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	vk::DescriptorBufferInfo try_store(const T& value);
 	void reset();
