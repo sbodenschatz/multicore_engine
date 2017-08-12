@@ -42,6 +42,19 @@ public:
 		return memory::align(alignof(T), sizeof(T), addr, space);
 	}
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
+	vk::DescriptorBufferInfo try_store(const T& value) noexcept {
+		void* addr = reinterpret_cast<char*>(data_buffer_.mapped_pointer()) + current_offset_;
+		vk::DeviceSize space = data_buffer_.size() - current_offset_;
+		if(memory::align(alignof(T), sizeof(T), addr, space)) {
+			std::memcpy(addr, &value, sizeof(T));
+			addr += sizeof(T);
+			current_offset_ =
+					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
+		} else {
+			return {};
+		}
+	}
+	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	vk::DescriptorBufferInfo store(const T& value) noexcept {
 		void* addr = reinterpret_cast<char*>(data_buffer_.mapped_pointer()) + current_offset_;
 		vk::DeviceSize space = data_buffer_.size() - current_offset_;
