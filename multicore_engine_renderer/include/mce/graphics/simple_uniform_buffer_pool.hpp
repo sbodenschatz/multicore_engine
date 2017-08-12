@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <mce/graphics/simple_uniform_buffer.hpp>
+#include <numeric>
 #include <vector>
 
 namespace mce {
