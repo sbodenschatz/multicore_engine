@@ -49,7 +49,11 @@ public:
 			b.reset();
 		}
 	}
-	void flush();
+	void flush() {
+		for(auto& b : buffers_) {
+			b.flush();
+		}
+	}
 	vk::DeviceSize available_space() const {
 		return std::accumulate(
 				buffers_.begin(), buffers_.end(), 0ull,
