@@ -43,7 +43,11 @@ public:
 	}
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	vk::DescriptorBufferInfo try_store(const T& value);
-	void reset();
+	void reset() {
+		for(auto& b : buffers_) {
+			b.reset();
+		}
+	}
 	void flush();
 	vk::DeviceSize available_space() const;
 };
