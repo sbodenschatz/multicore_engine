@@ -74,6 +74,12 @@ public:
 				buffers_.begin(), buffers_.end(), 0ull,
 				[](vk::DeviceSize s, const simple_uniform_buffer& b) { return s + b.available_space(); });
 	}
+	/// \brief Releases all but one buffer in the pool and resets the kept buffer making one buffer worth of
+	/// capacity available and invalidating all stored data.
+	void reset_and_shrink() {
+		buffers_.erase(buffers_.begin() + 1, buffers_.end());
+		buffers_.front().reset();
+	}
 };
 
 } /* namespace graphics */
