@@ -12,7 +12,9 @@ namespace graphics {
 simple_uniform_buffer_pool::simple_uniform_buffer_pool(device& dev, device_memory_manager_interface& mem_mgr,
 													   destruction_queue_manager* destruction_manager,
 													   vk::DeviceSize buffer_size)
-		: dev_{&dev}, mem_mgr_{&mem_mgr}, dqm_{destruction_manager}, buffer_size{buffer_size} {}
+		: dev_{&dev}, mem_mgr_{&mem_mgr}, dqm_{destruction_manager}, buffer_size{buffer_size} {
+	buffers_.emplace_back(*dev_, *mem_mgr_, dqm_, buffer_size);
+}
 
 } /* namespace graphics */
 } /* namespace mce */
