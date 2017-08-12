@@ -34,7 +34,11 @@ public:
 	~simple_uniform_buffer() = default;
 
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
-	bool can_fit(const T&) const;
+	bool can_fit(const T&) noexcept {
+		void* addr = reinterpret_cast<const char*>(data_buffer_.mapped_pointer()) + current_offset_;
+		vk::DeviceSize space = data_buffer_.size() - current_offset_;
+		return memory::align(alignof(T), sizeof(T), addr, space);
+	}
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	vk::DescriptorBufferInfo store(const T& value);
 	void reset() {
