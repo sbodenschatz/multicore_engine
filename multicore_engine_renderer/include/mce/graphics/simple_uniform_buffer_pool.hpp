@@ -21,7 +21,7 @@ class simple_uniform_buffer_pool {
 	device* dev_;
 	device_memory_manager_interface* mem_mgr_;
 	destruction_queue_manager* dqm_;
-	vk::DeviceSize buffer_size;
+	vk::DeviceSize buffer_size_;
 	std::vector<simple_uniform_buffer> buffers_;
 
 public:
@@ -50,7 +50,7 @@ public:
 		auto it = std::find_if(buffers_.begin(), buffers_.end(),
 							   [&value](simple_uniform_buffer& b) { return b.can_fit(value); });
 		if(it == buffers_.end()) {
-			buffers_.emplace_back(*dev_, *mem_mgr_, dqm_, buffer_size);
+			buffers_.emplace_back(*dev_, *mem_mgr_, dqm_, buffer_size_);
 			it = buffers_.end() - 1;
 		}
 		return it->store(value);
