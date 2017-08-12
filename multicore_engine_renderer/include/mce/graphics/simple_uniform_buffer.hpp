@@ -37,8 +37,12 @@ public:
 	bool can_fit(const T&) const;
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
 	vk::DescriptorBufferInfo store(const T& value);
-	void reset();
-	void flush();
+	void reset() {
+		current_offset_ = 0;
+	}
+	void flush() {
+		data_buffer_.flush_mapped(dev_);
+	}
 };
 
 } /* namespace graphics */
