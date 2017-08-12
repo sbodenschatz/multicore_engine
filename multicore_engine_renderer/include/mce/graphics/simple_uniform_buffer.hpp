@@ -7,6 +7,10 @@
 #ifndef MCE_GRAPHICS_SIMPLE_UNIFORM_BUFFER_HPP_
 #define MCE_GRAPHICS_SIMPLE_UNIFORM_BUFFER_HPP_
 
+#include <mce/graphics/buffer.hpp>
+#include <type_traits>
+#include <vulkan/vulkan.hpp>
+
 namespace mce {
 namespace graphics {
 
