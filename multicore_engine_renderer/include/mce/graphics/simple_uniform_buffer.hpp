@@ -55,7 +55,7 @@ public:
 		}
 	}
 	template <typename T, typename = std::enable_if<detail::uniform_buffer_is_element_compatible<T>::value>>
-	vk::DescriptorBufferInfo store(const T& value) noexcept {
+	vk::DescriptorBufferInfo store(const T& value) {
 		void* addr = reinterpret_cast<char*>(data_buffer_.mapped_pointer()) + current_offset_;
 		vk::DeviceSize space = data_buffer_.size() - current_offset_;
 		if(memory::align(alignof(T), sizeof(T), addr, space)) {
@@ -64,7 +64,7 @@ public:
 			current_offset_ =
 					reinterpret_cast<char*>(addr) - reinterpret_cast<char*>(data_buffer_.mapped_pointer());
 		} else {
-			return mce::resource_depleted_exception("Space in uniform buffer depleted.");
+			throw mce::resource_depleted_exception("Space in uniform buffer depleted.");
 		}
 	}
 	void reset() {
