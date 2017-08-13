@@ -11,6 +11,7 @@
 #include <mce/glfw/window.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/instance.hpp>
+#include <mce/graphics/window.hpp>
 
 namespace mce {
 namespace graphics {
@@ -20,6 +21,7 @@ class graphics_test {
 	glfw::window glfw_win_;
 	instance inst_;
 	device dev_;
+	window win_;
 
 public:
 	graphics_test();
