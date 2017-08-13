@@ -147,13 +147,13 @@ private:
 
 	device& dev;
 	device_memory_manager_interface& mm;
+	command_pool transfer_cmd_pool;
+	command_pool ownership_cmd_pool;
 	destruction_queue_manager dqm;
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
 	std::vector<transfer_job> waiting_jobs;
 	std::vector<std::vector<transfer_job>> running_jobs;
-	command_pool transfer_cmd_pool;
-	command_pool ownership_cmd_pool;
 	std::vector<vk::UniqueCommandBuffer> transfer_command_bufers;
 	std::vector<queued_handle<vk::UniqueCommandBuffer>> pending_ownership_command_buffers;
 	std::vector<queued_handle<vk::UniqueCommandBuffer>> ready_ownership_command_buffers;
