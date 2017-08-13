@@ -14,7 +14,9 @@ graphics_test::graphics_test()
 		: glfw_win_("Vulkan Test", glm::ivec2(800, 600)), dev_(inst_), win_(inst_, glfw_win_, dev_),
 		  mem_mgr_(&dev_, 1 << 27), dqm_(&dev_, uint32_t(win_.swapchain_images().size())),
 		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())),
-		  gmgr(dev_, &dqm_), last_frame_t_{std::chrono::high_resolution_clock::now()} {}
+		  gmgr_(dev_, &dqm_), last_frame_t_{std::chrono::high_resolution_clock::now()} {
+	fbcfg_ = gmgr_.create_framebuffer_config("test", win_, {});
+}
 
 graphics_test::~graphics_test() {}
 

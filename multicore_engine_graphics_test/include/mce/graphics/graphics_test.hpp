@@ -31,8 +31,9 @@ class graphics_test {
 	device_memory_manager mem_mgr_;
 	destruction_queue_manager dqm_;
 	transfer_manager tmgr_;
-	graphics_manager gmgr;
+	graphics_manager gmgr_;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
+	std::shared_ptr<const framebuffer_config> fbcfg_;
 
 public:
 	graphics_test();
