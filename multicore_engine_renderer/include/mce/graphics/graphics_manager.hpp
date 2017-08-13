@@ -148,9 +148,9 @@ public:
 	 * Avoids the overhead of separately retrieving each descriptor_set_layout taking a lock for each access.
 	 */
 	std::shared_ptr<const pipeline_layout>
-	create_pipeline_layout(const std::string& name,
-						   vk::ArrayProxy<const std::string> descriptor_set_layout_names,
-						   std::vector<vk::PushConstantRange> push_constant_ranges = {});
+	create_pipeline_layout_by_names(const std::string& name,
+									vk::ArrayProxy<const std::string> descriptor_set_layout_names,
+									std::vector<vk::PushConstantRange> push_constant_ranges = {});
 
 	/// Creates a sampler object with the given parameters and stores it under the given name.
 	std::shared_ptr<const sampler> create_sampler(const std::string& name, vk::Filter mag_filter,
