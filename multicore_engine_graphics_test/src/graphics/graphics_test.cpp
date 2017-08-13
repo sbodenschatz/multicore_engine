@@ -8,6 +8,7 @@
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_test.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
+#include <mce/graphics/render_pass.hpp>
 
 namespace mce {
 namespace graphics {
@@ -19,6 +20,11 @@ graphics_test::graphics_test()
 		  gmgr_(dev_, &dqm_), last_frame_t_{std::chrono::high_resolution_clock::now()} {
 	fbcfg_ = gmgr_.create_framebuffer_config("test_fbcfg", win_, {});
 	pll_ = gmgr_.create_pipeline_layout("test_pll", {}, {});
+	spg_ = gmgr_.create_subpass_graph(
+			"spg",
+			{subpass_entry{
+					{}, {vk::AttachmentReference(0, vk::ImageLayout::eColorAttachmentOptimal)}, {}, {}, {}}},
+			{});
 }
 
 graphics_test::~graphics_test() {}
