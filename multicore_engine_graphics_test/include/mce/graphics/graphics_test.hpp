@@ -7,6 +7,7 @@
 #ifndef MCE_GRAPHICS_GRAPHICS_TEST_HPP_
 #define MCE_GRAPHICS_GRAPHICS_TEST_HPP_
 
+#include <chrono>
 #include <mce/glfw/instance.hpp>
 #include <mce/glfw/window.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
@@ -30,6 +31,7 @@ class graphics_test {
 	device_memory_manager mem_mgr_;
 	destruction_queue_manager dqm_;
 	transfer_manager tmgr_;
+	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
 
 public:
 	graphics_test();
