@@ -12,14 +12,14 @@
  * Defines the meta data format for the engine specific model format.
  */
 
+#include <cstdint>
+#include <glm/glm.hpp>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
-#include <cstdint>
 #include <mce/exceptions.hpp>
-#include <glm/glm.hpp>
-#include <string>
 #include <mce/util/composite_magic_number.hpp>
 #include <mce/util/offset_range.hpp>
+#include <string>
 #include <vector>
 
 namespace mce {

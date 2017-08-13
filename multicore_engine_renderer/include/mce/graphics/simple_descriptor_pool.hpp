@@ -13,6 +13,7 @@
  */
 
 #include <boost/container/flat_map.hpp>
+#include <cassert>
 #include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/descriptor_set_resources.hpp>
@@ -21,7 +22,6 @@
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include <cassert>
 
 namespace mce {
 namespace graphics {

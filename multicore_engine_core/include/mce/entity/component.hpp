@@ -14,8 +14,8 @@
 
 #include <mce/core/engine.hpp>
 #include <mce/entity/component_property_assignment.hpp>
-#include <memory>
 #include <mce/reflection/property.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -39,8 +39,7 @@ protected:
 	/// \brief Allows derived classes to construct the base class with a given owner entity and reference to a
 	/// component_configuration.
 	component(entity& owner, const component_configuration& configuration) noexcept
-			: owner_(owner),
-			  configuration_(configuration) {}
+			: owner_(owner), configuration_(configuration) {}
 
 public:
 	/// Specifies the type of the list of properties.

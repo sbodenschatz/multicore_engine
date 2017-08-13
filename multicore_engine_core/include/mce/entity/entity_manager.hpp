@@ -12,9 +12,9 @@
  * Defines the entity_manager class, the central class of the entity component system.
  */
 
-#include <mce/asset/asset_defs.hpp>
 #include <atomic>
 #include <boost/container/flat_map.hpp>
+#include <mce/asset/asset_defs.hpp>
 #include <mce/containers/unordered_object_pool.hpp>
 #include <mce/entity/component_type.hpp>
 #include <mce/entity/ecs_types.hpp>

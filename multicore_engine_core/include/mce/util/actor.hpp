@@ -13,10 +13,10 @@
  */
 
 #include <cstdint>
-#include <tuple>
-#include <type_traits>
 #include <mce/util/local_function.hpp>
 #include <mce/util/message_queue.hpp>
+#include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace mce {

@@ -12,9 +12,9 @@
  * Defines the binary stream to istream adapter.
  */
 
-#include <mce/bstream/ibstream.hpp>
 #include <cstdint>
 #include <istream>
+#include <mce/bstream/ibstream.hpp>
 
 namespace mce {
 namespace bstream {

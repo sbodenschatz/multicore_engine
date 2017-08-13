@@ -13,10 +13,10 @@
  */
 
 #include <condition_variable>
+#include <mce/util/spin_lock.hpp>
 #include <mutex>
 #include <queue>
 #include <type_traits>
-#include <mce/util/spin_lock.hpp>
 
 namespace mce {
 namespace util {

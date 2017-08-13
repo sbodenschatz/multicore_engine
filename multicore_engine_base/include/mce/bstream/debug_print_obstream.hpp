@@ -12,8 +12,8 @@
  * Defines a binary stream debugging implementation.
  */
 
-#include <mce/bstream/obstream.hpp>
 #include <cstdint>
+#include <mce/bstream/obstream.hpp>
 #include <ostream>
 
 namespace mce {

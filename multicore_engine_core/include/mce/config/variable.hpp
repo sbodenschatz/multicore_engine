@@ -9,13 +9,13 @@
 
 #include <boost/utility/string_view.hpp>
 #include <cassert>
-#include <memory>
-#include <mutex>
 #include <mce/reflection/property.hpp>
-#include <string>
 #include <mce/util/local_function.hpp>
 #include <mce/util/traits.hpp>
 #include <mce/util/type_id.hpp>
+#include <memory>
+#include <mutex>
+#include <string>
 
 /**
  * \file
@@ -186,10 +186,10 @@ public:
 	/// Removes the modification listener whose addition returned the given listener_handle.
 	void remove_modification_listener(listener_handle id) {
 		std::lock_guard<std::mutex> lock(mutex_);
-		modification_listeners.erase(
-				std::remove_if(modification_listeners.begin(), modification_listeners.end(), [id](auto& e) {
-					return e.first == id;
-				}), modification_listeners.end());
+		modification_listeners.erase(std::remove_if(modification_listeners.begin(),
+													modification_listeners.end(),
+													[id](auto& e) { return e.first == id; }),
+									 modification_listeners.end());
 	}
 };
 

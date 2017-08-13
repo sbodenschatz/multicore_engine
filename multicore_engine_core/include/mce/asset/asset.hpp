@@ -12,16 +12,16 @@
  * Defines the class representing assets in the engine.
  */
 
-#include <mce/asset/asset_defs.hpp>
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
 #include <exception>
+#include <mce/asset/asset_defs.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/local_function.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <mce/util/local_function.hpp>
 #include <vector>
 
 namespace mce {

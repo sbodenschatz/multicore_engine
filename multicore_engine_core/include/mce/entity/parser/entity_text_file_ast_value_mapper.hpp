@@ -13,12 +13,12 @@
  */
 
 #include <cstdint>
-#include <mce/entity/entity_reference.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
-#include <mce/exceptions.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <limits>
+#include <mce/entity/entity_reference.hpp>
+#include <mce/entity/parser/entity_text_file_ast.hpp>
+#include <mce/exceptions.hpp>
 #include <string>
 #include <type_traits>
 #include <vector>

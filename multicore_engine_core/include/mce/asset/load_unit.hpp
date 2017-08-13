@@ -12,18 +12,18 @@
  * Defines the class representing a load unit in the engine.
  */
 
-#include <mce/asset/asset_defs.hpp>
-#include <mce/asset/load_unit_meta_data.hpp>
 #include <atomic>
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <mce/asset/asset_defs.hpp>
+#include <mce/asset/load_unit_meta_data.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/local_function.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <mce/util/local_function.hpp>
 #include <utility>
 #include <vector>
 
@@ -74,9 +74,8 @@ public:
 
 		asset_resolution_cookie() noexcept : load_unit{nullptr}, offset{0}, size{0} {}
 		asset_resolution_cookie(const mce::asset::load_unit* load_unit, uint64_t offset,
-								uint64_t size) noexcept : load_unit{load_unit},
-														  offset{offset},
-														  size{size} {}
+								uint64_t size) noexcept
+				: load_unit{load_unit}, offset{offset}, size{size} {}
 
 	public:
 		/// Checks if the resolution was successful.
