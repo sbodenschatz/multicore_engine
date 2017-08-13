@@ -14,11 +14,11 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <mce/util/string_tools.hpp>
 #include <numeric>
 #include <sstream>
 #include <string>
 #include <type_traits>
-#include <mce/util/string_tools.hpp>
 #include <vector>
 
 namespace mce {

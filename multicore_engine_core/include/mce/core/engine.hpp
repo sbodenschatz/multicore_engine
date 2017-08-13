@@ -14,8 +14,8 @@
 
 #include <atomic>
 #include <cassert>
-#include <memory>
 #include <mce/util/type_id.hpp>
+#include <memory>
 #include <utility>
 #include <vector>
 

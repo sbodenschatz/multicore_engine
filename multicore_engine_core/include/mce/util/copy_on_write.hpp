@@ -12,8 +12,8 @@
  * Defines a generic class implementing the copy on write pattern.
  */
 
-#include <memory>
 #include <mce/util/monitor.hpp>
+#include <memory>
 
 namespace mce {
 namespace util {

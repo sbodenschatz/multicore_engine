@@ -12,8 +12,8 @@
  * Provides automatic version information for the engine and tools.
  */
 
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace mce {
 namespace core {

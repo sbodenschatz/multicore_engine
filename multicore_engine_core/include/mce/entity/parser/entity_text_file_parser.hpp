@@ -12,8 +12,8 @@
  * Defines the parser class for entity text files.
  */
 
-#include <mce/asset/asset_defs.hpp>
 #include <boost/variant/static_visitor.hpp>
+#include <mce/asset/asset_defs.hpp>
 #include <mce/entity/ecs_types.hpp>
 #include <mce/entity/parser/entity_text_file_ast.hpp>
 #include <mce/entity/parser/entity_text_file_parser_frontend.hpp>

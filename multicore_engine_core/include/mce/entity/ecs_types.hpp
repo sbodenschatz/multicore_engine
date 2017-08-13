@@ -12,11 +12,11 @@
  * Provides basic typedefs for the entity component system.
  */
 
-#include <mce/containers/smart_pool_ptr.hpp>
 #include <cstdint>
-#include <mce/entity/component.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <mce/containers/smart_pool_ptr.hpp>
+#include <mce/entity/component.hpp>
 
 namespace mce {
 namespace entity {

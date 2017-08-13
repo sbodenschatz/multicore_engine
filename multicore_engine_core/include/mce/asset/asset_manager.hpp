@@ -13,16 +13,16 @@
  */
 
 #include <algorithm>
-#include <mce/asset/asset_defs.hpp>
 #include <boost/container/vector.hpp>
 #include <exception>
+#include <mce/asset/asset_defs.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/copy_on_write.hpp>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <string>
 #include <thread>
-#include <mce/util/copy_on_write.hpp>
 #include <vector>
 
 #ifdef _MSC_VER

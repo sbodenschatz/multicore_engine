@@ -8,9 +8,9 @@
 #define CONFIG_CONFIG_STORE_HPP_
 
 #include <boost/container/flat_map.hpp>
-#include <mce/config/variable.hpp>
 #include <functional>
 #include <istream>
+#include <mce/config/variable.hpp>
 #include <mutex>
 #include <ostream>
 
@@ -88,8 +88,7 @@ public:
 	 * The save callback must be callable with the signature <code>void(config_storer&)</code>.
 	 */
 	template <typename F>
-	explicit config_store(F&& save_callback)
-			: save_callback_{std::forward<F>(save_callback)} {}
+	explicit config_store(F&& save_callback) : save_callback_{std::forward<F>(save_callback)} {}
 
 	/// Calls the save callback and then destroys the config_store.
 	~config_store() noexcept;

@@ -61,13 +61,9 @@ class smart_pool_ptr {
 	friend class smart_pool_ptr;
 
 	smart_pool_ptr(T* object, detail::smart_object_pool_block_interface* block) noexcept
-			: object{object},
-			  managed_object{object},
-			  block{block} {}
+			: object{object}, managed_object{object}, block{block} {}
 	smart_pool_ptr(T* object, void* managed_object, detail::smart_object_pool_block_interface* block) noexcept
-			: object{object},
-			  managed_object{managed_object},
-			  block{block} {}
+			: object{object}, managed_object{managed_object}, block{block} {}
 
 	typedef detail::smart_object_pool_block_interface::ref_count_t ref_count_t;
 
@@ -75,15 +71,13 @@ public:
 	/// Creates and empty smart_pool_ptr, meaning one that does not manage an object.
 	smart_pool_ptr() noexcept : object{nullptr}, managed_object{nullptr}, block{nullptr} {}
 	/// Allows copy-construction of smart_pool_ptr.
-	smart_pool_ptr(const smart_pool_ptr& other) noexcept : object{other.object},
-														   managed_object{other.managed_object},
-														   block{other.block} {
+	smart_pool_ptr(const smart_pool_ptr& other) noexcept
+			: object{other.object}, managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_strong_ref(managed_object);
 	}
 	/// Allows move-construction of smart_pool_ptr.
-	smart_pool_ptr(smart_pool_ptr&& other) noexcept : object{other.object},
-													  managed_object{other.managed_object},
-													  block{other.block} {
+	smart_pool_ptr(smart_pool_ptr&& other) noexcept
+			: object{other.object}, managed_object{other.managed_object}, block{other.block} {
 		other.object = nullptr;
 		other.managed_object = nullptr;
 		other.block = nullptr;
@@ -99,9 +93,8 @@ public:
 	 * managed by other that should participate in the shared ownership.
 	 */
 	template <typename U>
-	smart_pool_ptr(const smart_pool_ptr<U>& other, T* ptr) noexcept : object{ptr},
-																	  managed_object{other.managed_object},
-																	  block{other.block} {
+	smart_pool_ptr(const smart_pool_ptr<U>& other, T* ptr) noexcept
+			: object{ptr}, managed_object{other.managed_object}, block{other.block} {
 		if(!block || !object || !managed_object) {
 			block = nullptr;
 			object = nullptr;
@@ -115,9 +108,8 @@ public:
 	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-	smart_pool_ptr(const smart_pool_ptr<U>& other) noexcept : object(other.object),
-															  managed_object{other.managed_object},
-															  block{other.block} {
+	smart_pool_ptr(const smart_pool_ptr<U>& other) noexcept
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_strong_ref(managed_object);
 	}
 	/// Allows move-constructing from a pointer-assignment-compatible other smart_pool_ptr template instance.
@@ -126,9 +118,8 @@ public:
 	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-	smart_pool_ptr(smart_pool_ptr<U>&& other) noexcept : object(other.object),
-														 managed_object{other.managed_object},
-														 block{other.block} {
+	smart_pool_ptr(smart_pool_ptr<U>&& other) noexcept
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		other.object = nullptr;
 		other.managed_object = nullptr;
 		other.block = nullptr;
@@ -303,15 +294,13 @@ public:
 	/// Creates and empty smart_pool_ptr, meaning one that does not manage an object.
 	weak_pool_ptr() noexcept : object{nullptr}, managed_object{nullptr}, block{nullptr} {}
 	/// Allows copy-construction of weak_pool_ptr.
-	weak_pool_ptr(const weak_pool_ptr& other) noexcept : object{other.object},
-														 managed_object{other.managed_object},
-														 block{other.block} {
+	weak_pool_ptr(const weak_pool_ptr& other) noexcept
+			: object{other.object}, managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_weak_ref(managed_object);
 	}
 	/// Allows move-construction of weak_pool_ptr.
-	weak_pool_ptr(weak_pool_ptr&& other) noexcept : object{other.object},
-													managed_object{other.managed_object},
-													block{other.block} {
+	weak_pool_ptr(weak_pool_ptr&& other) noexcept
+			: object{other.object}, managed_object{other.managed_object}, block{other.block} {
 		other.object = nullptr;
 		other.managed_object = nullptr;
 		other.block = nullptr;
@@ -322,9 +311,8 @@ public:
 	 * weak_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-	weak_pool_ptr(const weak_pool_ptr<U>& other) noexcept : object(other.object),
-															managed_object{other.managed_object},
-															block{other.block} {
+	weak_pool_ptr(const weak_pool_ptr<U>& other) noexcept
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		if(block) block->increment_weak_ref(managed_object);
 	}
 	/// Allows move-constructing from a pointer-assignment-compatible other weak_pool_ptr template instance.
@@ -333,9 +321,8 @@ public:
 	 * weak_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-	weak_pool_ptr(weak_pool_ptr<U>&& other) noexcept : object(other.object),
-													   managed_object{other.managed_object},
-													   block{other.block} {
+	weak_pool_ptr(weak_pool_ptr<U>&& other) noexcept
+			: object(other.object), managed_object{other.managed_object}, block{other.block} {
 		other.object = nullptr;
 		other.managed_object = nullptr;
 		other.block = nullptr;

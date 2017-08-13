@@ -13,10 +13,10 @@
  */
 
 #include <boost/container/flat_map.hpp>
-#include <memory>
 #include <mce/model/collision_model.hpp>
 #include <mce/model/model_defs.hpp>
 #include <mce/model/polygon_model.hpp>
+#include <memory>
 #include <shared_mutex>
 #include <string>
 

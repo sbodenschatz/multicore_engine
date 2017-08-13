@@ -12,10 +12,10 @@
  * Defines a generic monitor class providing thread-safe access to a (not necessarily POD) typed object.
  */
 
-#include <mutex>
-#include <type_traits>
 #include <mce/util/spin_lock.hpp>
 #include <mce/util/traits.hpp>
+#include <mutex>
+#include <type_traits>
 
 #ifdef _MSC_VER
 #pragma warning(push)

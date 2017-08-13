@@ -14,17 +14,16 @@
 
 #include <atomic>
 #include <cassert>
-#include <mce/containers/scratch_pad_pool.hpp>
-#include <mce/containers/smart_pool_ptr.hpp>
 #include <cstdint>
 #include <exception>
 #include <iostream>
 #include <iterator>
+#include <mce/containers/scratch_pad_pool.hpp>
+#include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/memory/aligned_new.hpp>
+#include <mce/util/local_function.hpp>
 #include <memory>
 #include <mutex>
-#include <mce/util/local_function.hpp>
-#include <mce/util/local_function.hpp>
 #include <vector>
 
 #ifdef _MSC_VER
@@ -249,9 +248,8 @@ private:
 
 		// May only be called inside of a lock on free list
 		block(smart_object_pool<T, block_size>* owning_pool, block_entry_link& prev,
-			  block* prev_block = nullptr) noexcept : owning_pool{owning_pool},
-													  prev_block{prev_block},
-													  block_index{owning_pool->block_count} {
+			  block* prev_block = nullptr) noexcept
+				: owning_pool{owning_pool}, prev_block{prev_block}, block_index{owning_pool->block_count} {
 			ref_counts[block_size - 1].strong = {-1, 0u};
 			ref_counts[block_size - 1].weak = 0;
 			entries[block_size - 1].next_free = prev;
@@ -476,7 +474,8 @@ public:
 	~smart_object_pool() noexcept {
 		if(allocated_objects > 0) {
 			std::cerr << "Attempt to destroy smart_object_pool which has alive objects in it. "
-						 "Continuing would leave dangling pointers. Calling std::terminate now." << std::endl;
+						 "Continuing would leave dangling pointers. Calling std::terminate now."
+					  << std::endl;
 			std::terminate();
 		}
 	}
@@ -569,9 +568,8 @@ public:
 
 		/// Allows copying of the iterator.
 		iterator_(const iterator_<T, block_entry_link>& it) noexcept
-				: target{it.target.entry, it.target.containing_block},
-				  pool{it.pool},
-				  is_limiter{it.is_limiter} {
+				: target{it.target.entry, it.target.containing_block}, pool{it.pool}, is_limiter{
+																							  it.is_limiter} {
 			if(pool) ++(pool->active_iterators);
 		}
 
@@ -589,9 +587,8 @@ public:
 
 		/// Allows moving of the iterator.
 		iterator_(iterator_<T, block_entry_link>&& it) noexcept
-				: target{it.target.entry, it.target.containing_block},
-				  pool{it.pool},
-				  is_limiter{it.is_limiter} {
+				: target{it.target.entry, it.target.containing_block}, pool{it.pool}, is_limiter{
+																							  it.is_limiter} {
 			it.target.entry = nullptr;
 			it.target.containing_block = nullptr;
 			it.pool = nullptr;

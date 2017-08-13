@@ -8,8 +8,8 @@
 #define CORE_GAME_STATE_HPP_
 
 #include <boost/any.hpp>
-#include <memory>
 #include <mce/util/type_id.hpp>
+#include <memory>
 #include <utility>
 #include <vector>
 

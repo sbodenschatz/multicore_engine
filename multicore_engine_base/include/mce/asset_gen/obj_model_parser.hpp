@@ -13,7 +13,6 @@
  */
 
 #include <array>
-#include <mce/asset_gen/static_model.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <boost/filesystem.hpp>
@@ -21,6 +20,7 @@
 #include <cstddef>
 #include <glm/glm.hpp>
 #include <istream>
+#include <mce/asset_gen/static_model.hpp>
 #include <mce/model/model_format.hpp>
 #include <string>
 #include <tuple>

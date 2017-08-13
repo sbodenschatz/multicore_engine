@@ -92,9 +92,8 @@ class pooled_byte_buffer_ptr {
 
 public:
 	/// Copies the pooled_byte_buffer_ptr, sharing the ownership between the copy and the original.
-	pooled_byte_buffer_ptr(const pooled_byte_buffer_ptr& other) noexcept : pool_buffer_{other.pool_buffer_},
-																		   data_{other.data_},
-																		   size_{other.size_} {
+	pooled_byte_buffer_ptr(const pooled_byte_buffer_ptr& other) noexcept
+			: pool_buffer_{other.pool_buffer_}, data_{other.data_}, size_{other.size_} {
 		if(pool_buffer_) pool_buffer_->increment_ref_count();
 	}
 
@@ -111,9 +110,7 @@ public:
 
 	/// Transfers the buffer ownership from other into the newly created pooled_byte_buffer_ptr.
 	pooled_byte_buffer_ptr(pooled_byte_buffer_ptr&& other) noexcept
-			: pool_buffer_{std::move(other.pool_buffer_)},
-			  data_{other.data_},
-			  size_{other.size_} {
+			: pool_buffer_{std::move(other.pool_buffer_)}, data_{other.data_}, size_{other.size_} {
 		other.reset();
 	}
 

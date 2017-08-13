@@ -14,11 +14,11 @@
 
 #include <algorithm>
 #include <boost/optional.hpp>
+#include <mce/graphics/render_pass.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include <mce/graphics/render_pass.hpp>
 
 namespace mce {
 namespace graphics {

@@ -13,6 +13,8 @@
  */
 
 #include <boost/container/small_vector.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
 #include <mce/containers/generic_flat_map.hpp>
@@ -20,8 +22,6 @@
 #include <mce/entity/component.hpp>
 #include <mce/entity/component_type_id_manager.hpp>
 #include <mce/entity/ecs_types.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 namespace mce {
 namespace entity {

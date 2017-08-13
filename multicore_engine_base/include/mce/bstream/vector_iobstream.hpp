@@ -12,10 +12,10 @@
  * Defines a binary stream working on top of a vector in memory.
  */
 
+#include <cstdint>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/iobstream.hpp>
 #include <mce/bstream/obstream.hpp>
-#include <cstdint>
 #include <vector>
 
 namespace mce {

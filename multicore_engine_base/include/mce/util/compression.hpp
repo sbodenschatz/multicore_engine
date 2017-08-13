@@ -14,8 +14,8 @@
 
 #include <cerrno>
 #include <cstddef>
-#include <mce/exceptions.hpp>
 #include <limits>
+#include <mce/exceptions.hpp>
 #include <string>
 #include <vector>
 #include <zconf.h>

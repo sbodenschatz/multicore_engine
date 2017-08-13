@@ -18,9 +18,9 @@
 #include <boost/utility/string_view.hpp>
 #include <functional>
 #include <mce/glfw/glfw_defs.hpp>
+#include <mce/util/copy_on_write.hpp>
 #include <mutex>
 #include <string>
-#include <mce/util/copy_on_write.hpp>
 #include <vector>
 
 struct GLFWmonitor;
@@ -69,9 +69,12 @@ public:
 	}
 	~observable() {
 		callback_functions.do_transaction([&](callback_container& cc) {
-			cc.erase(std::remove_if(cc.begin(), cc.end(), [&](auto& e) {
-				return std::find(callback_ids.begin(), callback_ids.end(), e.first) != callback_ids.end();
-			}),cc.end());
+			cc.erase(std::remove_if(cc.begin(), cc.end(),
+									[&](auto& e) {
+										return std::find(callback_ids.begin(), callback_ids.end(), e.first) !=
+											   callback_ids.end();
+									}),
+					 cc.end());
 		});
 	}
 };

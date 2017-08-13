@@ -12,16 +12,16 @@
  * Defines the representation of a collision detection model.
  */
 
-#include <mce/asset/asset_defs.hpp>
 #include <atomic>
 #include <exception>
+#include <mce/asset/asset_defs.hpp>
 #include <mce/exceptions.hpp>
-#include <memory>
 #include <mce/model/model_defs.hpp>
 #include <mce/model/model_format.hpp>
+#include <mce/util/local_function.hpp>
+#include <memory>
 #include <mutex>
 #include <string>
-#include <mce/util/local_function.hpp>
 #include <vector>
 
 namespace mce {
