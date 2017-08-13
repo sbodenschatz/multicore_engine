@@ -13,6 +13,7 @@
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
+#include <mce/graphics/graphics_manager.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/pipeline_cache.hpp>
 #include <mce/graphics/transfer_manager.hpp>
@@ -27,10 +28,10 @@ class graphics_test {
 	instance inst_;
 	device dev_;
 	window win_;
-	pipeline_cache plc_;
 	device_memory_manager mem_mgr_;
 	destruction_queue_manager dqm_;
 	transfer_manager tmgr_;
+	graphics_manager gmgr;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
 
 public:
