@@ -21,6 +21,7 @@
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include <cassert>
 
 namespace mce {
 namespace graphics {
@@ -136,6 +137,7 @@ public:
 							 bool store_layout = false) {
 		descriptor_set_resources req;
 		for(const auto& layout : layouts) {
+			assert(layout);
 			req += *layout;
 		}
 		if(!available_resources_.sufficient_for(req)) {
