@@ -5,7 +5,9 @@
  */
 
 #include <glm/vec2.hpp>
+#include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_test.hpp>
+#include <mce/graphics/pipeline_layout.hpp>
 
 namespace mce {
 namespace graphics {
@@ -15,7 +17,8 @@ graphics_test::graphics_test()
 		  mem_mgr_(&dev_, 1 << 27), dqm_(&dev_, uint32_t(win_.swapchain_images().size())),
 		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())),
 		  gmgr_(dev_, &dqm_), last_frame_t_{std::chrono::high_resolution_clock::now()} {
-	fbcfg_ = gmgr_.create_framebuffer_config("test", win_, {});
+	fbcfg_ = gmgr_.create_framebuffer_config("test_fbcfg", win_, {});
+	pll_ = gmgr_.create_pipeline_layout("test_pll", {}, {});
 }
 
 graphics_test::~graphics_test() {}

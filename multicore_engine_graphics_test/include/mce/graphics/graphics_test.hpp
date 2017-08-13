@@ -34,6 +34,7 @@ class graphics_test {
 	graphics_manager gmgr_;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
 	std::shared_ptr<const framebuffer_config> fbcfg_;
+	std::shared_ptr<const pipeline_layout> pll_;
 
 public:
 	graphics_test();
