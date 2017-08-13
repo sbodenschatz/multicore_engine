@@ -9,6 +9,7 @@
 
 #include <mce/glfw/instance.hpp>
 #include <mce/glfw/window.hpp>
+#include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
 #include <mce/graphics/instance.hpp>
@@ -26,6 +27,7 @@ class graphics_test {
 	window win_;
 	pipeline_cache plc_;
 	device_memory_manager mem_mgr_;
+	destruction_queue_manager dqm_;
 
 public:
 	graphics_test();

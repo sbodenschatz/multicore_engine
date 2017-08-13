@@ -12,12 +12,14 @@ namespace graphics {
 
 graphics_test::graphics_test()
 		: glfw_win_("Vulkan Test", glm::ivec2(800, 600)), dev_(inst_), win_(inst_, glfw_win_, dev_),
-		  plc_(dev_), mem_mgr_(&dev_, 1 << 27) {}
+		  plc_(dev_), mem_mgr_(&dev_, 1 << 27), dqm_(&dev_, win_.swapchain_images().size()) {}
 
 graphics_test::~graphics_test() {}
 
 void graphics_test::run() {
 	while(!glfw_win_.should_close()) {
+		dqm_.advance();
+
 		glfw_inst_.poll_events();
 	}
 }
