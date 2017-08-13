@@ -6,6 +6,7 @@
 
 #ifdef _MSC_VER
 #include <windows.h> //Required for OutputDebugStringA
+#include <intrin.h>
 #endif
 #include <algorithm>
 #include <cstdlib>
@@ -152,6 +153,9 @@ VkBool32 instance::validation_report_callback(VkDebugReportFlagsEXT flags_,
 	out->flush();
 #ifdef _MSC_VER
 	OutputDebugStringA(msg.c_str());
+#ifdef DEBUG
+	if (flags & crit_report_levels) __debugbreak();
+#endif // DEBUG
 #endif
 	return false;
 }
