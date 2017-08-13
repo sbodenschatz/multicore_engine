@@ -14,6 +14,7 @@
 #include <mce/graphics/device_memory_manager.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/pipeline_cache.hpp>
+#include <mce/graphics/transfer_manager.hpp>
 #include <mce/graphics/window.hpp>
 
 namespace mce {
@@ -28,6 +29,7 @@ class graphics_test {
 	pipeline_cache plc_;
 	device_memory_manager mem_mgr_;
 	destruction_queue_manager dqm_;
+	transfer_manager tmgr_;
 
 public:
 	graphics_test();
