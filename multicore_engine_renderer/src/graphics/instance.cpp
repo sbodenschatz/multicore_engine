@@ -5,8 +5,8 @@
  */
 
 #ifdef _MSC_VER
-#include <windows.h> //Required for OutputDebugStringA
 #include <intrin.h>
+#include <windows.h> //Required for OutputDebugStringA
 #endif
 #include <algorithm>
 #include <cstdlib>
@@ -149,13 +149,17 @@ VkBool32 instance::validation_report_callback(VkDebugReportFlagsEXT flags_,
 		out = &std::cout;
 	}
 	std::lock_guard<std::mutex> lock(validation_log_mtx);
-	(*out) << msg;
-	out->flush();
 #ifdef _MSC_VER
 	OutputDebugStringA(msg.c_str());
 #ifdef DEBUG
-	if (flags & crit_report_levels) __debugbreak();
+	if(flags & crit_report_levels) __debugbreak();
+#else
+	(*out) << msg;
+	out->flush();
 #endif // DEBUG
+#else
+	(*out) << msg;
+	out->flush();
 #endif
 	return false;
 }
