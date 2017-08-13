@@ -4,19 +4,20 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <glm/vec2.hpp>
 #include <mce/graphics/graphics_test.hpp>
 
 namespace mce {
 namespace graphics {
 
-graphics_test::graphics_test() {
-	// TODO Auto-generated constructor stub
-}
+graphics_test::graphics_test() : glfw_win_("Vulkan Test", glm::ivec2(800, 600)) {}
 
 graphics_test::~graphics_test() {}
 
 void graphics_test::run() {
-	// TODO Implement
+	while(!glfw_win_.should_close()) {
+		glfw_inst_.poll_events();
+	}
 }
 
 } /* namespace graphics */
