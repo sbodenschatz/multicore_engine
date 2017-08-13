@@ -7,13 +7,13 @@
 #ifndef GLFW_WINDOW_HPP_
 #define GLFW_WINDOW_HPP_
 
+#include <boost/optional.hpp>
 #include <functional>
 #include <glm/glm.hpp>
+#include <mce/glfw/glfw_defs.hpp>
 #include <memory>
 #include <string>
 #include <vector>
-#include <boost/optional.hpp>
-#include <mce/glfw/glfw_defs.hpp>
 
 struct GLFWwindow;
 
@@ -94,6 +94,7 @@ class window {
 	std::unique_ptr<instance> instance_;
 	std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)> window_;
 	std::unique_ptr<window_callbacks> callbacks_;
+	std::string title_;
 
 	void set_window_hints(window_hint_flags hints);
 
@@ -129,6 +130,13 @@ public:
 	bool key(key key_code) const;
 	/// Returns the pressed state of the given mouse button.
 	bool mouse_button(mouse_button button) const;
+
+	/// Returns the current title of the window.
+	const std::string& title() const {
+		return title_;
+	}
+	/// Changes the title of the window to the given string.
+	void title(const std::string& value);
 
 	/// Returns the position of the window in virtual screen coordinates.
 	glm::ivec2 window_position() const;
