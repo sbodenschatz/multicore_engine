@@ -10,7 +10,7 @@
 namespace mce {
 namespace graphics {
 
-graphics_test::graphics_test() : glfw_win_("Vulkan Test", glm::ivec2(800, 600)) {}
+graphics_test::graphics_test() : glfw_win_("Vulkan Test", glm::ivec2(800, 600)), dev_(inst_) {}
 
 graphics_test::~graphics_test() {}
 
