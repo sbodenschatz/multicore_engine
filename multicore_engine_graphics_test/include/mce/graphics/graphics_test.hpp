@@ -10,7 +10,9 @@
 #include <mce/glfw/instance.hpp>
 #include <mce/glfw/window.hpp>
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/device_memory_manager.hpp>
 #include <mce/graphics/instance.hpp>
+#include <mce/graphics/pipeline_cache.hpp>
 #include <mce/graphics/window.hpp>
 
 namespace mce {
@@ -22,6 +24,8 @@ class graphics_test {
 	instance inst_;
 	device dev_;
 	window win_;
+	pipeline_cache plc_;
+	device_memory_manager mem_mgr_;
 
 public:
 	graphics_test();
