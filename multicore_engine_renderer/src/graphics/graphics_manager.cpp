@@ -41,17 +41,9 @@ graphics_manager::create_descriptor_set_layout(const std::string& name,
 	return entry;
 }
 
-std::shared_ptr<const framebuffer_config> graphics_manager::create_framebuffer_config(
-		const std::string& name, vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs) {
-	std::lock_guard<std::mutex> lock(manager_mutex_);
-	auto& entry = framebuffer_configs_[name];
-	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
-	entry = std::make_shared<framebuffer_config>(attachment_configs);
-	return entry;
-}
 std::shared_ptr<const framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name,
-											std::vector<framebuffer_attachment_config>&& attachment_configs) {
+											std::vector<framebuffer_attachment_config> attachment_configs) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
@@ -59,19 +51,9 @@ graphics_manager::create_framebuffer_config(const std::string& name,
 	return entry;
 }
 
-std::shared_ptr<const framebuffer_config> graphics_manager::create_framebuffer_config(
-		const std::string& name, window& swapchain_window,
-		vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs) {
-	std::lock_guard<std::mutex> lock(manager_mutex_);
-	auto& entry = framebuffer_configs_[name];
-	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
-	entry = std::make_shared<framebuffer_config>(
-			swapchain_window.make_framebuffer_config(attachment_configs));
-	return entry;
-}
 std::shared_ptr<const framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name, window& swapchain_window,
-											std::vector<framebuffer_attachment_config>&& attachment_configs) {
+											std::vector<framebuffer_attachment_config> attachment_configs) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");

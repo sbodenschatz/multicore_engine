@@ -129,16 +129,7 @@ void window::create_swapchain() {
 }
 
 framebuffer_config
-window::make_framebuffer_config(vk::ArrayProxy<const framebuffer_attachment_config> additional_attachments) {
-	framebuffer_config res{additional_attachments};
-	framebuffer_attachment_config swapchain_attachment(surface_format_);
-	swapchain_attachment.is_swapchain_image_ = true;
-	res.attachment_configs_.insert(res.attachment_configs_.begin(), swapchain_attachment);
-	return res;
-}
-
-framebuffer_config
-window::make_framebuffer_config(std::vector<framebuffer_attachment_config>&& additional_attachments) {
+window::make_framebuffer_config(std::vector<framebuffer_attachment_config> additional_attachments) {
 	framebuffer_config res{std::move(additional_attachments)};
 	framebuffer_attachment_config swapchain_attachment(surface_format_);
 	swapchain_attachment.is_swapchain_image_ = true;

@@ -128,31 +128,13 @@ public:
 	/// the given name.
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name,
-							  vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs);
-	/// \brief Creates a framebuffer_config containing the given attachment configurations and stores it under
-	/// the given name.
-	/**
-	 * This overload optimizes cases where the attachment configs are already stored in a vector that can be
-	 * moved from, therefore avoiding an additional heap allocation.
-	 */
-	std::shared_ptr<const framebuffer_config>
-	create_framebuffer_config(const std::string& name,
-							  std::vector<framebuffer_attachment_config>&& attachment_configs);
+							  std::vector<framebuffer_attachment_config> attachment_configs);
 
 	/// \brief Creates a framebuffer_config containing a config for a swapchain attachment from the given
 	/// window and the given attachment configurations and stores it under the given name.
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name, window& swapchain_window,
-							  vk::ArrayProxy<const framebuffer_attachment_config> attachment_configs);
-	/// \brief Creates a framebuffer_config containing a config for a swapchain attachment from the given
-	/// window and the given attachment configurations and stores it under the given name.
-	/**
-	 * This overload optimizes cases where the attachment configs are already stored in a vector that can be
-	 * moved from, therefore avoiding an additional heap allocation.
-	 */
-	std::shared_ptr<const framebuffer_config>
-	create_framebuffer_config(const std::string& name, window& swapchain_window,
-							  std::vector<framebuffer_attachment_config>&& attachment_configs);
+							  std::vector<framebuffer_attachment_config> attachment_configs);
 
 	/// \brief Creates a pipeline_layout consisting of the given descriptor_set_layout objects and using the
 	/// given push_constant_ranges and stores it under the given name.
