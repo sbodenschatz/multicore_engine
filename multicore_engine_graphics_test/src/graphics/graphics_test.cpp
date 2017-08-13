@@ -21,10 +21,16 @@ graphics_test::graphics_test()
 	fbcfg_ = gmgr_.create_framebuffer_config("test_fbcfg", win_, {});
 	pll_ = gmgr_.create_pipeline_layout("test_pll", {}, {});
 	spg_ = gmgr_.create_subpass_graph(
-			"spg",
+			"test_spg",
 			{subpass_entry{
 					{}, {vk::AttachmentReference(0, vk::ImageLayout::eColorAttachmentOptimal)}, {}, {}, {}}},
 			{});
+	rp_ = gmgr_.create_render_pass(
+			"test_rp", spg_, fbcfg_,
+			{render_pass_attachment_access{vk::ImageLayout::eUndefined, vk::ImageLayout::ePresentSrcKHR,
+										   vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eStore,
+										   vk::AttachmentLoadOp::eDontCare,
+										   vk::AttachmentStoreOp::eDontCare}});
 }
 
 graphics_test::~graphics_test() {}

@@ -36,6 +36,7 @@ class graphics_test {
 	std::shared_ptr<const framebuffer_config> fbcfg_;
 	std::shared_ptr<const pipeline_layout> pll_;
 	std::shared_ptr<const subpass_graph> spg_;
+	std::shared_ptr<const render_pass> rp_;
 
 public:
 	graphics_test();
