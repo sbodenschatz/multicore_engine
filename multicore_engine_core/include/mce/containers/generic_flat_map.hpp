@@ -102,7 +102,7 @@ protected:
 	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(
 			std::is_nothrow_copy_assignable<container_t>::value&&
 					std::is_nothrow_copy_assignable<Compare>::value) {
-		assert(this == &other);
+		assert(this != &other);
 		compare = std::move_if_noexcept(other.compare);
 		values = std::move_if_noexcept(other.values);
 		return *this;
