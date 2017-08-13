@@ -6,20 +6,20 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <iterator>
 #include <mce/exceptions.hpp>
 #include <mce/glfw/cursor.hpp>
 #include <mce/glfw/instance.hpp>
 #include <mce/glfw/monitor.hpp>
 #include <mce/glfw/window.hpp>
-#include <iterator>
 
 namespace mce {
 namespace glfw {
 
 window::window(const std::string& title, const glm::ivec2& size, window_hint_flags hints)
-		: instance_{std::make_unique<instance>()},
-		  window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
-		  callbacks_{std::make_unique<window_callbacks>()} {
+		: instance_{std::make_unique<instance>()}, window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(
+														   nullptr, [](GLFWwindow*) {})},
+		  callbacks_{std::make_unique<window_callbacks>()}, title_{title} {
 	set_window_hints(hints);
 	window_ = std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(
 			glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr),
@@ -28,8 +28,8 @@ window::window(const std::string& title, const glm::ivec2& size, window_hint_fla
 	setup_callbacks();
 }
 window::window(const std::string& title, const monitor& mon, const video_mode& mode, window_hint_flags hints)
-		: instance_{std::make_unique<instance>()},
-		  window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(nullptr, [](GLFWwindow*) {})},
+		: instance_{std::make_unique<instance>()}, window_{std::unique_ptr<GLFWwindow, void (*)(GLFWwindow*)>(
+														   nullptr, [](GLFWwindow*) {})},
 		  callbacks_{std::make_unique<window_callbacks>()} {
 	set_window_hints(hints);
 	glfwWindowHint(GLFW_RED_BITS, mode.red_bits);
@@ -119,6 +119,11 @@ std::string window::clipboard() const {
 }
 void window::clipboard(const std::string& content) {
 	glfwSetClipboardString(window_.get(), content.c_str());
+}
+
+void window::title(const std::string& value) {
+	title_ = value;
+	glfwSetWindowTitle(window_.get(), title_.c_str());
 }
 
 glm::ivec2 window::window_position() const {
