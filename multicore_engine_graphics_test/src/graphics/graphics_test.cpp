@@ -5,6 +5,10 @@
  */
 
 #include <glm/vec2.hpp>
+#include <iomanip>
+#include <iostream>
+#include <mce/asset/load_unit_asset_loader.hpp>
+#include <mce/asset/pack_file_reader.hpp>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_test.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
@@ -12,6 +16,8 @@
 
 namespace mce {
 namespace graphics {
+
+boost::filesystem::path graphics_test::exe_path(".");
 
 graphics_test::graphics_test()
 		: glfw_win_("Vulkan Test", glm::ivec2(800, 600)), dev_(inst_), win_(inst_, glfw_win_, dev_),
@@ -31,6 +37,22 @@ graphics_test::graphics_test()
 										   vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eStore,
 										   vk::AttachmentLoadOp::eDontCare,
 										   vk::AttachmentStoreOp::eDontCare}});
+	auto loader = std::make_shared<asset::load_unit_asset_loader>(std::vector<asset::path_prefix>(
+			{{std::make_unique<asset::pack_file_reader>(), "assets.pack"},
+			 {std::make_unique<asset::pack_file_reader>(), "../multicore_engine_assets/assets.pack"},
+			 {std::make_unique<asset::pack_file_reader>(),
+			  ((exe_path.parent_path() / "multicore_engine_assets") / "assets.pack").string()}}));
+	amgr_.add_asset_loader(loader);
+	amgr_.start_pin_load_unit("shaders");
+	auto vert_shader_bin = amgr_.load_asset_sync("shaders/test_shader.vert.spv");
+	for(size_t i = 0; i < vert_shader_bin->size(); ++i) {
+		std::cout << std::hex << std::setw(2) << std::setfill('0')
+				  << int(reinterpret_cast<const unsigned char*>(vert_shader_bin->data())[i]) << " ";
+		if(i % 32 == 31) std::cout << std::endl;
+	}
+	vert_shader_ = gmgr_.create_shader_module("test_vert_shader", *vert_shader_bin);
+	auto frag_shader_bin = amgr_.load_asset_sync("shaders/test_shader.frag.spv");
+	frag_shader_ = gmgr_.create_shader_module("test_frag_shader", *frag_shader_bin);
 }
 
 graphics_test::~graphics_test() {}

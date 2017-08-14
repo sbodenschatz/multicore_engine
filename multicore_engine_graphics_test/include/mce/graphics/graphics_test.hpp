@@ -7,7 +7,9 @@
 #ifndef MCE_GRAPHICS_GRAPHICS_TEST_HPP_
 #define MCE_GRAPHICS_GRAPHICS_TEST_HPP_
 
+#include <boost/filesystem.hpp>
 #include <chrono>
+#include <mce/asset/asset_manager.hpp>
 #include <mce/glfw/instance.hpp>
 #include <mce/glfw/window.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
@@ -23,6 +25,7 @@ namespace mce {
 namespace graphics {
 
 class graphics_test {
+	asset::asset_manager amgr_;
 	glfw::instance glfw_inst_;
 	glfw::window glfw_win_;
 	instance inst_;
@@ -37,11 +40,15 @@ class graphics_test {
 	std::shared_ptr<const pipeline_layout> pll_;
 	std::shared_ptr<const subpass_graph> spg_;
 	std::shared_ptr<const render_pass> rp_;
+	std::shared_ptr<const shader_module> vert_shader_;
+	std::shared_ptr<const shader_module> frag_shader_;
 
 public:
 	graphics_test();
 	~graphics_test();
 	void run();
+
+	static boost::filesystem::path exe_path;
 };
 
 } /* namespace graphics */
