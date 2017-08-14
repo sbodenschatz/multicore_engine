@@ -84,7 +84,7 @@ function(compile_glsl_to_spirv OUTPUT_LIST)
 		set(SPV_FILE ${SRC_FILE}.spv)
 		add_custom_command(
 			OUTPUT ${SPV_FILE}
-			COMMAND glslangValidator -s -V -o ${SPV_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
+			COMMAND glslangValidator -V -o ${SPV_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
 			MAIN_DEPENDENCY ${SRC_FILE}
 			COMMENT "Compiling GLSL shader \"${SRC_FILE}\" to SPIR-V file \"${SPV_FILE}\""
 		)
