@@ -9,6 +9,7 @@
 
 #include <boost/filesystem.hpp>
 #include <chrono>
+#include <glm/vec2.hpp>
 #include <mce/asset/asset_manager.hpp>
 #include <mce/glfw/instance.hpp>
 #include <mce/glfw/window.hpp>
@@ -42,6 +43,10 @@ class graphics_test {
 	std::shared_ptr<const render_pass> rp_;
 	std::shared_ptr<const shader_module> vert_shader_;
 	std::shared_ptr<const shader_module> frag_shader_;
+
+	struct vertex {
+		glm::vec2 pos;
+	};
 
 public:
 	graphics_test();

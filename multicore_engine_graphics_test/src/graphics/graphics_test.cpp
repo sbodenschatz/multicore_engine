@@ -11,6 +11,7 @@
 #include <mce/asset/pack_file_reader.hpp>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_test.hpp>
+#include <mce/graphics/pipeline_config.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
 #include <mce/graphics/render_pass.hpp>
 
@@ -53,6 +54,22 @@ graphics_test::graphics_test()
 	vert_shader_ = gmgr_.create_shader_module("test_vert_shader", *vert_shader_bin);
 	auto frag_shader_bin = amgr_.load_asset_sync("shaders/test_shader.frag.spv");
 	frag_shader_ = gmgr_.create_shader_module("test_frag_shader", *frag_shader_bin);
+	auto pcfg = std::make_shared<pipeline_config>();
+	pcfg->shader_stages() = {{vk::ShaderStageFlagBits::eVertex, vert_shader_, "main"},
+							 {vk::ShaderStageFlagBits::eFragment, frag_shader_, "main"}};
+	pcfg->input_state() = {{{0, sizeof(vertex)}}, {{0, 0, vk::Format::eR32G32Sfloat, offsetof(vertex, pos)}}};
+	pcfg->assembly_state() = {{}, vk::PrimitiveTopology::eTriangleList};
+	pcfg->viewport_state() = pipeline_config::viewport_state_config{
+			{{0.0, 0.0, float(win_.swapchain_size().x), float(win_.swapchain_size().y), 0.0f, 1.0f}},
+			{{{0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}}}};
+	pcfg->rasterization_state().lineWidth = 1.0f;
+	pcfg->multisample_state() = vk::PipelineMultisampleStateCreateInfo{};
+	pcfg->color_blend_state() = pipeline_config::color_blend_state_config{{{}}};
+	pcfg->layout(pll_);
+	pcfg->compatible_render_pass(rp_);
+	pcfg->compatible_subpass(0);
+	gmgr_.add_pending_pipeline("test_pl", pcfg);
+	gmgr_.compile_pending_pipelines();
 }
 
 graphics_test::~graphics_test() {}
