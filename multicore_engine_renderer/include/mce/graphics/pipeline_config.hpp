@@ -218,6 +218,16 @@ public:
 		std::array<float, 4> blend_constants_;
 
 	public:
+		color_blend_state_config(std::vector<vk::PipelineColorBlendAttachmentState> attachments,
+								 std::array<float, 4> blend_constants = {{0.0f, 0.0f, 0.0f, 0.0f}})
+				: attachments_{std::move(attachments)}, blend_constants_{blend_constants} {}
+
+		color_blend_state_config(vk::LogicOp logic_op,
+								 std::vector<vk::PipelineColorBlendAttachmentState> attachments,
+								 std::array<float, 4> blend_constants = {{0.0f, 0.0f, 0.0f, 0.0f}})
+				: logic_op_{logic_op}, attachments_{std::move(attachments)}, blend_constants_{
+																					 blend_constants} {}
+
 		/// Initializes an empty color_blend_state_config.
 		color_blend_state_config() {}
 
