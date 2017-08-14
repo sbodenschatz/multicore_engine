@@ -4,14 +4,14 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <mce/asset/pack_file_reader.hpp>
-#include <boost/container/vector.hpp>
-#include <mce/exceptions.hpp>
-#include <cstring>
-#include <mce/util/compression.hpp>
 #include <algorithm>
+#include <boost/container/vector.hpp>
 #include <cassert>
+#include <cstring>
 #include <iterator>
+#include <mce/asset/pack_file_reader.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/util/compression.hpp>
 #include <mutex>
 
 namespace mce {
@@ -44,39 +44,43 @@ pack_file_reader::get_source_stream(const std::string& prefix) {
 
 std::pair<file_content_ptr, file_size> pack_file_reader::read_file(const std::string& prefix,
 																   const std::string& file) {
-	auto source = get_source_stream(prefix);
-	auto pos = std::find_if(source->metadata.elements.begin(), source->metadata.elements.end(),
-							[&](const pack_file_element_meta_data& elem) { return elem.name == file; });
-	if(pos == source->metadata.elements.end()) {
-		return std::make_pair(file_content_ptr(), 0ull);
-	} else if(pos->compressed_size == 0) {
-		// TODO Maybe use 64-bit aligned storage for content
-		std::shared_ptr<char> content =
-				std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });
-		source->stream.seekg(pos->offset, std::ios::beg);
-		source->stream.read(content.get(), pos->size);
-		if(!(source->stream))
+	try {
+		auto source = get_source_stream(prefix);
+		auto pos = std::find_if(source->metadata.elements.begin(), source->metadata.elements.end(),
+								[&](const pack_file_element_meta_data& elem) { return elem.name == file; });
+		if(pos == source->metadata.elements.end()) {
 			return std::make_pair(file_content_ptr(), 0ull);
-		else
-			return std::make_pair(content, pos->size);
-	} else {
-		source->compressed_buffer.clear();
-		source->compressed_buffer.resize(pos->compressed_size, '\0');
-		source->stream.seekg(pos->offset, std::ios::beg);
-		source->stream.read(source->compressed_buffer.data(), pos->compressed_size);
-		if(!(source->stream)) {
-			return std::make_pair(file_content_ptr(), 0ull);
-		} else {
-			source->decompressed_buffer.clear();
-			util::decompress(source->compressed_buffer, source->decompressed_buffer);
-			if(source->decompressed_buffer.size() != pos->size)
-				throw io_exception(
-						"Pack file appears corrupt: asset size and decompressed data size differ.");
+		} else if(pos->compressed_size == 0) {
+			// TODO Maybe use 64-bit aligned storage for content
 			std::shared_ptr<char> content =
 					std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });
-			std::memcpy(content.get(), source->decompressed_buffer.data(), pos->size);
-			return std::make_pair(content, pos->size);
+			source->stream.seekg(pos->offset, std::ios::beg);
+			source->stream.read(content.get(), pos->size);
+			if(!(source->stream))
+				return std::make_pair(file_content_ptr(), 0ull);
+			else
+				return std::make_pair(content, pos->size);
+		} else {
+			source->compressed_buffer.clear();
+			source->compressed_buffer.resize(pos->compressed_size, '\0');
+			source->stream.seekg(pos->offset, std::ios::beg);
+			source->stream.read(source->compressed_buffer.data(), pos->compressed_size);
+			if(!(source->stream)) {
+				return std::make_pair(file_content_ptr(), 0ull);
+			} else {
+				source->decompressed_buffer.clear();
+				util::decompress(source->compressed_buffer, source->decompressed_buffer);
+				if(source->decompressed_buffer.size() != pos->size)
+					throw io_exception(
+							"Pack file appears corrupt: asset size and decompressed data size differ.");
+				std::shared_ptr<char> content =
+						std::shared_ptr<char>(new char[pos->size], [](char* ptr) { delete[] ptr; });
+				std::memcpy(content.get(), source->decompressed_buffer.data(), pos->size);
+				return std::make_pair(content, pos->size);
+			}
 		}
+	} catch(...) {
+		return std::make_pair(file_content_ptr(), 0ull);
 	}
 }
 
