@@ -32,7 +32,7 @@ public:
 	class shader_stage_config {
 	private:
 		vk::ShaderStageFlagBits stage_;
-		std::shared_ptr<shader_module> module_;
+		std::shared_ptr<const shader_module> module_;
 		std::string entry_point_name_;
 		std::vector<char> specialization_data_;
 		std::vector<vk::SpecializationMapEntry> specialization_map_;
@@ -57,12 +57,12 @@ public:
 		}
 
 		/// Gets the shader module containing the binary.
-		const std::shared_ptr<shader_module>& module() const {
+		const std::shared_ptr<const shader_module>& module() const {
 			return module_;
 		}
 
 		/// Sets the shader module containing the binary.
-		void module(std::shared_ptr<shader_module> module) {
+		void module(std::shared_ptr<const shader_module> module) {
 			module_ = std::move(module);
 		}
 
@@ -270,8 +270,8 @@ private:
 	boost::optional<vk::PipelineColorBlendStateCreateInfo> color_blend_state_ci;
 	boost::optional<std::vector<vk::DynamicState>> dynamic_states_;
 	boost::optional<vk::PipelineDynamicStateCreateInfo> dynamic_states_ci;
-	std::shared_ptr<pipeline_layout> layout_;
-	std::shared_ptr<render_pass> compatible_render_pass_;
+	std::shared_ptr<const pipeline_layout> layout_;
+	std::shared_ptr<const render_pass> compatible_render_pass_;
 	uint32_t compatible_subpass_;
 
 public:
@@ -371,12 +371,12 @@ public:
 	}
 
 	/// Gets the pipeline layout for the pipeline.
-	const std::shared_ptr<pipeline_layout>& layout() const {
+	const std::shared_ptr<const pipeline_layout>& layout() const {
 		return layout_;
 	}
 
 	/// Sets the pipeline layout for the pipeline.
-	void layout(const std::shared_ptr<pipeline_layout>& layout) {
+	void layout(const std::shared_ptr<const pipeline_layout>& layout) {
 		this->layout_ = layout;
 	}
 
@@ -391,12 +391,12 @@ public:
 	}
 
 	/// Gets the render pass with which the render pass should be compatible.
-	const std::shared_ptr<graphics::render_pass>& compatible_render_pass() const {
+	const std::shared_ptr<const graphics::render_pass>& compatible_render_pass() const {
 		return compatible_render_pass_;
 	}
 
 	/// Sets the render pass with which the render pass should be compatible.
-	void compatible_render_pass(const std::shared_ptr<graphics::render_pass>& compatible_render_pass) {
+	void compatible_render_pass(const std::shared_ptr<const graphics::render_pass>& compatible_render_pass) {
 		this->compatible_render_pass_ = compatible_render_pass;
 	}
 
