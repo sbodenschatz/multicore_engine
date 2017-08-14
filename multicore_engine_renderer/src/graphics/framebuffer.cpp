@@ -14,7 +14,7 @@ namespace graphics {
 
 framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interface& mem_mgr,
 						 destruction_queue_manager* destruction_manager,
-						 std::shared_ptr<framebuffer_config> config, vk::RenderPass compatible_pass)
+						 std::shared_ptr<const framebuffer_config> config, vk::RenderPass compatible_pass)
 		: dev_{&dev}, win_{&win}, size_{win.glfw_window().framebuffer_size()}, config_{std::move(config)} {
 	if(std::count_if(config_->attachment_configs().begin(), config_->attachment_configs().end(),
 					 [](const framebuffer_attachment_config& cfg) { return cfg.is_swapchain_image(); }) > 1)
