@@ -46,6 +46,14 @@ public:
 		}
 
 	public:
+		shader_stage_config() : stage_{vk::ShaderStageFlagBits::eVertex} {}
+		shader_stage_config(vk::ShaderStageFlagBits stage, std::shared_ptr<const shader_module> module,
+							std::string entry_point_name, std::vector<char> specialization_data = {},
+							std::vector<vk::SpecializationMapEntry> specialization_map = {})
+				: stage_{stage}, module_{std::move(module)}, entry_point_name_{std::move(entry_point_name)},
+				  specialization_data_{std::move(specialization_data)}, specialization_map_{std::move(
+																				specialization_map)} {}
+
 		/// Gets the name of the entry point.
 		const std::string& entry_point_name() const {
 			return entry_point_name_;
