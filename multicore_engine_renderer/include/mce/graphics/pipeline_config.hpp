@@ -213,14 +213,13 @@ public:
 	/// Bundles the configuration data for the color blend state of a pipeline.
 	class color_blend_state_config {
 	private:
-		bool logicOpEnable;
-		vk::LogicOp logicOp;
+		boost::optional<vk::LogicOp> logic_op_;
 		std::vector<vk::PipelineColorBlendAttachmentState> attachments_;
-		std::array<float, 4> blendConstants;
+		std::array<float, 4> blend_constants_;
 
 	public:
 		/// Initializes an empty color_blend_state_config.
-		color_blend_state_config() : logicOpEnable{false}, logicOp{vk::LogicOp::eSet} {}
+		color_blend_state_config() {}
 
 		/// Gets the blend states for the attachments.
 		const std::vector<vk::PipelineColorBlendAttachmentState>& attachments() const {
@@ -239,32 +238,22 @@ public:
 
 		/// Allows read-only access to the blend constants array.
 		const std::array<float, 4>& blend_constants() const {
-			return blendConstants;
+			return blend_constants_;
 		}
 
 		/// Allows read-write access to the blend constants array.
 		std::array<float, 4>& blend_constants() {
-			return blendConstants;
+			return blend_constants_;
 		}
 
-		/// Gets the logic operation.
-		vk::LogicOp logic_op() const {
-			return logicOp;
+		/// Provides read-only access to the logic operation.
+		const boost::optional<vk::LogicOp>& logic_op() const {
+			return logic_op_;
 		}
 
-		/// Sets the logic operation.
-		void logic_op(vk::LogicOp logic_op) {
-			logicOp = logic_op;
-		}
-
-		/// Returns a boolean indicating if the the logic operation is enabled.
-		bool logic_op_enable() const {
-			return logicOpEnable;
-		}
-
-		/// Sets the activation status of the logic operation.
-		void logic_op_enable(bool logic_op_enable) {
-			logicOpEnable = logic_op_enable;
+		/// Provides read-write access to the logic operation.
+		boost::optional<vk::LogicOp>& logic_op() {
+			return logic_op_;
 		}
 
 		/// Returns the corresponding creation info structure to pass to vulkan.
