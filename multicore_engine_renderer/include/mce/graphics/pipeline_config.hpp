@@ -126,6 +126,11 @@ public:
 		std::vector<vk::VertexInputAttributeDescription> attributes_;
 
 	public:
+		vertex_input_state_config() {}
+		vertex_input_state_config(std::vector<vk::VertexInputBindingDescription> bindings,
+								  std::vector<vk::VertexInputAttributeDescription> attributes)
+				: bindings_{std::move(bindings)}, attributes_{std::move(attributes)} {}
+
 		/// Gets the vertex input attributes.
 		const std::vector<vk::VertexInputAttributeDescription>& attributes() const {
 			return attributes_;
