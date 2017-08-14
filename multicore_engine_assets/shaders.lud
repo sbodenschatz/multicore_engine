@@ -1,0 +1,4 @@
+shaders{
+	"shaders/test_shader.vert.spv";
+	"shaders/test_shader.frag.spv";
+}
