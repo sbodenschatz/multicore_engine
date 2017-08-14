@@ -172,6 +172,10 @@ public:
 		std::vector<vk::Rect2D> scissors_;
 
 	public:
+		viewport_state_config() {}
+		viewport_state_config(std::vector<vk::Viewport> viewports, std::vector<vk::Rect2D> scissors)
+				: viewports_{std::move(viewports)}, scissors_{std::move(scissors)} {}
+
 		/// Gets the scissor rectangles.
 		const std::vector<vk::Rect2D>& scissors() const {
 			return scissors_;
