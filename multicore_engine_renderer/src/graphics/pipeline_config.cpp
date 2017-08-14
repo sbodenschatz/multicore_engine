@@ -43,11 +43,13 @@ vk::PipelineViewportStateCreateInfo pipeline_config::viewport_state_config::crea
 
 vk::PipelineColorBlendStateCreateInfo pipeline_config::color_blend_state_config::create_info() const {
 	vk::PipelineColorBlendStateCreateInfo ci;
-	ci.logicOpEnable = logicOpEnable;
-	ci.logicOp = logicOp;
+	if(logic_op_) {
+		ci.logicOpEnable = true;
+		ci.logicOp = logic_op_.get();
+	}
 	ci.attachmentCount = uint32_t(attachments_.size());
 	ci.pAttachments = attachments_.data();
-	ci.setBlendConstants(blendConstants);
+	ci.setBlendConstants(blend_constants_);
 	return ci;
 }
 
