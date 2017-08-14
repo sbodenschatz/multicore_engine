@@ -9,6 +9,7 @@
 #include <iostream>
 #include <mce/asset/load_unit_asset_loader.hpp>
 #include <mce/asset/pack_file_reader.hpp>
+#include <mce/graphics/framebuffer.hpp>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_test.hpp>
 #include <mce/graphics/pipeline_config.hpp>
@@ -70,6 +71,7 @@ graphics_test::graphics_test()
 	pcfg->compatible_subpass(0);
 	gmgr_.add_pending_pipeline("test_pl", pcfg);
 	gmgr_.compile_pending_pipelines();
+	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_, rp_->native_render_pass());
 }
 
 graphics_test::~graphics_test() {}

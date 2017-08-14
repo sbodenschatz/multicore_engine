@@ -24,6 +24,7 @@
 
 namespace mce {
 namespace graphics {
+class framebuffer;
 
 class graphics_test {
 	asset::asset_manager amgr_;
@@ -43,6 +44,7 @@ class graphics_test {
 	std::shared_ptr<const render_pass> rp_;
 	std::shared_ptr<const shader_module> vert_shader_;
 	std::shared_ptr<const shader_module> frag_shader_;
+	std::unique_ptr<framebuffer> fb_;
 
 	struct vertex {
 		glm::vec2 pos;
