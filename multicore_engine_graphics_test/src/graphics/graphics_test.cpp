@@ -112,7 +112,6 @@ void graphics_test::run() {
 			glfw_win_.title("Vulkan Test " + std::to_string(frame_counter / delta_t.count()) + " fps");
 			frame_counter = 0;
 		}
-		std::cout << acq_res.value << "\n";
 		tmgr_.start_frame(acq_res.value);
 		dqm_.cleanup_and_set_current(acq_res.value);
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
