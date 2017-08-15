@@ -23,7 +23,8 @@ boost::filesystem::path graphics_test::exe_path(".");
 
 graphics_test::graphics_test()
 		: glfw_win_("Vulkan Test", glm::ivec2(800, 600)), dev_(inst_), win_(inst_, glfw_win_, dev_),
-		  mem_mgr_(&dev_, 1 << 27), dqm_(&dev_, uint32_t(win_.swapchain_images().size())),
+		  mem_mgr_(&dev_, 1 << 27), render_cmd_pool_(dev_, dev_.graphics_queue_index().first, true),
+		  dqm_(&dev_, uint32_t(win_.swapchain_images().size())),
 		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())),
 		  gmgr_(dev_, &dqm_), last_frame_t_{std::chrono::high_resolution_clock::now()} {
 	fbcfg_ = gmgr_.create_framebuffer_config("test_fbcfg", win_, {});
@@ -78,6 +79,7 @@ graphics_test::~graphics_test() {}
 
 void graphics_test::run() {
 	static int frame_counter = 0;
+	std::vector<vk::CommandBuffer> cmd_buff_handles;
 	// for(int frame=0;frame<4;++frame){
 	while(!glfw_win_.should_close()) {
 		auto this_frame_t = std::chrono::high_resolution_clock::now();
@@ -91,8 +93,15 @@ void graphics_test::run() {
 		/// TODO Use index from acquire.
 		tmgr_.start_frame();
 		dqm_.advance();
-		/// TODO Use buffers
-		tmgr_.retrieve_ready_ownership_transfers();
+		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
+				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
+		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+		render_cmb_buf->end();
+		auto cmd_buffers = tmgr_.retrieve_ready_ownership_transfers();
+		cmd_buffers.push_back(std::move(render_cmb_buf));
+		cmd_buff_handles.clear();
+		std::transform(cmd_buffers.begin(), cmd_buffers.end(), std::back_inserter(cmd_buff_handles),
+					   [](const auto& h) { return h.get(); });
 
 		tmgr_.end_frame();
 		glfw_inst_.poll_events();

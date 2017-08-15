@@ -13,6 +13,7 @@
 #include <mce/asset/asset_manager.hpp>
 #include <mce/glfw/instance.hpp>
 #include <mce/glfw/window.hpp>
+#include <mce/graphics/command_pool.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
@@ -34,6 +35,7 @@ class graphics_test {
 	device dev_;
 	window win_;
 	device_memory_manager mem_mgr_;
+	command_pool render_cmd_pool_;
 	destruction_queue_manager dqm_;
 	transfer_manager tmgr_;
 	graphics_manager gmgr_;
