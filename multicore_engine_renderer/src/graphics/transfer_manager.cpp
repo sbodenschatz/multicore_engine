@@ -28,6 +28,8 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 		if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
 			pending_ownership_command_buffers.push_back(queued_handle<vk::UniqueCommandBuffer>(
 					ownership_cmd_pool.allocate_primary_command_buffer(), &dqm));
+			pending_ownership_command_buffers.back()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+			pending_ownership_command_buffers.back()->end();
 		}
 		fences.push_back(dev->createFenceUnique({vk::FenceCreateFlagBits::eSignaled}));
 	}
