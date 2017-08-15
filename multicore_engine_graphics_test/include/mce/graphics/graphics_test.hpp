@@ -11,6 +11,7 @@
 #include <chrono>
 #include <glm/vec2.hpp>
 #include <mce/asset/asset_manager.hpp>
+#include <mce/containers/dynamic_array.hpp>
 #include <mce/glfw/instance.hpp>
 #include <mce/glfw/window.hpp>
 #include <mce/graphics/command_pool.hpp>
@@ -39,6 +40,10 @@ class graphics_test {
 	destruction_queue_manager dqm_;
 	transfer_manager tmgr_;
 	graphics_manager gmgr_;
+	vk::UniqueSemaphore tmp_semaphore_;
+	containers::dynamic_array<vk::UniqueSemaphore> acquire_semaphores_;
+	containers::dynamic_array<vk::UniqueSemaphore> present_semaphores_;
+	containers::dynamic_array<vk::UniqueFence> fences_;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
 	std::shared_ptr<const framebuffer_config> fbcfg_;
 	std::shared_ptr<const pipeline_layout> pll_;

@@ -15,6 +15,7 @@
 #include <mce/graphics/pipeline_config.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
 #include <mce/graphics/render_pass.hpp>
+#include <mce/util/array_utils.hpp>
 
 namespace mce {
 namespace graphics {
@@ -25,8 +26,18 @@ graphics_test::graphics_test()
 		: glfw_win_("Vulkan Test", glm::ivec2(800, 600)), dev_(inst_), win_(inst_, glfw_win_, dev_),
 		  mem_mgr_(&dev_, 1 << 27), render_cmd_pool_(dev_, dev_.graphics_queue_index().first, true),
 		  dqm_(&dev_, uint32_t(win_.swapchain_images().size())),
-		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())),
-		  gmgr_(dev_, &dqm_), last_frame_t_{std::chrono::high_resolution_clock::now()} {
+		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())), gmgr_(dev_, &dqm_),
+		  tmp_semaphore_(dev_->createSemaphoreUnique({})),
+		  acquire_semaphores_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
+								  return dev_->createSemaphoreUnique({});
+							  })),
+		  present_semaphores_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
+								  return dev_->createSemaphoreUnique({});
+							  })),
+		  fences_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
+					  return dev_->createFenceUnique(vk::FenceCreateInfo(vk::FenceCreateFlagBits::eSignaled));
+				  })),
+		  last_frame_t_{std::chrono::high_resolution_clock::now()} {
 	fbcfg_ = gmgr_.create_framebuffer_config("test_fbcfg", win_, {});
 	pll_ = gmgr_.create_pipeline_layout("test_pll", {}, {});
 	spg_ = gmgr_.create_subpass_graph(
@@ -75,13 +86,23 @@ graphics_test::graphics_test()
 	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_, rp_->native_render_pass());
 }
 
-graphics_test::~graphics_test() {}
+graphics_test::~graphics_test() {
+	containers::dynamic_array<vk::Fence> tmp(
+			fences_.size(), containers::generator_param([this](size_t i) { return fences_[i].get(); }));
+	dev_->waitForFences({uint32_t(tmp.size()), tmp.data()}, true, ~0u);
+}
 
 void graphics_test::run() {
 	static int frame_counter = 0;
 	std::vector<vk::CommandBuffer> cmd_buff_handles;
 	// for(int frame=0;frame<4;++frame){
 	while(!glfw_win_.should_close()) {
+		auto acq_res = dev_->acquireNextImageKHR(win_.swapchain(), ~0ull, tmp_semaphore_.get(), vk::Fence());
+		auto img_index = acq_res.value;
+		dev_->waitForFences(fences_[img_index].get(), true, ~0u);
+		dev_->resetFences(fences_[img_index].get());
+		using std::swap;
+		swap(tmp_semaphore_, acquire_semaphores_[acq_res.value]);
 		auto this_frame_t = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> delta_t = this_frame_t - last_frame_t_;
 		frame_counter++;
@@ -90,9 +111,9 @@ void graphics_test::run() {
 			glfw_win_.title("Vulkan Test " + std::to_string(frame_counter / delta_t.count()) + " fps");
 			frame_counter = 0;
 		}
-		/// TODO Use index from acquire.
-		tmgr_.start_frame();
-		dqm_.advance();
+		std::cout << acq_res.value << "\n";
+		tmgr_.start_frame(acq_res.value);
+		dqm_.cleanup_and_set_current(acq_res.value);
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
@@ -102,7 +123,16 @@ void graphics_test::run() {
 		cmd_buff_handles.clear();
 		std::transform(cmd_buffers.begin(), cmd_buffers.end(), std::back_inserter(cmd_buff_handles),
 					   [](const auto& h) { return h.get(); });
-
+		auto acq_sema = acquire_semaphores_[img_index].get();
+		vk::PipelineStageFlags wait_ps = vk::PipelineStageFlagBits::eTopOfPipe;
+		auto present_sema = present_semaphores_[img_index].get();
+		dev_.graphics_queue().submit(
+				{vk::SubmitInfo(1, &acq_sema, &wait_ps, uint32_t(cmd_buff_handles.size()),
+								cmd_buff_handles.data(), 1, &present_sema)},
+				fences_[img_index].get());
+		auto swapchain_handle = win_.swapchain();
+		dev_.present_queue().presentKHR(
+				vk::PresentInfoKHR(1, &present_sema, 1, &swapchain_handle, &img_index));
 		tmgr_.end_frame();
 		glfw_inst_.poll_events();
 	}
