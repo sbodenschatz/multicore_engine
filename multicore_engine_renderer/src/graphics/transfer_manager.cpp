@@ -28,6 +28,8 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 		if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
 			pending_ownership_command_buffers.push_back(queued_handle<vk::UniqueCommandBuffer>(
 					ownership_cmd_pool.allocate_primary_command_buffer(), &dqm));
+			pending_ownership_command_buffers.back()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+			pending_ownership_command_buffers.back()->end();
 		}
 		fences.push_back(dev->createFenceUnique({vk::FenceCreateFlagBits::eSignaled}));
 	}
@@ -153,7 +155,7 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	transfer_command_bufers[current_ring_index]->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 	transfer_command_bufers[current_ring_index]->pipelineBarrier(
 			vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eHost,
-			vk::PipelineStageFlagBits::eTopOfPipe, {}, {},
+			vk::PipelineStageFlagBits::eAllCommands, {}, {},
 			{vk::BufferMemoryBarrier(vk::AccessFlagBits::eHostWrite, vk::AccessFlagBits::eTransferRead,
 									 VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
 									 staging_buffer.native_buffer(), 0, VK_WHOLE_SIZE)},
