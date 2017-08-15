@@ -103,6 +103,7 @@ void graphics_test::run() {
 		dev_->resetFences(fences_[img_index].get());
 		using std::swap;
 		swap(tmp_semaphore_, acquire_semaphores_[acq_res.value]);
+		glfw_inst_.poll_events();
 		auto this_frame_t = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> delta_t = this_frame_t - last_frame_t_;
 		frame_counter++;
@@ -134,7 +135,6 @@ void graphics_test::run() {
 		dev_.present_queue().presentKHR(
 				vk::PresentInfoKHR(1, &present_sema, 1, &swapchain_handle, &img_index));
 		tmgr_.end_frame();
-		glfw_inst_.poll_events();
 	}
 }
 
