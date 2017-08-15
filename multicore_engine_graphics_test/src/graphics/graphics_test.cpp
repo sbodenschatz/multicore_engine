@@ -48,7 +48,7 @@ graphics_test::graphics_test()
 	rp_ = gmgr_.create_render_pass(
 			"test_rp", spg_, fbcfg_,
 			{render_pass_attachment_access{vk::ImageLayout::eUndefined, vk::ImageLayout::ePresentSrcKHR,
-										   vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eStore,
+										   vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eStore,
 										   vk::AttachmentLoadOp::eDontCare,
 										   vk::AttachmentStoreOp::eDontCare}});
 	auto loader = std::make_shared<asset::load_unit_asset_loader>(std::vector<asset::path_prefix>(
@@ -118,6 +118,14 @@ void graphics_test::run() {
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+		vk::ClearValue clear(vk::ClearColorValue(util::make_array<uint32_t>(0u, 0u, 0u, 0u)));
+		render_cmb_buf->beginRenderPass(
+				vk::RenderPassBeginInfo(
+						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
+						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 1, &clear),
+				vk::SubpassContents::eInline);
+
+		render_cmb_buf->endRenderPass();
 		render_cmb_buf->end();
 		auto cmd_buffers = tmgr_.retrieve_ready_ownership_transfers();
 		cmd_buffers.push_back(std::move(render_cmb_buf));
