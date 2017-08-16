@@ -134,7 +134,7 @@ void graphics_test::run() {
 						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 1, &clear),
 				vk::SubpassContents::eInline);
 		pl_->bind(render_cmb_buf.get());
-		render_cmb_buf->bindVertexBuffers(0, vertex_buffer_.native_buffer(), 0ull);
+		render_cmb_buf->bindVertexBuffers(0, vertex_buffer_.native_buffer(), vk::DeviceSize(0));
 		render_cmb_buf->draw(3, 1, 0, 0);
 		render_cmb_buf->endRenderPass();
 		render_cmb_buf->pipelineBarrier(
