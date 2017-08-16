@@ -127,7 +127,7 @@ void graphics_test::run() {
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-		vk::ClearValue clear(vk::ClearColorValue(util::make_array<uint32_t>(0u, 255u, 0u, 0u)));
+		vk::ClearValue clear(vk::ClearColorValue(util::make_array<float>(0.0f, 1.0f, 0.0f, 1.0f)));
 		render_cmb_buf->beginRenderPass(
 				vk::RenderPassBeginInfo(
 						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
