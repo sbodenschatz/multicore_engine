@@ -13,6 +13,7 @@
  * STL.
  */
 
+#include <algorithm>
 #include <cstddef>
 
 namespace mce {
@@ -94,6 +95,32 @@ It n_unique(It begin, It end, Eq eq, size_t n) {
 		++cur;
 	}
 	return out;
+}
+
+template <typename ItVal, typename ItPref, typename KeyFunc>
+ItVal preference_sort(ItVal val_begin, ItVal val_end, ItPref pref_begin, ItPref pref_end, KeyFunc key) {
+	auto pref = [&pref_begin, &pref_end](const auto& x) { return std::find(pref_begin, pref_end, x); };
+	std::stable_sort(val_begin, val_end,
+					 [&pref_begin, &pref_end, &key, &pref](const auto& v0, const auto& v1) {
+						 return pref(key(v0)) < pref(key(v1));
+					 });
+	return std::find_if(val_begin, val_end,
+						[&key, &pref, &pref_end](const auto& v) { return pref(key(v)) == pref_end; });
+}
+
+template <typename ItVal, typename ItPref>
+ItVal preference_sort(ItVal val_begin, ItVal val_end, ItPref pref_begin, ItPref pref_end) {
+	return preference_sort(val_begin, val_end, pref_begin, pref_end, [](auto v) { return v; });
+}
+
+template <typename ValRange, typename PrefRange, typename KeyFunc>
+auto preference_sort(ValRange& val_range, const PrefRange& pref_range, KeyFunc key) {
+	return preference_sort(val_range.begin(), val_range.end(), pref_range.begin(), pref_range.end(), key);
+}
+
+template <typename ValRange, typename PrefRange>
+auto preference_sort(ValRange& val_range, const PrefRange& pref_range) {
+	return preference_sort(val_range.begin(), val_range.end(), pref_range.begin(), pref_range.end());
 }
 
 } // namespace util
