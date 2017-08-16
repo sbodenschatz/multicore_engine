@@ -21,6 +21,7 @@ buffer::buffer(device& dev, device_memory_manager_interface& mem_mgr,
 			make_device_memory_handle(
 					mem_mgr, mem_mgr.allocate(dev->getBufferMemoryRequirements(*buff_), required_flags)),
 			destruction_manager);
+	dev->bindBufferMemory(buff_.get(), memory_handle_->memory(), memory_handle_->offset());
 }
 
 buffer::~buffer() {}
