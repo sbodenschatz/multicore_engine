@@ -7,9 +7,9 @@
 #ifndef ASSET_ASSET_MANAGER_CPP_
 #define ASSET_ASSET_MANAGER_CPP_
 
-#include <mce/asset/asset_manager.hpp>
-#include <boost/asio/io_service.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
+#include <mce/asset/asset_manager.hpp>
+#include <mce/asset/cleaned_asio_ioservice.hpp>
 
 namespace mce {
 namespace asset {
