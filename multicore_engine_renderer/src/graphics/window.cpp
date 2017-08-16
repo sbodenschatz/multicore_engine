@@ -15,6 +15,7 @@
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/window.hpp>
+#include <mce/util/algorithm.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
@@ -53,13 +54,7 @@ void window::configure_surface_format() {
 	if(surface_formats.size() != 1 || surface_formats[0].format != vk::Format::eUndefined) {
 		std::vector<vk::Format> format_preferences = {// TODO Place other preferred formats here
 													  vk::Format::eB8G8R8A8Unorm};
-		std::stable_sort(surface_formats.begin(), surface_formats.end(),
-						 [&format_preferences](const auto& v0, const auto& v1) {
-							 auto pref = [&format_preferences](auto x) {
-								 return std::find(format_preferences.begin(), format_preferences.end(), x);
-							 };
-							 return pref(v0.format) < pref(v1.format);
-						 });
+		util::preference_sort(surface_formats, format_preferences, [](const auto& v) { return v.format; });
 		color_space_ = surface_formats[0].colorSpace;
 		surface_format_ = surface_formats[0].format;
 	}
