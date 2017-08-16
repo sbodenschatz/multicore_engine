@@ -16,6 +16,7 @@
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/window.hpp>
 #include <mce/util/algorithm.hpp>
+#include <mce/util/array_utils.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
@@ -63,19 +64,14 @@ void window::configure_surface_format() {
 }
 
 void window::select_present_mode() {
-	present_mode_ = vk::PresentModeKHR::eFifo; // Fifo is required to be available by spec.
-	// Check if fifo relaxed mode is available
 	std::vector<vk::PresentModeKHR> present_modes =
 			device_.physical_device().getSurfacePresentModesKHR(surface_.get());
-	if(std::find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eFifoRelaxed) !=
-	   present_modes.end()) {
-		present_mode_ = vk::PresentModeKHR::eFifoRelaxed;
-	}
-	if(std::find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eMailbox) !=
-	   present_modes.end()) {
-		present_mode_ = vk::PresentModeKHR::eMailbox;
-	}
+	assert(!present_modes.empty());
+	auto preference_list = util::make_array(vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eFifoRelaxed,
+											vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eImmediate);
+	util::preference_sort(present_modes, preference_list);
 	for(const auto& pm : present_modes) std::cout << vk::to_string(pm) << std::endl;
+	present_mode_ = present_modes.front();
 }
 
 void window::create_swapchain() {
