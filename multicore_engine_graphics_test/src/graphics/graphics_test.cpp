@@ -80,7 +80,9 @@ graphics_test::graphics_test()
 			{{{0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}}}};
 	pcfg->rasterization_state().lineWidth = 1.0f;
 	pcfg->multisample_state() = vk::PipelineMultisampleStateCreateInfo{};
-	pcfg->color_blend_state() = pipeline_config::color_blend_state_config{{{}}};
+	vk::PipelineColorBlendAttachmentState pcbas;
+	pcbas.colorWriteMask = ~vk::ColorComponentFlags();
+	pcfg->color_blend_state() = pipeline_config::color_blend_state_config{{pcbas}};
 	pcfg->layout(pll_);
 	pcfg->compatible_render_pass(rp_);
 	pcfg->compatible_subpass(0);
