@@ -44,6 +44,7 @@ class graphics_test {
 	containers::dynamic_array<vk::UniqueSemaphore> acquire_semaphores_;
 	containers::dynamic_array<vk::UniqueSemaphore> present_semaphores_;
 	containers::dynamic_array<vk::UniqueFence> fences_;
+	buffer vertex_buffer_;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
 	std::shared_ptr<const framebuffer_config> fbcfg_;
 	std::shared_ptr<const pipeline_layout> pll_;
@@ -51,6 +52,8 @@ class graphics_test {
 	std::shared_ptr<const render_pass> rp_;
 	std::shared_ptr<const shader_module> vert_shader_;
 	std::shared_ptr<const shader_module> frag_shader_;
+	std::shared_ptr<const pipeline_config> plc_;
+	std::shared_ptr<const pipeline> pl_;
 	std::unique_ptr<framebuffer> fb_;
 
 	struct vertex {

@@ -12,6 +12,7 @@
 #include <mce/graphics/framebuffer.hpp>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_test.hpp>
+#include <mce/graphics/pipeline.hpp>
 #include <mce/graphics/pipeline_config.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
 #include <mce/graphics/render_pass.hpp>
@@ -37,6 +38,8 @@ graphics_test::graphics_test()
 		  fences_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
 					  return dev_->createFenceUnique(vk::FenceCreateInfo(vk::FenceCreateFlagBits::eSignaled));
 				  })),
+		  vertex_buffer_(dev_, mem_mgr_, &dqm_, sizeof(vertex) * 3, vk::BufferUsageFlagBits::eVertexBuffer,
+						 vk::MemoryPropertyFlagBits::eHostVisible),
 		  last_frame_t_{std::chrono::high_resolution_clock::now()} {
 	fbcfg_ = gmgr_.create_framebuffer_config("test_fbcfg", win_, {});
 	pll_ = gmgr_.create_pipeline_layout("test_pll", {}, {});
@@ -83,7 +86,12 @@ graphics_test::graphics_test()
 	pcfg->compatible_subpass(0);
 	gmgr_.add_pending_pipeline("test_pl", pcfg);
 	gmgr_.compile_pending_pipelines();
+	plc_ = gmgr_.find_pipeline_config("test_pl");
+	pl_ = gmgr_.find_pipeline("test_pl");
 	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_, rp_->native_render_pass());
+	vertex vertices[] = {{{0.0f, -1.0f}}, {{-1.0f, 1.0f}}, {{1.0f, 1.0f}}};
+	memcpy(vertex_buffer_.mapped_pointer(), vertices, sizeof(vertices));
+	vertex_buffer_.flush_mapped(dev_.native_device());
 }
 
 graphics_test::~graphics_test() {
@@ -117,14 +125,20 @@ void graphics_test::run() {
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-		vk::ClearValue clear(vk::ClearColorValue(util::make_array<uint32_t>(0u, 0u, 0u, 0u)));
+		vk::ClearValue clear(vk::ClearColorValue(util::make_array<uint32_t>(0u, 255u, 0u, 0u)));
 		render_cmb_buf->beginRenderPass(
 				vk::RenderPassBeginInfo(
 						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
 						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 1, &clear),
 				vk::SubpassContents::eInline);
-
+		pl_->bind(render_cmb_buf.get());
+		render_cmb_buf->bindVertexBuffers(0, vertex_buffer_.native_buffer(), 0ull);
+		render_cmb_buf->draw(3, 1, 0, 0);
 		render_cmb_buf->endRenderPass();
+		render_cmb_buf->pipelineBarrier(
+				vk::PipelineStageFlagBits::eAllCommands,
+				vk::PipelineStageFlagBits::eHost | vk::PipelineStageFlagBits::eAllCommands, {},
+				{vk::MemoryBarrier(~vk::AccessFlags(), ~vk::AccessFlags())}, {}, {});
 		render_cmb_buf->end();
 		auto cmd_buffers = tmgr_.retrieve_ready_ownership_transfers();
 		cmd_buffers.push_back(std::move(render_cmb_buf));
