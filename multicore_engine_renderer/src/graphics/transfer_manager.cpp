@@ -136,6 +136,7 @@ void transfer_manager::reallocate_buffer(size_t min_size) {
 	staging_buffer_ends.assign(ring_slots, nullptr);
 }
 void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_lock<std::mutex> lock) {
+	in_frame = true;
 	auto jobs = job_scratch_pad.get();
 	current_ring_index = ring_index;
 	auto nd = dev.native_device();
@@ -167,6 +168,7 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 }
 void transfer_manager::end_frame() {
 	std::unique_lock<std::mutex> lock(manager_mutex);
+	in_frame = false;
 	process_waiting_jobs();
 	staging_buffer.flush_mapped(dev.native_device());
 	staging_buffer_ends[current_ring_index] = chunk_placer.in_position();
