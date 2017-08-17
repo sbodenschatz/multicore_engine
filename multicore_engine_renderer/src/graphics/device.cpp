@@ -233,5 +233,17 @@ boost::optional<vk::Format> device::supported_format(vk::ArrayProxy<const vk::Fo
 	}
 }
 
+vk::Format device::best_supported_depth_attachment_format(vk::FormatFeatureFlags additional_required_flags,
+														  bool linear) {
+	auto fmt = supported_format(
+			{vk::Format::eD32Sfloat, vk::Format::eX8D24UnormPack32, vk::Format::eD16Unorm},
+			vk::FormatFeatureFlagBits::eDepthStencilAttachment | additional_required_flags, linear);
+	if(fmt) {
+		return fmt.get();
+	} else {
+		throw mce::graphics_exception("No supported depth attachment format with the required flags found.");
+	}
+}
+
 } /* namespace graphics */
 } /* namespace mce */
