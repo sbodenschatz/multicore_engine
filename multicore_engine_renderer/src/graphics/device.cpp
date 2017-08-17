@@ -216,5 +216,22 @@ void device::create_device() {
 
 device::~device() {}
 
+boost::optional<vk::Format> device::supported_format(vk::ArrayProxy<const vk::Format> candidates,
+													 vk::FormatFeatureFlags required_flags,
+													 bool linear) const {
+	auto member = linear ? &vk::FormatProperties::linearTilingFeatures
+						 : &vk::FormatProperties::optimalTilingFeatures;
+	auto it = std::find_if(candidates.begin(), candidates.end(),
+						   [this, member, required_flags](vk::Format fmt) {
+							   const auto& flags = physical_device_.getFormatProperties(fmt).*member;
+							   return bool(flags) && ((flags & required_flags) == flags);
+						   });
+	if(it != candidates.end()) {
+		return *it;
+	} else {
+		return {};
+	}
+}
+
 } /* namespace graphics */
 } /* namespace mce */

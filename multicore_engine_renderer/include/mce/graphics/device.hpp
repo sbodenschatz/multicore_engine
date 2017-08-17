@@ -61,8 +61,8 @@ public:
 	/// Releases the resources associated with the device object.
 	~device();
 
-	boost::optional<vk::Format> supported_format(vk::FormatFeatureFlags required_flags,
-												 vk::ArrayProxy<const vk::Format> candidates,
+	boost::optional<vk::Format> supported_format(vk::ArrayProxy<const vk::Format> candidates,
+												 vk::FormatFeatureFlags required_flags = {},
 												 bool linear = false) const;
 
 	boost::optional<vk::Format>
