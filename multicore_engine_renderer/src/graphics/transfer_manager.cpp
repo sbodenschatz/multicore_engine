@@ -178,7 +178,7 @@ void transfer_manager::end_frame() {
 	si.commandBufferCount = 1;
 	si.pCommandBuffers = &*transfer_command_bufers[current_ring_index];
 	dev->resetFences({fences[current_ring_index].get()});
-	dev.transfer_queue().submit({}, *fences[current_ring_index]);
+	dev.transfer_queue().submit(si, *fences[current_ring_index]);
 }
 void transfer_manager::process_waiting_jobs() {
 	struct size_visitor : boost::static_visitor<size_t> {
