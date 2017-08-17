@@ -13,6 +13,7 @@
  */
 
 #include <boost/container/flat_set.hpp>
+#include <boost/optional.hpp>
 #include <glm/glm.hpp>
 #include <mce/graphics/graphics_defs.hpp>
 #include <mce/graphics/instance.hpp>
