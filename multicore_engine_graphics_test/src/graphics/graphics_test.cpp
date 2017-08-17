@@ -74,7 +74,9 @@ graphics_test::graphics_test()
 	auto pcfg = std::make_shared<pipeline_config>();
 	pcfg->shader_stages() = {{vk::ShaderStageFlagBits::eVertex, vert_shader_, "main"},
 							 {vk::ShaderStageFlagBits::eFragment, frag_shader_, "main"}};
-	pcfg->input_state() = {{{0, sizeof(vertex)}}, {{0, 0, vk::Format::eR32G32Sfloat, offsetof(vertex, pos)}}};
+	pcfg->input_state() = {{{0, sizeof(vertex)}},
+						   {{0, 0, vk::Format::eR32G32B32Sfloat, offsetof(vertex, pos)},
+							{1, 0, vk::Format::eR32G32B32Sfloat, offsetof(vertex, color)}}};
 	pcfg->assembly_state() = {{}, vk::PrimitiveTopology::eTriangleList};
 	pcfg->viewport_state() = pipeline_config::viewport_state_config{
 			{{0.0, 0.0, float(win_.swapchain_size().x), float(win_.swapchain_size().y), 0.0f, 1.0f}},
@@ -92,7 +94,9 @@ graphics_test::graphics_test()
 	plc_ = gmgr_.find_pipeline_config("test_pl");
 	pl_ = gmgr_.find_pipeline("test_pl");
 	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_, rp_->native_render_pass());
-	vertex vertices[] = {{{0.0f, -1.0f}}, {{-1.0f, 1.0f}}, {{1.0f, 1.0f}}};
+	vertex vertices[] = {{{0.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+						 {{-1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+						 {{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}};
 	tmgr_.upload_buffer(vertices, sizeof(vertices), vertex_buffer_.native_buffer(), 0,
 						[this](vk::Buffer) { //
 							vb_ready_ = true;
@@ -130,7 +134,8 @@ void graphics_test::run() {
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-		vk::ClearValue clear(vk::ClearColorValue(util::make_array<float>(0.0f, 1.0f, 0.0f, 1.0f)));
+		vk::ClearValue clear(
+				vk::ClearColorValue(util::make_array<float>(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f)));
 		render_cmb_buf->beginRenderPass(
 				vk::RenderPassBeginInfo(
 						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),

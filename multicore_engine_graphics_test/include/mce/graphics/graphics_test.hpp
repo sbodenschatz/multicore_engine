@@ -58,7 +58,8 @@ class graphics_test {
 	std::unique_ptr<framebuffer> fb_;
 
 	struct vertex {
-		glm::vec2 pos;
+		glm::vec3 pos;
+		glm::vec3 color;
 	};
 
 public:
