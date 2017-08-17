@@ -15,7 +15,8 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 		: dev{dev}, mm{mm}, transfer_cmd_pool{dev, dev.transfer_queue_index().first, true, true},
 		  ownership_cmd_pool{dev, dev.graphics_queue_index().first, true, true}, dqm{&dev, ring_slots},
 		  ring_slots{ring_slots}, running_jobs{ring_slots},
-		  staging_buffer{dev, mm, &dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc},
+		  staging_buffer(dev, mm, &dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc,
+						 vk::MemoryPropertyFlagBits::eHostVisible),
 		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()}, staging_buffer_ends{
 																						ring_slots, nullptr} {
 	transfer_command_bufers.reserve(ring_slots);
@@ -128,7 +129,7 @@ void transfer_manager::start_frame(uint32_t ring_index) {
 void transfer_manager::reallocate_buffer(size_t min_size) {
 	staging_buffer.flush_mapped(dev.native_device());
 	buffer new_buffer(dev, mm, &dqm, std::max(min_size * 4, staging_buffer.size()),
-					  vk::BufferUsageFlagBits::eTransferSrc);
+					  vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible);
 	util::ring_chunk_placer new_chunk_placer(new_buffer.mapped_pointer(), new_buffer.size());
 	using std::swap;
 	swap(staging_buffer, new_buffer);
