@@ -17,7 +17,9 @@ namespace mce {
 namespace graphics {
 
 render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
+						 // cppcheck-suppress passedByValue
 						 std::shared_ptr<const subpass_graph> subpasses,
+						 // cppcheck-suppress passedByValue
 						 std::shared_ptr<const framebuffer_config> fb_config,
 						 vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes)
 		: device_(device_), subpasses_{std::move(subpasses)}, fb_config_{std::move(fb_config)} {

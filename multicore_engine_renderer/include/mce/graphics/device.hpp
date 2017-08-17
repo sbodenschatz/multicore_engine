@@ -57,7 +57,7 @@ private:
 
 public:
 	/// Creates a device object from the given instance.
-	device(instance& app_inst);
+	explicit device(instance& app_inst);
 	/// Releases the resources associated with the device object.
 	~device();
 

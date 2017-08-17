@@ -70,7 +70,8 @@ class framebuffer_config {
 
 public:
 	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
-	framebuffer_config(std::vector<framebuffer_attachment_config> attachment_configs)
+	// cppcheck-suppress passedByValue
+	explicit framebuffer_config(std::vector<framebuffer_attachment_config> attachment_configs)
 			: attachment_configs_{std::move(attachment_configs)} {}
 
 	/// Allows access to the framebuffer_attachment_config entries.
