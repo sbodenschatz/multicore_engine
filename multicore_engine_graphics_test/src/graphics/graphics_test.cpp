@@ -38,7 +38,7 @@ graphics_test::graphics_test()
 		  fences_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
 					  return dev_->createFenceUnique(vk::FenceCreateInfo(vk::FenceCreateFlagBits::eSignaled));
 				  })),
-		  vertex_buffer_(dev_, mem_mgr_, &dqm_, sizeof(vertex) * 3,
+		  vertex_buffer_(dev_, mem_mgr_, &dqm_, sizeof(vertex) * 6,
 						 vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
 						 vk::MemoryPropertyFlagBits::eDeviceLocal),
 		  last_frame_t_{std::chrono::high_resolution_clock::now()} {
@@ -94,9 +94,11 @@ graphics_test::graphics_test()
 	plc_ = gmgr_.find_pipeline_config("test_pl");
 	pl_ = gmgr_.find_pipeline("test_pl");
 	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_, rp_->native_render_pass());
-	vertex vertices[] = {{{0.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-						 {{-1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-						 {{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}};
+	vertex vertices[] = {{{0.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, {{-1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+						 {{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+
+						 {{0.0f, 1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}},  {{1.0f, -1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}},
+						 {{-1.0f, -1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}}};
 	tmgr_.upload_buffer(vertices, sizeof(vertices), vertex_buffer_.native_buffer(), 0,
 						[this](vk::Buffer) { //
 							vb_ready_ = true;
@@ -144,7 +146,7 @@ void graphics_test::run() {
 		if(vb_ready_) {
 			pl_->bind(render_cmb_buf.get());
 			render_cmb_buf->bindVertexBuffers(0, vertex_buffer_.native_buffer(), vk::DeviceSize(0));
-			render_cmb_buf->draw(3, 1, 0, 0);
+			render_cmb_buf->draw(6, 1, 0, 0);
 		}
 		render_cmb_buf->endRenderPass();
 		render_cmb_buf->pipelineBarrier(
