@@ -56,33 +56,36 @@ private:
 	void create_device();
 
 public:
+	enum class format_support_query_type { linear_tiling_image, optimal_tiling_image, buffer };
+
 	/// Creates a device object from the given instance.
 	explicit device(instance& app_inst);
 	/// Releases the resources associated with the device object.
 	~device();
 
-	boost::optional<vk::Format> supported_format(vk::ArrayProxy<const vk::Format> candidates,
-												 vk::FormatFeatureFlags required_flags = {},
-												 bool linear = false) const;
+	boost::optional<vk::Format> supported_format(
+			vk::ArrayProxy<const vk::Format> candidates, vk::FormatFeatureFlags required_flags = {},
+			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image) const;
 
-	vk::Format best_supported_depth_attachment_format(vk::FormatFeatureFlags additional_required_flags = {},
-													  bool linear = false);
+	vk::Format best_supported_depth_attachment_format(
+			vk::FormatFeatureFlags additional_required_flags = {},
+			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
 
-	vk::Format
-	best_supported_depth_stencil_attachment_format(vk::FormatFeatureFlags additional_required_flags = {},
-												   bool linear = false);
+	vk::Format best_supported_depth_stencil_attachment_format(
+			vk::FormatFeatureFlags additional_required_flags = {},
+			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
 
-	vk::Format best_unsigned_color_attachment_format(int components,
-													 vk::FormatFeatureFlags additional_required_flags = {},
-													 bool linear = false);
+	vk::Format best_unsigned_color_attachment_format(
+			int components, vk::FormatFeatureFlags additional_required_flags = {},
+			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
 
-	vk::Format best_signed_color_attachment_format(int components,
-												   vk::FormatFeatureFlags additional_required_flags = {},
-												   bool linear = false);
+	vk::Format best_signed_color_attachment_format(
+			int components, vk::FormatFeatureFlags additional_required_flags = {},
+			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
 
-	vk::Format best_float_color_attachment_format(int components,
-												  vk::FormatFeatureFlags additional_required_flags = {},
-												  bool linear = false);
+	vk::Format best_float_color_attachment_format(
+			int components, vk::FormatFeatureFlags additional_required_flags = {},
+			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
 
 	/// Allows calling native device member function using the operator -> on the wrapper device.
 	const vk::Device* operator->() const {

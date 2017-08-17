@@ -218,9 +218,12 @@ device::~device() {}
 
 boost::optional<vk::Format> device::supported_format(vk::ArrayProxy<const vk::Format> candidates,
 													 vk::FormatFeatureFlags required_flags,
-													 bool linear) const {
-	auto member = linear ? &vk::FormatProperties::linearTilingFeatures
-						 : &vk::FormatProperties::optimalTilingFeatures;
+													 format_support_query_type query_type) const {
+	auto member = (query_type == format_support_query_type::optimal_tiling_image)
+						  ? &vk::FormatProperties::optimalTilingFeatures
+						  : ((query_type == format_support_query_type::linear_tiling_image)
+									 ? &vk::FormatProperties::linearTilingFeatures
+									 : &vk::FormatProperties::bufferFeatures);
 	auto it = std::find_if(candidates.begin(), candidates.end(),
 						   [this, member, required_flags](vk::Format fmt) {
 							   const auto& flags = physical_device_.getFormatProperties(fmt).*member;
@@ -234,10 +237,10 @@ boost::optional<vk::Format> device::supported_format(vk::ArrayProxy<const vk::Fo
 }
 
 vk::Format device::best_supported_depth_attachment_format(vk::FormatFeatureFlags additional_required_flags,
-														  bool linear) {
+														  format_support_query_type query_type) {
 	auto fmt = supported_format(
 			{vk::Format::eD32Sfloat, vk::Format::eX8D24UnormPack32, vk::Format::eD16Unorm},
-			vk::FormatFeatureFlagBits::eDepthStencilAttachment | additional_required_flags, linear);
+			vk::FormatFeatureFlagBits::eDepthStencilAttachment | additional_required_flags, query_type);
 	if(fmt) {
 		return fmt.get();
 	} else {
