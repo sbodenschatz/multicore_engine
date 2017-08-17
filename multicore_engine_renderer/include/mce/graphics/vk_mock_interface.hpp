@@ -38,9 +38,11 @@ class device_memory_wrapper {
 
 public:
 	/// Creates a wrapper containing a vk::UniqueDeviceMemory.
-	explicit device_memory_wrapper(vk::UniqueDeviceMemory&& m) : handle_(std::move(m)){};
+	// cppcheck-suppress noExplicitConstructor
+	device_memory_wrapper(vk::UniqueDeviceMemory&& m) : handle_(std::move(m)){};
 	/// Creates a wrapper containing a fake_unique_device_memory.
-	explicit device_memory_wrapper(fake_unique_device_memory&& m) : handle_(std::move(m)){};
+	// cppcheck-suppress noExplicitConstructor
+	device_memory_wrapper(fake_unique_device_memory&& m) : handle_(std::move(m)){};
 
 	/// Allows move-construction, transforming exceptions to empty values.
 	device_memory_wrapper(device_memory_wrapper&& other) noexcept {
