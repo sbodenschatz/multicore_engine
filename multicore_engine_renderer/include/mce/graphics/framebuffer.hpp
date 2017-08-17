@@ -80,7 +80,7 @@ private:
 		framebuffer* fb;
 
 	public:
-		imgview_visitor(framebuffer* fb) : fb{fb} {}
+		explicit imgview_visitor(framebuffer* fb) : fb{fb} {}
 		void operator()(image_2d& img) const {
 			fb->attachment_views_.emplace_back(img.create_view());
 		}

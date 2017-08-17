@@ -28,7 +28,7 @@ namespace graphics {
 const std::pair<uint32_t, uint32_t> device::no_queue_index{~0u, ~0u};
 const uint32_t device::no_queue_family_index{~0u};
 
-device::device(instance& app_inst) : instance_(app_inst) {
+explicit device::device(instance& app_inst) : instance_(app_inst) {
 	find_physical_device();
 	find_queue_indexes();
 	create_device();

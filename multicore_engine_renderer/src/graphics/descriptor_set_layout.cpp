@@ -15,6 +15,7 @@ namespace mce {
 namespace graphics {
 
 descriptor_set_layout::descriptor_set_layout(const device& dev, destruction_queue_manager* dqm,
+											 // cppcheck-suppress passedByValue
 											 std::vector<descriptor_set_layout_binding_element> bindings)
 		: bindings_{std::move(bindings)} {
 	if(!std::all_of(bindings_.begin(), bindings_.end(), [](const descriptor_set_layout_binding_element& b) {

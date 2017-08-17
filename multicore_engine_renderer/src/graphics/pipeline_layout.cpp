@@ -16,7 +16,9 @@ namespace graphics {
 
 pipeline_layout::pipeline_layout(
 		const device& dev, destruction_queue_manager* dqm,
+		// cppcheck-suppress passedByValue
 		std::vector<std::shared_ptr<const descriptor_set_layout>> descriptor_set_layouts,
+		// cppcheck-suppress passedByValue
 		std::vector<vk::PushConstantRange> push_constant_ranges)
 		: push_constant_ranges_{std::move(push_constant_ranges)}, descriptor_set_layouts_{
 																		  std::move(descriptor_set_layouts)} {
