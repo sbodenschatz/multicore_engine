@@ -45,6 +45,7 @@ class graphics_test {
 	containers::dynamic_array<vk::UniqueSemaphore> present_semaphores_;
 	containers::dynamic_array<vk::UniqueFence> fences_;
 	buffer vertex_buffer_;
+	bool vb_ready_ = false;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
 	std::shared_ptr<const framebuffer_config> fbcfg_;
 	std::shared_ptr<const pipeline_layout> pll_;
