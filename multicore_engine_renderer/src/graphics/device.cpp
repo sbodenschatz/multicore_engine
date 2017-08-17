@@ -10,12 +10,17 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/util/unused.hpp>
 #include <vector>
+
+#if !defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
+#error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
+#endif
 
 namespace mce {
 namespace graphics {
@@ -74,8 +79,7 @@ void device::find_physical_device() {
 	for(const auto& phy_dev : phy_devs) {
 		uint32_t queue_family_count = uint32_t(phy_dev.getQueueFamilyProperties().size());
 		for(uint32_t queue_family = 0; queue_family < queue_family_count; ++queue_family) {
-			if(glfwGetPhysicalDevicePresentationSupport(instance_.native_instance(), phy_dev,
-														queue_family)) {
+			if(glfwGetPhysicalDevicePresentationSupport(instance_.native_instance(), phy_dev, queue_family)) {
 				if(!physical_device_) {
 					// We have no useable device so far, accept any device that can present
 					physical_device_ = phy_dev;

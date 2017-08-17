@@ -13,6 +13,7 @@
 #include <iostream>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/window.hpp>
 #include <mce/util/algorithm.hpp>

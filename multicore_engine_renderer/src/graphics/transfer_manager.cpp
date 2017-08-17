@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <boost/container/small_vector.hpp>
 #include <cassert>
 #include <mce/graphics/transfer_manager.hpp>
 #include <utility>
