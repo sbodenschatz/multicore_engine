@@ -30,9 +30,11 @@
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4005)
 #endif
-#include <boost/asio/io_service.hpp>
+
 #include <boost/container/flat_map.hpp>
 #include <boost/thread/future.hpp>
+#include <mce/asset/cleaned_asio_ioservice.hpp>
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

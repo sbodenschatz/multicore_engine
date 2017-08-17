@@ -165,6 +165,7 @@ private:
 	size_t immediate_allocation_slack = 128;
 	std::vector<vk::UniqueFence> fences;
 	containers::scratch_pad_pool<std::vector<transfer_job>> job_scratch_pad;
+	bool in_frame = false;
 	mutable std::mutex manager_mutex;
 
 	template <typename S, typename F>
@@ -192,6 +193,7 @@ private:
 	template <typename F>
 	bool try_immediate_alloc_buffer(const void* data, size_t data_size, vk::Buffer dst_buffer,
 									vk::DeviceSize dst_offset, F&& callback) {
+		if(!in_frame) return false;
 		if(data_size > chunk_placer.buffer_space_size()) {
 			reallocate_buffer(data_size);
 		}
@@ -210,6 +212,7 @@ private:
 	bool try_immediate_alloc_image(const void* data, size_t data_size, base_image& dst_img,
 								   vk::ImageLayout final_layout,
 								   vk::ArrayProxy<const vk::BufferImageCopy> regions, F&& callback) {
+		if(!in_frame) return false;
 		if(data_size > chunk_placer.buffer_space_size()) {
 			reallocate_buffer(data_size);
 		}

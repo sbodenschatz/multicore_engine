@@ -46,7 +46,9 @@ public:
 		}
 
 	public:
+		/// Creates an empty shader_stage_config.
 		shader_stage_config() : stage_{vk::ShaderStageFlagBits::eVertex} {}
+		/// Creates a shader_stage_config from the given parameters.
 		shader_stage_config(vk::ShaderStageFlagBits stage, std::shared_ptr<const shader_module> module,
 							std::string entry_point_name, std::vector<char> specialization_data = {},
 							std::vector<vk::SpecializationMapEntry> specialization_map = {})
@@ -126,7 +128,9 @@ public:
 		std::vector<vk::VertexInputAttributeDescription> attributes_;
 
 	public:
+		/// Creates an empty vertex_input_state.
 		vertex_input_state_config() {}
+		/// Creates a vertex_input_state from the given vertex input bindings and vertex input attributes.
 		vertex_input_state_config(std::vector<vk::VertexInputBindingDescription> bindings,
 								  std::vector<vk::VertexInputAttributeDescription> attributes)
 				: bindings_{std::move(bindings)}, attributes_{std::move(attributes)} {}
@@ -172,7 +176,9 @@ public:
 		std::vector<vk::Rect2D> scissors_;
 
 	public:
+		/// Creates an empty viewport_state_config.
 		viewport_state_config() {}
+		/// Creates a viewport_state_config from the given viewports and scissors.
 		viewport_state_config(std::vector<vk::Viewport> viewports, std::vector<vk::Rect2D> scissors)
 				: viewports_{std::move(viewports)}, scissors_{std::move(scissors)} {}
 
@@ -218,10 +224,12 @@ public:
 		std::array<float, 4> blend_constants_;
 
 	public:
+		/// Creates a color_blend_state_config from the given blending settings.
 		color_blend_state_config(std::vector<vk::PipelineColorBlendAttachmentState> attachments,
 								 std::array<float, 4> blend_constants = {{0.0f, 0.0f, 0.0f, 0.0f}})
 				: attachments_{std::move(attachments)}, blend_constants_{blend_constants} {}
 
+		/// Creates a color_blend_state_config from the given logic operation and blending settings.
 		color_blend_state_config(vk::LogicOp logic_op,
 								 std::vector<vk::PipelineColorBlendAttachmentState> attachments,
 								 std::array<float, 4> blend_constants = {{0.0f, 0.0f, 0.0f, 0.0f}})

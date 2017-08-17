@@ -12,9 +12,9 @@
  * Defines the interface for asset loaders.
  */
 
-#include <boost/asio/io_service.hpp>
 #include <exception>
 #include <mce/asset/asset_defs.hpp>
+#include <mce/asset/cleaned_asio_ioservice.hpp>
 #include <memory>
 #include <string>
 

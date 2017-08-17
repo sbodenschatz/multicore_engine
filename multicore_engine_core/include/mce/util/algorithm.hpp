@@ -13,6 +13,7 @@
  * STL.
  */
 
+#include <algorithm>
 #include <cstddef>
 
 namespace mce {
@@ -94,6 +95,71 @@ It n_unique(It begin, It end, Eq eq, size_t n) {
 		++cur;
 	}
 	return out;
+}
+
+/// \brief Stable-sorts the elements in [val_begin,val_end) in the order their keys (obtained by the given key
+/// function object) appear in [pref_begin,pref_end).
+/**
+ * The key function object must be callable with a const reference to the element type of [val_begin,val_end)
+ * and return a value of a type that can be searched for in [pref_begin,pref_end) using std::find.
+ *
+ * Elements from [val_begin,val_end) with keys that don't appear in [pref_begin,pref_end) are sorted to the
+ * end in stable order.
+ * The function returns an iterator to the first such element or val_end if all element keys were found in
+ * [pref_begin,pref_end).
+ */
+template <typename ItVal, typename ItPref, typename KeyFunc>
+ItVal preference_sort(ItVal val_begin, ItVal val_end, ItPref pref_begin, ItPref pref_end, KeyFunc key) {
+	auto pref = [&pref_begin, &pref_end](const auto& x) { return std::find(pref_begin, pref_end, x); };
+	std::stable_sort(val_begin, val_end,
+					 [&pref_begin, &pref_end, &key, &pref](const auto& v0, const auto& v1) {
+						 return pref(key(v0)) < pref(key(v1));
+					 });
+	return std::find_if(val_begin, val_end,
+						[&key, &pref, &pref_end](const auto& v) { return pref(key(v)) == pref_end; });
+}
+
+/// Stable-sorts the elements in [val_begin,val_end) in the order they appear in [pref_begin,pref_end).
+/**
+ * The element type of [val_begin,val_end) must be a type that can be searched for in [pref_begin,pref_end)
+ * using std::find.
+ *
+ * Elements from [val_begin,val_end) that don't appear in [pref_begin,pref_end) are sorted to the end in
+ * stable order.
+ * The function returns an iterator to the first such element or val_end if all elements were found in
+ * [pref_begin,pref_end).
+ */
+template <typename ItVal, typename ItPref>
+ItVal preference_sort(ItVal val_begin, ItVal val_end, ItPref pref_begin, ItPref pref_end) {
+	return preference_sort(val_begin, val_end, pref_begin, pref_end, [](auto v) { return v; });
+}
+
+/// \brief Stable-sorts the elements in range val_range in the order their keys (obtained by the given key
+/// function object) appear in the range pref_range.
+/**
+ * The key function object must be callable with a const reference to the element type of val_range and return
+ * a value of a type that can be searched for in pref_range using std::find.
+ *
+ * Elements from val_range with keys that don't appear in pref_range are sorted to the end in stable order.
+ * The function returns an iterator to the first such element or val_range.end() if all element keys were
+ * found in pref_range.
+ */
+template <typename ValRange, typename PrefRange, typename KeyFunc>
+auto preference_sort(ValRange& val_range, const PrefRange& pref_range, KeyFunc key) {
+	return preference_sort(val_range.begin(), val_range.end(), pref_range.begin(), pref_range.end(), key);
+}
+
+/// Stable-sorts the elements in range val_range in the order they appear in the range pref_range.
+/**
+ * The element type of val_range must be a type that can be searched for in pref_range using std::find.
+ *
+ * Elements from val_range that don't appear in pref_range are sorted to the end in stable order.
+ * The function returns an iterator to the first such element or val_range.end() if all elements were found in
+ * pref_range.
+ */
+template <typename ValRange, typename PrefRange>
+auto preference_sort(ValRange& val_range, const PrefRange& pref_range) {
+	return preference_sort(val_range.begin(), val_range.end(), pref_range.begin(), pref_range.end());
 }
 
 } // namespace util
