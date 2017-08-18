@@ -33,9 +33,19 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 														   vk::ImageUsageFlagBits::eSampled));
 				break;
 			case image_aspect_mode::depth:
+				attachments_.emplace_back(image_2d_depth(
+						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
+						vk::ImageUsageFlagBits::eDepthStencilAttachment |
+								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));
+				break;
 			case image_aspect_mode::depth_stencil:
-			case image_aspect_mode::stencil:
 				attachments_.emplace_back(image_2d_ds(
+						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
+						vk::ImageUsageFlagBits::eDepthStencilAttachment |
+								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));
+				break;
+			case image_aspect_mode::stencil:
+				attachments_.emplace_back(image_2d_stencil(
 						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
 						vk::ImageUsageFlagBits::eDepthStencilAttachment |
 								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));
@@ -60,20 +70,22 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 		for(uint32_t index = 0; index < win.swapchain_image_views().size(); ++index) {
 			views[sci_pos] = win.swapchain_image_views()[index].get();
 			frames_.push_back(
-					framebuffer_frame(index, queued_handle<vk::UniqueFramebuffer>(
-													 dev->createFramebufferUnique(vk::FramebufferCreateInfo(
-															 {}, compatible_pass, uint32_t(views.size()),
-															 views.data(), size_.x, size_.y, 1u)),
-													 destruction_manager),
+					framebuffer_frame(index,
+									  queued_handle<vk::UniqueFramebuffer>(
+											  dev->createFramebufferUnique(vk::FramebufferCreateInfo(
+													  {}, compatible_pass, uint32_t(views.size()),
+													  views.data(), size_.x, size_.y, 1u)),
+											  destruction_manager),
 									  *this));
 		}
 	} else {
-		frames_.push_back(framebuffer_frame(0, queued_handle<vk::UniqueFramebuffer>(
-													   dev->createFramebufferUnique(vk::FramebufferCreateInfo(
-															   {}, compatible_pass, uint32_t(views.size()),
-															   views.data(), size_.x, size_.y, 1u)),
-													   destruction_manager),
-											*this));
+		frames_.push_back(framebuffer_frame(
+				0,
+				queued_handle<vk::UniqueFramebuffer>(dev->createFramebufferUnique(vk::FramebufferCreateInfo(
+															 {}, compatible_pass, uint32_t(views.size()),
+															 views.data(), size_.x, size_.y, 1u)),
+													 destruction_manager),
+				*this));
 	}
 }
 

@@ -87,6 +87,12 @@ private:
 		void operator()(image_2d_ds& img) const {
 			fb->attachment_views_.emplace_back(img.create_view());
 		}
+		void operator()(image_2d_depth& img) const {
+			fb->attachment_views_.emplace_back(img.create_view());
+		}
+		void operator()(image_2d_stencil& img) const {
+			fb->attachment_views_.emplace_back(img.create_view());
+		}
 		template <typename T>
 		void operator()(T&) const {
 			assert(false && "Imageviews in the framebuffer should only be 2d non-layered currently.");
