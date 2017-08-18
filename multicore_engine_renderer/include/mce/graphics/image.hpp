@@ -661,10 +661,19 @@ using image_cube_layered = image<image_dimension::dim_cube, true, image_aspect_m
 using image_2d_ds = image<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
 /// Type alias for 2d layered depth and stencil images.
 using image_2d_ds_layered = image<image_dimension::dim_2d, true, image_aspect_mode::depth_stencil>;
+/// Type alias for 2d unlayered depth images.
+using image_2d_depth = image<image_dimension::dim_2d, false, image_aspect_mode::depth>;
+/// Type alias for 2d layered depth images.
+using image_2d_depth_layered = image<image_dimension::dim_2d, true, image_aspect_mode::depth>;
+/// Type alias for 2d unlayered stencil images.
+using image_2d_stencil = image<image_dimension::dim_2d, false, image_aspect_mode::stencil>;
+/// Type alias for 2d layered stencil images.
+using image_2d_stencil_layered = image<image_dimension::dim_2d, true, image_aspect_mode::stencil>;
 
 /// Type alias for a variant that can contain any of the common image types.
 using image_var =
 		boost::variant<vk::Image, image_1d, image_1d_layered, image_2d, image_2d_ds, image_2d_ds_layered,
+					   image_2d_depth, image_2d_stencil, image_2d_stencil_layered, image_2d_depth_layered,
 					   image_2d_layered, image_3d, image_cube, image_cube_layered>;
 
 /// Type alias for 1d unlayered image views on color images.
@@ -685,11 +694,21 @@ using image_view_cube_layered = image_view<image_dimension::dim_cube, true, imag
 using image_view_2d_ds = image_view<image_dimension::dim_2d, false, image_aspect_mode::depth_stencil>;
 /// Type alias for 2d layered image views on depth stencil images.
 using image_view_2d_ds_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::depth_stencil>;
+/// Type alias for 2d unlayered image views on depth images.
+using image_view_2d_depth = image_view<image_dimension::dim_2d, false, image_aspect_mode::depth>;
+/// Type alias for 2d layered image views on depth images.
+using image_view_2d_depth_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::depth>;
+/// Type alias for 2d unlayered image views on stencil images.
+using image_view_2d_stencil = image_view<image_dimension::dim_2d, false, image_aspect_mode::stencil>;
+/// Type alias for 2d layered image views on stencil images.
+using image_view_2d_stencil_layered = image_view<image_dimension::dim_2d, true, image_aspect_mode::stencil>;
 
 /// Type alias for a variant that can contain any of the common image view types.
-using image_view_var = boost::variant<vk::ImageView, image_view_1d, image_view_1d_layered, image_view_2d,
-									  image_view_2d_ds, image_view_2d_ds_layered, image_view_2d_layered,
-									  image_view_3d, image_view_cube, image_view_cube_layered>;
+using image_view_var =
+		boost::variant<vk::ImageView, image_view_1d, image_view_1d_layered, image_view_2d, image_view_2d_ds,
+					   image_view_2d_ds_layered, image_view_2d_depth, image_view_2d_depth_layered,
+					   image_view_2d_stencil, image_view_2d_stencil_layered, image_view_2d_layered,
+					   image_view_3d, image_view_cube, image_view_cube_layered>;
 
 } // namespace graphics
 } // namespace mce
