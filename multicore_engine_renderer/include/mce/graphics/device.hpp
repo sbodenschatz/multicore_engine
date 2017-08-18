@@ -56,7 +56,15 @@ private:
 	void create_device();
 
 public:
-	enum class format_support_query_type { linear_tiling_image, optimal_tiling_image, buffer };
+	/// Defines the type of use for a format is checked in a supported format query
+	enum class format_support_query_type {
+		/// Query support of the format for linearly tiled images.
+		linear_tiling_image,
+		/// Query support of the format for optimally tiled images.
+		optimal_tiling_image,
+		/// Query support of the format for buffers.
+		buffer
+	};
 
 	/// Creates a device object from the given instance.
 	explicit device(instance& app_inst);
