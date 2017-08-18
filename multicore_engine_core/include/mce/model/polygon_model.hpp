@@ -33,7 +33,7 @@ class model_data_manager;
 class polygon_model : public std::enable_shared_from_this<polygon_model> {
 public:
 	/// Represents the status of polygon_model.
-	enum class state { loading, staging, ready, error };
+	enum class state { loading, ready, error };
 
 private:
 	std::atomic<state> current_state_;
@@ -44,8 +44,7 @@ private:
 	static_model_meta_data meta_data_;
 	std::shared_ptr<const char> content_data_;
 
-	void complete_loading(const asset::asset_ptr& polygon_asset, model_data_manager& mm) noexcept;
-	void complete_staging(model_data_manager& mm) noexcept;
+	void complete_loading(const asset::asset_ptr& polygon_asset) noexcept;
 
 	void raise_error_flag(std::exception_ptr e) noexcept {
 		current_state_ = state::error;
