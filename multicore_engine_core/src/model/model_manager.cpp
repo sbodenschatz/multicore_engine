@@ -4,12 +4,12 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
+#include <boost/container/vector.hpp>
+#include <exception>
 #include <mce/asset/asset.hpp>
 #include <mce/asset/asset_defs.hpp>
 #include <mce/asset/asset_manager.hpp>
-#include <boost/container/vector.hpp>
 #include <mce/model/model_manager.hpp>
-#include <exception>
 #include <memory>
 #include <mutex>
 #include <string>

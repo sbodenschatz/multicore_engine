@@ -5,8 +5,8 @@
  */
 
 #include <algorithm>
-#include <mce/asset/asset_manager.hpp>
 #include <chrono>
+#include <mce/asset/asset_manager.hpp>
 #include <mce/core/core_defs.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/core/game_state_machine.hpp>

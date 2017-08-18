@@ -4,9 +4,9 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <mce/glfw/joystick.hpp>
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <mce/glfw/joystick.hpp>
 
 namespace mce {
 namespace glfw {

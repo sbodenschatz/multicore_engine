@@ -4,13 +4,13 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <exception>
 #include <mce/bstream/asset_ibstream.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/model/model_manager.hpp>
 #include <mce/model/polygon_model.hpp>
 #include <mce/util/local_function.hpp>
-#include <algorithm>
-#include <exception>
 #include <string>
 
 namespace mce {

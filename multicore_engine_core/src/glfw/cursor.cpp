@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <mce/glfw/cursor.hpp>
 #include <GLFW/glfw3.h>
+#include <mce/glfw/cursor.hpp>
 
 namespace mce {
 namespace glfw {

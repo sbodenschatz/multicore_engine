@@ -70,22 +70,20 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 		for(uint32_t index = 0; index < win.swapchain_image_views().size(); ++index) {
 			views[sci_pos] = win.swapchain_image_views()[index].get();
 			frames_.push_back(
-					framebuffer_frame(index,
-									  queued_handle<vk::UniqueFramebuffer>(
-											  dev->createFramebufferUnique(vk::FramebufferCreateInfo(
-													  {}, compatible_pass, uint32_t(views.size()),
-													  views.data(), size_.x, size_.y, 1u)),
-											  destruction_manager),
-									  *this));
-		}
-	} else {
-		frames_.push_back(framebuffer_frame(
-				0,
-				queued_handle<vk::UniqueFramebuffer>(dev->createFramebufferUnique(vk::FramebufferCreateInfo(
+					framebuffer_frame(index, queued_handle<vk::UniqueFramebuffer>(
+													 dev->createFramebufferUnique(vk::FramebufferCreateInfo(
 															 {}, compatible_pass, uint32_t(views.size()),
 															 views.data(), size_.x, size_.y, 1u)),
 													 destruction_manager),
-				*this));
+									  *this));
+		}
+	} else {
+		frames_.push_back(framebuffer_frame(0, queued_handle<vk::UniqueFramebuffer>(
+													   dev->createFramebufferUnique(vk::FramebufferCreateInfo(
+															   {}, compatible_pass, uint32_t(views.size()),
+															   views.data(), size_.x, size_.y, 1u)),
+													   destruction_manager),
+											*this));
 	}
 }
 

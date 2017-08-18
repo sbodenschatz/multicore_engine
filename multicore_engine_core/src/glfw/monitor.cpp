@@ -4,10 +4,10 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <mce/glfw/monitor.hpp>
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <iterator>
+#include <mce/glfw/monitor.hpp>
 
 namespace mce {
 namespace glfw {

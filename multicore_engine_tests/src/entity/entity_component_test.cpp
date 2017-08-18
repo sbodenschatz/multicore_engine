@@ -4,12 +4,12 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <gtest.hpp>
 #include <mce/asset/dummy_asset.hpp>
 #include <mce/bstream/vector_iobstream.hpp>
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/entity/component.hpp>
 #include <mce/entity/entity_manager.hpp>
-#include <gtest.hpp>
 #include <mce/util/finally.hpp>
 
 namespace mce {

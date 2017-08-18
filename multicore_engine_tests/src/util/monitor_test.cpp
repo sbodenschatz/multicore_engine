@@ -7,10 +7,10 @@
 #include <algorithm>
 #include <atomic>
 #include <gtest.hpp>
+#include <mce/util/monitor.hpp>
 #include <mutex>
 #include <thread>
 #include <tuple>
-#include <mce/util/monitor.hpp>
 #include <utility>
 #include <vector>
 
