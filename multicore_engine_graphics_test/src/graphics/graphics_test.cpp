@@ -44,7 +44,8 @@ graphics_test::graphics_test()
 		  last_frame_t_{std::chrono::high_resolution_clock::now()} {
 	fbcfg_ = gmgr_.create_framebuffer_config(
 			"test_fbcfg", win_,
-			{framebuffer_attachment_config(vk::Format::eD32Sfloat, image_aspect_mode::depth)});
+			{framebuffer_attachment_config(dev_.best_supported_depth_attachment_format(),
+										   image_aspect_mode::depth)});
 	pll_ = gmgr_.create_pipeline_layout("test_pll", {}, {});
 	spg_ = gmgr_.create_subpass_graph(
 			"test_spg",
