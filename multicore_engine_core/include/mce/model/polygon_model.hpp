@@ -149,6 +149,10 @@ public:
 	const std::shared_ptr<const char>& content_data_shared() const {
 		return content_data_;
 	}
+	/// Returns the size of the content data of the file.
+	uint64_t content_data_size() const {
+		return meta_data_.content_range.length();
+	}
 };
 
 } // namespace model
