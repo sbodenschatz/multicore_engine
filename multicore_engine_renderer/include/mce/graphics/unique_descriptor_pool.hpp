@@ -180,6 +180,7 @@ class growing_unique_descriptor_pool {
 public:
 	/// Creates a pool for the given device with the given resource amounts per block.
 	growing_unique_descriptor_pool(device& dev, uint32_t descriptor_sets_per_block,
+								   // cppcheck-suppress passedByValue
 								   std::vector<vk::DescriptorPoolSize> pool_sizes_per_block)
 			: growing_unique_descriptor_pool(
 					  dev, descriptor_set_resources{pool_sizes_per_block, descriptor_sets_per_block}) {}

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <functional>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <iterator>
 #include <mce/core/version.hpp>
@@ -20,6 +21,10 @@
 #include <sstream>
 #include <stdexcept>
 #include <vulkan/vulkan.hpp>
+
+#if !defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
+#error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
+#endif
 
 // Provide wrapper functions to call into extension function pointers because extension functions aren't
 // provided by the loader library. To make the symbols available they are defined here.
