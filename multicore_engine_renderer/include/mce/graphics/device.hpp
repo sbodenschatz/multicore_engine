@@ -63,19 +63,39 @@ public:
 	/// Releases the resources associated with the device object.
 	~device();
 
+	/// \brief Returns the first format in candidates that supports the given required feature flags for the
+	/// given format_support_query_type.
+	/**
+	 * If none of them supports the required flags an empty optional is returned.
+	 */
 	boost::optional<vk::Format> best_supported_format_try(
 			vk::ArrayProxy<const vk::Format> candidates, vk::FormatFeatureFlags required_flags = {},
 			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const
 			noexcept;
 
+	/// \brief Returns the first format in candidates that supports the given required feature flags for the
+	/// given format_support_query_type.
+	/**
+	 * If none of them supports the required flags an exception of type mce::graphics_exception is thrown.
+	 */
 	vk::Format best_supported_format(
 			vk::ArrayProxy<const vk::Format> candidates, vk::FormatFeatureFlags required_flags = {},
 			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
 
+	/// \brief Returns the best depth-only format that supports the given required feature flags (additionally
+	/// to eDepthStencilAttachment) for the given format_support_query_type.
+	/**
+	 * If none of them supports the required flags an exception of type mce::graphics_exception is thrown.
+	 */
 	vk::Format best_supported_depth_attachment_format(
 			vk::FormatFeatureFlags additional_required_flags = {},
 			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
 
+	/// \brief Returns the best depth-stencil format that supports the given required feature flags
+	/// (additionally to eDepthStencilAttachment) for the given format_support_query_type.
+	/**
+	 * If none of them supports the required flags an exception of type mce::graphics_exception is thrown.
+	 */
 	vk::Format best_supported_depth_stencil_attachment_format(
 			vk::FormatFeatureFlags additional_required_flags = {},
 			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
