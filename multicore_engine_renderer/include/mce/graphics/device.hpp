@@ -73,19 +73,19 @@ public:
 
 	vk::Format best_supported_depth_stencil_attachment_format(
 			vk::FormatFeatureFlags additional_required_flags = {},
-			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image);
 
 	vk::Format best_unsigned_color_attachment_format(
 			int components, vk::FormatFeatureFlags additional_required_flags = {},
-			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image);
 
 	vk::Format best_signed_color_attachment_format(
 			int components, vk::FormatFeatureFlags additional_required_flags = {},
-			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image);
 
 	vk::Format best_float_color_attachment_format(
 			int components, vk::FormatFeatureFlags additional_required_flags = {},
-			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image);
 
 	/// Allows calling native device member function using the operator -> on the wrapper device.
 	const vk::Device* operator->() const {
