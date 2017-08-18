@@ -63,17 +63,22 @@ public:
 	/// Releases the resources associated with the device object.
 	~device();
 
-	boost::optional<vk::Format> supported_format(
+	boost::optional<vk::Format> best_supported_format_try(
 			vk::ArrayProxy<const vk::Format> candidates, vk::FormatFeatureFlags required_flags = {},
-			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image) const;
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const
+			noexcept;
+
+	vk::Format best_supported_format(
+			vk::ArrayProxy<const vk::Format> candidates, vk::FormatFeatureFlags required_flags = {},
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
 
 	vk::Format best_supported_depth_attachment_format(
 			vk::FormatFeatureFlags additional_required_flags = {},
-			format_support_query_type querry_type = format_support_query_type::optimal_tiling_image);
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
 
 	vk::Format best_supported_depth_stencil_attachment_format(
 			vk::FormatFeatureFlags additional_required_flags = {},
-			format_support_query_type query_type = format_support_query_type::optimal_tiling_image);
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
 
 	/// Allows calling native device member function using the operator -> on the wrapper device.
 	const vk::Device* operator->() const {
