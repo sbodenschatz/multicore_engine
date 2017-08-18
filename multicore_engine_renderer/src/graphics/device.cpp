@@ -228,7 +228,7 @@ boost::optional<vk::Format> device::best_supported_format_try(vk::ArrayProxy<con
 	auto it = std::find_if(candidates.begin(), candidates.end(),
 						   [this, member, required_flags](vk::Format fmt) {
 							   const auto& flags = physical_device_.getFormatProperties(fmt).*member;
-							   return bool(flags) && ((flags & required_flags) == flags);
+							   return bool(flags) && ((flags & required_flags) == required_flags);
 						   });
 	if(it != candidates.end()) {
 		return *it;
