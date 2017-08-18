@@ -248,5 +248,19 @@ vk::Format device::best_supported_depth_attachment_format(vk::FormatFeatureFlags
 	}
 }
 
+vk::Format
+device::best_supported_depth_stencil_attachment_format(vk::FormatFeatureFlags additional_required_flags = {},
+													   format_support_query_type query_type) {
+	auto fmt = supported_format(
+			{vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint, vk::Format::eD16UnormS8Uint},
+			vk::FormatFeatureFlagBits::eDepthStencilAttachment | additional_required_flags, query_type);
+	if(fmt) {
+		return fmt.get();
+	} else {
+		throw mce::graphics_exception(
+				"No supported depth-stencil attachment format with the required flags found.");
+	}
+}
+
 } /* namespace graphics */
 } /* namespace mce */
