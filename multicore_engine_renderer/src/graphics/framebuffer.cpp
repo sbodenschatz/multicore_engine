@@ -50,12 +50,6 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 						vk::ImageUsageFlagBits::eDepthStencilAttachment |
 								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));
 				break;
-			case image_aspect_mode::stencil:
-				attachments_.emplace_back(image_2d_stencil(
-						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
-						vk::ImageUsageFlagBits::eDepthStencilAttachment |
-								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));
-				break;
 			}
 			imgview_visitor v(this);
 			attachments_.back().apply_visitor(v);
