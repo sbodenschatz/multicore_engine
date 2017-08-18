@@ -218,7 +218,8 @@ device::~device() {}
 
 boost::optional<vk::Format> device::best_supported_format_try(vk::ArrayProxy<const vk::Format> candidates,
 															  vk::FormatFeatureFlags required_flags,
-															  format_support_query_type query_type) const {
+															  format_support_query_type query_type) const
+		noexcept {
 	auto member = (query_type == format_support_query_type::optimal_tiling_image)
 						  ? &vk::FormatProperties::optimalTilingFeatures
 						  : ((query_type == format_support_query_type::linear_tiling_image)
