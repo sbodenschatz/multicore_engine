@@ -42,19 +42,27 @@ graphics_test::graphics_test()
 						 vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
 						 vk::MemoryPropertyFlagBits::eDeviceLocal),
 		  last_frame_t_{std::chrono::high_resolution_clock::now()} {
-	fbcfg_ = gmgr_.create_framebuffer_config("test_fbcfg", win_, {});
+	fbcfg_ = gmgr_.create_framebuffer_config(
+			"test_fbcfg", win_,
+			{framebuffer_attachment_config(vk::Format::eD32Sfloat, image_aspect_mode::depth)});
 	pll_ = gmgr_.create_pipeline_layout("test_pll", {}, {});
 	spg_ = gmgr_.create_subpass_graph(
 			"test_spg",
-			{subpass_entry{
-					{}, {vk::AttachmentReference(0, vk::ImageLayout::eColorAttachmentOptimal)}, {}, {}, {}}},
+			{subpass_entry{{},
+						   {vk::AttachmentReference(0, vk::ImageLayout::eColorAttachmentOptimal)},
+						   {},
+						   vk::AttachmentReference(1, vk::ImageLayout::eDepthStencilAttachmentOptimal),
+						   {}}},
 			{});
 	rp_ = gmgr_.create_render_pass(
 			"test_rp", spg_, fbcfg_,
 			{render_pass_attachment_access{vk::ImageLayout::eUndefined, vk::ImageLayout::ePresentSrcKHR,
 										   vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eStore,
-										   vk::AttachmentLoadOp::eDontCare,
-										   vk::AttachmentStoreOp::eDontCare}});
+										   vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare},
+			 render_pass_attachment_access{
+					 vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthStencilAttachmentOptimal,
+					 vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eStore,
+					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare}});
 	auto loader = std::make_shared<asset::load_unit_asset_loader>(std::vector<asset::path_prefix>(
 			{{std::make_unique<asset::pack_file_reader>(), "assets.pack"},
 			 {std::make_unique<asset::pack_file_reader>(), "../multicore_engine_assets/assets.pack"},
@@ -83,6 +91,8 @@ graphics_test::graphics_test()
 			{{{0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}}}};
 	pcfg->rasterization_state().lineWidth = 1.0f;
 	pcfg->multisample_state() = vk::PipelineMultisampleStateCreateInfo{};
+	pcfg->depth_stencil_state() =
+			vk::PipelineDepthStencilStateCreateInfo({}, true, true, vk::CompareOp::eLess);
 	vk::PipelineColorBlendAttachmentState pcbas;
 	pcbas.colorWriteMask = ~vk::ColorComponentFlags();
 	pcfg->color_blend_state() = pipeline_config::color_blend_state_config{{pcbas}};
@@ -136,12 +146,13 @@ void graphics_test::run() {
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-		vk::ClearValue clear(
-				vk::ClearColorValue(util::make_array<float>(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f)));
+		vk::ClearValue clear[] = {
+				vk::ClearColorValue(util::make_array<float>(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f)),
+				vk::ClearDepthStencilValue(1.0f)};
 		render_cmb_buf->beginRenderPass(
 				vk::RenderPassBeginInfo(
 						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
-						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 1, &clear),
+						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 2, clear),
 				vk::SubpassContents::eInline);
 		if(vb_ready_) {
 			pl_->bind(render_cmb_buf.get());
