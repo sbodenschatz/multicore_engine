@@ -6,9 +6,9 @@
 
 #include <atomic>
 #include <gtest.hpp>
+#include <mce/util/locked.hpp>
 #include <mutex>
 #include <thread>
-#include <mce/util/locked.hpp>
 #include <utility>
 #include <vector>
 

@@ -6,10 +6,10 @@
 
 #include <boost/container/flat_set.hpp>
 #include <gtest.hpp>
-#include <mutex>
-#include <thread>
 #include <mce/util/message_queue.hpp>
 #include <mce/util/spin_lock.hpp>
+#include <mutex>
+#include <thread>
 #include <utility>
 #include <vector>
 

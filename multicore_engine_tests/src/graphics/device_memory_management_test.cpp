@@ -104,8 +104,10 @@ TEST(graphics_device_memory_manager_test, flag_constraints_valid) {
 	device_memory_manager mm(nullptr, 0x10000);
 	std::vector<device_memory_allocation> allocs;
 	vk::MemoryPropertyFlags flags[] = {
-			vk::MemoryPropertyFlags(), vk::MemoryPropertyFlagBits::eDeviceLocal,
-			vk::MemoryPropertyFlagBits::eHostVisible, vk::MemoryPropertyFlagBits::eHostCoherent,
+			vk::MemoryPropertyFlags(),
+			vk::MemoryPropertyFlagBits::eDeviceLocal,
+			vk::MemoryPropertyFlagBits::eHostVisible,
+			vk::MemoryPropertyFlagBits::eHostCoherent,
 			vk::MemoryPropertyFlagBits::eHostCached,
 			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
 			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent |

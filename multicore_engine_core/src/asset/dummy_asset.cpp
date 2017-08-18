@@ -4,9 +4,9 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <cstring>
 #include <mce/asset/asset.hpp>
 #include <mce/asset/dummy_asset.hpp>
-#include <cstring>
 #include <memory>
 
 namespace mce {

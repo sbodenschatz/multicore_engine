@@ -7,9 +7,9 @@
 #include <atomic>
 #include <cstdint>
 #include <gtest.hpp>
+#include <mce/util/spin_lock.hpp>
 #include <mutex>
 #include <thread>
-#include <mce/util/spin_lock.hpp>
 #include <vector>
 
 namespace mce {

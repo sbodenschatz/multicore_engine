@@ -5,11 +5,11 @@
  */
 
 #include <algorithm>
-#include <gtest.hpp>
-#include <string>
-#include <mce/util/functional.hpp>
 #include <cctype>
 #include <functional>
+#include <gtest.hpp>
+#include <mce/util/functional.hpp>
+#include <string>
 
 namespace mce {
 namespace util {

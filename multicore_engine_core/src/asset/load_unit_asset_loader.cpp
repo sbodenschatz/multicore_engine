@@ -4,14 +4,14 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <exception>
+#include <iterator>
 #include <mce/asset/asset.hpp>
 #include <mce/asset/file_reader.hpp>
 #include <mce/asset/load_unit.hpp>
 #include <mce/asset/load_unit_asset_loader.hpp>
 #include <mce/exceptions.hpp>
-#include <algorithm>
-#include <exception>
-#include <iterator>
 #include <mutex>
 #include <shared_mutex>
 #include <tuple>
@@ -183,9 +183,9 @@ void load_unit_asset_loader::start_pin_load_unit(const std::string& name, asset_
 }
 void load_unit_asset_loader::start_unpin_load_unit(const std::string& name, asset_manager&) {
 	std::unique_lock<std::shared_timed_mutex> lock(load_units_rw_lock);
-	load_units.erase(std::remove_if(load_units.begin(), load_units.end(), [&name](const auto& load_unit) {
-		return load_unit->name() == name;
-	}), load_units.end());
+	load_units.erase(std::remove_if(load_units.begin(), load_units.end(),
+									[&name](const auto& load_unit) { return load_unit->name() == name; }),
+					 load_units.end());
 }
 } // namespace asset
 } // namespace mce

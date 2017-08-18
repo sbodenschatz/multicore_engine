@@ -4,8 +4,8 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <mce/bstream/vector_iobstream.hpp>
 #include <cstdint>
+#include <mce/bstream/vector_iobstream.hpp>
 
 namespace mce {
 namespace bstream {

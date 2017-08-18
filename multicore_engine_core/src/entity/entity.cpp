@@ -4,7 +4,9 @@
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <boost/container/vector.hpp>
+#include <iterator>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
 #include <mce/entity/component.hpp>
@@ -13,8 +15,6 @@
 #include <mce/entity/entity.hpp>
 #include <mce/entity/entity_manager.hpp>
 #include <mce/exceptions.hpp>
-#include <algorithm>
-#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -94,7 +94,7 @@ void entity::load_from_bstream(bstream::ibstream& istr, const entity_manager& en
 			throw invalid_component_type_exception("Unknown component_type id " + std::to_string(id) + ".");
 		components_.insert(id, comp_type->create_component(*this, comp_type->empty_configuration(), engine));
 	}
-	for (auto& comp : components_) {
+	for(auto& comp : components_) {
 		comp.second->load_from_bstream(istr);
 	}
 }

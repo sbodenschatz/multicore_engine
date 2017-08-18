@@ -14,6 +14,7 @@ namespace graphics {
 
 framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interface& mem_mgr,
 						 destruction_queue_manager* destruction_manager,
+						 // cppcheck-suppress passedByValue
 						 std::shared_ptr<const framebuffer_config> config, vk::RenderPass compatible_pass)
 		: dev_{&dev}, win_{&win}, size_{win.glfw_window().framebuffer_size()}, config_{std::move(config)} {
 	if(std::count_if(config_->attachment_configs().begin(), config_->attachment_configs().end(),
@@ -33,9 +34,19 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 														   vk::ImageUsageFlagBits::eSampled));
 				break;
 			case image_aspect_mode::depth:
+				attachments_.emplace_back(image_2d_depth(
+						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
+						vk::ImageUsageFlagBits::eDepthStencilAttachment |
+								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));
+				break;
 			case image_aspect_mode::depth_stencil:
-			case image_aspect_mode::stencil:
 				attachments_.emplace_back(image_2d_ds(
+						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
+						vk::ImageUsageFlagBits::eDepthStencilAttachment |
+								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));
+				break;
+			case image_aspect_mode::stencil:
+				attachments_.emplace_back(image_2d_stencil(
 						dev, mem_mgr, destruction_manager, ac.format(), size_, 1,
 						vk::ImageUsageFlagBits::eDepthStencilAttachment |
 								vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eSampled));

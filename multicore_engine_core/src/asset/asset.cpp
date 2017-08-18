@@ -4,8 +4,8 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <mce/asset/asset.hpp>
 #include <algorithm>
+#include <mce/asset/asset.hpp>
 
 namespace mce {
 namespace asset {

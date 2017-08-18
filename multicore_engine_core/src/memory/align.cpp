@@ -4,9 +4,9 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#include <mce/memory/align.hpp>
 #include <cstddef>
 #include <cstdint>
+#include <mce/memory/align.hpp>
 
 namespace mce {
 namespace memory {

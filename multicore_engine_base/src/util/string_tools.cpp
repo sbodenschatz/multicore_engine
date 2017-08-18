@@ -4,10 +4,10 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <boost/utility/string_view_fwd.hpp>
-#include <mce/util/string_tools.hpp>
 #include <algorithm>
+#include <boost/utility/string_view_fwd.hpp>
 #include <cctype>
+#include <mce/util/string_tools.hpp>
 
 namespace mce {
 namespace util {

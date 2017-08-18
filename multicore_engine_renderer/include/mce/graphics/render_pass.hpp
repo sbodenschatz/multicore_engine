@@ -47,6 +47,7 @@ class subpass_graph {
 
 public:
 	/// Creates a subpass_graph consisting of the given nodes (subpasses) and edges (dependencies).
+	// cppcheck-suppress passedByValue
 	subpass_graph(std::vector<subpass_entry> subpasses, std::vector<vk::SubpassDependency> dependencies)
 			: subpasses_{std::move(subpasses)}, dependencies_{std::move(dependencies)} {}
 

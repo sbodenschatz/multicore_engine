@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <mce/config/config_store.hpp>
 #include <gtest.hpp>
+#include <mce/config/config_store.hpp>
 #include <sstream>
 
 namespace mce {

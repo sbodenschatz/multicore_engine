@@ -4,11 +4,11 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
-#include <mce/bstream/buffer_ibstream.hpp>
-#include <cstdint>
-#include <mce/exceptions.hpp>
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
+#include <mce/bstream/buffer_ibstream.hpp>
+#include <mce/exceptions.hpp>
 
 namespace mce {
 namespace bstream {

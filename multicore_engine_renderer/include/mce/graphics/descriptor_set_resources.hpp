@@ -68,6 +68,7 @@ public:
 	descriptor_set_resources(descriptor_set_resources&& other) noexcept
 			: descriptors_{std::move(other.descriptors_)}, descriptor_sets_{other.descriptor_sets_} {
 		other.descriptor_sets_ = 0;
+		// cppcheck-suppress useInitializationList
 		other.descriptors_ = decltype(other.descriptors_)();
 	}
 	/// Allows move-assignment.

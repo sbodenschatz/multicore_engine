@@ -169,7 +169,7 @@ TEST(util_callback_pool_test, const_correctnes) {
 	auto c_res = c_f();
 	ASSERT_EQ(0, c_res);
 	ASSERT_EQ(0, x);
-	auto res=f();
+	auto res = f();
 	ASSERT_EQ(0, res);
 	ASSERT_EQ(1, x);
 }
