@@ -9,17 +9,17 @@
 #endif
 
 #include <algorithm>
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
+#include <fstream>
+#include <iostream>
 #include <mce/asset_gen/load_unit_description_ast.hpp>
 #include <mce/asset_gen/load_unit_description_parser.hpp>
 #include <mce/asset_gen/load_unit_gen.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include <mce/core/version.hpp>
 #include <mce/exceptions.hpp>
-#include <fstream>
-#include <iostream>
-#include <string>
 #include <mce/util/program_name.hpp>
+#include <string>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

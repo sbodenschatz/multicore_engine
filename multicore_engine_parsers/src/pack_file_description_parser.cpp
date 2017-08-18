@@ -6,12 +6,12 @@
 
 //#define BOOST_SPIRIT_DEBUG
 
-#include <mce/asset_gen/base_ast.hpp>
+#include <algorithm>
 #include <boost/phoenix/core/actor.hpp>
 #include <boost/phoenix/fusion/at.hpp>
-#include <algorithm>
 #include <fstream>
 #include <iterator>
+#include <mce/asset_gen/base_ast.hpp>
 #include <string>
 #include <vector>
 
@@ -24,15 +24,14 @@
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4348)
 #endif
-#include <mce/asset_gen/pack_file_description_ast.hpp>
-#include <mce/asset_gen/pack_file_description_ast_fusion.hpp>
-#include <mce/asset_gen/pack_file_description_parser.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <mce/asset_gen/pack_file_description_ast.hpp>
+#include <mce/asset_gen/pack_file_description_ast_fusion.hpp>
+#include <mce/asset_gen/pack_file_description_parser.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/util/error_helper.hpp>
 

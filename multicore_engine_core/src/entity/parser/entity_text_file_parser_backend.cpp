@@ -4,10 +4,13 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <boost/variant/variant.hpp>
+#include <glm/glm.hpp>
+#include <iterator>
 #include <mce/asset/asset.hpp>
 #include <mce/asset/asset_defs.hpp>
 #include <mce/asset/asset_manager.hpp>
-#include <boost/variant/variant.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/entity/component_configuration.hpp>
 #include <mce/entity/component_type.hpp>
@@ -18,9 +21,6 @@
 #include <mce/entity/parser/entity_text_file_ast.hpp>
 #include <mce/entity/parser/entity_text_file_parser.hpp>
 #include <mce/exceptions.hpp>
-#include <glm/glm.hpp>
-#include <algorithm>
-#include <iterator>
 #include <memory>
 #include <stdexcept>
 #include <string>

@@ -4,11 +4,11 @@
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <iterator>
 #include <mce/asset/load_unit.hpp>
 #include <mce/bstream/buffer_ibstream.hpp>
 #include <mce/exceptions.hpp>
-#include <algorithm>
-#include <iterator>
 
 namespace mce {
 namespace asset {

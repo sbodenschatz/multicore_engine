@@ -4,11 +4,11 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <gtest.hpp>
 #include <mce/asset_gen/pack_file_description_ast.hpp>
 #include <mce/asset_gen/pack_file_description_ast_compare.hpp>
 #include <mce/asset_gen/pack_file_description_parser.hpp>
 #include <mce/exceptions.hpp>
-#include <gtest.hpp>
 
 namespace mce {
 namespace asset_gen {

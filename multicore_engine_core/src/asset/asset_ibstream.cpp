@@ -5,10 +5,10 @@
  */
 
 #include <algorithm>
-#include <mce/asset/asset.hpp>
-#include <mce/bstream/asset_ibstream.hpp>
 #include <cstdint>
 #include <cstring>
+#include <mce/asset/asset.hpp>
+#include <mce/bstream/asset_ibstream.hpp>
 #include <mce/exceptions.hpp>
 
 namespace mce {

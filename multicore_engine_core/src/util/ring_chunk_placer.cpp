@@ -4,8 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 #include <mce/util/ring_chunk_placer.hpp>
 
 namespace mce {
