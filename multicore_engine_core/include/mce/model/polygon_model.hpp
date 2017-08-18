@@ -42,6 +42,7 @@ private:
 	std::vector<polygon_model_completion_handler> completion_handlers;
 	std::vector<asset::error_handler> error_handlers;
 	static_model_meta_data meta_data_;
+	std::shared_ptr<const char> content_data_;
 
 	void complete_loading(const asset::asset_ptr& polygon_asset, model_data_manager& mm) noexcept;
 	void complete_staging(model_data_manager& mm) noexcept;
@@ -134,6 +135,20 @@ public:
 	/// Returns the name of the model.
 	const std::string& name() const noexcept {
 		return name_;
+	}
+	/// Returns a pointer to the content data.
+	/**
+	 * Requires the model to be ready for use.
+	 */
+	const char* content_data() const {
+		return content_data_.get();
+	}
+	/// Returns a pointer to the content data participating in ownership.
+	/**
+	 * Requires the model to be ready for use.
+	 */
+	const std::shared_ptr<const char>& content_data_shared() const {
+		return content_data_;
 	}
 };
 

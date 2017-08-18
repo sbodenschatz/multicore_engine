@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <mce/asset/asset.hpp>
 #include <mce/bstream/asset_ibstream.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/model/model_data_manager.hpp>
@@ -32,6 +33,7 @@ void polygon_model::complete_loading(const asset::asset_ptr& polygon_asset, mode
 				io_exception("Error on loading meta data for polygon model '" + name_ + "'.")));
 		return;
 	}
+	content_data_ = polygon_asset->data_shared();
 	current_state_ = state::staging;
 	lock.unlock();
 	mm.start_stage_polygon_model(this->shared_from_this());
