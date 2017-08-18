@@ -59,7 +59,7 @@ private:
 		completion_handlers.shrink_to_fit();
 	}
 
-	friend class model_manager;
+	friend class model_data_manager;
 
 public:
 	/// \brief Creates an model object with the given name. Should only be used within the model system but

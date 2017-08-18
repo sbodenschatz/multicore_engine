@@ -27,7 +27,7 @@
 namespace mce {
 namespace model {
 
-class model_manager;
+class model_data_manager;
 
 /// Represents a static (3D-)polygon model consisting of arbitrarily many meshes used for rendering.
 class polygon_model : public std::enable_shared_from_this<polygon_model> {
@@ -43,8 +43,8 @@ private:
 	std::vector<asset::error_handler> error_handlers;
 	static_model_meta_data meta_data_;
 
-	void complete_loading(const asset::asset_ptr& polygon_asset, model_manager& mm) noexcept;
-	void complete_staging(model_manager& mm) noexcept;
+	void complete_loading(const asset::asset_ptr& polygon_asset, model_data_manager& mm) noexcept;
+	void complete_staging(model_data_manager& mm) noexcept;
 
 	void raise_error_flag(std::exception_ptr e) noexcept {
 		current_state_ = state::error;
@@ -62,7 +62,7 @@ private:
 		completion_handlers.shrink_to_fit();
 	}
 
-	friend class model_manager;
+	friend class model_data_manager;
 
 public:
 	/// \brief Creates an model object with the given name. Should only be used within the model system but

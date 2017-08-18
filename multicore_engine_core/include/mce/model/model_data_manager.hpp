@@ -28,10 +28,10 @@ class asset_manager;
 namespace model {
 
 /// Manages the loading and lifetime of collision and polygon models in the engine.
-class model_manager {
+class model_data_manager {
 public:
 	/// Constructs a model_manager using the given asset_manager.
-	explicit model_manager(asset::asset_manager& asset_manager) noexcept : asset_manager(asset_manager) {}
+	explicit model_data_manager(asset::asset_manager& asset_manager) noexcept : asset_manager(asset_manager) {}
 
 	/// \brief Asynchronously loads the polygon_model with the given name and calls the completion_handler
 	/// function object on success or the error_handler function object on error.
@@ -69,14 +69,14 @@ private:
 };
 
 template <typename F, typename E>
-polygon_model_ptr model_manager::load_polygon_model(const std::string& name, F completion_handler,
+polygon_model_ptr model_data_manager::load_polygon_model(const std::string& name, F completion_handler,
 													E error_handler) {
 	auto model = internal_load_polygon_model(name);
 	model->run_when_ready(std::move(completion_handler), std::move(error_handler));
 	return model;
 }
 template <typename F, typename E>
-collision_model_ptr model_manager::load_collision_model(const std::string& name, F completion_handler,
+collision_model_ptr model_data_manager::load_collision_model(const std::string& name, F completion_handler,
 														E error_handler) {
 	auto model = internal_load_collision_model(name);
 	model->run_when_ready(std::move(completion_handler), std::move(error_handler));

@@ -9,7 +9,7 @@
 #include <mce/asset/asset.hpp>
 #include <mce/asset/asset_defs.hpp>
 #include <mce/asset/asset_manager.hpp>
-#include <mce/model/model_manager.hpp>
+#include <mce/model/model_data_manager.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -17,13 +17,13 @@
 namespace mce {
 namespace model {
 
-polygon_model_ptr model_manager::load_polygon_model(const std::string& name) {
+polygon_model_ptr model_data_manager::load_polygon_model(const std::string& name) {
 	return internal_load_polygon_model(name);
 }
-collision_model_ptr model_manager::load_collision_model(const std::string& name) {
+collision_model_ptr model_data_manager::load_collision_model(const std::string& name) {
 	return internal_load_collision_model(name);
 }
-std::shared_ptr<polygon_model> model_manager::internal_load_polygon_model(const std::string& name) {
+std::shared_ptr<polygon_model> model_data_manager::internal_load_polygon_model(const std::string& name) {
 	{
 		// Acquire read lock
 		std::shared_lock<std::shared_timed_mutex> lock(loaded_polygon_models_rw_lock);
@@ -51,7 +51,7 @@ std::shared_ptr<polygon_model> model_manager::internal_load_polygon_model(const 
 		}
 	}
 }
-std::shared_ptr<collision_model> model_manager::internal_load_collision_model(const std::string& name) {
+std::shared_ptr<collision_model> model_data_manager::internal_load_collision_model(const std::string& name) {
 	{
 		// Acquire read lock
 		std::shared_lock<std::shared_timed_mutex> lock(loaded_collision_models_rw_lock);
@@ -79,7 +79,7 @@ std::shared_ptr<collision_model> model_manager::internal_load_collision_model(co
 		}
 	}
 }
-void model_manager::start_stage_polygon_model(const std::shared_ptr<polygon_model>& model) noexcept {
+void model_data_manager::start_stage_polygon_model(const std::shared_ptr<polygon_model>& model) noexcept {
 	// TODO: Initiate upload to GPU memory through renderer and do the call below when upload is finished.
 	model->complete_staging(*this);
 }

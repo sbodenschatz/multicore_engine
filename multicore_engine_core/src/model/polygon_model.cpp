@@ -8,7 +8,7 @@
 #include <exception>
 #include <mce/bstream/asset_ibstream.hpp>
 #include <mce/exceptions.hpp>
-#include <mce/model/model_manager.hpp>
+#include <mce/model/model_data_manager.hpp>
 #include <mce/model/polygon_model.hpp>
 #include <mce/util/local_function.hpp>
 #include <string>
@@ -19,7 +19,7 @@ namespace model {
 polygon_model::polygon_model(const std::string& name) : current_state_{state::loading}, name_{name} {}
 polygon_model::polygon_model(std::string&& name) : current_state_{state::loading}, name_{std::move(name)} {}
 
-void polygon_model::complete_loading(const asset::asset_ptr& polygon_asset, model_manager& mm) noexcept {
+void polygon_model::complete_loading(const asset::asset_ptr& polygon_asset, model_data_manager& mm) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	bstream::asset_ibstream stream{polygon_asset};
 	try {
@@ -37,7 +37,7 @@ void polygon_model::complete_loading(const asset::asset_ptr& polygon_asset, mode
 	mm.start_stage_polygon_model(this->shared_from_this());
 }
 
-void polygon_model::complete_staging(model_manager&) noexcept {
+void polygon_model::complete_staging(model_data_manager&) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	current_state_ = state::ready;
 	auto this_shared = std::static_pointer_cast<const polygon_model>(this->shared_from_this());
