@@ -80,6 +80,7 @@ public:
 	};
 
 	/// Creates an executor from the given function object.
+	// cppcheck-suppress passedByValue
 	static executor<std::function<void()>> make_executor(std::function<void()> f) {
 		return executor<std::function<void()>>{std::move(f)};
 	}

@@ -49,8 +49,11 @@ public:
 		/// Creates an empty shader_stage_config.
 		shader_stage_config() : stage_{vk::ShaderStageFlagBits::eVertex} {}
 		/// Creates a shader_stage_config from the given parameters.
+		// cppcheck-suppress passedByValue
 		shader_stage_config(vk::ShaderStageFlagBits stage, std::shared_ptr<const shader_module> module,
+							// cppcheck-suppress passedByValue
 							std::string entry_point_name, std::vector<char> specialization_data = {},
+							// cppcheck-suppress passedByValue
 							std::vector<vk::SpecializationMapEntry> specialization_map = {})
 				: stage_{stage}, module_{std::move(module)}, entry_point_name_{std::move(entry_point_name)},
 				  specialization_data_{std::move(specialization_data)}, specialization_map_{std::move(
@@ -131,7 +134,9 @@ public:
 		/// Creates an empty vertex_input_state.
 		vertex_input_state_config() {}
 		/// Creates a vertex_input_state from the given vertex input bindings and vertex input attributes.
+		// cppcheck-suppress passedByValue
 		vertex_input_state_config(std::vector<vk::VertexInputBindingDescription> bindings,
+								  // cppcheck-suppress passedByValue
 								  std::vector<vk::VertexInputAttributeDescription> attributes)
 				: bindings_{std::move(bindings)}, attributes_{std::move(attributes)} {}
 
@@ -179,6 +184,7 @@ public:
 		/// Creates an empty viewport_state_config.
 		viewport_state_config() {}
 		/// Creates a viewport_state_config from the given viewports and scissors.
+		// cppcheck-suppress passedByValue
 		viewport_state_config(std::vector<vk::Viewport> viewports, std::vector<vk::Rect2D> scissors)
 				: viewports_{std::move(viewports)}, scissors_{std::move(scissors)} {}
 
@@ -225,12 +231,14 @@ public:
 
 	public:
 		/// Creates a color_blend_state_config from the given blending settings.
+		// cppcheck-suppress passedByValue
 		color_blend_state_config(std::vector<vk::PipelineColorBlendAttachmentState> attachments,
 								 std::array<float, 4> blend_constants = {{0.0f, 0.0f, 0.0f, 0.0f}})
 				: attachments_{std::move(attachments)}, blend_constants_{blend_constants} {}
 
 		/// Creates a color_blend_state_config from the given logic operation and blending settings.
 		color_blend_state_config(vk::LogicOp logic_op,
+								 // cppcheck-suppress passedByValue
 								 std::vector<vk::PipelineColorBlendAttachmentState> attachments,
 								 std::array<float, 4> blend_constants = {{0.0f, 0.0f, 0.0f, 0.0f}})
 				: logic_op_{logic_op}, attachments_{std::move(attachments)}, blend_constants_{

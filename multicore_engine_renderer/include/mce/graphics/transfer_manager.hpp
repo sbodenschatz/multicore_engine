@@ -13,7 +13,6 @@
  */
 
 #include <boost/variant.hpp>
-#include <glm/glm.hpp>
 #include <mce/containers/byte_buffer_pool.hpp>
 #include <mce/containers/scratch_pad_pool.hpp>
 #include <mce/graphics/buffer.hpp>
@@ -23,6 +22,7 @@
 #include <mce/util/ring_chunk_placer.hpp>
 #include <mutex>
 #include <vector>
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {

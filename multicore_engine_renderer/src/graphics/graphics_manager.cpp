@@ -33,6 +33,7 @@ graphics_manager::~graphics_manager() {}
 
 std::shared_ptr<const descriptor_set_layout>
 graphics_manager::create_descriptor_set_layout(const std::string& name,
+											   // cppcheck-suppress passedByValue
 											   std::vector<descriptor_set_layout_binding_element> bindings) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = descriptor_set_layouts_[name];
@@ -43,6 +44,7 @@ graphics_manager::create_descriptor_set_layout(const std::string& name,
 
 std::shared_ptr<const framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name,
+											// cppcheck-suppress passedByValue
 											std::vector<framebuffer_attachment_config> attachment_configs) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
@@ -53,6 +55,7 @@ graphics_manager::create_framebuffer_config(const std::string& name,
 
 std::shared_ptr<const framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name, window& swapchain_window,
+											// cppcheck-suppress passedByValue
 											std::vector<framebuffer_attachment_config> attachment_configs) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
@@ -64,7 +67,9 @@ graphics_manager::create_framebuffer_config(const std::string& name, window& swa
 
 std::shared_ptr<const pipeline_layout> graphics_manager::create_pipeline_layout(
 		const std::string& name,
+		// cppcheck-suppress passedByValue
 		std::vector<std::shared_ptr<const descriptor_set_layout>> descriptor_set_layouts,
+		// cppcheck-suppress passedByValue
 		std::vector<vk::PushConstantRange> push_constant_ranges) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = pipeline_layouts_[name];
@@ -75,6 +80,7 @@ std::shared_ptr<const pipeline_layout> graphics_manager::create_pipeline_layout(
 }
 std::shared_ptr<const pipeline_layout> graphics_manager::create_pipeline_layout_by_names(
 		const std::string& name, vk::ArrayProxy<const std::string> descriptor_set_layout_names,
+		// cppcheck-suppress passedByValue
 		std::vector<vk::PushConstantRange> push_constant_ranges) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = pipeline_layouts_[name];
@@ -94,7 +100,9 @@ std::shared_ptr<const pipeline_layout> graphics_manager::create_pipeline_layout_
 	return entry;
 }
 std::shared_ptr<const render_pass> graphics_manager::create_render_pass(
+		// cppcheck-suppress passedByValue
 		const std::string& name, std::shared_ptr<const subpass_graph> subpasses,
+		// cppcheck-suppress passedByValue
 		std::shared_ptr<const framebuffer_config> fb_config,
 		vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
@@ -121,7 +129,9 @@ std::shared_ptr<const render_pass> graphics_manager::create_render_pass(
 	return entry;
 }
 std::shared_ptr<const subpass_graph>
+// cppcheck-suppress passedByValue
 graphics_manager::create_subpass_graph(const std::string& name, std::vector<subpass_entry> subpasses,
+									   // cppcheck-suppress passedByValue
 									   std::vector<vk::SubpassDependency> dependencies) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = subpass_graphs_[name];
@@ -156,6 +166,7 @@ graphics_manager::create_sampler(const std::string& name, vk::Filter mag_filter,
 	return entry;
 }
 void graphics_manager::add_pending_pipeline(const std::string& name,
+											// cppcheck-suppress passedByValue
 											std::shared_ptr<const pipeline_config> cfg) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto it = pipelines_.find(name);

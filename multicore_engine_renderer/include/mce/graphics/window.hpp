@@ -13,13 +13,14 @@
  */
 
 #include <mce/glfw/window.hpp>
-#include <mce/graphics/framebuffer_config.hpp>
 #include <memory>
 
 namespace mce {
 namespace graphics {
 class instance;
 class device;
+class framebuffer_attachment_config;
+class framebuffer_config;
 
 /// Implements the window handling for the graphics subsystem.
 class window {

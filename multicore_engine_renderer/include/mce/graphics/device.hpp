@@ -13,16 +13,10 @@
  */
 
 #include <boost/container/flat_set.hpp>
-#include <glm/glm.hpp>
+#include <boost/optional.hpp>
 #include <mce/graphics/graphics_defs.hpp>
-#include <mce/graphics/instance.hpp>
-#include <utility>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-
-#if !defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
-#error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
-#endif
 
 namespace mce {
 namespace graphics {
@@ -62,10 +56,57 @@ private:
 	void create_device();
 
 public:
+	/// Defines the type of use for a format is checked in a supported format query
+	enum class format_support_query_type {
+		/// Query support of the format for linearly tiled images.
+		linear_tiling_image,
+		/// Query support of the format for optimally tiled images.
+		optimal_tiling_image,
+		/// Query support of the format for buffers.
+		buffer
+	};
+
 	/// Creates a device object from the given instance.
-	device(instance& app_inst);
+	explicit device(instance& app_inst);
 	/// Releases the resources associated with the device object.
 	~device();
+
+	/// \brief Returns the first format in candidates that supports the given required feature flags for the
+	/// given format_support_query_type.
+	/**
+	 * If none of them supports the required flags an empty optional is returned.
+	 */
+	boost::optional<vk::Format> best_supported_format_try(
+			vk::ArrayProxy<const vk::Format> candidates, vk::FormatFeatureFlags required_flags = {},
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const
+			noexcept;
+
+	/// \brief Returns the first format in candidates that supports the given required feature flags for the
+	/// given format_support_query_type.
+	/**
+	 * If none of them supports the required flags an exception of type mce::graphics_exception is thrown.
+	 */
+	vk::Format best_supported_format(
+			vk::ArrayProxy<const vk::Format> candidates, vk::FormatFeatureFlags required_flags = {},
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
+
+	/// \brief Returns the best depth-only format that supports the given required feature flags (additionally
+	/// to eDepthStencilAttachment) for the given format_support_query_type.
+	/**
+	 * If none of them supports the required flags an exception of type mce::graphics_exception is thrown.
+	 */
+	vk::Format best_supported_depth_attachment_format(
+			vk::FormatFeatureFlags additional_required_flags = {},
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
+
+	/// \brief Returns the best depth-stencil format that supports the given required feature flags
+	/// (additionally to eDepthStencilAttachment) for the given format_support_query_type.
+	/**
+	 * If none of them supports the required flags an exception of type mce::graphics_exception is thrown.
+	 */
+	vk::Format best_supported_depth_stencil_attachment_format(
+			vk::FormatFeatureFlags additional_required_flags = {},
+			format_support_query_type query_type = format_support_query_type::optimal_tiling_image) const;
 
 	/// Allows calling native device member function using the operator -> on the wrapper device.
 	const vk::Device* operator->() const {

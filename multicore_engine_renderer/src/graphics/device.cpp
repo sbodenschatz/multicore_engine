@@ -10,12 +10,17 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/util/unused.hpp>
 #include <vector>
+
+#if !defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
+#error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
+#endif
 
 namespace mce {
 namespace graphics {
@@ -210,6 +215,65 @@ void device::create_device() {
 }
 
 device::~device() {}
+
+boost::optional<vk::Format> device::best_supported_format_try(vk::ArrayProxy<const vk::Format> candidates,
+															  vk::FormatFeatureFlags required_flags,
+															  format_support_query_type query_type) const
+		noexcept {
+	auto member = (query_type == format_support_query_type::optimal_tiling_image)
+						  ? &vk::FormatProperties::optimalTilingFeatures
+						  : ((query_type == format_support_query_type::linear_tiling_image)
+									 ? &vk::FormatProperties::linearTilingFeatures
+									 : &vk::FormatProperties::bufferFeatures);
+	auto it = std::find_if(candidates.begin(), candidates.end(),
+						   [this, member, required_flags](vk::Format fmt) {
+							   const auto& flags = physical_device_.getFormatProperties(fmt).*member;
+							   return bool(flags) && ((flags & required_flags) == flags);
+						   });
+	if(it != candidates.end()) {
+		return *it;
+	} else {
+		return {};
+	}
+}
+
+vk::Format device::best_supported_depth_attachment_format(vk::FormatFeatureFlags additional_required_flags,
+														  format_support_query_type query_type) const {
+	auto fmt = best_supported_format_try(
+			{vk::Format::eD32Sfloat, vk::Format::eX8D24UnormPack32, vk::Format::eD16Unorm},
+			vk::FormatFeatureFlagBits::eDepthStencilAttachment | additional_required_flags, query_type);
+	if(fmt) {
+		return fmt.get();
+	} else {
+		throw mce::graphics_exception("No supported depth attachment format with the required flags found.");
+	}
+}
+
+vk::Format
+device::best_supported_depth_stencil_attachment_format(vk::FormatFeatureFlags additional_required_flags,
+													   format_support_query_type query_type) const {
+	auto fmt = best_supported_format_try(
+			{vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint, vk::Format::eD16UnormS8Uint},
+			vk::FormatFeatureFlagBits::eDepthStencilAttachment | additional_required_flags, query_type);
+	if(fmt) {
+		return fmt.get();
+	} else {
+		throw mce::graphics_exception(
+				"No supported depth-stencil attachment format with the required flags found.");
+	}
+}
+
+vk::Format device::best_supported_format(vk::ArrayProxy<const vk::Format> candidates,
+										 vk::FormatFeatureFlags required_flags,
+										 format_support_query_type query_type) const {
+	auto fmt = best_supported_format_try(candidates, required_flags, query_type);
+	if(fmt) {
+		return fmt.get();
+	} else {
+		throw mce::graphics_exception(
+				"No supported format with the required flags found in the given candidates.");
+	}
+}
 
 } /* namespace graphics */
 } /* namespace mce */
