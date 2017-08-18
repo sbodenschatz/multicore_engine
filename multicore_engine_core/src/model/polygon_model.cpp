@@ -33,7 +33,8 @@ void polygon_model::complete_loading(const asset::asset_ptr& polygon_asset, mode
 				io_exception("Error on loading meta data for polygon model '" + name_ + "'.")));
 		return;
 	}
-	content_data_ = polygon_asset->data_shared();
+	content_data_ = std::shared_ptr<const char>(polygon_asset->data_shared(),
+												polygon_asset->data() + meta_data_.content_range.begin());
 	current_state_ = state::staging;
 	lock.unlock();
 	mm.start_stage_polygon_model(this->shared_from_this());
