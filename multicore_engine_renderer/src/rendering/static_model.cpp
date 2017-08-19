@@ -80,5 +80,20 @@ void static_model::complete_staging() noexcept {
 	error_handlers.shrink_to_fit();
 }
 
+void static_model::mesh::bind_vertices(vk::CommandBuffer cmd_buf) {
+	parent_->bind_vertices(cmd_buf);
+}
+void static_model::mesh::bind_indices(vk::CommandBuffer cmd_buf) {
+	cmd_buf.bindIndexBuffer(parent_->vertex_index_buffer_.native_buffer(), offset_, vk::IndexType::eUint32);
+}
+void static_model::mesh::record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances) {
+	cmd_buf.drawIndexed(vertex_count_, instances, 0, 0, 0);
+}
+void static_model::mesh::draw(vk::CommandBuffer cmd_buf, uint32_t instances) {
+	bind_vertices(cmd_buf);
+	bind_indices(cmd_buf);
+	record_draw_call(cmd_buf, instances);
+}
+
 } /* namespace rendering */
 } /* namespace mce */
