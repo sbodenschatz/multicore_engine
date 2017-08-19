@@ -34,6 +34,7 @@ public:
 
 		friend class static_model;
 
+		// cppcheck-suppress passedByValue
 		mesh(static_model* parent, std::string object_name, std::string group_name, vk::DeviceSize offset,
 			 uint32_t vertex_count)
 				: parent_{parent}, object_name_{std::move(object_name)},
