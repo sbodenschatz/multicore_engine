@@ -50,9 +50,14 @@ public:
 			return object_name_;
 		}
 
+		/// Binds the common vertex buffer for all meshes in the model to the given command buffer.
 		void bind_vertices(vk::CommandBuffer cmd_buf);
+		/// Binds the index buffer to the given command buffer.
 		void bind_indices(vk::CommandBuffer cmd_buf);
+		/// \brief Records a draw call to the given command buffer, optionally drawing multiple instances.
 		void record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances = 1);
+		/// \brief Binds the vertex and index buffer for the given mesh and records a draw call to the given
+		/// command buffer, optionally drawing multiple instances.
 		void draw(vk::CommandBuffer cmd_buf, uint32_t instances = 1);
 	};
 
@@ -149,9 +154,15 @@ public:
 		return meshes_;
 	}
 
+	/// Binds the common vertex buffer for all meshes in the model to the given command buffer.
 	void bind_vertices(vk::CommandBuffer cmd_buf);
+	/// Binds the index buffer for the given mesh to the given command buffer.
 	void bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index);
+	/// \brief Records a draw call for the given mesh to the given command buffer, optionally drawing
+	/// multiple instances.
 	void record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1);
+	/// \brief Binds the vertex and index buffer for the given mesh and records a draw call to the given
+	/// command buffer, optionally drawing multiple instances.
 	void draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1);
 };
 } /* namespace rendering */
