@@ -11,6 +11,8 @@
 namespace mce {
 namespace graphics {
 
+buffer::buffer() : size_{0} {}
+
 buffer::buffer(device& dev, device_memory_manager_interface& mem_mgr,
 			   destruction_queue_manager* destruction_manager, vk::DeviceSize size,
 			   vk::BufferUsageFlags usage, vk::MemoryPropertyFlags required_flags)

@@ -94,6 +94,7 @@ public:
 			lock.unlock();
 			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
 		} else if(current_state_ == state::error) {
+			lock.unlock();
 			error_handler(std::make_exception_ptr(
 					path_not_found_exception("Requested asset '" + name_ + "' is cached as failed.")));
 		} else {
