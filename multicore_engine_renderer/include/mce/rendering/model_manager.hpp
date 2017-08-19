@@ -27,7 +27,7 @@ class model_manager {
 	boost::container::flat_map<std::string, std::shared_ptr<static_model>> loaded_static_models_;
 
 public:
-	model_manager(model::model_data_manager& model_data_mgr) : model_data_mgr_{model_data_mgr} {}
+	explicit model_manager(model::model_data_manager& model_data_mgr) : model_data_mgr_{model_data_mgr} {}
 	~model_manager();
 
 	template <typename F, typename E>
