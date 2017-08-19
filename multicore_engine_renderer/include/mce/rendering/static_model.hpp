@@ -74,12 +74,28 @@ public:
 			error_handlers.emplace_back(std::move(error_handler));
 		}
 	}
-	bool ready() const noexcept;
-	bool has_error() const noexcept;
-	void check_error_flag() const;
-	state current_state() const noexcept;
+	/// Checks if the model is ready for use.
+	bool ready() const noexcept {
+		return current_state_ == state::ready;
+	}
+	/// Checks if an error prevented loading.
+	bool has_error() const noexcept {
+		return current_state_ == state::error;
+	}
+	/// Triggers an error check by throwing an exception if an error prevented loading.
+	void check_error_flag() const {
+		if(current_state_ == state::error)
+			throw path_not_found_exception("Error loading model '" + name_ + "'.");
+	}
+	/// Returns the current state of the model.
+	state current_state() const noexcept {
+		return current_state_;
+	}
 	const model::static_model_meta_data& meta_data() const noexcept;
-	const std::string& name() const noexcept;
+	/// Returns the name of the model.
+	const std::string& name() const noexcept {
+		return name_;
+	}
 	void bind_vertices(vk::CommandBuffer cmd_buf);
 	void bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index);
 	void record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1);
