@@ -141,7 +141,7 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	/// Creates an empty dynamic_array.
-	dynamic_array() : size_{0}, data_{nullptr} {}
+	dynamic_array() : data_{nullptr}, size_{0} {}
 
 	/// Creates a dynamic_array containing the given number of copies of the given value.
 	dynamic_array(size_type size, const_reference value) : data_{nullptr}, size_{0} {
