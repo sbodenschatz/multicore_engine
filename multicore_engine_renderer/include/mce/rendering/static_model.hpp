@@ -37,7 +37,7 @@ private:
 	graphics::buffer vertex_index_buffer_;
 
 public:
-	static_model(model_manager& mgr) : mgr_{mgr} {}
+	explicit static_model(model_manager& mgr) : mgr_{mgr} {}
 	~static_model();
 	explicit static_model(const std::string& name);
 	explicit static_model(std::string&& name);
