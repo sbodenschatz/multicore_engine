@@ -32,12 +32,14 @@ public:
 		vk::DeviceSize offset_;
 		uint32_t vertex_count_;
 
-	public:
+		friend class static_model;
+
 		mesh(static_model* parent, std::string object_name, std::string group_name, vk::DeviceSize offset,
 			 uint32_t vertex_count)
 				: parent_{parent}, object_name_{std::move(object_name)},
 				  group_name_{std::move(group_name)}, offset_{offset}, vertex_count_{vertex_count} {}
 
+	public:
 		const std::string& group_name() const {
 			return group_name_;
 		}
