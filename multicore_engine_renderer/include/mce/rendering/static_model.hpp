@@ -20,7 +20,7 @@ namespace mce {
 namespace rendering {
 class model_manager;
 
-class static_model {
+class static_model : public std::enable_shared_from_this<static_model> {
 public:
 	/// Represents the status of static_model.
 	enum class state { loading, staging, ready, error };
@@ -36,11 +36,19 @@ private:
 	model::polygon_model_ptr poly_model_;
 	graphics::buffer vertex_index_buffer_;
 
+	void complete_loading(const model::polygon_model_ptr& polygon_mdl) noexcept;
+	void complete_staging() noexcept;
+
+	void raise_error_flag(std::exception_ptr e) noexcept;
+
+	friend class model_manager;
+
 public:
-	explicit static_model(model_manager& mgr) : mgr_{mgr} {}
+	explicit static_model(model_manager& mgr, const std::string& name)
+			: mgr_{mgr}, current_state_{state::loading}, name_{name} {}
+	explicit static_model(model_manager& mgr, std::string&& name)
+			: mgr_{mgr}, current_state_{state::loading}, name_{std::move(name)} {}
 	~static_model();
-	explicit static_model(const std::string& name);
-	explicit static_model(std::string&& name);
 	static_model(const static_model&) = delete;
 	static_model& operator=(const static_model&) = delete;
 	template <typename F, typename E>
