@@ -9,10 +9,6 @@
 namespace mce {
 namespace rendering {
 
-model_manager::model_manager() {
-	// TODO Auto-generated constructor stub
-}
-
 model_manager::~model_manager() {}
 
 } /* namespace rendering */

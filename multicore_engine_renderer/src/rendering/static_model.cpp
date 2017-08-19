@@ -1,19 +1,19 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_renderer/src/rendering/model.cpp
+ * File /multicore_engine_renderer/src/rendering/static_model.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <mce/rendering/model.hpp>
+#include <mce/rendering/static_model.hpp>
 
 namespace mce {
 namespace rendering {
 
-model::model() {
+static_model::static_model() {
 	// TODO Auto-generated constructor stub
 }
 
-model::~model() {}
+static_model::~static_model() {}
 
 } /* namespace rendering */
 } /* namespace mce */
