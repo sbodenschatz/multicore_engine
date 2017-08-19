@@ -9,6 +9,7 @@
 
 #include <boost/container/flat_map.hpp>
 #include <mce/rendering/rendering_defs.hpp>
+#include <mce/rendering/static_model.hpp>
 #include <memory>
 #include <shared_mutex>
 #include <string>
@@ -54,8 +55,14 @@ public:
 	model_manager& operator=(const model_manager&) = delete;
 
 	template <typename F, typename E>
-	static_model_ptr load_static_model(const std::string& name, F completion_handler, E error_handler);
-	static_model_ptr load_static_model(const std::string& name);
+	static_model_ptr load_static_model(const std::string& name, F completion_handler, E error_handler) {
+		auto tmp = internal_load_static_model(name);
+		tmp->run_when_ready(std::move(completion_handler), std::move(error_handler));
+		return tmp;
+	}
+	static_model_ptr load_static_model(const std::string& name) {
+		return internal_load_static_model(name);
+	}
 };
 
 } /* namespace rendering */
