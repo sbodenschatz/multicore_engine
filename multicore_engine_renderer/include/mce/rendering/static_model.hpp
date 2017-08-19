@@ -118,11 +118,15 @@ public:
 	state current_state() const noexcept {
 		return current_state_;
 	}
-	const model::static_model_meta_data& meta_data() const noexcept;
 	/// Returns the name of the model.
 	const std::string& name() const noexcept {
 		return name_;
 	}
+	/// Allows access to the contained meshes.
+	const std::vector<mesh>& meshes() const {
+		return meshes_;
+	}
+
 	void bind_vertices(vk::CommandBuffer cmd_buf);
 	void bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index);
 	void record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1);
