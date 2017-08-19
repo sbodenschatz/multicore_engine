@@ -94,6 +94,18 @@ void static_model::mesh::draw(vk::CommandBuffer cmd_buf, uint32_t instances) {
 	bind_indices(cmd_buf);
 	record_draw_call(cmd_buf, instances);
 }
+void static_model::bind_vertices(vk::CommandBuffer cmd_buf) {
+	cmd_buf.bindVertexBuffers(0, vertex_index_buffer_.native_buffer(), vk::DeviceSize(0));
+}
+void static_model::bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index) {
+	meshes_.at(mesh_index).bind_indices(cmd_buf);
+}
+void static_model::record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances) {
+	meshes_.at(mesh_index).record_draw_call(cmd_buf, instances);
+}
+void static_model::draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances) {
+	meshes_.at(mesh_index).draw(cmd_buf, instances);
+}
 
 } /* namespace rendering */
 } /* namespace mce */
