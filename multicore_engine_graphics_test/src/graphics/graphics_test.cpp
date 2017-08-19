@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/vec2.hpp>
 #include <iomanip>
 #include <iostream>
@@ -40,6 +41,9 @@ graphics_test::graphics_test()
 		  fences_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
 					  return dev_->createFenceUnique(vk::FenceCreateInfo(vk::FenceCreateFlagBits::eSignaled));
 				  })),
+		  uniform_buffers_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
+							   return simple_uniform_buffer(dev_, mem_mgr_, &dqm_, 4096);
+						   })),
 		  vertex_buffer_(dev_, mem_mgr_, &dqm_, sizeof(vertex) * 6,
 						 vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
 						 vk::MemoryPropertyFlagBits::eDeviceLocal),
@@ -152,6 +156,11 @@ void graphics_test::run() {
 		}
 		tmgr_.start_frame(acq_res.value);
 		dqm_.cleanup_and_set_current(acq_res.value);
+		uniform_buffers_[img_index].reset();
+		uniform_data ud;
+		ud.projection = glm::perspectiveFov(glm::radians(90.0f), float(win_.swapchain_size().x),
+											float(win_.swapchain_size().y), 0.1f, 1000.0f);
+		ud.model = glm::mat4();
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
@@ -163,6 +172,7 @@ void graphics_test::run() {
 						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
 						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 2, clear),
 				vk::SubpassContents::eInline);
+		uniform_buffers_[img_index].store(ud); // TODO Bind uniform descriptor.
 		if(vb_ready_) {
 			pl_->bind(render_cmb_buf.get());
 			render_cmb_buf->bindVertexBuffers(0, vertex_buffer_.native_buffer(), vk::DeviceSize(0));

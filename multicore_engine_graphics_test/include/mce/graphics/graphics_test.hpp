@@ -9,7 +9,8 @@
 
 #include <boost/filesystem.hpp>
 #include <chrono>
-#include <glm/vec2.hpp>
+#include <glm/matrix.hpp>
+#include <glm/vec3.hpp>
 #include <mce/asset/asset_manager.hpp>
 #include <mce/containers/dynamic_array.hpp>
 #include <mce/glfw/instance.hpp>
@@ -21,6 +22,7 @@
 #include <mce/graphics/graphics_manager.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/pipeline_cache.hpp>
+#include <mce/graphics/simple_uniform_buffer.hpp>
 #include <mce/graphics/transfer_manager.hpp>
 #include <mce/graphics/window.hpp>
 #include <mce/model/model_data_manager.hpp>
@@ -48,6 +50,7 @@ class graphics_test {
 	containers::dynamic_array<vk::UniqueSemaphore> acquire_semaphores_;
 	containers::dynamic_array<vk::UniqueSemaphore> present_semaphores_;
 	containers::dynamic_array<vk::UniqueFence> fences_;
+	containers::dynamic_array<simple_uniform_buffer> uniform_buffers_;
 	buffer vertex_buffer_;
 	bool vb_ready_ = false;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
@@ -65,6 +68,11 @@ class graphics_test {
 	struct vertex {
 		glm::vec3 pos;
 		glm::vec3 color;
+	};
+
+	struct uniform_data {
+		glm::mat4 projection;
+		glm::mat4 model;
 	};
 
 public:
