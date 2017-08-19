@@ -52,7 +52,28 @@ public:
 	static_model(const static_model&) = delete;
 	static_model& operator=(const static_model&) = delete;
 	template <typename F, typename E>
-	void run_when_ready(F handler, E error_handler);
+	void run_when_ready(F handler, E error_handler) {
+		if(current_state_ == state::ready) {
+			handler(this->shared_from_this());
+			return;
+		} else if(current_state_ == state::error) {
+			error_handler(std::make_exception_ptr(
+					path_not_found_exception("Static model '" + name() + "' was cached as failed.")));
+			return;
+		}
+		std::unique_lock<std::mutex> lock(modification_mutex);
+		if(current_state_ == state::ready) {
+			lock.unlock();
+			handler(this->shared_from_this());
+		} else if(current_state_ == state::error) {
+			lock.unlock();
+			error_handler(std::make_exception_ptr(
+					path_not_found_exception("Polygon model '" + name() + "' was cached as failed.")));
+		} else {
+			completion_handlers.emplace_back(std::move(handler));
+			error_handlers.emplace_back(std::move(error_handler));
+		}
+	}
 	bool ready() const noexcept;
 	bool has_error() const noexcept;
 	void check_error_flag() const;
