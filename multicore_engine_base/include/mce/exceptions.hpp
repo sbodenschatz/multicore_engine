@@ -142,6 +142,11 @@ struct key_not_found_exception : std::runtime_error {
 	using std::runtime_error::runtime_error;
 };
 
+/// Exception used to signal that given data violates a constraint.
+struct invalid_data_exception : std::runtime_error {
+	using std::runtime_error::runtime_error;
+};
+
 } // namespace mce
 
 #endif /* CORE_EXCEPTIONS_HPP_ */

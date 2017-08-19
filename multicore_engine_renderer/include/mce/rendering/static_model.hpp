@@ -25,6 +25,33 @@ public:
 	/// Represents the status of static_model.
 	enum class state { loading, staging, ready, error };
 
+	class mesh {
+		static_model* parent_;
+		std::string object_name_;
+		std::string group_name_;
+		vk::DeviceSize offset_;
+		uint32_t vertex_count_;
+
+	public:
+		mesh(static_model* parent, std::string object_name, std::string group_name, vk::DeviceSize offset,
+			 uint32_t vertex_count)
+				: parent_{parent}, object_name_{std::move(object_name)},
+				  group_name_{std::move(group_name)}, offset_{offset}, vertex_count_{vertex_count} {}
+
+		const std::string& group_name() const {
+			return group_name_;
+		}
+
+		const std::string& object_name() const {
+			return object_name_;
+		}
+
+		void bind_vertices(vk::CommandBuffer cmd_buf);
+		void bind_indices(vk::CommandBuffer cmd_buf);
+		void record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances = 1);
+		void draw(vk::CommandBuffer cmd_buf, uint32_t instances = 1);
+	};
+
 private:
 	model_manager& mgr_;
 	std::atomic<state> current_state_;
@@ -32,7 +59,7 @@ private:
 	std::string name_;
 	std::vector<static_model_completion_handler> completion_handlers;
 	std::vector<asset::error_handler> error_handlers;
-	model::static_model_meta_data meta_data_;
+	std::vector<mesh> meshes_;
 	model::polygon_model_ptr poly_model_;
 	graphics::buffer vertex_index_buffer_;
 
