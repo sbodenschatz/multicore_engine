@@ -24,10 +24,12 @@ namespace graphics {
 boost::filesystem::path graphics_test::exe_path(".");
 
 graphics_test::graphics_test()
-		: glfw_win_("Vulkan Test", glm::ivec2(800, 600)), dev_(inst_), win_(inst_, glfw_win_, dev_),
-		  mem_mgr_(&dev_, 1 << 27), render_cmd_pool_(dev_, dev_.graphics_queue_index().first, true),
+		: mdmgr(amgr_), glfw_win_("Vulkan Test", glm::ivec2(800, 600)), dev_(inst_),
+		  win_(inst_, glfw_win_, dev_), mem_mgr_(&dev_, 1 << 27),
+		  render_cmd_pool_(dev_, dev_.graphics_queue_index().first, true),
 		  dqm_(&dev_, uint32_t(win_.swapchain_images().size())),
-		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())), gmgr_(dev_, &dqm_),
+		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())),
+		  mmgr(mdmgr, dev_, mem_mgr_, &dqm_, tmgr_), gmgr_(dev_, &dqm_),
 		  tmp_semaphore_(dev_->createSemaphoreUnique({})),
 		  acquire_semaphores_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
 								  return dev_->createSemaphoreUnique({});
@@ -71,6 +73,7 @@ graphics_test::graphics_test()
 			  ((exe_path.parent_path() / "multicore_engine_assets") / "assets.pack").string()}}));
 	amgr_.add_asset_loader(loader);
 	amgr_.start_pin_load_unit("shaders");
+	amgr_.start_pin_load_unit("models_geo");
 	auto vert_shader_bin = amgr_.load_asset_sync("shaders/test_shader.vert.spv");
 	for(size_t i = 0; i < vert_shader_bin->size(); ++i) {
 		std::cout << std::hex << std::setw(2) << std::setfill('0')
@@ -114,6 +117,11 @@ graphics_test::graphics_test()
 						[this](vk::Buffer) { //
 							vb_ready_ = true;
 						});
+	mdl_ = mmgr.load_static_model("models/cube",
+								  [](rendering::static_model_ptr mdl) { //
+									  std::cout << mdl->meshes().size() << std::endl;
+								  },
+								  [](std::exception_ptr) {});
 }
 
 graphics_test::~graphics_test() {

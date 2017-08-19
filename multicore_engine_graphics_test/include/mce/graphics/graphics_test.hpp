@@ -23,6 +23,8 @@
 #include <mce/graphics/pipeline_cache.hpp>
 #include <mce/graphics/transfer_manager.hpp>
 #include <mce/graphics/window.hpp>
+#include <mce/model/model_data_manager.hpp>
+#include <mce/rendering/model_manager.hpp>
 
 namespace mce {
 namespace graphics {
@@ -30,6 +32,7 @@ class framebuffer;
 
 class graphics_test {
 	asset::asset_manager amgr_;
+	model::model_data_manager mdmgr;
 	glfw::instance glfw_inst_;
 	glfw::window glfw_win_;
 	instance inst_;
@@ -39,6 +42,7 @@ class graphics_test {
 	command_pool render_cmd_pool_;
 	destruction_queue_manager dqm_;
 	transfer_manager tmgr_;
+	rendering::model_manager mmgr;
 	graphics_manager gmgr_;
 	vk::UniqueSemaphore tmp_semaphore_;
 	containers::dynamic_array<vk::UniqueSemaphore> acquire_semaphores_;
@@ -56,6 +60,7 @@ class graphics_test {
 	std::shared_ptr<const pipeline_config> plc_;
 	std::shared_ptr<const pipeline> pl_;
 	std::unique_ptr<framebuffer> fb_;
+	rendering::static_model_ptr mdl_;
 
 	struct vertex {
 		glm::vec3 pos;
