@@ -59,7 +59,7 @@ private:
 		completion_handlers.shrink_to_fit();
 	}
 
-	friend class model_manager;
+	friend class model_data_manager;
 
 public:
 	/// \brief Creates an model object with the given name. Should only be used within the model system but
@@ -97,6 +97,7 @@ public:
 			lock.unlock();
 			handler(this->shared_from_this());
 		} else if(current_state_ == state::error) {
+			lock.unlock();
 			error_handler(std::make_exception_ptr(
 					path_not_found_exception("Collision model '" + name() + "' was cached as failed.")));
 		} else {

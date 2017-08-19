@@ -28,6 +28,8 @@ class buffer {
 	vk::BufferUsageFlags usage_;
 
 public:
+	/// Constructs a buffer object that doesn't manage a buffer to allow deferred allocation.
+	buffer();
 	/// Constructs a buffer with the given parameters.
 	buffer(device& dev, device_memory_manager_interface& mem_mgr,
 		   destruction_queue_manager* destruction_manager, vk::DeviceSize size, vk::BufferUsageFlags usage,
