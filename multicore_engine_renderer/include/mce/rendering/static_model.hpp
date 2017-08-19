@@ -40,10 +40,12 @@ public:
 				  group_name_{std::move(group_name)}, offset_{offset}, vertex_count_{vertex_count} {}
 
 	public:
+		/// Returns the group name specified for this mesh in the model file.
 		const std::string& group_name() const {
 			return group_name_;
 		}
 
+		/// Returns the object name specified for this mesh in the model file.
 		const std::string& object_name() const {
 			return object_name_;
 		}
@@ -73,13 +75,31 @@ private:
 	friend class model_manager;
 
 public:
+	/// \brief Creates an model object with the given name. Should only be used within the rendering system
+	/// but can't be private due to being used in make_shared.
 	explicit static_model(model_manager& mgr, const std::string& name)
 			: mgr_{mgr}, current_state_{state::loading}, name_{name} {}
+	/// \brief Creates an model object with the given name. Should only be used within the rendering system
+	/// but can't be private due to being used in make_shared.
 	explicit static_model(model_manager& mgr, std::string&& name)
 			: mgr_{mgr}, current_state_{state::loading}, name_{std::move(name)} {}
+	/// Destroys the static_model and releases the underlying resources.
 	~static_model();
+	/// Forbids copy-construction of static_model.
 	static_model(const static_model&) = delete;
+	/// Forbids copy-construction of static_model.
 	static_model& operator=(const static_model&) = delete;
+	/// \brief Instructs the rendering system to run the handler function object when the model has completed
+	/// loading and was transfered to the graphics device or to run the error_handler if an error occurred
+	/// during loading or transfer.
+	/**
+	 * The handler function object must have the signature <code>void(const static_model_ptr&
+	 * model)</code>.
+	 * The error_handler function object must have the signature <code>void(std::exception_ptr)</code>.
+	 * Both handlers are called either on the thread calling this function or on a worker thread of the asset
+	 * system. Both must fit into their respective handler function wrapper type
+	 * static_model_completion_handler and error_handler.
+	 */
 	template <typename F, typename E>
 	void run_when_ready(F handler, E error_handler) {
 		if(current_state_ == state::ready) {
