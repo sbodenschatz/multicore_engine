@@ -9,10 +9,6 @@
 namespace mce {
 namespace rendering {
 
-static_model::static_model() {
-	// TODO Auto-generated constructor stub
-}
-
 static_model::~static_model() {}
 
 } /* namespace rendering */
