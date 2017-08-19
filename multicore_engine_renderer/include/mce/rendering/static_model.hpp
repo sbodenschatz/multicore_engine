@@ -7,6 +7,10 @@
 #ifndef MCE_RENDERING_STATIC_MODEL_HPP_
 #define MCE_RENDERING_STATIC_MODEL_HPP_
 
+/**
+ * Defines the static_model class.
+ */
+
 #include <atomic>
 #include <mce/asset/asset_defs.hpp>
 #include <mce/graphics/buffer.hpp>
@@ -20,11 +24,19 @@ namespace mce {
 namespace rendering {
 class model_manager;
 
+/// Represents a non-animated model used in the rendering subsystem.
+/**
+ * This class builds on top of model::polygon_model and adds the required resources of the graphics system as
+ * well as rendering functionality.
+ *
+ * A model consists of multiple meshes that can be drawn individually.
+ */
 class static_model : public std::enable_shared_from_this<static_model> {
 public:
 	/// Represents the status of static_model.
 	enum class state { loading, staging, ready, error };
 
+	/// Represents a mesh in the model.
 	class mesh {
 		static_model* parent_;
 		std::string object_name_;
