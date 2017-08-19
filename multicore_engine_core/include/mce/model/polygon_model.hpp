@@ -100,6 +100,7 @@ public:
 			lock.unlock();
 			handler(this->shared_from_this());
 		} else if(current_state_ == state::error) {
+			lock.unlock();
 			error_handler(std::make_exception_ptr(
 					path_not_found_exception("Polygon model '" + name() + "' was cached as failed.")));
 		} else {
