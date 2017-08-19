@@ -27,13 +27,13 @@
 namespace mce {
 namespace model {
 
-class model_manager;
+class model_data_manager;
 
 /// Represents a static (3D-)polygon model consisting of arbitrarily many meshes used for rendering.
 class polygon_model : public std::enable_shared_from_this<polygon_model> {
 public:
 	/// Represents the status of polygon_model.
-	enum class state { loading, staging, ready, error };
+	enum class state { loading, ready, error };
 
 private:
 	std::atomic<state> current_state_;
@@ -42,9 +42,9 @@ private:
 	std::vector<polygon_model_completion_handler> completion_handlers;
 	std::vector<asset::error_handler> error_handlers;
 	static_model_meta_data meta_data_;
+	std::shared_ptr<const char> content_data_;
 
-	void complete_loading(const asset::asset_ptr& polygon_asset, model_manager& mm) noexcept;
-	void complete_staging(model_manager& mm) noexcept;
+	void complete_loading(const asset::asset_ptr& polygon_asset) noexcept;
 
 	void raise_error_flag(std::exception_ptr e) noexcept {
 		current_state_ = state::error;
@@ -62,7 +62,7 @@ private:
 		completion_handlers.shrink_to_fit();
 	}
 
-	friend class model_manager;
+	friend class model_data_manager;
 
 public:
 	/// \brief Creates an model object with the given name. Should only be used within the model system but
@@ -100,6 +100,7 @@ public:
 			lock.unlock();
 			handler(this->shared_from_this());
 		} else if(current_state_ == state::error) {
+			lock.unlock();
 			error_handler(std::make_exception_ptr(
 					path_not_found_exception("Polygon model '" + name() + "' was cached as failed.")));
 		} else {
@@ -134,6 +135,24 @@ public:
 	/// Returns the name of the model.
 	const std::string& name() const noexcept {
 		return name_;
+	}
+	/// Returns a pointer to the content data.
+	/**
+	 * Requires the model to be ready for use.
+	 */
+	const char* content_data() const {
+		return content_data_.get();
+	}
+	/// Returns a pointer to the content data participating in ownership.
+	/**
+	 * Requires the model to be ready for use.
+	 */
+	const std::shared_ptr<const char>& content_data_shared() const {
+		return content_data_;
+	}
+	/// Returns the size of the content data of the file.
+	uint64_t content_data_size() const {
+		return meta_data_.content_range.length();
 	}
 };
 
