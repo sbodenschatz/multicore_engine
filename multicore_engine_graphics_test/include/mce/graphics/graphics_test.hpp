@@ -55,6 +55,7 @@ class graphics_test {
 	bool vb_ready_ = false;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
 	std::shared_ptr<const framebuffer_config> fbcfg_;
+	std::shared_ptr<const descriptor_set_layout> uniform_dsl_;
 	std::shared_ptr<const pipeline_layout> pll_;
 	std::shared_ptr<const subpass_graph> spg_;
 	std::shared_ptr<const render_pass> rp_;

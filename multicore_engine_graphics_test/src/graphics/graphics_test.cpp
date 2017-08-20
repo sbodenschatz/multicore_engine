@@ -10,6 +10,7 @@
 #include <iostream>
 #include <mce/asset/load_unit_asset_loader.hpp>
 #include <mce/asset/pack_file_reader.hpp>
+#include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/framebuffer.hpp>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_test.hpp>
@@ -52,7 +53,11 @@ graphics_test::graphics_test()
 			"test_fbcfg", win_,
 			{framebuffer_attachment_config(dev_.best_supported_depth_attachment_format(),
 										   image_aspect_mode::depth)});
-	pll_ = gmgr_.create_pipeline_layout("test_pll", {}, {});
+	uniform_dsl_ = gmgr_.create_descriptor_set_layout(
+			"test_uniform_dsl",
+			{descriptor_set_layout_binding_element{
+					0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex, {}}});
+	pll_ = gmgr_.create_pipeline_layout("test_pll", {uniform_dsl_}, {});
 	spg_ = gmgr_.create_subpass_graph(
 			"test_spg",
 			{subpass_entry{{},
