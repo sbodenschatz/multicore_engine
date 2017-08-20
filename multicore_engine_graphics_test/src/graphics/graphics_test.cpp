@@ -57,6 +57,9 @@ graphics_test::graphics_test()
 			"test_uniform_dsl",
 			{descriptor_set_layout_binding_element{
 					0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex, {}}});
+	descriptor_pools_ = {win_.swapchain_images().size(), containers::generator_param([this](size_t) {
+							 return simple_descriptor_pool(dev_, descriptor_set_resources(*uniform_dsl_, 16));
+						 })};
 	pll_ = gmgr_.create_pipeline_layout("test_pll", {uniform_dsl_}, {});
 	spg_ = gmgr_.create_subpass_graph(
 			"test_spg",
@@ -117,8 +120,8 @@ graphics_test::graphics_test()
 	plc_ = gmgr_.find_pipeline_config("test_pl");
 	pl_ = gmgr_.find_pipeline("test_pl");
 	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_, rp_->native_render_pass());
-	vertex vertices[] = {{{0.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, {{-1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-						 {{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+	vertex vertices[] = {{{0.0f, -1.0f, 0.2f}, {1.0f, 0.0f, 0.0f}}, {{-1.0f, 1.0f, 0.2f}, {0.0f, 1.0f, 0.0f}},
+						 {{1.0f, 1.0f, 0.2f}, {0.0f, 0.0f, 1.0f}},
 
 						 {{0.0f, 1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}},  {{1.0f, -1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}},
 						 {{-1.0f, -1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}}};
@@ -162,10 +165,11 @@ void graphics_test::run() {
 		tmgr_.start_frame(acq_res.value);
 		dqm_.cleanup_and_set_current(acq_res.value);
 		uniform_buffers_[img_index].reset();
+		descriptor_pools_[img_index].reset();
 		uniform_data ud;
 		ud.projection = glm::perspectiveFov(glm::radians(90.0f), float(win_.swapchain_size().x),
-											float(win_.swapchain_size().y), 0.1f, 1000.0f);
-		ud.model = glm::mat4();
+											float(win_.swapchain_size().y), 1.0f, 1000.0f);
+		ud.model = glm::translate(glm::mat4(), {0.0f, 0.0f, -2.0f});
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
@@ -177,12 +181,17 @@ void graphics_test::run() {
 						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
 						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 2, clear),
 				vk::SubpassContents::eInline);
-		uniform_buffers_[img_index].store(ud); // TODO Bind uniform descriptor.
+		auto ds = descriptor_pools_[img_index].allocate_descriptor_set(uniform_dsl_);
+		ds.update_buffers(0, 0, vk::DescriptorType::eUniformBuffer, uniform_buffers_[img_index].store(ud));
+		ds.bind(render_cmb_buf.get(), pll_, 0, ds);
+		pl_->bind(render_cmb_buf.get());
 		if(vb_ready_) {
-			pl_->bind(render_cmb_buf.get());
 			render_cmb_buf->bindVertexBuffers(0, vertex_buffer_.native_buffer(), vk::DeviceSize(0));
 			render_cmb_buf->draw(6, 1, 0, 0);
 		}
+		/*if(mdl_->ready()) {
+			mdl_->draw_model_mesh(render_cmb_buf.get(), 0);
+		}*/
 		render_cmb_buf->endRenderPass();
 		render_cmb_buf->pipelineBarrier(
 				vk::PipelineStageFlagBits::eAllCommands,
@@ -197,6 +206,7 @@ void graphics_test::run() {
 		auto acq_sema = acquire_semaphores_[img_index].get();
 		vk::PipelineStageFlags wait_ps = vk::PipelineStageFlagBits::eTopOfPipe;
 		auto present_sema = present_semaphores_[img_index].get();
+		uniform_buffers_[img_index].flush();
 		dev_.graphics_queue().submit(
 				{vk::SubmitInfo(1, &acq_sema, &wait_ps, uint32_t(cmd_buff_handles.size()),
 								cmd_buff_handles.data(), 1, &present_sema)},

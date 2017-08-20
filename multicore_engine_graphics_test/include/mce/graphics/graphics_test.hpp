@@ -22,6 +22,7 @@
 #include <mce/graphics/graphics_manager.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/pipeline_cache.hpp>
+#include <mce/graphics/simple_descriptor_pool.hpp>
 #include <mce/graphics/simple_uniform_buffer.hpp>
 #include <mce/graphics/transfer_manager.hpp>
 #include <mce/graphics/window.hpp>
@@ -51,6 +52,7 @@ class graphics_test {
 	containers::dynamic_array<vk::UniqueSemaphore> present_semaphores_;
 	containers::dynamic_array<vk::UniqueFence> fences_;
 	containers::dynamic_array<simple_uniform_buffer> uniform_buffers_;
+	containers::dynamic_array<simple_descriptor_pool> descriptor_pools_;
 	buffer vertex_buffer_;
 	bool vb_ready_ = false;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
@@ -72,8 +74,8 @@ class graphics_test {
 	};
 
 	struct uniform_data {
-		glm::mat4 projection;
 		glm::mat4 model;
+		glm::mat4 projection;
 	};
 
 public:
