@@ -32,7 +32,7 @@ unique_descriptor_pool::unique_descriptor_pool(device& dev, descriptor_set_resou
 unique_descriptor_pool::~unique_descriptor_pool() {}
 
 descriptor_set
-unique_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+unique_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<const descriptor_set_layout>& layout,
 												destruction_queue_manager* dqm) {
 	descriptor_set_resources req = *layout;
 	auto nlayout = layout->native_layout();
@@ -53,7 +53,8 @@ unique_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor
 }
 
 std::vector<descriptor_set> unique_descriptor_pool::allocate_descriptor_sets(
-		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts, destruction_queue_manager* dqm) {
+		const std::vector<std::shared_ptr<const descriptor_set_layout>>& layouts,
+		destruction_queue_manager* dqm) {
 	std::vector<descriptor_set> rv;
 	descriptor_set_resources req;
 	for(const auto& layout : layouts) {
@@ -63,7 +64,7 @@ std::vector<descriptor_set> unique_descriptor_pool::allocate_descriptor_sets(
 	rv.reserve(layouts.size());
 	nlayouts.reserve(layouts.size());
 	std::transform(layouts.begin(), layouts.end(), std::back_inserter(nlayouts),
-				   [](const std::shared_ptr<descriptor_set_layout>& l) { return l->native_layout(); });
+				   [](const std::shared_ptr<const descriptor_set_layout>& l) { return l->native_layout(); });
 	std::unique_lock<std::mutex> lock(pool_mutex_);
 	if(!available_resources_.sufficient_for(req)) {
 		throw mce::graphics_exception("Insufficient resources in pool for requested allocation.");
@@ -81,7 +82,7 @@ std::vector<descriptor_set> unique_descriptor_pool::allocate_descriptor_sets(
 }
 
 void unique_descriptor_pool::free(vk::DescriptorSet set,
-								  const std::shared_ptr<descriptor_set_layout>& layout) {
+								  const std::shared_ptr<const descriptor_set_layout>& layout) {
 	descriptor_set_resources alloc = *layout;
 	std::lock_guard<std::mutex> lock(pool_mutex_);
 	(*dev_)->freeDescriptorSets(native_pool_.get(), set);
@@ -110,9 +111,8 @@ uint32_t growing_unique_descriptor_pool::available_sets() const {
 						   });
 }
 
-descriptor_set
-growing_unique_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
-														destruction_queue_manager* dqm) {
+descriptor_set growing_unique_descriptor_pool::allocate_descriptor_set(
+		const std::shared_ptr<const descriptor_set_layout>& layout, destruction_queue_manager* dqm) {
 	descriptor_set_resources req = *layout;
 	std::lock_guard<std::mutex> lock(blocks_mutex_);
 	auto it = std::find_if(blocks_.begin(), blocks_.end(),
@@ -128,7 +128,8 @@ growing_unique_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<de
 }
 
 std::vector<descriptor_set> growing_unique_descriptor_pool::allocate_descriptor_sets(
-		const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts, destruction_queue_manager* dqm) {
+		const std::vector<std::shared_ptr<const descriptor_set_layout>>& layouts,
+		destruction_queue_manager* dqm) {
 	descriptor_set_resources req;
 	for(const auto& layout : layouts) {
 		req += *layout;
