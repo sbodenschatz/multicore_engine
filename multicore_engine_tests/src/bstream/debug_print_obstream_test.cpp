@@ -4,11 +4,11 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
-#include <mce/bstream/debug_print_obstream.hpp>
 #include <gtest.hpp>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <mce/bstream/debug_print_obstream.hpp>
 #include <sstream>
 
 namespace mce {

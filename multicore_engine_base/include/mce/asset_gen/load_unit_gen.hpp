@@ -13,9 +13,9 @@
  */
 
 #include <algorithm>
-#include <mce/asset/load_unit_meta_data.hpp>
 #include <cstdint>
 #include <iostream>
+#include <mce/asset/load_unit_meta_data.hpp>
 #include <string>
 #include <vector>
 

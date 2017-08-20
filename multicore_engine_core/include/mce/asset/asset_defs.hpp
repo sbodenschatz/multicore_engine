@@ -14,8 +14,8 @@
 
 #include <cstdint>
 #include <exception>
-#include <memory>
 #include <mce/util/local_function.hpp>
+#include <memory>
 
 namespace mce {
 namespace asset {

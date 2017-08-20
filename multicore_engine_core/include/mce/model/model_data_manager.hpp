@@ -13,10 +13,10 @@
  */
 
 #include <boost/container/flat_map.hpp>
-#include <memory>
 #include <mce/model/collision_model.hpp>
 #include <mce/model/model_defs.hpp>
 #include <mce/model/polygon_model.hpp>
+#include <memory>
 #include <shared_mutex>
 #include <string>
 
@@ -28,10 +28,11 @@ class asset_manager;
 namespace model {
 
 /// Manages the loading and lifetime of collision and polygon models in the engine.
-class model_manager {
+class model_data_manager {
 public:
 	/// Constructs a model_manager using the given asset_manager.
-	explicit model_manager(asset::asset_manager& asset_manager) noexcept : asset_manager(asset_manager) {}
+	explicit model_data_manager(asset::asset_manager& asset_manager) noexcept
+			: asset_manager(asset_manager) {}
 
 	/// \brief Asynchronously loads the polygon_model with the given name and calls the completion_handler
 	/// function object on success or the error_handler function object on error.
@@ -63,21 +64,19 @@ private:
 	std::shared_ptr<polygon_model> internal_load_polygon_model(const std::string& name);
 	std::shared_ptr<collision_model> internal_load_collision_model(const std::string& name);
 
-	void start_stage_polygon_model(const std::shared_ptr<polygon_model>& model) noexcept;
-
 	friend class polygon_model;
 };
 
 template <typename F, typename E>
-polygon_model_ptr model_manager::load_polygon_model(const std::string& name, F completion_handler,
-													E error_handler) {
+polygon_model_ptr model_data_manager::load_polygon_model(const std::string& name, F completion_handler,
+														 E error_handler) {
 	auto model = internal_load_polygon_model(name);
 	model->run_when_ready(std::move(completion_handler), std::move(error_handler));
 	return model;
 }
 template <typename F, typename E>
-collision_model_ptr model_manager::load_collision_model(const std::string& name, F completion_handler,
-														E error_handler) {
+collision_model_ptr model_data_manager::load_collision_model(const std::string& name, F completion_handler,
+															 E error_handler) {
 	auto model = internal_load_collision_model(name);
 	model->run_when_ready(std::move(completion_handler), std::move(error_handler));
 	return model;

@@ -25,7 +25,7 @@ static void test_transfer_manager_compilation() {
 	mce::glfw::window w("Test", {800, 600});
 	mce::graphics::window win(ai, w, dev);
 	mce::graphics::device_memory_manager mm(&dev, 1u << 26);
-	mce::graphics::destruction_queue_manager dqm(&dev, 1 << 26);
+	mce::graphics::destruction_queue_manager dqm(&dev, 3);
 	mce::graphics::image_2d img(dev, mm, &dqm, vk::Format::eA8B8G8R8UnormPack32, {1024, 1024},
 								mce::graphics::image_2d::full_mip_levels(glm::vec2{1024, 1024}),
 								vk::ImageUsageFlagBits::eSampled);

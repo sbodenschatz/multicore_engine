@@ -13,8 +13,8 @@
  */
 
 #include <algorithm>
-#include <mce/bstream/ibstream.hpp>
 #include <cstdint>
+#include <mce/bstream/ibstream.hpp>
 #include <memory>
 
 namespace mce {

@@ -12,10 +12,10 @@
  * Adaptation of pack file description AST nodes for boost.fusion.
  */
 
-#include <mce/asset_gen/base_ast.hpp>
-#include <mce/asset_gen/pack_file_description_ast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/mpl/sequence_tag.hpp>
+#include <mce/asset_gen/base_ast.hpp>
+#include <mce/asset_gen/pack_file_description_ast.hpp>
 #include <string>
 #include <vector>
 

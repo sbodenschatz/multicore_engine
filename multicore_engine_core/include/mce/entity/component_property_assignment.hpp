@@ -17,8 +17,8 @@
 #include <mce/entity/parser/entity_text_file_ast.hpp>
 #include <mce/entity/parser/entity_text_file_ast_value_mapper.hpp>
 #include <mce/exceptions.hpp>
-#include <memory>
 #include <mce/reflection/property.hpp>
+#include <memory>
 #include <string>
 
 namespace mce {
@@ -52,8 +52,8 @@ protected:
 
 public:
 	/// Allows implementing classes to create an abstract_component_property_assignment for the given engine.
-	explicit abstract_component_property_assignment(core::engine* engine) noexcept : engine_(engine),
-																					 valid_(false) {}
+	explicit abstract_component_property_assignment(core::engine* engine) noexcept
+			: engine_(engine), valid_(false) {}
 	/// Allows copy-construction of abstract_component_property_assignment.
 	abstract_component_property_assignment(const abstract_component_property_assignment&) = default;
 	/// Allows move-construction of abstract_component_property_assignment.

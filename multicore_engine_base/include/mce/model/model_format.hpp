@@ -12,14 +12,14 @@
  * Defines the meta data format for the engine specific model format.
  */
 
+#include <cstdint>
+#include <glm/glm.hpp>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
-#include <cstdint>
 #include <mce/exceptions.hpp>
-#include <glm/glm.hpp>
-#include <string>
 #include <mce/util/composite_magic_number.hpp>
 #include <mce/util/offset_range.hpp>
+#include <string>
 #include <vector>
 
 namespace mce {
@@ -40,15 +40,15 @@ struct static_model_mesh_meta_data {
 	std::string object_name; ///< The object name of the static mesh.
 	std::string group_name;  ///< The group name of the static mesh.
 
-	/// The offset range of the index data of the static mesh within the model file.
-	util::offset_range<uint64_t> index_data;
+	/// The offset range of the index data of the static mesh within the content range of the model file.
+	util::offset_range<uint64_t> index_data_in_content;
 
 	/// Serializes the mesh meta data.
 	friend bstream::obstream& operator<<(bstream::obstream& stream,
 										 const static_model_mesh_meta_data& value) {
 		stream << value.object_name;
 		stream << value.group_name;
-		stream << value.index_data;
+		stream << value.index_data_in_content;
 		return stream;
 	}
 
@@ -56,7 +56,7 @@ struct static_model_mesh_meta_data {
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_mesh_meta_data& value) {
 		stream >> value.object_name;
 		stream >> value.group_name;
-		stream >> value.index_data;
+		stream >> value.index_data_in_content;
 		return stream;
 	}
 };
@@ -67,21 +67,30 @@ struct static_model_meta_data {
 	constexpr static uint64_t magic_number_ = util::composite_magic_number<uint64_t>(
 			'm', 'c', 'e', 'm', 'd', 'l', 's' /*static*/, 'g' /*geometry*/);
 	/// The supported(current) version of the model file format.
-	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 1u);
+	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 2u);
 
-	uint64_t magic_number = magic_number_;			 ///< The deserialized magic number.
-	uint64_t version = version_;					 ///< The deserialized version tag.
+	uint64_t magic_number = magic_number_; ///< The deserialized magic number.
+	uint64_t version = version_;		   ///< The deserialized version tag.
+
+	/// The offset range spanning the complete content data of the file.
+	/**
+	 * This can be used to load the full geometry into a single buffer and use the other offsets to address
+	 * into this buffer.
+	 */
+	util::offset_range<uint64_t> content_range;
+
 	std::vector<static_model_mesh_meta_data> meshes; ///< The meta data for the meshes in the model.
 
-	/// The offset range of the vertex data of the static model within the model file.
-	util::offset_range<uint64_t> vertex_data;
+	/// The offset range of the vertex data of the static model within the content range of the model file.
+	util::offset_range<uint64_t> vertex_data_in_content;
 
 	/// Serializes the model meta data.
 	friend bstream::obstream& operator<<(bstream::obstream& stream, const static_model_meta_data& value) {
 		stream << value.magic_number;
 		stream << value.version;
+		stream << value.content_range;
 		stream << value.meshes;
-		stream << value.vertex_data;
+		stream << value.vertex_data_in_content;
 		return stream;
 	}
 
@@ -89,8 +98,9 @@ struct static_model_meta_data {
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_meta_data& value) {
 		stream >> value.magic_number;
 		stream >> value.version;
+		stream >> value.content_range;
 		stream >> value.meshes;
-		stream >> value.vertex_data;
+		stream >> value.vertex_data_in_content;
 		if(value.magic_number != magic_number_) throw invalid_magic_number_exception("Invalid magic number.");
 		if(value.version != version_) throw invalid_version_exception("Can't load different model version.");
 		return stream;

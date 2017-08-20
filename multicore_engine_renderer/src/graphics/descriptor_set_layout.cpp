@@ -15,9 +15,10 @@ namespace mce {
 namespace graphics {
 
 descriptor_set_layout::descriptor_set_layout(const device& dev, destruction_queue_manager* dqm,
-											 std::vector<binding_element> bindings)
+											 // cppcheck-suppress passedByValue
+											 std::vector<descriptor_set_layout_binding_element> bindings)
 		: bindings_{std::move(bindings)} {
-	if(!std::all_of(bindings_.begin(), bindings_.end(), [](const binding_element& b) {
+	if(!std::all_of(bindings_.begin(), bindings_.end(), [](const descriptor_set_layout_binding_element& b) {
 		   return b.immutable_samplers.empty() || b.immutable_samplers.size() == b.descriptor_count;
 	   })) {
 		throw mce::graphics_exception("Mismatching immutable samplers count specified.");
@@ -25,7 +26,7 @@ descriptor_set_layout::descriptor_set_layout(const device& dev, destruction_queu
 	boost::container::small_vector<vk::DescriptorSetLayoutBinding, 32> binding_cis;
 	binding_cis.reserve(bindings_.size());
 	std::transform(bindings_.begin(), bindings_.end(), std::back_inserter(binding_cis),
-				   [](const binding_element& b) {
+				   [](const descriptor_set_layout_binding_element& b) {
 					   return vk::DescriptorSetLayoutBinding(b.binding, b.descriptor_type, b.descriptor_count,
 															 b.stage_flags, b.immutable_samplers.data());
 				   });

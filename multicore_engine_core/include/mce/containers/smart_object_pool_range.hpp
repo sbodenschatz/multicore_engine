@@ -13,8 +13,8 @@
  */
 
 #include <cassert>
-#include <mce/containers/smart_object_pool.hpp>
 #include <cstdint>
+#include <mce/containers/smart_object_pool.hpp>
 #include <mce/exceptions.hpp>
 #include <tbb/tbb_stddef.h>
 

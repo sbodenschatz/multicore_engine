@@ -17,12 +17,12 @@
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
 #include <mce/exceptions.hpp>
-#include <memory>
 #include <mce/reflection/type.hpp>
-#include <string>
-#include <type_traits>
 #include <mce/util/traits.hpp>
 #include <mce/util/type_id.hpp>
+#include <memory>
+#include <string>
+#include <type_traits>
 #include <utility>
 
 namespace mce {
@@ -220,7 +220,7 @@ public:
 	}
 	/// Creates an assignment object for T from the given parameters.
 	virtual std::unique_ptr<Abstract_Assignment<Root_Type>>
-			make_assignment(Assignment_Param...) const override;
+	make_assignment(Assignment_Param...) const override;
 	/// Writes the value of the property on the given object to the given binary stream.
 	virtual void from_bstream(Root_Type& object, bstream::ibstream& istr) const override {
 		T val;
@@ -242,8 +242,8 @@ public:
 template <typename Root_Type, typename T, template <typename> class Abstract_Assignment,
 		  template <typename, typename> class Assignment, typename... Assignment_Param>
 std::unique_ptr<Abstract_Assignment<Root_Type>>
-		property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>::make_assignment(
-				Assignment_Param... param) const {
+property<Root_Type, T, Abstract_Assignment, Assignment, Assignment_Param...>::make_assignment(
+		Assignment_Param... param) const {
 	return std::make_unique<Assignment<Root_Type, T>>(*this, param...);
 }
 ///@endcond

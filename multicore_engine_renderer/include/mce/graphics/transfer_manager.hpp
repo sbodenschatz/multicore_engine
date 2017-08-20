@@ -13,7 +13,6 @@
  */
 
 #include <boost/variant.hpp>
-#include <glm/glm.hpp>
 #include <mce/containers/byte_buffer_pool.hpp>
 #include <mce/containers/scratch_pad_pool.hpp>
 #include <mce/graphics/buffer.hpp>
@@ -23,6 +22,7 @@
 #include <mce/util/ring_chunk_placer.hpp>
 #include <mutex>
 #include <vector>
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
@@ -147,13 +147,13 @@ private:
 
 	device& dev;
 	device_memory_manager_interface& mm;
+	command_pool transfer_cmd_pool;
+	command_pool ownership_cmd_pool;
 	destruction_queue_manager dqm;
 	uint32_t current_ring_index = 0;
 	uint32_t ring_slots;
 	std::vector<transfer_job> waiting_jobs;
 	std::vector<std::vector<transfer_job>> running_jobs;
-	command_pool transfer_cmd_pool;
-	command_pool ownership_cmd_pool;
 	std::vector<vk::UniqueCommandBuffer> transfer_command_bufers;
 	std::vector<queued_handle<vk::UniqueCommandBuffer>> pending_ownership_command_buffers;
 	std::vector<queued_handle<vk::UniqueCommandBuffer>> ready_ownership_command_buffers;
@@ -165,6 +165,7 @@ private:
 	size_t immediate_allocation_slack = 128;
 	std::vector<vk::UniqueFence> fences;
 	containers::scratch_pad_pool<std::vector<transfer_job>> job_scratch_pad;
+	bool in_frame = false;
 	mutable std::mutex manager_mutex;
 
 	template <typename S, typename F>
@@ -192,6 +193,7 @@ private:
 	template <typename F>
 	bool try_immediate_alloc_buffer(const void* data, size_t data_size, vk::Buffer dst_buffer,
 									vk::DeviceSize dst_offset, F&& callback) {
+		if(!in_frame) return false;
 		if(data_size > chunk_placer.buffer_space_size()) {
 			reallocate_buffer(data_size);
 		}
@@ -210,6 +212,7 @@ private:
 	bool try_immediate_alloc_image(const void* data, size_t data_size, base_image& dst_img,
 								   vk::ImageLayout final_layout,
 								   vk::ArrayProxy<const vk::BufferImageCopy> regions, F&& callback) {
+		if(!in_frame) return false;
 		if(data_size > chunk_placer.buffer_space_size()) {
 			reallocate_buffer(data_size);
 		}

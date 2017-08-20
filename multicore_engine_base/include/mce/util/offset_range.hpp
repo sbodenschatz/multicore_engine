@@ -12,10 +12,10 @@
  * Defines a generic range of offsets used in file formats.
  */
 
+#include <limits>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
 #include <mce/exceptions.hpp>
-#include <limits>
 #include <type_traits>
 
 namespace mce {

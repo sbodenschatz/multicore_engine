@@ -32,13 +32,16 @@ struct fake_device_memory_deleter {
 using fake_unique_device_memory = vk::UniqueHandle<vk::DeviceMemory, fake_device_memory_deleter>;
 
 /// Wraps either a vk::UniqueDeviceMemory, a fake_unique_device_memory or is empty.
+// cppcheck-suppress copyCtorAndEqOperator
 class device_memory_wrapper {
 	boost::variant<boost::blank, vk::UniqueDeviceMemory, fake_unique_device_memory> handle_;
 
 public:
 	/// Creates a wrapper containing a vk::UniqueDeviceMemory.
+	// cppcheck-suppress noExplicitConstructor
 	device_memory_wrapper(vk::UniqueDeviceMemory&& m) : handle_(std::move(m)){};
 	/// Creates a wrapper containing a fake_unique_device_memory.
+	// cppcheck-suppress noExplicitConstructor
 	device_memory_wrapper(fake_unique_device_memory&& m) : handle_(std::move(m)){};
 
 	/// Allows move-construction, transforming exceptions to empty values.

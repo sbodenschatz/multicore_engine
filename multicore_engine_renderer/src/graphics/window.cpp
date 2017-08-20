@@ -13,8 +13,11 @@
 #include <iostream>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/window.hpp>
+#include <mce/util/algorithm.hpp>
+#include <mce/util/array_utils.hpp>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
@@ -50,16 +53,12 @@ void window::configure_surface_format() {
 			device_.physical_device().getSurfaceFormatsKHR(surface_.get());
 	color_space_ = vk::ColorSpaceKHR::eSrgbNonlinear;
 	surface_format_ = vk::Format::eB8G8R8A8Unorm;
+	assert(!surface_formats.empty());
 	if(surface_formats.size() != 1 || surface_formats[0].format != vk::Format::eUndefined) {
-		std::vector<vk::Format> format_preferences = {// TODO Place other preferred formats here
-													  vk::Format::eB8G8R8A8Unorm};
-		std::stable_sort(surface_formats.begin(), surface_formats.end(),
-						 [&format_preferences](const auto& v0, const auto& v1) {
-							 auto pref = [&format_preferences](auto x) {
-								 return std::find(format_preferences.begin(), format_preferences.end(), x);
-							 };
-							 return pref(v0.format) < pref(v1.format);
-						 });
+		auto format_preferences = util::make_array(vk::Format::eB8G8R8A8Unorm
+												   // TODO Place other preferred formats here
+												   );
+		util::preference_sort(surface_formats, format_preferences, [](const auto& v) { return v.format; });
 		color_space_ = surface_formats[0].colorSpace;
 		surface_format_ = surface_formats[0].format;
 	}
@@ -68,19 +67,14 @@ void window::configure_surface_format() {
 }
 
 void window::select_present_mode() {
-	present_mode_ = vk::PresentModeKHR::eFifo; // Fifo is required to be available by spec.
-	// Check if fifo relaxed mode is available
 	std::vector<vk::PresentModeKHR> present_modes =
 			device_.physical_device().getSurfacePresentModesKHR(surface_.get());
-	if(std::find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eFifoRelaxed) !=
-	   present_modes.end()) {
-		present_mode_ = vk::PresentModeKHR::eFifoRelaxed;
-	}
-	if(std::find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eMailbox) !=
-	   present_modes.end()) {
-		present_mode_ = vk::PresentModeKHR::eMailbox;
-	}
+	assert(!present_modes.empty());
+	auto preference_list = util::make_array(vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eFifoRelaxed,
+											vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eImmediate);
+	util::preference_sort(present_modes, preference_list);
 	for(const auto& pm : present_modes) std::cout << vk::to_string(pm) << std::endl;
+	present_mode_ = present_modes.front();
 }
 
 void window::create_swapchain() {
@@ -129,8 +123,9 @@ void window::create_swapchain() {
 }
 
 framebuffer_config
-window::make_framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> additional_attachments) {
-	framebuffer_config res{additional_attachments};
+// cppcheck-suppress passedByValue
+window::make_framebuffer_config(std::vector<framebuffer_attachment_config> additional_attachments) {
+	framebuffer_config res{std::move(additional_attachments)};
 	framebuffer_attachment_config swapchain_attachment(surface_format_);
 	swapchain_attachment.is_swapchain_image_ = true;
 	res.attachment_configs_.insert(res.attachment_configs_.begin(), swapchain_attachment);

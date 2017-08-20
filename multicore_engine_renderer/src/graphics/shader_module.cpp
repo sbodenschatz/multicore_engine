@@ -37,7 +37,7 @@ void shader_module::load_shader_module(device& dev, const asset::asset& shader_b
 	std::vector<uint32_t> aligned_buffer(shader_binary_asset.size() / 4);
 	std::memcpy(aligned_buffer.data(), shader_binary_asset.data(), shader_binary_asset.size());
 	vk::ShaderModuleCreateInfo ci;
-	ci.codeSize = aligned_buffer.size();
+	ci.codeSize = aligned_buffer.size() * 4;
 	ci.pCode = aligned_buffer.data();
 	native_shader_module_ = owner_dev.createShaderModuleUnique(ci);
 }

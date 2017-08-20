@@ -5,11 +5,13 @@
  */
 
 #ifdef _MSC_VER
+#include <intrin.h>
 #include <windows.h> //Required for OutputDebugStringA
 #endif
 #include <algorithm>
 #include <cstdlib>
 #include <functional>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <iterator>
 #include <mce/core/version.hpp>
@@ -19,6 +21,10 @@
 #include <sstream>
 #include <stdexcept>
 #include <vulkan/vulkan.hpp>
+
+#if !defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
+#error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
+#endif
 
 // Provide wrapper functions to call into extension function pointers because extension functions aren't
 // provided by the loader library. To make the symbols available they are defined here.
@@ -79,11 +85,11 @@ instance::instance(const std::vector<std::string>& exts, unsigned int validation
 	std::vector<const char*> layer_names;
 	layer_names.reserve(layers.size());
 	std::transform(layers.begin(), layers.end(), std::back_inserter(layer_names),
-				   std::mem_fn(&std::string::c_str));
+				   [](const std::string& n) { return n.c_str(); });
 	std::vector<const char*> extension_names;
 	extension_names.reserve(extensions.size());
 	std::transform(extensions.begin(), extensions.end(), std::back_inserter(extension_names),
-				   std::mem_fn(&std::string::c_str));
+				   [](const std::string& n) { return n.c_str(); });
 	// for(const auto& e : extensions) std::cout << e << std::endl;
 	vk::InstanceCreateInfo instance_ci;
 	instance_ci.enabledLayerCount = uint32_t(layer_names.size());
@@ -148,10 +154,17 @@ VkBool32 instance::validation_report_callback(VkDebugReportFlagsEXT flags_,
 		out = &std::cout;
 	}
 	std::lock_guard<std::mutex> lock(validation_log_mtx);
-	(*out) << msg;
-	out->flush();
 #ifdef _MSC_VER
 	OutputDebugStringA(msg.c_str());
+#ifdef DEBUG
+	if(flags & crit_report_levels) __debugbreak();
+#else
+	(*out) << msg;
+	out->flush();
+#endif // DEBUG
+#else
+	(*out) << msg;
+	out->flush();
 #endif
 	return false;
 }

@@ -4,12 +4,12 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <iterator>
 #include <mce/asset/asset.hpp>
 #include <mce/asset/file_asset_loader.hpp>
 #include <mce/asset/file_reader.hpp>
 #include <mce/util/local_function.hpp>
-#include <algorithm>
-#include <iterator>
 #include <mutex>
 #include <tuple>
 #include <utility>

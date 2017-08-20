@@ -13,16 +13,16 @@
  */
 
 #include <algorithm>
-#include <mce/asset/asset_defs.hpp>
 #include <boost/container/vector.hpp>
 #include <exception>
+#include <mce/asset/asset_defs.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/copy_on_write.hpp>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <string>
 #include <thread>
-#include <mce/util/copy_on_write.hpp>
 #include <vector>
 
 #ifdef _MSC_VER
@@ -30,9 +30,11 @@
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4005)
 #endif
-#include <boost/asio/io_service.hpp>
+
 #include <boost/container/flat_map.hpp>
 #include <boost/thread/future.hpp>
+#include <mce/asset/cleaned_asio_ioservice.hpp>
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

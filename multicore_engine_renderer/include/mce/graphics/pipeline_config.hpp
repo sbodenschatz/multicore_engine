@@ -14,11 +14,11 @@
 
 #include <algorithm>
 #include <boost/optional.hpp>
+#include <mce/graphics/render_pass.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include <mce/graphics/render_pass.hpp>
 
 namespace mce {
 namespace graphics {
@@ -32,7 +32,7 @@ public:
 	class shader_stage_config {
 	private:
 		vk::ShaderStageFlagBits stage_;
-		std::shared_ptr<shader_module> module_;
+		std::shared_ptr<const shader_module> module_;
 		std::string entry_point_name_;
 		std::vector<char> specialization_data_;
 		std::vector<vk::SpecializationMapEntry> specialization_map_;
@@ -46,6 +46,19 @@ public:
 		}
 
 	public:
+		/// Creates an empty shader_stage_config.
+		shader_stage_config() : stage_{vk::ShaderStageFlagBits::eVertex} {}
+		/// Creates a shader_stage_config from the given parameters.
+		// cppcheck-suppress passedByValue
+		shader_stage_config(vk::ShaderStageFlagBits stage, std::shared_ptr<const shader_module> module,
+							// cppcheck-suppress passedByValue
+							std::string entry_point_name, std::vector<char> specialization_data = {},
+							// cppcheck-suppress passedByValue
+							std::vector<vk::SpecializationMapEntry> specialization_map = {})
+				: stage_{stage}, module_{std::move(module)}, entry_point_name_{std::move(entry_point_name)},
+				  specialization_data_{std::move(specialization_data)}, specialization_map_{std::move(
+																				specialization_map)} {}
+
 		/// Gets the name of the entry point.
 		const std::string& entry_point_name() const {
 			return entry_point_name_;
@@ -57,12 +70,12 @@ public:
 		}
 
 		/// Gets the shader module containing the binary.
-		const std::shared_ptr<shader_module>& module() const {
+		const std::shared_ptr<const shader_module>& module() const {
 			return module_;
 		}
 
 		/// Sets the shader module containing the binary.
-		void module(std::shared_ptr<shader_module> module) {
+		void module(std::shared_ptr<const shader_module> module) {
 			module_ = std::move(module);
 		}
 
@@ -118,6 +131,15 @@ public:
 		std::vector<vk::VertexInputAttributeDescription> attributes_;
 
 	public:
+		/// Creates an empty vertex_input_state.
+		vertex_input_state_config() {}
+		/// Creates a vertex_input_state from the given vertex input bindings and vertex input attributes.
+		// cppcheck-suppress passedByValue
+		vertex_input_state_config(std::vector<vk::VertexInputBindingDescription> bindings,
+								  // cppcheck-suppress passedByValue
+								  std::vector<vk::VertexInputAttributeDescription> attributes)
+				: bindings_{std::move(bindings)}, attributes_{std::move(attributes)} {}
+
 		/// Gets the vertex input attributes.
 		const std::vector<vk::VertexInputAttributeDescription>& attributes() const {
 			return attributes_;
@@ -159,6 +181,13 @@ public:
 		std::vector<vk::Rect2D> scissors_;
 
 	public:
+		/// Creates an empty viewport_state_config.
+		viewport_state_config() {}
+		/// Creates a viewport_state_config from the given viewports and scissors.
+		// cppcheck-suppress passedByValue
+		viewport_state_config(std::vector<vk::Viewport> viewports, std::vector<vk::Rect2D> scissors)
+				: viewports_{std::move(viewports)}, scissors_{std::move(scissors)} {}
+
 		/// Gets the scissor rectangles.
 		const std::vector<vk::Rect2D>& scissors() const {
 			return scissors_;
@@ -196,14 +225,27 @@ public:
 	/// Bundles the configuration data for the color blend state of a pipeline.
 	class color_blend_state_config {
 	private:
-		bool logicOpEnable;
-		vk::LogicOp logicOp;
+		boost::optional<vk::LogicOp> logic_op_;
 		std::vector<vk::PipelineColorBlendAttachmentState> attachments_;
-		std::array<float, 4> blendConstants;
+		std::array<float, 4> blend_constants_;
 
 	public:
+		/// Creates a color_blend_state_config from the given blending settings.
+		// cppcheck-suppress passedByValue
+		color_blend_state_config(std::vector<vk::PipelineColorBlendAttachmentState> attachments,
+								 std::array<float, 4> blend_constants = {{0.0f, 0.0f, 0.0f, 0.0f}})
+				: attachments_{std::move(attachments)}, blend_constants_{blend_constants} {}
+
+		/// Creates a color_blend_state_config from the given logic operation and blending settings.
+		color_blend_state_config(vk::LogicOp logic_op,
+								 // cppcheck-suppress passedByValue
+								 std::vector<vk::PipelineColorBlendAttachmentState> attachments,
+								 std::array<float, 4> blend_constants = {{0.0f, 0.0f, 0.0f, 0.0f}})
+				: logic_op_{logic_op}, attachments_{std::move(attachments)}, blend_constants_{
+																					 blend_constants} {}
+
 		/// Initializes an empty color_blend_state_config.
-		color_blend_state_config() : logicOpEnable{false}, logicOp{vk::LogicOp::eSet} {}
+		color_blend_state_config() {}
 
 		/// Gets the blend states for the attachments.
 		const std::vector<vk::PipelineColorBlendAttachmentState>& attachments() const {
@@ -222,32 +264,22 @@ public:
 
 		/// Allows read-only access to the blend constants array.
 		const std::array<float, 4>& blend_constants() const {
-			return blendConstants;
+			return blend_constants_;
 		}
 
 		/// Allows read-write access to the blend constants array.
 		std::array<float, 4>& blend_constants() {
-			return blendConstants;
+			return blend_constants_;
 		}
 
-		/// Gets the logic operation.
-		vk::LogicOp logic_op() const {
-			return logicOp;
+		/// Provides read-only access to the logic operation.
+		const boost::optional<vk::LogicOp>& logic_op() const {
+			return logic_op_;
 		}
 
-		/// Sets the logic operation.
-		void logic_op(vk::LogicOp logic_op) {
-			logicOp = logic_op;
-		}
-
-		/// Returns a boolean indicating if the the logic operation is enabled.
-		bool logic_op_enable() const {
-			return logicOpEnable;
-		}
-
-		/// Sets the activation status of the logic operation.
-		void logic_op_enable(bool logic_op_enable) {
-			logicOpEnable = logic_op_enable;
+		/// Provides read-write access to the logic operation.
+		boost::optional<vk::LogicOp>& logic_op() {
+			return logic_op_;
 		}
 
 		/// Returns the corresponding creation info structure to pass to vulkan.
@@ -270,8 +302,8 @@ private:
 	boost::optional<vk::PipelineColorBlendStateCreateInfo> color_blend_state_ci;
 	boost::optional<std::vector<vk::DynamicState>> dynamic_states_;
 	boost::optional<vk::PipelineDynamicStateCreateInfo> dynamic_states_ci;
-	std::shared_ptr<pipeline_layout> layout_;
-	std::shared_ptr<render_pass> compatible_render_pass_;
+	std::shared_ptr<const pipeline_layout> layout_;
+	std::shared_ptr<const render_pass> compatible_render_pass_;
 	uint32_t compatible_subpass_;
 
 public:
@@ -371,12 +403,12 @@ public:
 	}
 
 	/// Gets the pipeline layout for the pipeline.
-	const std::shared_ptr<pipeline_layout>& layout() const {
+	const std::shared_ptr<const pipeline_layout>& layout() const {
 		return layout_;
 	}
 
 	/// Sets the pipeline layout for the pipeline.
-	void layout(const std::shared_ptr<pipeline_layout>& layout) {
+	void layout(const std::shared_ptr<const pipeline_layout>& layout) {
 		this->layout_ = layout;
 	}
 
@@ -391,12 +423,12 @@ public:
 	}
 
 	/// Gets the render pass with which the render pass should be compatible.
-	const std::shared_ptr<graphics::render_pass>& compatible_render_pass() const {
+	const std::shared_ptr<const graphics::render_pass>& compatible_render_pass() const {
 		return compatible_render_pass_;
 	}
 
 	/// Sets the render pass with which the render pass should be compatible.
-	void compatible_render_pass(const std::shared_ptr<graphics::render_pass>& compatible_render_pass) {
+	void compatible_render_pass(const std::shared_ptr<const graphics::render_pass>& compatible_render_pass) {
 		this->compatible_render_pass_ = compatible_render_pass;
 	}
 

@@ -267,6 +267,8 @@ target_compile_definitions(deps.Boost INTERFACE
 		#The following 2 defines are needed to extend the allowed parameter count for boost::variant to the required amount.
 		BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
 		BOOST_MPL_LIMIT_LIST_SIZE=30
+		$<$<CXX_COMPILER_ID:Clang>:_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES>
+		BOOST_NO_AUTO_PTR
 	)
 target_include_directories(deps.Boost SYSTEM INTERFACE
 		${BOOST_INCLUDE}

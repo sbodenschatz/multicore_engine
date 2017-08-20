@@ -13,9 +13,9 @@
  */
 
 #include <algorithm>
-#include <mce/asset/pack_file_meta_data.hpp>
 #include <cstdint>
 #include <iostream>
+#include <mce/asset/pack_file_meta_data.hpp>
 #include <string>
 #include <utility>
 #include <vector>

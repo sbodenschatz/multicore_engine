@@ -14,8 +14,8 @@
 
 #include <boost/variant/variant.hpp>
 #include <cmath>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
 #include <limits>
+#include <mce/entity/parser/entity_text_file_ast.hpp>
 #include <string>
 #include <vector>
 

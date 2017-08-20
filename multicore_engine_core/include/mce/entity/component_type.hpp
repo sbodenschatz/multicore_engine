@@ -19,8 +19,8 @@
 #include <mce/entity/component_property_assignment.hpp>
 #include <mce/entity/component_type_id_manager.hpp>
 #include <mce/entity/ecs_types.hpp>
-#include <memory>
 #include <mce/reflection/property.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 

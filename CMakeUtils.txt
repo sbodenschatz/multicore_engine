@@ -84,7 +84,7 @@ function(compile_glsl_to_spirv OUTPUT_LIST)
 		set(SPV_FILE ${SRC_FILE}.spv)
 		add_custom_command(
 			OUTPUT ${SPV_FILE}
-			COMMAND glslangValidator -s -V -o ${SPV_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
+			COMMAND glslangValidator -V -o ${SPV_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
 			MAIN_DEPENDENCY ${SRC_FILE}
 			COMMENT "Compiling GLSL shader \"${SRC_FILE}\" to SPIR-V file \"${SPV_FILE}\""
 		)
@@ -130,7 +130,7 @@ function(bootstrap_tools)
 			list(APPEND BOOTSTRAP_VAR_CMD "-D${VARNAME}=${${VARNAME}}")
 		endif()
 	endforeach()
-	print_list("	Forwarded variables for bootstrap: " ${BOOTSTRAP_VAR_CMD})
+	print_list("	Forwarded variables for bootstrap" ${BOOTSTRAP_VAR_CMD})
 	if(MSVC)
 		file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools_bootstrap)
 		execute_process(COMMAND cmake -G "${CMAKE_GENERATOR}" ${CMAKE_SOURCE_DIR}/tools_bootstrap ${BOOTSTRAP_VAR_CMD} WORKING_DIRECTORY tools_bootstrap)
@@ -191,3 +191,19 @@ function(convert_models OUTPUT_MODEL_LIST OUTPUT_COL_LIST)
 	set(${OUTPUT_COL_LIST} ${COL_LIST} PARENT_SCOPE)
 endfunction()
 
+function(tbb_shared_libs_copy TARGET_NAME)
+	if(WIN32)
+		if(MSVC)
+			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+				$<$<CONFIG:DEBUG>:"${TBB_LIBS_DEBUG}/tbb_debug.dll"> $<$<CONFIG:DEBUG>:"${TBB_LIBS_DEBUG}/tbbmalloc_debug.dll">
+				$<$<CONFIG:RELWITHDEBINFO>:"${TBB_LIBS_RELWITHDEBINFO}/tbb.dll"> $<$<CONFIG:RELWITHDEBINFO>:"${TBB_LIBS_RELWITHDEBINFO}/tbbmalloc.dll">
+				$<$<CONFIG:MINSIZEREL>:"${TBB_LIBS_MINSIZEREL}/tbb.dll"> $<$<CONFIG:MINSIZEREL>:"${TBB_LIBS_MINSIZEREL}/tbbmalloc.dll">
+				$<$<CONFIG:RELEASE>:"${TBB_LIBS_RELEASE}/tbb.dll"> $<$<CONFIG:RELEASE>:"${TBB_LIBS_RELEASE}/tbbmalloc.dll">
+				$<TARGET_FILE_DIR:${TARGET_NAME}>)
+		else()
+			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				${TBB_LIBS}/tbb$<$<CONFIG:DEBUG>:_debug>.dll ${TBB_LIBS}/tbbmalloc$<$<CONFIG:DEBUG>:_debug>.dll
+				$<TARGET_FILE_DIR:${TARGET_NAME}>)
+		endif()
+	endif()
+endfunction()

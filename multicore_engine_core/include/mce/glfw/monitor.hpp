@@ -7,8 +7,8 @@
 #ifndef GLFW_MONITOR_HPP_
 #define GLFW_MONITOR_HPP_
 
-#include <mce/glfw/glfw_defs.hpp>
 #include <glm/glm.hpp>
+#include <mce/glfw/glfw_defs.hpp>
 #include <string>
 #include <vector>
 

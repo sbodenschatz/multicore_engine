@@ -70,16 +70,8 @@ class framebuffer_config {
 
 public:
 	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
-	/**
-	 * General copying version of the constructor.
-	 */
-	framebuffer_config(vk::ArrayProxy<framebuffer_attachment_config> attachment_configs)
-			: attachment_configs_{attachment_configs.begin(), attachment_configs.end()} {}
-	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
-	/**
-	 * Optimized version of the constructor for moving the data from a vector and avoiding the copy.
-	 */
-	framebuffer_config(std::vector<framebuffer_attachment_config>&& attachment_configs)
+	// cppcheck-suppress passedByValue
+	explicit framebuffer_config(std::vector<framebuffer_attachment_config> attachment_configs)
 			: attachment_configs_{std::move(attachment_configs)} {}
 
 	/// Allows access to the framebuffer_attachment_config entries.

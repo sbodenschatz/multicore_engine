@@ -5,11 +5,11 @@
  */
 
 #include <boost/variant/get.hpp>
+#include <gtest.hpp>
 #include <mce/entity/parser/entity_text_file_ast.hpp>
 #include <mce/entity/parser/entity_text_file_ast_compare.hpp>
 #include <mce/entity/parser/entity_text_file_parser.hpp>
 #include <mce/exceptions.hpp>
-#include <gtest.hpp>
 #include <string>
 
 namespace mce {

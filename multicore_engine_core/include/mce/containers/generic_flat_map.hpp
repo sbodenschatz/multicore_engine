@@ -102,7 +102,7 @@ protected:
 	generic_flat_map_base& operator=(generic_flat_map_base&& other) noexcept(
 			std::is_nothrow_copy_assignable<container_t>::value&&
 					std::is_nothrow_copy_assignable<Compare>::value) {
-		assert(this == &other);
+		assert(this != &other);
 		compare = std::move_if_noexcept(other.compare);
 		values = std::move_if_noexcept(other.values);
 		return *this;
@@ -575,6 +575,16 @@ public:
 		std::stable_sort(values.begin(), values.end(),
 						 [this](const auto& a, const auto& b) { return compare(a.first, b.first); });
 	}
+
+	/// Compares *this and other for equality of the key-value-pairs stored in them.
+	bool operator==(const generic_flat_map_base& other) const {
+		return values == other.values;
+	}
+
+	/// Compares *this and other for inequality of the key-value-pairs stored in them.
+	bool operator!=(const generic_flat_map_base& other) const {
+		return !(*this == other);
+	}
 };
 
 /// \brief Provides a non-member ADL swap by calling the member generic_flat_map_base::swap.
@@ -664,9 +674,11 @@ public:
 		auto it_after = std::upper_bound(this->values.begin(), this->values.end(), key, comp);
 		auto it = it_after;
 		if(it != this->values.begin()) --it;
-		if(!comp(*it, key) && !comp(key, *it)) return std::make_pair(iterator(it), false);
+		if(it != this->values.end() && !comp(*it, key) && !comp(key, *it))
+			return std::make_pair(iterator(it), false);
+		auto pos = std::distance(this->values.begin(), it_after);
 		this->values.reserve(this->values.size() + 1);
-		it = this->values.emplace(it_after, std::forward<K>(key), std::forward<V>(value));
+		it = this->values.emplace(this->values.begin() + pos, std::forward<K>(key), std::forward<V>(value));
 		return std::make_pair(iterator(it), true);
 	}
 
@@ -681,12 +693,13 @@ public:
 		auto it_after = std::upper_bound(this->values.begin(), this->values.end(), key, comp);
 		auto it = it_after;
 		if(it != this->values.begin()) --it;
-		if(!comp(*it, key) && !comp(key, *it)) {
+		if(it != this->values.end() && !comp(*it, key) && !comp(key, *it)) {
 			it->second = std::forward<V>(value);
 			return std::make_pair(iterator(it), false);
 		}
+		auto pos = std::distance(this->values.begin(), it_after);
 		this->values.reserve(this->values.size() + 1);
-		it = this->values.emplace(it_after, std::forward<K>(key), std::forward<V>(value));
+		it = this->values.emplace(this->values.begin() + pos, std::forward<K>(key), std::forward<V>(value));
 		return std::make_pair(iterator(it), true);
 	}
 
@@ -772,9 +785,9 @@ public:
 		if(it != this->values.end())
 			if(comp(key, *it)) it = this->values.end();
 		if(it == this->values.end()) {
-			std::tie(it, std::ignore) = insert(std::forward<K>(key), Value());
+			it = insert(std::forward<K>(key), Value()).first.iterator;
 		}
-		return *it;
+		return it->second;
 	}
 
 	/// Swaps the contents of *this with other by swapping their components.
@@ -871,8 +884,10 @@ public:
 	iterator insert(K&& key, V&& value) {
 		key_compare comp(this->compare);
 		auto it_after = std::upper_bound(this->values.begin(), this->values.end(), key, comp);
+		auto pos = std::distance(this->values.begin(), it_after);
 		this->values.reserve(this->values.size() + 1);
-		auto it = this->values.emplace(it_after, std::forward<K>(key), std::forward<V>(value));
+		auto it = this->values.emplace(this->values.begin() + pos, std::forward<K>(key),
+									   std::forward<V>(value));
 		return iterator(it);
 	}
 

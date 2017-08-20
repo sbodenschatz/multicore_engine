@@ -12,16 +12,16 @@
  * Defines the class representing assets in the engine.
  */
 
-#include <mce/asset/asset_defs.hpp>
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
 #include <exception>
+#include <mce/asset/asset_defs.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/local_function.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <mce/util/local_function.hpp>
 #include <vector>
 
 namespace mce {
@@ -94,6 +94,7 @@ public:
 			lock.unlock();
 			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
 		} else if(current_state_ == state::error) {
+			lock.unlock();
 			error_handler(std::make_exception_ptr(
 					path_not_found_exception("Requested asset '" + name_ + "' is cached as failed.")));
 		} else {

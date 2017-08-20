@@ -12,18 +12,18 @@
  * Defines a file_reader that reads from pack files.
  */
 
+#include <atomic>
+#include <boost/container/flat_map.hpp>
+#include <fstream>
 #include <mce/asset/asset_defs.hpp>
 #include <mce/asset/file_reader.hpp>
 #include <mce/asset/pack_file_meta_data.hpp>
-#include <atomic>
-#include <boost/container/flat_map.hpp>
 #include <mce/bstream/istream_bstream.hpp>
 #include <mce/exceptions.hpp>
-#include <fstream>
+#include <mce/util/lock_ptr_wrapper.hpp>
 #include <memory>
 #include <shared_mutex>
 #include <string>
-#include <mce/util/lock_ptr_wrapper.hpp>
 #include <utility>
 #include <vector>
 

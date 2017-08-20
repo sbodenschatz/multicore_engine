@@ -5,8 +5,8 @@
  */
 
 #include <algorithm>
-#include <mce/containers/unordered_object_pool.hpp>
 #include <gtest.hpp>
+#include <mce/containers/unordered_object_pool.hpp>
 #include <string>
 #include <unordered_set>
 

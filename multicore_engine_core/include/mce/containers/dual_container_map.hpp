@@ -144,8 +144,8 @@ public:
 
 		/// Copy-constructs an iterator.
 		iterator_(const iterator_<std::remove_const_t<It_Map>, It_Key, std::remove_const_t<It_Value>>&
-						  it) noexcept : index(it.index),
-										 map(it.map) {}
+						  it) noexcept
+				: index(it.index), map(it.map) {}
 
 		/// Copy-assigns an iterator.
 		iterator_& operator=(const iterator_<std::remove_const_t<It_Map>, It_Key,
@@ -695,12 +695,13 @@ public:
 		auto it_key = it_after_key;
 		if(it_key != this->keys.begin()) --it_key;
 		auto key_index = std::distance(this->keys.begin(), it_key);
-		if(!this->compare(*it_key, key) && !this->compare(key, *it_key))
+		if(it_key != this->keys.end() && !this->compare(*it_key, key) && !this->compare(key, *it_key))
 			return std::make_pair(iterator(key_index, this), false);
 		auto index = std::distance(this->keys.begin(), it_after_key);
-		auto it_after_value = this->values.begin() + index;
 		this->keys.reserve(this->keys.size() + 1);
 		this->values.reserve(this->values.size() + 1);
+		auto it_after_value = this->values.begin() + index;
+		it_after_key = this->keys.begin() + index;
 		try {
 			this->keys.emplace(it_after_key, std::forward<K>(key));
 			this->values.emplace(it_after_value, std::forward<V>(value));
@@ -729,14 +730,15 @@ public:
 		auto it_key = it_after_key;
 		if(it_key != this->keys.begin()) --it_key;
 		auto key_index = std::distance(this->keys.begin(), it_key);
-		if(!this->compare(*it_key, key) && !this->compare(key, *it_key)) {
+		if(it_key != this->keys.end() && !this->compare(*it_key, key) && !this->compare(key, *it_key)) {
 			this->values[key_index] = std::forward<V>(value);
 			return std::make_pair(iterator(key_index, this), false);
 		}
 		auto index = std::distance(this->keys.begin(), it_after_key);
-		auto it_after_value = this->values.begin() + index;
 		this->keys.reserve(this->keys.size() + 1);
 		this->values.reserve(this->values.size() + 1);
+		auto it_after_value = this->values.begin() + index;
+		it_after_key = this->keys.begin() + index;
 		try {
 			this->keys.emplace(it_after_key, std::forward<K>(key));
 			this->values.emplace(it_after_value, std::forward<V>(value));
@@ -933,9 +935,10 @@ public:
 	iterator insert(K&& key, V&& value) {
 		auto it_after_key = std::upper_bound(this->keys.begin(), this->keys.end(), key, this->compare);
 		auto index = std::distance(this->keys.begin(), it_after_key);
-		auto it_after_value = this->values.begin() + index;
 		this->keys.reserve(this->keys.size() + 1);
 		this->values.reserve(this->values.size() + 1);
+		auto it_after_value = this->values.begin() + index;
+		it_after_key = this->keys.begin() + index;
 		try {
 			this->keys.emplace(it_after_key, std::forward<K>(key));
 			this->values.emplace(it_after_value, std::forward<V>(value));

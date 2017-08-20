@@ -73,18 +73,24 @@ private:
 	glm::uvec2 size_;
 	std::vector<image_var> attachments_;
 	std::vector<image_view_var> attachment_views_;
-	std::shared_ptr<framebuffer_config> config_;
+	std::shared_ptr<const framebuffer_config> config_;
 	std::vector<framebuffer_frame> frames_;
 
 	class imgview_visitor : public boost::static_visitor<> {
 		framebuffer* fb;
 
 	public:
-		imgview_visitor(framebuffer* fb) : fb{fb} {}
+		explicit imgview_visitor(framebuffer* fb) : fb{fb} {}
 		void operator()(image_2d& img) const {
 			fb->attachment_views_.emplace_back(img.create_view());
 		}
 		void operator()(image_2d_ds& img) const {
+			fb->attachment_views_.emplace_back(img.create_view());
+		}
+		void operator()(image_2d_depth& img) const {
+			fb->attachment_views_.emplace_back(img.create_view());
+		}
+		void operator()(image_2d_stencil& img) const {
 			fb->attachment_views_.emplace_back(img.create_view());
 		}
 		template <typename T>
@@ -110,13 +116,13 @@ public:
 	/// and determining the size) using the given memory and destruction managers with the given configuration
 	/// to be compatible with the given render pass.
 	framebuffer(device& dev, window& win, device_memory_manager_interface& mem_mgr,
-				destruction_queue_manager* destruction_manager, std::shared_ptr<framebuffer_config> config,
-				vk::RenderPass compatible_pass);
+				destruction_queue_manager* destruction_manager,
+				std::shared_ptr<const framebuffer_config> config, vk::RenderPass compatible_pass);
 	/// Destroys the framebuffer and releases the resources to the destruction_manager given on construction.
 	~framebuffer();
 
 	/// Allows access to the framebuffer_config describing the structure of the framebuffer.
-	const std::shared_ptr<framebuffer_config>& config() const {
+	const std::shared_ptr<const framebuffer_config>& config() const {
 		return config_;
 	}
 

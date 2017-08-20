@@ -4,12 +4,12 @@
  * Copyright 2016 by Stefan Bodenschatz
  */
 
+#include <atomic>
+#include <gtest.hpp>
 #include <mce/asset/asset_manager.hpp>
 #include <mce/asset/load_unit_asset_loader.hpp>
 #include <mce/asset/pack_file_reader.hpp>
-#include <atomic>
-#include <gtest.hpp>
-#include <mce/model/model_manager.hpp>
+#include <mce/model/model_data_manager.hpp>
 #include <thread>
 #include <vector>
 
@@ -32,7 +32,7 @@ TEST(model_collision_model_test, load_example_collision_model) {
 	ASSERT_TRUE(load_unit_ready);
 	ASSERT_TRUE(!load_unit_failed);
 	if(load_unit_failed) return;
-	model_manager mm(am);
+	model_data_manager mm(am);
 	std::atomic<bool> model_loaded{false};
 	std::atomic<bool> model_failed{false};
 	mm.load_collision_model("models/cube",
@@ -60,7 +60,7 @@ TEST(model_collision_model_test, load_example_polygon_model) {
 	}
 	ASSERT_TRUE(load_unit_ready);
 	ASSERT_TRUE(!load_unit_failed);
-	model_manager mm(am);
+	model_data_manager mm(am);
 	std::atomic<bool> model_loaded{false};
 	std::atomic<bool> model_failed{false};
 	mm.load_polygon_model("models/cube", [&model_loaded](const polygon_model_ptr&) { model_loaded = true; },

@@ -4,11 +4,11 @@
  * Copyright 2015 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <iterator>
 #include <mce/asset/pack_file_meta_data.hpp>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
-#include <algorithm>
-#include <iterator>
 
 namespace mce {
 namespace asset {
