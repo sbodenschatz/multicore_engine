@@ -64,14 +64,14 @@ public:
 		}
 
 		/// Binds the common vertex buffer for all meshes in the model to the given command buffer.
-		void bind_vertices(vk::CommandBuffer cmd_buf);
+		void bind_vertices(vk::CommandBuffer cmd_buf) const;
 		/// Binds the index buffer to the given command buffer.
-		void bind_indices(vk::CommandBuffer cmd_buf);
+		void bind_indices(vk::CommandBuffer cmd_buf) const;
 		/// \brief Records a draw call to the given command buffer, optionally drawing multiple instances.
-		void record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances = 1);
+		void record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances = 1) const;
 		/// \brief Binds the vertex and index buffer for the given mesh and records a draw call to the given
 		/// command buffer, optionally drawing multiple instances.
-		void draw(vk::CommandBuffer cmd_buf, uint32_t instances = 1);
+		void draw(vk::CommandBuffer cmd_buf, uint32_t instances = 1) const;
 	};
 
 private:
@@ -168,15 +168,15 @@ public:
 	}
 
 	/// Binds the common vertex buffer for all meshes in the model to the given command buffer.
-	void bind_vertices(vk::CommandBuffer cmd_buf);
+	void bind_vertices(vk::CommandBuffer cmd_buf) const;
 	/// Binds the index buffer for the given mesh to the given command buffer.
-	void bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index);
+	void bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index) const;
 	/// \brief Records a draw call for the given mesh to the given command buffer, optionally drawing
 	/// multiple instances.
-	void record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1);
+	void record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1) const;
 	/// \brief Binds the vertex and index buffer for the given mesh and records a draw call to the given
 	/// command buffer, optionally drawing multiple instances.
-	void draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1);
+	void draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1) const;
 };
 } /* namespace rendering */
 } /* namespace mce */
