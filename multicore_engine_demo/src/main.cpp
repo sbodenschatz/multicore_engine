@@ -27,8 +27,8 @@ int main() {
 
 	mce::graphics::simple_descriptor_pool dp(dev, 128, {{vk::DescriptorType::eUniformBuffer, 128}});
 	auto sets = dp.allocate_descriptor_sets(
-			mce::util::make_array(std::shared_ptr<mce::graphics::descriptor_set_layout>()));
+			mce::util::make_array(std::shared_ptr<const mce::graphics::descriptor_set_layout>()));
 	mce::graphics::unique_descriptor_pool dp2(dev, 128, {{vk::DescriptorType::eUniformBuffer, 128}});
 	auto sets2 = dp2.allocate_descriptor_sets(
-			mce::util::make_array(std::shared_ptr<mce::graphics::descriptor_set_layout>()));
+			mce::util::make_array(std::shared_ptr<const mce::graphics::descriptor_set_layout>()));
 }
