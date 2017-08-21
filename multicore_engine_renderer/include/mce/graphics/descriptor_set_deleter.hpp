@@ -28,8 +28,8 @@ class descriptor_set_deleter {
 public:
 	/// \brief Creates a deleter to free a descriptor_set using the given layout back to the given
 	/// unique_descriptor_pool.
-	// cppcheck-suppress passedByValue
 	descriptor_set_deleter(unique_descriptor_pool* unique_pool,
+						   // cppcheck-suppress passedByValue
 						   std::shared_ptr<const descriptor_set_layout> layout)
 			: unique_pool_{unique_pool}, layout_{std::move(layout)} {}
 
