@@ -33,9 +33,9 @@ class descriptor_set {
 	friend class simple_descriptor_pool;
 	friend class unique_descriptor_pool;
 	descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
-				   std::shared_ptr<descriptor_set_layout> layout);
+				   std::shared_ptr<const descriptor_set_layout> layout);
 	descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set, unique_descriptor_pool* pool,
-				   destruction_queue_manager* dqm, std::shared_ptr<descriptor_set_layout> layout);
+				   destruction_queue_manager* dqm, std::shared_ptr<const descriptor_set_layout> layout);
 
 public:
 	/// Forbids copying.
@@ -56,7 +56,7 @@ public:
 	 * May be null if the descriptor_set was allocated from a simple_descriptor_pool and the store_layout
 	 * parameter of the allocation member function was false.
 	 */
-	const std::shared_ptr<descriptor_set_layout>& layout() const {
+	const std::shared_ptr<const descriptor_set_layout>& layout() const {
 		return native_descriptor_set_.get_deleter().layout();
 	}
 
@@ -73,8 +73,8 @@ public:
 						vk::ArrayProxy<const vk::DescriptorBufferInfo> data);
 
 	/// Binds the given descriptor sets in the given command buffer using the given additional parameters.
-	static void bind(vk::CommandBuffer cb, const std::shared_ptr<pipeline_layout>& layout, uint32_t first_set,
-					 vk::ArrayProxy<const descriptor_set> sets,
+	static void bind(vk::CommandBuffer cb, const std::shared_ptr<const pipeline_layout>& layout,
+					 uint32_t first_set, vk::ArrayProxy<const descriptor_set> sets,
 					 vk::ArrayProxy<const uint32_t> dynamic_offsets = {});
 };
 

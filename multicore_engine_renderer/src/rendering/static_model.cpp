@@ -34,6 +34,7 @@ void static_model::raise_error_flag(std::exception_ptr e) noexcept {
 
 void static_model::complete_loading(const model::polygon_model_ptr& polygon_mdl) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
+	poly_model_ = polygon_mdl;
 	meshes_.reserve(polygon_mdl->meta_data().meshes.size());
 	std::transform(polygon_mdl->meta_data().meshes.begin(), polygon_mdl->meta_data().meshes.end(),
 				   std::back_inserter(meshes_), [this](const model::static_model_mesh_meta_data& data) {
@@ -80,30 +81,30 @@ void static_model::complete_staging() noexcept {
 	error_handlers.shrink_to_fit();
 }
 
-void static_model::mesh::bind_vertices(vk::CommandBuffer cmd_buf) {
+void static_model::mesh::bind_vertices(vk::CommandBuffer cmd_buf) const {
 	parent_->bind_vertices(cmd_buf);
 }
-void static_model::mesh::bind_indices(vk::CommandBuffer cmd_buf) {
+void static_model::mesh::bind_indices(vk::CommandBuffer cmd_buf) const {
 	cmd_buf.bindIndexBuffer(parent_->vertex_index_buffer_.native_buffer(), offset_, vk::IndexType::eUint32);
 }
-void static_model::mesh::record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances) {
+void static_model::mesh::record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances) const {
 	cmd_buf.drawIndexed(vertex_count_, instances, 0, 0, 0);
 }
-void static_model::mesh::draw(vk::CommandBuffer cmd_buf, uint32_t instances) {
+void static_model::mesh::draw(vk::CommandBuffer cmd_buf, uint32_t instances) const {
 	bind_vertices(cmd_buf);
 	bind_indices(cmd_buf);
 	record_draw_call(cmd_buf, instances);
 }
-void static_model::bind_vertices(vk::CommandBuffer cmd_buf) {
+void static_model::bind_vertices(vk::CommandBuffer cmd_buf) const {
 	cmd_buf.bindVertexBuffers(0, vertex_index_buffer_.native_buffer(), vk::DeviceSize(0));
 }
-void static_model::bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index) {
+void static_model::bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index) const {
 	meshes_.at(mesh_index).bind_indices(cmd_buf);
 }
-void static_model::record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances) {
+void static_model::record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances) const {
 	meshes_.at(mesh_index).record_draw_call(cmd_buf, instances);
 }
-void static_model::draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances) {
+void static_model::draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances) const {
 	meshes_.at(mesh_index).draw(cmd_buf, instances);
 }
 

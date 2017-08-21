@@ -95,7 +95,7 @@ namespace vk_mock_interface {}
 }
 
 /// Contains the rendering subsystem, drawing the 3D scene and implementing effects.
-namespace renderer {}
+namespace rendering {}
 
 } // namespace mce
 

@@ -14,7 +14,7 @@ namespace graphics {
 
 descriptor_set::descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
 							   // cppcheck-suppress passedByValue
-							   std::shared_ptr<descriptor_set_layout> layout)
+							   std::shared_ptr<const descriptor_set_layout> layout)
 		: dev_{&dev}, native_descriptor_set_{queued_handle<descriptor_set_unique_handle>(
 							  descriptor_set_unique_handle(
 									  native_descriptor_set,
@@ -23,7 +23,7 @@ descriptor_set::descriptor_set(device& dev, vk::DescriptorSet native_descriptor_
 descriptor_set::descriptor_set(device& dev, vk::DescriptorSet native_descriptor_set,
 							   unique_descriptor_pool* pool, destruction_queue_manager* dqm,
 							   // cppcheck-suppress passedByValue
-							   std::shared_ptr<descriptor_set_layout> layout)
+							   std::shared_ptr<const descriptor_set_layout> layout)
 		: dev_{&dev}, native_descriptor_set_{queued_handle<descriptor_set_unique_handle>(
 							  descriptor_set_unique_handle(native_descriptor_set,
 														   descriptor_set_deleter(pool, std::move(layout))),
@@ -46,7 +46,7 @@ void descriptor_set::update_buffers(uint32_t binding, uint32_t array_start_eleme
 			{});
 }
 
-void descriptor_set::bind(vk::CommandBuffer cb, const std::shared_ptr<pipeline_layout>& layout,
+void descriptor_set::bind(vk::CommandBuffer cb, const std::shared_ptr<const pipeline_layout>& layout,
 						  uint32_t first_set, vk::ArrayProxy<const descriptor_set> sets,
 						  vk::ArrayProxy<const uint32_t> dynamic_offsets) {
 	boost::container::small_vector<vk::DescriptorSet, 8> native_sets;
