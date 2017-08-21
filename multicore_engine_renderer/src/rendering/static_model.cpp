@@ -34,6 +34,7 @@ void static_model::raise_error_flag(std::exception_ptr e) noexcept {
 
 void static_model::complete_loading(const model::polygon_model_ptr& polygon_mdl) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
+	poly_model_ = polygon_mdl;
 	meshes_.reserve(polygon_mdl->meta_data().meshes.size());
 	std::transform(polygon_mdl->meta_data().meshes.begin(), polygon_mdl->meta_data().meshes.end(),
 				   std::back_inserter(meshes_), [this](const model::static_model_mesh_meta_data& data) {
