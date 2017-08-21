@@ -18,6 +18,8 @@
 #include <mce/graphics/pipeline_config.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
 #include <mce/graphics/render_pass.hpp>
+#include <mce/model/dump_model.hpp>
+#include <mce/rendering/model_format.hpp>
 #include <mce/util/array_utils.hpp>
 
 namespace mce {
@@ -87,11 +89,6 @@ graphics_test::graphics_test()
 	amgr_.start_pin_load_unit("shaders");
 	amgr_.start_pin_load_unit("models_geo");
 	auto vert_shader_bin = amgr_.load_asset_sync("shaders/test_shader.vert.spv");
-	for(size_t i = 0; i < vert_shader_bin->size(); ++i) {
-		std::cout << std::hex << std::setw(2) << std::setfill('0')
-				  << int(reinterpret_cast<const unsigned char*>(vert_shader_bin->data())[i]) << " ";
-		if(i % 32 == 31) std::cout << std::endl;
-	}
 	vert_shader_ = gmgr_.create_shader_module("test_vert_shader", *vert_shader_bin);
 	auto frag_shader_bin = amgr_.load_asset_sync("shaders/test_shader.frag.spv");
 	frag_shader_ = gmgr_.create_shader_module("test_frag_shader", *frag_shader_bin);
@@ -116,9 +113,36 @@ graphics_test::graphics_test()
 	pcfg->compatible_render_pass(rp_);
 	pcfg->compatible_subpass(0);
 	gmgr_.add_pending_pipeline("test_pl", pcfg);
+
+	auto vert_shader2_bin = amgr_.load_asset_sync("shaders/test_shader2.vert.spv");
+	vert_shader2_ = gmgr_.create_shader_module("test_vert_shader2", *vert_shader2_bin);
+	auto frag_shader2_bin = amgr_.load_asset_sync("shaders/test_shader2.frag.spv");
+	frag_shader2_ = gmgr_.create_shader_module("test_frag_shader2", *frag_shader2_bin);
+	auto pcfg2 = std::make_shared<pipeline_config>();
+	pcfg2->shader_stages() = {{vk::ShaderStageFlagBits::eVertex, vert_shader2_, "main"},
+							  {vk::ShaderStageFlagBits::eFragment, frag_shader2_, "main"}};
+	pcfg2->input_state() = rendering::model_vertex_input_config();
+	pcfg2->assembly_state() = {{}, vk::PrimitiveTopology::eTriangleList};
+	pcfg2->viewport_state() = pipeline_config::viewport_state_config{
+			{{0.0, 0.0, float(win_.swapchain_size().x), float(win_.swapchain_size().y), 0.0f, 1.0f}},
+			{{{0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}}}};
+	pcfg2->rasterization_state().lineWidth = 1.0f;
+	pcfg2->multisample_state() = vk::PipelineMultisampleStateCreateInfo{};
+	pcfg2->depth_stencil_state() =
+			vk::PipelineDepthStencilStateCreateInfo({}, true, true, vk::CompareOp::eLess);
+	vk::PipelineColorBlendAttachmentState pcbas2;
+	pcbas2.colorWriteMask = ~vk::ColorComponentFlags();
+	pcfg2->color_blend_state() = pipeline_config::color_blend_state_config{{pcbas2}};
+	pcfg2->layout(pll_);
+	pcfg2->compatible_render_pass(rp_);
+	pcfg2->compatible_subpass(0);
+	gmgr_.add_pending_pipeline("test_pl2", pcfg2);
+
 	gmgr_.compile_pending_pipelines();
 	plc_ = gmgr_.find_pipeline_config("test_pl");
 	pl_ = gmgr_.find_pipeline("test_pl");
+	plc2_ = gmgr_.find_pipeline_config("test_pl2");
+	pl2_ = gmgr_.find_pipeline("test_pl2");
 	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_, rp_->native_render_pass());
 	vertex vertices[] = {{{0.0f, -1.0f, 0.2f}, {1.0f, 0.0f, 0.0f}}, {{-1.0f, 1.0f, 0.2f}, {0.0f, 1.0f, 0.0f}},
 						 {{1.0f, 1.0f, 0.2f}, {0.0f, 0.0f, 1.0f}},
@@ -129,11 +153,16 @@ graphics_test::graphics_test()
 						[this](vk::Buffer) { //
 							vb_ready_ = true;
 						});
-	mdl_ = mmgr.load_static_model("models/cube",
-								  [](rendering::static_model_ptr mdl) { //
-									  std::cout << mdl->meshes().size() << std::endl;
-								  },
-								  [](std::exception_ptr) {});
+	mdl_ = mmgr.load_static_model(
+			"models/cube",
+			[](rendering::static_model_ptr mdl) { //
+				std::cout << mdl->meshes().size() << std::endl;
+				model::dump_model_vertices(std::cout, mdl->poly_model()->content_data(),
+										   reinterpret_cast<const char*>(mdl->poly_model()->content_data()) +
+												   mdl->meshes().at(0).indices_offset(),
+										   mdl->meshes().at(0).vertex_count());
+			},
+			[](std::exception_ptr) {});
 }
 
 graphics_test::~graphics_test() {
@@ -156,10 +185,13 @@ void graphics_test::run() {
 		glfw_inst_.poll_events();
 		auto this_frame_t = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> delta_t = this_frame_t - last_frame_t_;
+		last_frame_t_ = this_frame_t;
+		rot_angle += glm::vec3(1.0f, 0.7f, 0.5f) * glm::radians(30.0f) * delta_t.count();
 		frame_counter++;
-		if(delta_t.count() >= 1.0f) {
-			last_frame_t_ = this_frame_t;
-			glfw_win_.title("Vulkan Test " + std::to_string(frame_counter / delta_t.count()) + " fps");
+		std::chrono::duration<float> delta_t_fps = this_frame_t - last_fps_frame_t_;
+		if(delta_t_fps.count() >= 1.0f) {
+			last_fps_frame_t_ = this_frame_t;
+			glfw_win_.title("Vulkan Test " + std::to_string(frame_counter / delta_t_fps.count()) + " fps");
 			frame_counter = 0;
 		}
 		tmgr_.start_frame(acq_res.value);
@@ -169,7 +201,10 @@ void graphics_test::run() {
 		uniform_data ud;
 		ud.projection = glm::perspectiveFov(glm::radians(90.0f), float(win_.swapchain_size().x),
 											float(win_.swapchain_size().y), 1.0f, 1000.0f);
-		ud.model = glm::translate(glm::mat4(), {0.0f, 0.0f, -2.0f});
+		ud.model = glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::mat4(), {0.0f, 0.0f, -4.0f}),
+													   rot_angle.x, {1.0f, 0.0f, 0.0f}),
+										   rot_angle.y, {0.0f, 1.0f, 0.0f}),
+							   rot_angle.z, {0.0f, 0.0f, 1.0f});
 		auto render_cmb_buf = queued_handle<vk::UniqueCommandBuffer>(
 				render_cmd_pool_.allocate_primary_command_buffer(), &dqm_);
 		render_cmb_buf->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
@@ -184,14 +219,15 @@ void graphics_test::run() {
 		auto ds = descriptor_pools_[img_index].allocate_descriptor_set(uniform_dsl_);
 		ds.update_buffers(0, 0, vk::DescriptorType::eUniformBuffer, uniform_buffers_[img_index].store(ud));
 		ds.bind(render_cmb_buf.get(), pll_, 0, ds);
-		pl_->bind(render_cmb_buf.get());
-		if(vb_ready_) {
+		/*if(vb_ready_) {
+			pl_->bind(render_cmb_buf.get());
 			render_cmb_buf->bindVertexBuffers(0, vertex_buffer_.native_buffer(), vk::DeviceSize(0));
 			render_cmb_buf->draw(6, 1, 0, 0);
-		}
-		/*if(mdl_->ready()) {
-			mdl_->draw_model_mesh(render_cmb_buf.get(), 0);
 		}*/
+		if(mdl_->ready()) {
+			pl2_->bind(render_cmb_buf.get());
+			mdl_->draw_model_mesh(render_cmb_buf.get(), 0);
+		}
 		render_cmb_buf->endRenderPass();
 		render_cmb_buf->pipelineBarrier(
 				vk::PipelineStageFlagBits::eAllCommands,

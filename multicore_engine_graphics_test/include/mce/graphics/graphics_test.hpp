@@ -56,6 +56,7 @@ class graphics_test {
 	buffer vertex_buffer_;
 	bool vb_ready_ = false;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_t_;
+	std::chrono::time_point<std::chrono::high_resolution_clock> last_fps_frame_t_;
 	std::shared_ptr<const framebuffer_config> fbcfg_;
 	std::shared_ptr<const descriptor_set_layout> uniform_dsl_;
 	std::shared_ptr<const pipeline_layout> pll_;
@@ -63,10 +64,15 @@ class graphics_test {
 	std::shared_ptr<const render_pass> rp_;
 	std::shared_ptr<const shader_module> vert_shader_;
 	std::shared_ptr<const shader_module> frag_shader_;
+	std::shared_ptr<const shader_module> vert_shader2_;
+	std::shared_ptr<const shader_module> frag_shader2_;
 	std::shared_ptr<const pipeline_config> plc_;
 	std::shared_ptr<const pipeline> pl_;
+	std::shared_ptr<const pipeline_config> plc2_;
+	std::shared_ptr<const pipeline> pl2_;
 	std::unique_ptr<framebuffer> fb_;
 	rendering::static_model_ptr mdl_;
+	glm::vec3 rot_angle;
 
 	struct vertex {
 		glm::vec3 pos;
