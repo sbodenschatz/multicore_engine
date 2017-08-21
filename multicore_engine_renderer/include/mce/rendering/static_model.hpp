@@ -72,6 +72,16 @@ public:
 		/// \brief Binds the vertex and index buffer for the given mesh and records a draw call to the given
 		/// command buffer, optionally drawing multiple instances.
 		void draw(vk::CommandBuffer cmd_buf, uint32_t instances = 1) const;
+
+		/// Returns the offset of the index data of this mesh from the vertex and index buffer.
+		vk::DeviceSize indices_offset() const {
+			return offset_;
+		}
+
+		/// Returns the number of (indexed) vertices in this mesh.
+		uint32_t vertex_count() const {
+			return vertex_count_;
+		}
 	};
 
 private:
