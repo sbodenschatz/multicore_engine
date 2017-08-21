@@ -14,7 +14,9 @@ namespace mce {
 namespace graphics {
 
 template <typename T>
-struct format_from_type {};
+struct format_from_type {
+	static constexpr vk::Format default_format = vk::Format::eUndefined;
+};
 
 template <>
 struct format_from_type<float> {
