@@ -7,6 +7,11 @@
 #ifndef MCE_RENDERING_MODEL_FORMAT_HPP_
 #define MCE_RENDERING_MODEL_FORMAT_HPP_
 
+/**
+ * \file
+ * Defines helper functions related to the model format used by the renderer.
+ */
+
 #include <mce/graphics/format_from_type.hpp>
 #include <mce/graphics/pipeline_config.hpp>
 #include <mce/model/model_format.hpp>
@@ -14,6 +19,7 @@
 namespace mce {
 namespace rendering {
 
+/// Returns a vertex input state config for the vertices of rendered models (defined in model::model_vertex).
 graphics::pipeline_config::vertex_input_state_config model_vertex_input_config() {
 	return graphics::pipeline_config::vertex_input_state_config(
 			{vk::VertexInputBindingDescription(0, sizeof(model::model_vertex), vk::VertexInputRate::eVertex)},
