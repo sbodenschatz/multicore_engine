@@ -177,6 +177,11 @@ public:
 		return meshes_;
 	}
 
+	/// Allows access to the model::polygon_model from which this was loaded.
+	const model::polygon_model_ptr& poly_model() const {
+		return poly_model_;
+	}
+
 	/// Binds the common vertex buffer for all meshes in the model to the given command buffer.
 	void bind_vertices(vk::CommandBuffer cmd_buf) const;
 	/// Binds the index buffer for the given mesh to the given command buffer.
