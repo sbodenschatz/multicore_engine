@@ -9,10 +9,6 @@
 namespace mce {
 namespace graphics {
 
-texture::texture() {
-	// TODO Auto-generated constructor stub
-}
-
 texture::~texture() {}
 
 } /* namespace graphics */
