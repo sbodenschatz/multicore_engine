@@ -147,6 +147,22 @@ public:
 	void update_buffers(uint32_t binding, uint32_t array_start_element, vk::DescriptorType type,
 						vk::ArrayProxy<const vk::DescriptorBufferInfo> data);
 
+	/// \brief Returns a chainable function object that enables grouping multiple descriptor set writes in a
+	/// single API call.
+	/**
+	 * The returned function object is callable with the signature of update_images as well as the signature
+	 * of update_buffers and returns another function object with the same properties.
+	 * This way a chain can be formed and after completion the actual update is performed by the last object
+	 * in the chain on destruction.
+	 *
+	 * Example:
+	 * @code
+	 * descriptor_set ds = ...;
+	 * ds.update()
+	 * 		(0,0,vk::DescriptorType::eUniformBuffer,{ubo.store(data)})
+	 * 		(1,0,vk::DescriptorType::eCombinedImageSampler,{tex.bind()});
+	 * @endcode
+	 */
 	detail::descriptor_set_updater<0, void> update();
 
 	/// Binds the given descriptor sets in the given command buffer using the given additional parameters.
