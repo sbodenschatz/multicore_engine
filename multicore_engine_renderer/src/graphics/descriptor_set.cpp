@@ -4,6 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <algorithm>
+#include <iterator>
 #include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
@@ -63,5 +65,44 @@ void descriptor_set_deleter::operator()(vk::DescriptorSet set) const {
 	}
 	// unique_pool==false -> Non-owning descriptor set.
 }
+
+detail::descriptor_set_updater<0, void> descriptor_set::update() {
+	return detail::descriptor_set_updater<0, void>(dev_->native_device(), native_descriptor_set_.get());
+}
+
+void descriptor_set::update(vk::ArrayProxy<const write_descriptor_set> writes) {
+	boost::container::small_vector<vk::WriteDescriptorSet, 64> writes_transformed;
+	writes_transformed.reserve(writes.size());
+	std::transform(
+			writes.begin(), writes.end(), std::back_inserter(writes_transformed),
+			[this](const write_descriptor_set& wds) {
+				struct v_t : boost::static_visitor<vk::WriteDescriptorSet> {
+					vk::DescriptorSet set;
+					uint32_t binding;
+					uint32_t array_start_element;
+					vk::DescriptorType type;
+					v_t(vk::DescriptorSet set, uint32_t binding, uint32_t array_start_element,
+						vk::DescriptorType type)
+							: set{set}, binding{binding},
+							  array_start_element{array_start_element}, type{type} {}
+					vk::WriteDescriptorSet
+					operator()(const boost::container::small_vector<vk::DescriptorImageInfo, 16>& di) {
+						return vk::WriteDescriptorSet(set, binding, array_start_element, uint32_t(di.size()),
+													  type, di.data(), nullptr, nullptr);
+					}
+					vk::WriteDescriptorSet
+					operator()(const boost::container::small_vector<vk::DescriptorBufferInfo, 16>& di) {
+						return vk::WriteDescriptorSet(set, binding, array_start_element, uint32_t(di.size()),
+													  type, nullptr, di.data(), nullptr);
+					}
+				};
+				v_t v(native_descriptor_set_.get(), wds.binding, wds.array_start_element, wds.type);
+				return wds.data.apply_visitor(v);
+			});
+	(*dev_)->updateDescriptorSets(vk::ArrayProxy<const vk::WriteDescriptorSet>(
+										  uint32_t(writes_transformed.size()), writes_transformed.data()),
+								  {});
+}
+
 } /* namespace graphics */
 } /* namespace mce */
