@@ -4,6 +4,17 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4310)
+#pragma warning(disable : 4458)
+#pragma warning(disable : 4100)
+#endif
+#include <gli/gli.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 #include <mce/graphics/texture.hpp>
 
 namespace mce {
