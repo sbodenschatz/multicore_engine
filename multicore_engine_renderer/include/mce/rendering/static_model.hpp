@@ -121,12 +121,11 @@ public:
 	/// loading and was transfered to the graphics device or to run the error_handler if an error occurred
 	/// during loading or transfer.
 	/**
-	 * The handler function object must have the signature <code>void(const static_model_ptr&
-	 * model)</code>.
+	 * The handler function object must have the signature <code>void(const static_model_ptr& model)</code>.
 	 * The error_handler function object must have the signature <code>void(std::exception_ptr)</code>.
-	 * Both handlers are called either on the thread calling this function or on a worker thread of the asset
-	 * system. Both must fit into their respective handler function wrapper type
-	 * static_model_completion_handler and error_handler.
+	 * Both handlers are called on the thread calling this function, on the thread running
+	 * transfer_manager::start_frame or on a worker thread of the asset system. Both must fit into their
+	 * respective handler function wrapper type static_model_completion_handler and error_handler.
 	 */
 	template <typename F, typename E>
 	void run_when_ready(F handler, E error_handler) {
@@ -145,7 +144,7 @@ public:
 		} else if(current_state_ == state::error) {
 			lock.unlock();
 			error_handler(std::make_exception_ptr(
-					path_not_found_exception("Polygon model '" + name() + "' was cached as failed.")));
+					path_not_found_exception("Static model '" + name() + "' was cached as failed.")));
 		} else {
 			completion_handlers.emplace_back(std::move(handler));
 			error_handlers.emplace_back(std::move(error_handler));
