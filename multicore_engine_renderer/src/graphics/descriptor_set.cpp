@@ -63,5 +63,10 @@ void descriptor_set_deleter::operator()(vk::DescriptorSet set) const {
 	}
 	// unique_pool==false -> Non-owning descriptor set.
 }
+
+detail::descriptor_set_updater<0, void> descriptor_set::update() {
+	return detail::descriptor_set_updater<0, void>(dev_->native_device(), native_descriptor_set_.get());
+}
+
 } /* namespace graphics */
 } /* namespace mce */
