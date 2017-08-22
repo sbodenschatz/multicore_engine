@@ -96,6 +96,8 @@ if (WIN32)
 
 	set(GLM_INCLUDE ${LIBS_DIR}/glm/include CACHE PATH "Include path for glm.")
 
+	set(GLI_INCLUDE ${LIBS_DIR}/gli/include CACHE PATH "Include path for gli.")
+
 	set(ZLIB_INCLUDE ${LIBS_DIR}/zlib/include CACHE PATH "Include path for zlib.")
 	if(MSVC)
 		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for zlib.")
@@ -141,6 +143,7 @@ if (WIN32)
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
 	set(GLM_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLM.")
+	set(GLI_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLI.")
 	set(ZLIB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for zlib.")
 	set(ZLIB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for zlib.")
 	set(VULKAN_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vulkan.")
@@ -179,6 +182,15 @@ target_compile_options(mce_compiler_settings INTERFACE
 		$<$<CXX_COMPILER_ID:MSVC>:/wd4201>		
 	)
 	
+add_library(deps.gli INTERFACE)
+target_compile_definitions(deps.gli INTERFACE
+	)
+target_include_directories(deps.gli SYSTEM INTERFACE
+		${GLI_INCLUDE}
+	)
+target_compile_options(deps.gli INTERFACE
+	)
+
 add_library(deps.zlib INTERFACE)
 target_compile_definitions(deps.zlib INTERFACE
 		ZLIB_CONST
