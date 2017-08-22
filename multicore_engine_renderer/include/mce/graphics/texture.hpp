@@ -42,8 +42,10 @@ private:
 	std::string name_;
 	std::vector<texture_completion_handler> completion_handlers;
 	std::vector<asset::error_handler> error_handlers;
-	boost::variant<boost::blank, image_2d, image_2d_layered> image_;
-	boost::variant<boost::blank, image_view_2d, image_view_2d_layered> image_view_;
+	boost::variant<boost::blank, image_2d, image_2d_layered, image_cube, image_cube_layered> image_;
+	boost::variant<boost::blank, image_view_2d, image_view_2d_layered, image_view_cube,
+				   image_view_cube_layered>
+			image_view_;
 
 	void complete_loading(const asset::asset_ptr& texture_asset) noexcept;
 	void complete_staging() noexcept;
