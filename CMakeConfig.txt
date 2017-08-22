@@ -178,7 +178,7 @@ target_compile_definitions(deps.glm INTERFACE
 target_include_directories(deps.glm SYSTEM INTERFACE
 		${GLM_INCLUDE}
 	)
-target_compile_options(mce_compiler_settings INTERFACE
+target_compile_options(deps.glm INTERFACE
 		$<$<CXX_COMPILER_ID:MSVC>:/wd4201>		
 	)
 	
