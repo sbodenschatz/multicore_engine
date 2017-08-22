@@ -36,7 +36,7 @@ class descriptor_set_updater {
 	friend class descriptor_set_updater<entries - 1, void>;
 
 	template <typename U>
-	descriptor_set_updater(descriptor_set_updater<entries - 1, U> prev, vk::WriteDescriptorSet write)
+	descriptor_set_updater(const descriptor_set_updater<entries - 1, U>& prev, vk::WriteDescriptorSet write)
 			: dev_{prev.dev_}, set_{prev.set_} {
 		for(size_t i = 0; i + 1 < entries; ++i) {
 			writes_[i] = prev.writes_[i];
