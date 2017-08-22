@@ -114,10 +114,18 @@ class descriptor_set {
 				   destruction_queue_manager* dqm, std::shared_ptr<const descriptor_set_layout> layout);
 
 public:
+	/// Describes an element in a container-based batched update of the descriptor_set.
+	/**
+	 * See equivalent members of vk::WriteDescriptorSet from the vulkan spec for details.
+	 */
 	struct write_descriptor_set {
+		/// The binding to update.
 		uint32_t binding;
+		/// The array index to start from.
 		uint32_t array_start_element;
+		/// The type of the descriptors to update.
 		vk::DescriptorType type;
+		/// The data to update the descriptors with (can either be image or buffer data).
 		boost::variant<boost::container::small_vector<vk::DescriptorImageInfo, 16>,
 					   boost::container::small_vector<vk::DescriptorBufferInfo, 16>>
 				data;
@@ -175,6 +183,8 @@ public:
 	 */
 	detail::descriptor_set_updater<0, void> update();
 
+	/// \brief Updates multiple bindings in a single operation with data described by the given
+	/// write_descriptor_set collection.
 	void update(vk::ArrayProxy<const write_descriptor_set> writes);
 
 	/// Binds the given descriptor sets in the given command buffer using the given additional parameters.
