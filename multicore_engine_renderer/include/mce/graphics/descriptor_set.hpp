@@ -175,7 +175,7 @@ public:
 	 */
 	detail::descriptor_set_updater<0, void> update();
 
-	void bind(vk::ArrayProxy<const write_descriptor_set> writes);
+	void update(vk::ArrayProxy<const write_descriptor_set> writes);
 
 	/// Binds the given descriptor sets in the given command buffer using the given additional parameters.
 	static void bind(vk::CommandBuffer cb, const std::shared_ptr<const pipeline_layout>& layout,

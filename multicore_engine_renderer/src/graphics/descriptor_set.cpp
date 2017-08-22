@@ -70,7 +70,7 @@ detail::descriptor_set_updater<0, void> descriptor_set::update() {
 	return detail::descriptor_set_updater<0, void>(dev_->native_device(), native_descriptor_set_.get());
 }
 
-void descriptor_set::bind(vk::ArrayProxy<const write_descriptor_set> writes) {
+void descriptor_set::update(vk::ArrayProxy<const write_descriptor_set> writes) {
 	boost::container::small_vector<vk::WriteDescriptorSet, 64> writes_transformed;
 	writes_transformed.reserve(writes.size());
 	std::transform(
