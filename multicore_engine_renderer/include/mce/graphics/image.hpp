@@ -47,6 +47,9 @@ struct image_size<image_dimension::dim_1d, false> {
 	/// Allows taking a single unsigned integer as the size.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(uint32_t width) : width{width} {}
+	/// Allows taking an extent from a gli texture.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(glm::tvec3<int> extent) : width{uint32_t(extent.x)} {}
 };
 /// Specialization of image_size for unlayered 2d-images.
 template <>
@@ -60,6 +63,9 @@ struct image_size<image_dimension::dim_2d, false> {
 	/// Allows taking a 2d unsigned integer vector as the size.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(glm::uvec2 size) : width{size.x}, height{size.y} {}
+	/// Allows taking an extent from a gli texture.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(glm::tvec3<int> extent) : width{uint32_t(extent.x)}, height{uint32_t(extent.y)} {}
 };
 /// Specialization of image_size for unlayered 3d-images.
 template <>
@@ -74,6 +80,10 @@ struct image_size<image_dimension::dim_3d, false> {
 	/// Allows taking a 3d unsigned integer vector as the size.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(glm::uvec3 size) : width{size.x}, height{size.y}, depth{size.z} {}
+	/// Allows taking an extent from a gli texture.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(glm::tvec3<int> extent)
+			: width{uint32_t(extent.x)}, height{uint32_t(extent.y)}, depth{uint32_t(extent.z)} {}
 };
 /// Specialization of image_size for unlayered cubemap-images.
 template <>
@@ -84,6 +94,9 @@ struct image_size<image_dimension::dim_cube, false> {
 	uint32_t layers = 6; ///< The number of layers of the image object.
 	/// Allows taking an unsigned integers as the length of the cube sides.
 	image_size(uint32_t side_length) : width{side_length}, height{side_length} {}
+	/// Allows taking an extent from a gli texture.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(glm::tvec3<int> extent) : width{uint32_t(extent.x)}, height{uint32_t(extent.y)} {}
 };
 /// Specialization of image_size for layered 1d-images.
 template <>
