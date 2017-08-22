@@ -8,7 +8,8 @@
 #define MCE_GRAPHICS_DESCRIPTOR_SET_HPP_
 
 #include <array>
-#include <boost/optional.hpp>
+#include <boost/container/small_vector.hpp>
+#include <boost/variant.hpp>
 #include <mce/graphics/descriptor_set_deleter.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <vulkan/vulkan.hpp>
@@ -113,6 +114,15 @@ class descriptor_set {
 				   destruction_queue_manager* dqm, std::shared_ptr<const descriptor_set_layout> layout);
 
 public:
+	struct write_descriptor_set {
+		uint32_t binding;
+		uint32_t array_start_element;
+		vk::DescriptorType type;
+		boost::variant<boost::container::small_vector<vk::DescriptorImageInfo, 16>,
+					   boost::container::small_vector<vk::DescriptorBufferInfo, 16>>
+				data;
+	};
+
 	/// Forbids copying.
 	descriptor_set(const descriptor_set&) = delete;
 	/// Forbids copying.
@@ -164,6 +174,8 @@ public:
 	 * @endcode
 	 */
 	detail::descriptor_set_updater<0, void> update();
+
+	void bind(vk::ArrayProxy<const write_descriptor_set> writes);
 
 	/// Binds the given descriptor sets in the given command buffer using the given additional parameters.
 	static void bind(vk::CommandBuffer cb, const std::shared_ptr<const pipeline_layout>& layout,
