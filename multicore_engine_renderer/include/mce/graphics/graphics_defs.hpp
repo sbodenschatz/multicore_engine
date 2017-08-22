@@ -26,7 +26,9 @@ typedef std::pair<uint32_t, uint32_t> queue_index_t;
 /// Type used to represent the index of a queue family of a vulkan device.
 typedef uint32_t queue_family_index_t;
 
+/// Specifies the smart pointer type managing the lifetime of texture objects.
 using texture_ptr = std::shared_ptr<const texture>;
+/// Specifies the function wrapper type used to wrap completion handlers for texture loading.
 using texture_completion_handler = util::local_function<128, void(const texture_ptr& tex)>;
 
 } // namespace graphics
