@@ -217,7 +217,7 @@ void graphics_test::run() {
 						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 2, clear),
 				vk::SubpassContents::eInline);
 		auto ds = descriptor_pools_[img_index].allocate_descriptor_set(uniform_dsl_);
-		ds.update_buffers(0, 0, vk::DescriptorType::eUniformBuffer, uniform_buffers_[img_index].store(ud));
+		ds.update()(0, 0, vk::DescriptorType::eUniformBuffer, uniform_buffers_[img_index].store(ud));
 		ds.bind(render_cmb_buf.get(), pll_, 0, ds);
 		/*if(vb_ready_) {
 			pl_->bind(render_cmb_buf.get());
