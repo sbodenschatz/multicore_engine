@@ -108,6 +108,9 @@ struct image_size<image_dimension::dim_1d, true> {
 	/// Allows taking a single unsigned integer as the size and an unsigned integer as the layer count.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(uint32_t width, uint32_t layers) : width{width}, layers{layers} {}
+	/// Allows taking an extent from a gli texture.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(glm::tvec3<int> extent, uint32_t layers) : width{uint32_t(extent.x)}, layers{layers} {}
 };
 /// Specialization of image_size for layered 2d-images.
 template <>
@@ -122,6 +125,10 @@ struct image_size<image_dimension::dim_2d, true> {
 	/// Allows taking a 2d unsigned integer vector as the size and an unsigned integer as the layer count.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(glm::uvec2 size, uint32_t layers) : width{size.x}, height{size.y}, layers{layers} {}
+	/// Allows taking an extent from a gli texture.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(glm::tvec3<int> extent, uint32_t layers)
+			: width{uint32_t(extent.x)}, height{uint32_t(extent.y)}, layers{layers} {}
 };
 /// Specialization of image_size for layered cubemap-images.
 template <>
@@ -134,6 +141,10 @@ struct image_size<image_dimension::dim_cube, true> {
 	/// the layer count.
 	image_size(uint32_t side_length, uint32_t layers)
 			: width{side_length}, height{side_length}, layers{layers} {}
+	/// Allows taking an extent from a gli texture.
+	// cppcheck-suppress noExplicitConstructor
+	image_size(glm::tvec3<int> extent, uint32_t layers)
+			: width{uint32_t(extent.x)}, height{uint32_t(extent.y)}, layers{layers} {}
 };
 
 /// Represents the base class for a view of an image object to access the image data.

@@ -21,10 +21,15 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
+namespace gli {
+class texture;
+} // namespace gli
+
 namespace mce {
 namespace graphics {
 class texture_manager;
 class sampler;
+class base_image;
 
 /// Represents a texture image asset.
 /**
@@ -42,15 +47,26 @@ private:
 	std::string name_;
 	std::vector<texture_completion_handler> completion_handlers;
 	std::vector<asset::error_handler> error_handlers;
-	boost::variant<boost::blank, image_2d, image_2d_layered, image_cube, image_cube_layered> image_;
-	boost::variant<boost::blank, image_view_2d, image_view_2d_layered, image_view_cube,
-				   image_view_cube_layered>
+	boost::variant<boost::blank, image_1d, image_1d_layered, image_2d, image_2d_layered, image_3d, image_cube,
+				   image_cube_layered>
+			image_;
+	boost::variant<boost::blank, image_view_1d, image_view_1d_layered, image_view_2d, image_view_2d_layered,
+				   image_view_3d, image_view_cube, image_view_cube_layered>
 			image_view_;
 
 	void complete_loading(const asset::asset_ptr& texture_asset) noexcept;
 	void complete_staging() noexcept;
 
 	void raise_error_flag(std::exception_ptr e) noexcept;
+
+	// Intentionally only declared but not implemented here despite being a template function because it is
+	// only used in a single compilation unit.
+	template <typename T>
+	base_image* create_image(vk::Format format, const gli::texture& tex);
+	// Intentionally only declared but not implemented here despite being a template function because it is
+	// only used in a single compilation unit.
+	template <typename T>
+	base_image* create_image_layered(vk::Format format, const gli::texture& tex);
 
 	friend class texture_manager;
 

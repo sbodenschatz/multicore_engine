@@ -41,20 +41,36 @@ void texture::raise_error_flag(std::exception_ptr e) noexcept {
 	completion_handlers.shrink_to_fit();
 }
 
+template <typename T>
+base_image* texture::create_image(vk::Format format, const gli::texture& tex) {
+	image_ = T(mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, format,
+			   typename T::size_type(tex.extent()), uint32_t(tex.levels()),
+			   vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
+	image_view_ = boost::strict_get<T>(image_).create_view();
+	return &boost::strict_get<T>(image_);
+}
+template <typename T>
+base_image* texture::create_image_layered(vk::Format format, const gli::texture& tex) {
+	image_ = T(mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, format,
+			   typename T::size_type(tex.extent(), uint32_t(tex.layers())), uint32_t(tex.levels()),
+			   vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
+	image_view_ = boost::strict_get<T>(image_).create_view();
+	return &boost::strict_get<T>(image_);
+}
+
 void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	auto tex = gli::load_dds(tex_asset->data(), tex_asset->size());
 	base_image* bimg = nullptr;
 	auto format = vk::Format::eUndefined; // TODO Determine format from loaded texture.
 	switch(tex.target()) {
-	case gli::TARGET_2D:
-		image_ = image_2d(mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, format,
-						  image_2d::size_type(tex.extent()), uint32_t(tex.levels()),
-						  vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
-		image_view_ = boost::strict_get<image_2d>(image_).create_view();
-		bimg = &boost::strict_get<image_2d>(image_);
-		break;
-	// TODO Implement other texture types
+	case gli::TARGET_1D: bimg = create_image<image_1d>(format, tex); break;
+	case gli::TARGET_2D: bimg = create_image<image_2d>(format, tex); break;
+	case gli::TARGET_3D: bimg = create_image<image_3d>(format, tex); break;
+	case gli::TARGET_CUBE: bimg = create_image<image_cube>(format, tex); break;
+	case gli::TARGET_1D_ARRAY: bimg = create_image_layered<image_1d_layered>(format, tex); break;
+	case gli::TARGET_2D_ARRAY: bimg = create_image_layered<image_2d_layered>(format, tex); break;
+	case gli::TARGET_CUBE_ARRAY: bimg = create_image_layered<image_cube_layered>(format, tex); break;
 	default:
 		raise_error_flag(std::make_exception_ptr(mce::graphics_exception("Unsupported texture type.")));
 		break;
