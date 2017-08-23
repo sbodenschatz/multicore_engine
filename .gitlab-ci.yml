@@ -48,6 +48,7 @@ stages:
     - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a ${BUILD_COMPILER_NAME}/libmce_parsers.a
     - cmake -E copy build/multicore_engine_base/libmce_base.a ${BUILD_COMPILER_NAME}/libmce_base.a
     - cmake -E copy build/multicore_engine_core/libmce_core.a ${BUILD_COMPILER_NAME}/libmce_core.a
+    - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a ${BUILD_COMPILER_NAME}/libmce_renderer.a
     - cmake -E copy build/multicore_engine_demo/mce_demo ${BUILD_COMPILER_NAME}/demo
     - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test ${BUILD_COMPILER_NAME}/graphics_test
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
@@ -68,7 +69,8 @@ stages:
     - cmake -E make_directory %BUILD_COMPILER_NAME%
     - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a %BUILD_COMPILER_NAME%/libmce_parsers.a
     - cmake -E copy build/multicore_engine_base/libmce_base.a %BUILD_COMPILER_NAME%/libmce_base.a
-    - cmake -E copy build/multicore_engine_core/libmce_core.a %BUILD_COMPILER_NAME%/libmulticore_engine_core.a
+    - cmake -E copy build/multicore_engine_core/libmce_core.a %BUILD_COMPILER_NAME%/libmce_core.a
+    - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a %BUILD_COMPILER_NAME%/libmce_renderer.a
     - cmake -E copy build/multicore_engine_demo/mce_demo.exe %BUILD_COMPILER_NAME%/demo.exe
     - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
