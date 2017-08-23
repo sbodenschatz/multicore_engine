@@ -140,11 +140,11 @@ struct image_size<image_dimension::dim_cube, true> {
 	/// \brief Allows taking an unsigned integers as the length of the cube sides and an unsigned integer as
 	/// the layer count.
 	image_size(uint32_t side_length, uint32_t layers)
-			: width{side_length}, height{side_length}, layers{layers} {}
+			: width{side_length}, height{side_length}, layers{layers * 6} {}
 	/// Allows taking an extent from a gli texture.
 	// cppcheck-suppress noExplicitConstructor
 	image_size(glm::tvec3<int> extent, uint32_t layers)
-			: width{uint32_t(extent.x)}, height{uint32_t(extent.y)}, layers{layers} {}
+			: width{uint32_t(extent.x)}, height{uint32_t(extent.y)}, layers{layers * 6} {}
 };
 
 /// Represents the base class for a view of an image object to access the image data.
@@ -487,7 +487,7 @@ public:
 /// constructor signatures and view creation functions.
 template <image_dimension img_dim, bool layered, image_aspect_mode img_aspect = image_aspect_mode::color>
 class image {
-	static_assert(!layered, "Layered images are not yet implemented.");
+	static_assert(layered && !layered, "Unsupported image type.");
 };
 
 /// Specialization of the image template class for general unlayered images.
