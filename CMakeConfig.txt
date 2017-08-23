@@ -69,6 +69,7 @@ target_include_directories(mce_compiler_settings SYSTEM INTERFACE
 list(APPEND PASS_TO_BOOTSTRAP 
 		LIBS_DIR
 		GLM_INCLUDE 
+		GLI_INCLUDE 
 		ZLIB_INCLUDE
 		ZLIB_LIBS
 		VULKAN_INCLUDE
@@ -94,7 +95,11 @@ list(APPEND PASS_TO_BOOTSTRAP
 if (WIN32)
 	set(LIBS_DIR C:/Libs CACHE PATH "Custom library directory")
 
+	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/vkglformat/include CACHE PATH "Include path for vkglformat.")
+
 	set(GLM_INCLUDE ${LIBS_DIR}/glm/include CACHE PATH "Include path for glm.")
+
+	set(GLI_INCLUDE ${LIBS_DIR}/gli/include CACHE PATH "Include path for gli.")
 
 	set(ZLIB_INCLUDE ${LIBS_DIR}/zlib/include CACHE PATH "Include path for zlib.")
 	if(MSVC)
@@ -140,7 +145,9 @@ if (WIN32)
 	endif()
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
+	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vkglformat.")
 	set(GLM_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLM.")
+	set(GLI_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLI.")
 	set(ZLIB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for zlib.")
 	set(ZLIB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for zlib.")
 	set(VULKAN_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vulkan.")
@@ -166,6 +173,15 @@ if(SANITIZER_INSTRUMENTATION AND UNIX)
 	endif ()
 endif()
 
+add_library(deps.vkglformat INTERFACE)
+target_compile_definitions(deps.vkglformat INTERFACE
+	)
+target_include_directories(deps.vkglformat SYSTEM INTERFACE
+		${VKGLFORMAT_INCLUDE}
+	)
+target_compile_options(deps.vkglformat INTERFACE
+	)
+
 add_library(deps.glm INTERFACE)
 target_compile_definitions(deps.glm INTERFACE
 		GLM_FORCE_RADIANS 
@@ -179,6 +195,15 @@ target_compile_options(deps.glm INTERFACE
 		$<$<CXX_COMPILER_ID:MSVC>:/wd4201>		
 	)
 	
+add_library(deps.gli INTERFACE)
+target_compile_definitions(deps.gli INTERFACE
+	)
+target_include_directories(deps.gli SYSTEM INTERFACE
+		${GLI_INCLUDE}
+	)
+target_compile_options(deps.gli INTERFACE
+	)
+
 add_library(deps.zlib INTERFACE)
 target_compile_definitions(deps.zlib INTERFACE
 		ZLIB_CONST
