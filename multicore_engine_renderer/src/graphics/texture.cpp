@@ -16,6 +16,7 @@
 #endif
 
 #include <mce/asset/asset.hpp>
+#include <mce/graphics/sampler.hpp>
 #include <mce/graphics/texture.hpp>
 #include <mce/graphics/texture_manager.hpp>
 #include <mce/graphics/transfer_manager.hpp>
@@ -123,6 +124,14 @@ void texture::complete_staging() noexcept {
 	error_handlers.clear();
 	completion_handlers.shrink_to_fit();
 	error_handlers.shrink_to_fit();
+}
+
+vk::DescriptorImageInfo texture::bind(const sampler* sampler_to_use) const {
+	vk::Sampler sampler_handle;
+	if(sampler_to_use) {
+		sampler_handle = sampler_to_use->native_sampler();
+	}
+	return vk::DescriptorImageInfo(sampler_handle, img_view_handle, vk::ImageLayout::eShaderReadOnlyOptimal);
 }
 
 } /* namespace graphics */
