@@ -86,7 +86,21 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 	current_state_ = state::staging;
 	lock.unlock();
 	std::vector<vk::BufferImageCopy> regions;
-	// TODO Fill regions
+	auto base = static_cast<const char*>(tex.data());
+	for(std::size_t layer = 0; layer < tex.layers(); ++layer) {
+		for(std::size_t face = 0; face < tex.faces(); ++face) {
+			for(std::size_t level = 0; level < tex.levels(); ++level) {
+				vk::DeviceSize offset = static_cast<const char*>(tex.data()) - base;
+				auto ext = tex.extent(level);
+				regions.emplace_back(offset, 0, 0,
+									 vk::ImageSubresourceLayers(vk::ImageAspectFlagBits::eColor,
+																uint32_t(level),
+																uint32_t(layer * tex.faces() + face), 1),
+									 vk::Offset3D(0, 0, 0), vk::Extent3D(ext.x, ext.y, ext.z));
+			}
+		}
+	}
+
 	mgr_.transfer_mgr_.upload_image(tex.data(), tex.size(), *bimg, vk::ImageLayout::eShaderReadOnlyOptimal,
 									regions, [this_shared](vk::Image) { this_shared->complete_staging(); });
 }
