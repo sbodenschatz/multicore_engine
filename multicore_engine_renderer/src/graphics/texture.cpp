@@ -45,16 +45,20 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	auto tex = gli::load_dds(tex_asset->data(), tex_asset->size());
 	base_image* bimg = nullptr;
-	if(tex.faces() == 1 && tex.layers() == 1) {
-		auto format = vk::Format::eUndefined; // TODO Determine format from loaded texture.
+	auto format = vk::Format::eUndefined; // TODO Determine format from loaded texture.
+	switch(tex.target()) {
+	case gli::TARGET_2D:
 		image_2d img(mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, format,
 					 image_2d::size_type(tex.extent()), uint32_t(tex.levels()),
 					 vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
 		image_view_ = img.create_view();
 		image_ = std::move(img);
 		bimg = &boost::strict_get<image_2d>(image_);
-	} else {
+		break;
+	// TODO Implement other texture types
+	default:
 		raise_error_flag(std::make_exception_ptr(mce::graphics_exception("Unsupported texture type.")));
+		break;
 	}
 
 	auto this_shared = this->shared_from_this();
