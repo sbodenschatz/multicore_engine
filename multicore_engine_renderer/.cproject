@@ -30,6 +30,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1459155580" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -45,6 +46,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.708417641" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -62,6 +64,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.362269587" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -115,6 +118,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2072545442" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -130,6 +134,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.494437666" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -147,6 +152,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.458810890" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -200,6 +206,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.365241325" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -215,6 +222,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.809694774" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -232,6 +240,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1584369689" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
