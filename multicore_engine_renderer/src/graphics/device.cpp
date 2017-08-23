@@ -191,7 +191,9 @@ void device::create_device() {
 	}
 
 	vk::PhysicalDeviceFeatures dev_features;
+	dev_features.textureCompressionBC = true;
 	// TODO: Set bools for needed features
+	// TODO: Check availability in device selection.
 	vk::DeviceCreateInfo dev_ci;
 	const char* swapchain_extension_name = "VK_KHR_swapchain";
 	dev_ci.ppEnabledExtensionNames = &swapchain_extension_name;
