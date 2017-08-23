@@ -106,5 +106,24 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 									regions, [this_shared](vk::Image) { this_shared->complete_staging(); });
 }
 
+void texture::complete_staging() noexcept {
+	std::unique_lock<std::mutex> lock(modification_mutex);
+	current_state_ = state::ready;
+	auto this_shared = std::static_pointer_cast<const texture>(this->shared_from_this());
+	lock.unlock();
+	// From here on the texture object is immutable and can therefore be read without holding a lock
+	for(auto& handler : completion_handlers) {
+		try {
+			handler(this_shared);
+		} catch(...) {
+			// Drop exceptions escaped from completion handlers
+		}
+	}
+	completion_handlers.clear();
+	error_handlers.clear();
+	completion_handlers.shrink_to_fit();
+	error_handlers.shrink_to_fit();
+}
+
 } /* namespace graphics */
 } /* namespace mce */
