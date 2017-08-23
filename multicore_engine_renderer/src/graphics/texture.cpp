@@ -47,6 +47,9 @@ base_image* texture::create_image(vk::Format format, const gli::texture& tex) {
 			   typename T::size_type(tex.extent()), uint32_t(tex.levels()),
 			   vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
 	image_view_ = boost::strict_get<T>(image_).create_view();
+	img_handle = boost::strict_get<T>(image_).native_image();
+	img_view_handle = boost::strict_get<decltype(boost::strict_get<T>(image_).create_view())>(image_view_)
+							  .native_view();
 	return &boost::strict_get<T>(image_);
 }
 template <typename T>
@@ -55,6 +58,9 @@ base_image* texture::create_image_layered(vk::Format format, const gli::texture&
 			   typename T::size_type(tex.extent(), uint32_t(tex.layers())), uint32_t(tex.levels()),
 			   vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
 	image_view_ = boost::strict_get<T>(image_).create_view();
+	img_handle = boost::strict_get<T>(image_).native_image();
+	img_view_handle = boost::strict_get<decltype(boost::strict_get<T>(image_).create_view())>(image_view_)
+							  .native_view();
 	return &boost::strict_get<T>(image_);
 }
 

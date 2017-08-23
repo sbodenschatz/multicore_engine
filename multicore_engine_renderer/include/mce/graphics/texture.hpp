@@ -53,6 +53,8 @@ private:
 	boost::variant<boost::blank, image_view_1d, image_view_1d_layered, image_view_2d, image_view_2d_layered,
 				   image_view_3d, image_view_cube, image_view_cube_layered>
 			image_view_;
+	vk::Image img_handle;
+	vk::ImageView img_view_handle;
 
 	void complete_loading(const asset::asset_ptr& texture_asset) noexcept;
 	void complete_staging() noexcept;
