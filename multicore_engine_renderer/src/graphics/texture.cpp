@@ -48,11 +48,10 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 	auto format = vk::Format::eUndefined; // TODO Determine format from loaded texture.
 	switch(tex.target()) {
 	case gli::TARGET_2D:
-		image_2d img(mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, format,
-					 image_2d::size_type(tex.extent()), uint32_t(tex.levels()),
-					 vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
-		image_view_ = img.create_view();
-		image_ = std::move(img);
+		image_ = image_2d(mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, format,
+						  image_2d::size_type(tex.extent()), uint32_t(tex.levels()),
+						  vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
+		image_view_ = boost::strict_get<image_2d>(image_).create_view();
 		bimg = &boost::strict_get<image_2d>(image_);
 		break;
 	// TODO Implement other texture types
