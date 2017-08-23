@@ -19,11 +19,13 @@
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/device_memory_manager.hpp>
+#include <mce/graphics/graphics_defs.hpp>
 #include <mce/graphics/graphics_manager.hpp>
 #include <mce/graphics/instance.hpp>
 #include <mce/graphics/pipeline_cache.hpp>
 #include <mce/graphics/simple_descriptor_pool.hpp>
 #include <mce/graphics/simple_uniform_buffer.hpp>
+#include <mce/graphics/texture_manager.hpp>
 #include <mce/graphics/transfer_manager.hpp>
 #include <mce/graphics/window.hpp>
 #include <mce/model/model_data_manager.hpp>
@@ -46,6 +48,7 @@ class graphics_test {
 	destruction_queue_manager dqm_;
 	transfer_manager tmgr_;
 	rendering::model_manager mmgr;
+	graphics::texture_manager tex_mgr_;
 	graphics_manager gmgr_;
 	vk::UniqueSemaphore tmp_semaphore_;
 	containers::dynamic_array<vk::UniqueSemaphore> acquire_semaphores_;
@@ -73,6 +76,7 @@ class graphics_test {
 	std::unique_ptr<framebuffer> fb_;
 	rendering::static_model_ptr mdl_;
 	glm::vec3 rot_angle;
+	graphics::texture_ptr tex_;
 
 	struct vertex {
 		glm::vec3 pos;

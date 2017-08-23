@@ -33,8 +33,8 @@ graphics_test::graphics_test()
 		  render_cmd_pool_(dev_, dev_.graphics_queue_index().first, true),
 		  dqm_(&dev_, uint32_t(win_.swapchain_images().size())),
 		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())),
-		  mmgr(mdmgr, dev_, mem_mgr_, &dqm_, tmgr_), gmgr_(dev_, &dqm_),
-		  tmp_semaphore_(dev_->createSemaphoreUnique({})),
+		  mmgr(mdmgr, dev_, mem_mgr_, &dqm_, tmgr_), tex_mgr_(amgr_, dev_, mem_mgr_, &dqm_, tmgr_),
+		  gmgr_(dev_, &dqm_), tmp_semaphore_(dev_->createSemaphoreUnique({})),
 		  acquire_semaphores_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
 								  return dev_->createSemaphoreUnique({});
 							  })),
@@ -163,6 +163,7 @@ graphics_test::graphics_test()
 										   mdl->meshes().at(0).vertex_count());
 			},
 			[](std::exception_ptr) {});
+	tex_ = tex_mgr_.load_texture("textures/test.dds");
 }
 
 graphics_test::~graphics_test() {
