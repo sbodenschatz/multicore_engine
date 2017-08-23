@@ -19,6 +19,7 @@
 #include <mce/graphics/texture.hpp>
 #include <mce/graphics/texture_manager.hpp>
 #include <mce/graphics/transfer_manager.hpp>
+#include <vulkan/vk_format.h>
 
 namespace mce {
 namespace graphics {
@@ -68,7 +69,8 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
 	auto tex = gli::load_dds(tex_asset->data(), tex_asset->size());
 	base_image* bimg = nullptr;
-	auto format = vk::Format::eUndefined; // TODO Determine format from loaded texture.
+	auto gl_format = gli::gl(gli::gl::PROFILE_GL33).translate(tex.format(), tex.swizzles());
+	auto format = static_cast<vk::Format>(vkGetFormatFromOpenGLInternalFormat(gl_format.Internal));
 	switch(tex.target()) {
 	case gli::TARGET_1D: bimg = create_image<image_1d>(format, tex); break;
 	case gli::TARGET_2D: bimg = create_image<image_2d>(format, tex); break;
@@ -92,10 +94,9 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 			for(std::size_t level = 0; level < tex.levels(); ++level) {
 				vk::DeviceSize offset = static_cast<const char*>(tex.data()) - base;
 				auto ext = tex.extent(level);
-				regions.emplace_back(offset, 0, 0,
-									 vk::ImageSubresourceLayers(vk::ImageAspectFlagBits::eColor,
-																uint32_t(level),
-																uint32_t(layer * tex.faces() + face), 1),
+				regions.emplace_back(offset, 0, 0, vk::ImageSubresourceLayers(
+														   vk::ImageAspectFlagBits::eColor, uint32_t(level),
+														   uint32_t(layer * tex.faces() + face), 1),
 									 vk::Offset3D(0, 0, 0), vk::Extent3D(ext.x, ext.y, ext.z));
 			}
 		}
