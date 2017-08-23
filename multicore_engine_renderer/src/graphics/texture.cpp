@@ -54,7 +54,7 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 		image_ = std::move(img);
 		bimg = &boost::strict_get<image_2d>(image_);
 	} else {
-		raise_error_flag(std::make_exception_ptr(mce::graphics_exception("Unsupported exception type.")));
+		raise_error_flag(std::make_exception_ptr(mce::graphics_exception("Unsupported texture type.")));
 	}
 
 	auto this_shared = this->shared_from_this();
