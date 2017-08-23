@@ -7,6 +7,10 @@
 #ifndef GRAPHICS_TEXTURE_MANAGER_HPP_
 #define GRAPHICS_TEXTURE_MANAGER_HPP_
 
+/**
+ * Defines the texture_manager class.
+ */
+
 #include <boost/container/flat_map.hpp>
 #include <mce/graphics/graphics_defs.hpp>
 #include <mce/graphics/texture.hpp>
@@ -24,6 +28,7 @@ class device_memory_manager_interface;
 class destruction_queue_manager;
 class transfer_manager;
 
+/// Manages the loading and lifetime of textures in the renderer.
 class texture_manager {
 	asset::asset_manager& asset_mgr_;
 	graphics::device& dev_;
