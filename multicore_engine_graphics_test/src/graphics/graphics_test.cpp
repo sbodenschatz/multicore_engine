@@ -58,7 +58,7 @@ graphics_test::graphics_test()
 										   image_aspect_mode::depth)});
 	sampler_ = gmgr_.create_sampler("test_sampler", vk::Filter::eLinear, vk::Filter::eLinear,
 									vk::SamplerMipmapMode::eLinear,
-									sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, {}, {},
+									sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, 16.0f, {},
 									0.0f, 7.0f, vk::BorderColor::eIntOpaqueBlack);
 	uniform_dsl_ = gmgr_.create_descriptor_set_layout(
 			"test_uniform_dsl",
