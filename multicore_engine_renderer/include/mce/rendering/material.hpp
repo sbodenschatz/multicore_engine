@@ -7,10 +7,19 @@
 #ifndef MCE_RENDERING_MATERIAL_HPP_
 #define MCE_RENDERING_MATERIAL_HPP_
 
+#include <mce/graphics/graphics_defs.hpp>
+
 namespace mce {
 namespace rendering {
 
 class material {
+	graphics::texture_ptr albedo_map_;
+	graphics::texture_ptr normal_map_;
+	graphics::texture_ptr metallic_map_;
+	graphics::texture_ptr roughness_map_;
+	graphics::texture_ptr ambient_occlusion_map_;
+	graphics::texture_ptr emission_map_;
+
 public:
 	material();
 	~material();
