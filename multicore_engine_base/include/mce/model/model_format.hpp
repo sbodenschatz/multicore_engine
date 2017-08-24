@@ -37,8 +37,9 @@ using model_index = uint32_t;
 
 /// Represents the meta data for a single static mesh of a static model.
 struct static_model_mesh_meta_data {
-	std::string object_name; ///< The object name of the static mesh.
-	std::string group_name;  ///< The group name of the static mesh.
+	std::string object_name;   ///< The object name of the static mesh.
+	std::string group_name;	///< The group name of the static mesh.
+	std::string material_name; ///< The name of the material assigned to this mesh.
 
 	/// The offset range of the index data of the static mesh within the content range of the model file.
 	util::offset_range<uint64_t> index_data_in_content;
@@ -48,6 +49,7 @@ struct static_model_mesh_meta_data {
 										 const static_model_mesh_meta_data& value) {
 		stream << value.object_name;
 		stream << value.group_name;
+		stream << value.material_name;
 		stream << value.index_data_in_content;
 		return stream;
 	}
@@ -56,6 +58,7 @@ struct static_model_mesh_meta_data {
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_mesh_meta_data& value) {
 		stream >> value.object_name;
 		stream >> value.group_name;
+		stream >> value.material_name;
 		stream >> value.index_data_in_content;
 		return stream;
 	}
@@ -67,7 +70,7 @@ struct static_model_meta_data {
 	constexpr static uint64_t magic_number_ = util::composite_magic_number<uint64_t>(
 			'm', 'c', 'e', 'm', 'd', 'l', 's' /*static*/, 'g' /*geometry*/);
 	/// The supported(current) version of the model file format.
-	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 2u);
+	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 3u);
 
 	uint64_t magic_number = magic_number_; ///< The deserialized magic number.
 	uint64_t version = version_;		   ///< The deserialized version tag.
