@@ -15,8 +15,10 @@ out gl_PerVertex {
 };
 
 layout(location = 0) out vec3 color;
+layout(location = 1) out vec2 uv;
 
 void main() {
 	color = abs(in_normal);
+	uv = in_uv;
 	gl_Position = ubo.proj * ubo.model * vec4(in_position,1.0);
 }

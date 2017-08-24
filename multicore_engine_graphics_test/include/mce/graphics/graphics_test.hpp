@@ -73,6 +73,7 @@ class graphics_test {
 	std::shared_ptr<const pipeline> pl_;
 	std::shared_ptr<const pipeline_config> plc2_;
 	std::shared_ptr<const pipeline> pl2_;
+	std::shared_ptr<const sampler> sampler_;
 	std::unique_ptr<framebuffer> fb_;
 	rendering::static_model_ptr mdl_;
 	glm::vec3 rot_angle;

@@ -18,6 +18,7 @@
 #include <mce/graphics/pipeline_config.hpp>
 #include <mce/graphics/pipeline_layout.hpp>
 #include <mce/graphics/render_pass.hpp>
+#include <mce/graphics/sampler.hpp>
 #include <mce/model/dump_model.hpp>
 #include <mce/rendering/model_format.hpp>
 #include <mce/util/array_utils.hpp>
@@ -55,10 +56,19 @@ graphics_test::graphics_test()
 			"test_fbcfg", win_,
 			{framebuffer_attachment_config(dev_.best_supported_depth_attachment_format(),
 										   image_aspect_mode::depth)});
+	sampler_ = gmgr_.create_sampler("test_sampler", vk::Filter::eLinear, vk::Filter::eLinear,
+									vk::SamplerMipmapMode::eLinear,
+									sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, {}, {},
+									0.0f, 7.0f, vk::BorderColor::eIntOpaqueBlack);
 	uniform_dsl_ = gmgr_.create_descriptor_set_layout(
 			"test_uniform_dsl",
 			{descriptor_set_layout_binding_element{
-					0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex, {}}});
+					 0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex, {}},
+			 descriptor_set_layout_binding_element{1,
+												   vk::DescriptorType::eCombinedImageSampler,
+												   1,
+												   vk::ShaderStageFlagBits::eFragment,
+												   {sampler_->native_sampler()}}});
 	descriptor_pools_ = {win_.swapchain_images().size(), containers::generator_param([this](size_t) {
 							 return simple_descriptor_pool(dev_, descriptor_set_resources(*uniform_dsl_, 16));
 						 })};
@@ -217,18 +227,19 @@ void graphics_test::run() {
 						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
 						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 2, clear),
 				vk::SubpassContents::eInline);
-		auto ds = descriptor_pools_[img_index].allocate_descriptor_set(uniform_dsl_);
-		ds.update()(0, 0, vk::DescriptorType::eUniformBuffer, uniform_buffers_[img_index].store(ud));
-		ds.bind(render_cmb_buf.get(), pll_, 0, ds);
+		if(mdl_->ready() && tex_->ready()) {
+			auto ds = descriptor_pools_[img_index].allocate_descriptor_set(uniform_dsl_);
+			ds.update()(0, 0, vk::DescriptorType::eUniformBuffer, uniform_buffers_[img_index].store(ud))(
+					1, 0, vk::DescriptorType::eCombinedImageSampler, tex_->bind(/*sampler_.get()*/));
+			ds.bind(render_cmb_buf.get(), pll_, 0, ds);
+			pl2_->bind(render_cmb_buf.get());
+			mdl_->draw_model_mesh(render_cmb_buf.get(), 0);
+		}
 		/*if(vb_ready_) {
 			pl_->bind(render_cmb_buf.get());
 			render_cmb_buf->bindVertexBuffers(0, vertex_buffer_.native_buffer(), vk::DeviceSize(0));
 			render_cmb_buf->draw(6, 1, 0, 0);
 		}*/
-		if(mdl_->ready()) {
-			pl2_->bind(render_cmb_buf.get());
-			mdl_->draw_model_mesh(render_cmb_buf.get(), 0);
-		}
 		render_cmb_buf->endRenderPass();
 		render_cmb_buf->pipelineBarrier(
 				vk::PipelineStageFlagBits::eAllCommands,
