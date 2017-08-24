@@ -192,6 +192,7 @@ void device::create_device() {
 
 	vk::PhysicalDeviceFeatures dev_features;
 	dev_features.textureCompressionBC = true;
+	dev_features.samplerAnisotropy = true;
 	// TODO: Set bools for needed features
 	// TODO: Check availability in device selection.
 	vk::DeviceCreateInfo dev_ci;
