@@ -47,7 +47,7 @@ void static_model::complete_loading(const model::polygon_model_ptr& polygon_mdl)
 						   throw mce::invalid_data_exception("The size of the index data section for " +
 															 data.group_name + "." + data.object_name +
 															 " is too big (must fit in uint32_t).");
-					   return mesh(this, data.object_name, data.group_name,
+					   return mesh(this, data.object_name, data.group_name, data.material_name,
 								   data.index_data_in_content.begin(), uint32_t(vertex_count));
 				   });
 	vertex_index_buffer_ = graphics::buffer(
