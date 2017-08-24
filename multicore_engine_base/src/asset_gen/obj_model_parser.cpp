@@ -238,6 +238,7 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 				});
 		mesh.collision_data.object_name = mesh.object_name;
 		mesh.collision_data.group_name = mesh.group_name;
+		mesh.collision_data.material_name = mesh.material_name;
 	}
 	model::static_model_collision_data model_colision_data;
 	model_colision_data.meshes.reserve(meshes.size());

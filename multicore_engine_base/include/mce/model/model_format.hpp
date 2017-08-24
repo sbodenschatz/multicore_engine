@@ -159,8 +159,10 @@ struct axis_aligned_collision_box {
 
 /// Defines the structure of the collision data for a mesh of a static model.
 struct static_model_mesh_collision_data {
-	std::string object_name;					 ///< The object name of the mesh.
-	std::string group_name;						 ///< The group name of the mesh.
+	std::string object_name; ///< The object name of the mesh.
+	std::string group_name;  ///< The group name of the mesh.
+	/// The material name of the mesh, because the group and object name combination might not be unique.
+	std::string material_name;
 	collision_sphere sphere;					 ///< The sphere based collision data for the mesh.
 	axis_aligned_collision_box axis_aligned_box; ///< The axis-aligned box based collision data for the mesh.
 
@@ -169,6 +171,7 @@ struct static_model_mesh_collision_data {
 										 const static_model_mesh_collision_data& value) {
 		stream << value.object_name;
 		stream << value.group_name;
+		stream << value.material_name;
 		stream << value.sphere;
 		stream << value.axis_aligned_box;
 		return stream;
@@ -177,6 +180,7 @@ struct static_model_mesh_collision_data {
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_mesh_collision_data& value) {
 		stream >> value.object_name;
 		stream >> value.group_name;
+		stream >> value.material_name;
 		stream >> value.sphere;
 		stream >> value.axis_aligned_box;
 		return stream;
@@ -189,11 +193,13 @@ struct static_model_collision_data {
 	constexpr static uint64_t magic_number_ = util::composite_magic_number<uint64_t>(
 			'm', 'c', 'e', 'm', 'd', 'l', 's' /*static*/, 'c' /*collision*/);
 	/// The supported(current) version of the collision data files.
-	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 1u);
+	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 2u);
 
 	uint64_t magic_number = magic_number_;				  ///< The deserialized magic number.
 	uint64_t version = version_;						  ///< The deserialized version flag.
 	std::vector<static_model_mesh_collision_data> meshes; ///<The collision data of the meshes of the model.
+
+	// TODO Possibly add collision data for the model as a whole.
 
 	/// Serializes the static model collision data.
 	friend bstream::obstream& operator<<(bstream::obstream& stream,
