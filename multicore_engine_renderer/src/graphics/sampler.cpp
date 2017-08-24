@@ -31,6 +31,7 @@ sampler::sampler(const device& dev, destruction_queue_manager* dqm, vk::Filter m
 		ci.anisotropyEnable = true;
 		ci.maxAnisotropy = max_anisotropy_.get();
 	} else {
+		ci.maxAnisotropy = 1.0f;
 		ci.anisotropyEnable = false;
 	}
 	if(compare_op_) {
