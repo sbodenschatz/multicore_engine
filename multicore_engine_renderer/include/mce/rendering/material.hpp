@@ -15,9 +15,7 @@ namespace rendering {
 class material {
 	graphics::texture_ptr albedo_map_;
 	graphics::texture_ptr normal_map_;
-	graphics::texture_ptr metallic_map_;
-	graphics::texture_ptr roughness_map_;
-	graphics::texture_ptr ambient_occlusion_map_;
+	graphics::texture_ptr material_param_map_; // Metallic,Roughness,Ambient occlusion
 	graphics::texture_ptr emission_map_;
 
 public:
