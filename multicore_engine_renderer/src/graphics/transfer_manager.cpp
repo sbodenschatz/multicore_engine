@@ -6,6 +6,7 @@
 
 #include <boost/container/small_vector.hpp>
 #include <cassert>
+#include <mce/graphics/sync_utils.hpp>
 #include <mce/graphics/transfer_manager.hpp>
 #include <utility>
 
@@ -90,30 +91,30 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk
 			vk::PipelineStageFlagBits::eAllCommands | vk::PipelineStageFlagBits::eHost,
 			vk::PipelineStageFlagBits::eTransfer, {}, {}, {},
 			{base_image::generate_transition_native(dst_img, old_layout, vk::ImageLayout::eTransferDstOptimal,
-													~vk::AccessFlags{}, vk::AccessFlagBits::eTransferWrite,
-													aspects, mip_levels, layers)});
+													allowed_flags_for_layout(old_layout),
+													vk::AccessFlagBits::eTransferWrite, aspects, mip_levels,
+													layers)});
 	transfer_command_bufers[current_ring_index]->copyBufferToImage(
 			staging_buffer.native_buffer(), dst_img, vk::ImageLayout::eTransferDstOptimal,
 			{uint32_t(regions_transformed.size()), regions_transformed.data()});
+	transfer_command_bufers[current_ring_index]->pipelineBarrier(
+			vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
+			{base_image::generate_transition_native(dst_img, vk::ImageLayout::eTransferDstOptimal,
+													final_layout, vk::AccessFlagBits::eTransferWrite,
+													allowed_flags_for_layout(final_layout), aspects,
+													mip_levels, layers)});
 	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
 		transfer_command_bufers[current_ring_index]->pipelineBarrier(
-				vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
-				{vk::ImageMemoryBarrier(
-						vk::AccessFlagBits::eTransferWrite, {}, vk::ImageLayout::eTransferDstOptimal,
-						final_layout, dev.transfer_queue_index().first, dev.graphics_queue_index().first,
-						dst_img, vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
+				vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
+				{vk::ImageMemoryBarrier({}, {}, final_layout, final_layout, dev.transfer_queue_index().first,
+										dev.graphics_queue_index().first, dst_img,
+										vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
 		pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
-				vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
-				{vk::ImageMemoryBarrier({}, ~vk::AccessFlags{}, vk::ImageLayout::eTransferDstOptimal,
+				vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
+				{vk::ImageMemoryBarrier({}, allowed_flags_for_layout(final_layout), final_layout,
 										final_layout, dev.transfer_queue_index().first,
 										dev.graphics_queue_index().first, dst_img,
 										vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
-	} else {
-		transfer_command_bufers[current_ring_index]->pipelineBarrier(
-				vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
-				{base_image::generate_transition_native(dst_img, vk::ImageLayout::eTransferDstOptimal,
-														final_layout, vk::AccessFlagBits::eTransferWrite,
-														~vk::AccessFlags{}, aspects, mip_levels, layers)});
 	}
 }
 

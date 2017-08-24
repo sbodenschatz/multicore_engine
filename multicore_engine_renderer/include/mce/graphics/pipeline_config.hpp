@@ -296,6 +296,7 @@ private:
 	boost::optional<viewport_state_config> viewport_state_;
 	boost::optional<vk::PipelineViewportStateCreateInfo> viewport_state_ci;
 	vk::PipelineRasterizationStateCreateInfo rasterization_state_;
+	// TODO: Handle ownership for sample mask.
 	boost::optional<vk::PipelineMultisampleStateCreateInfo> multisample_state_;
 	boost::optional<vk::PipelineDepthStencilStateCreateInfo> depth_stencil_state_;
 	boost::optional<color_blend_state_config> color_blend_state_;

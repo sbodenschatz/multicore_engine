@@ -50,6 +50,7 @@ stages:
     - cmake -E copy build/multicore_engine_core/libmce_core.a ${BUILD_COMPILER_NAME}/libmce_core.a
     - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a ${BUILD_COMPILER_NAME}/libmce_renderer.a
     - cmake -E copy build/multicore_engine_demo/mce_demo ${BUILD_COMPILER_NAME}/demo
+    - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test ${BUILD_COMPILER_NAME}/graphics_test
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
     - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
     - cmake -E copy build/multicore_engine_model_converter/mce_model_converter ${BUILD_COMPILER_NAME}/model_converter
@@ -71,6 +72,7 @@ stages:
     - cmake -E copy build/multicore_engine_core/libmce_core.a %BUILD_COMPILER_NAME%/libmce_core.a
     - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a %BUILD_COMPILER_NAME%/libmce_renderer.a
     - cmake -E copy build/multicore_engine_demo/mce_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
     - cmake -E copy build/multicore_engine_model_converter/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
@@ -93,6 +95,7 @@ stages:
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core.lib %BUILD_COMPILER_NAME%/mce_core.lib) ELSE (echo Skipping LTCG Lib)
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_renderer/%BUILD_TYPE%/mce_renderer.lib %BUILD_COMPILER_NAME%/mce_renderer.lib) ELSE (echo Skipping LTCG Lib)
     - cmake -E copy build/multicore_engine_demo/%BUILD_TYPE%/mce_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E copy build/multicore_engine_graphics_test/%BUILD_TYPE%/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E copy build/multicore_engine_pack_file_gen/%BUILD_TYPE%/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
     - cmake -E copy build/multicore_engine_model_converter/%BUILD_TYPE%/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe

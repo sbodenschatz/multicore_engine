@@ -159,7 +159,7 @@ public:
 												  boost::optional<float> max_anisotropy,
 												  boost::optional<vk::CompareOp> compare_op, float min_lod,
 												  float max_lod, vk::BorderColor border_color,
-												  bool unnormalized_coordinates);
+												  bool unnormalized_coordinates = false);
 
 	/// \brief Creates a subpass_graph from the given subpass configurations and dependencies between the
 	/// subpasses and stores it under the given name.

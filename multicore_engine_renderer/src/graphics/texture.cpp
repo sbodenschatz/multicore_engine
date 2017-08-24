@@ -93,7 +93,7 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 	for(std::size_t layer = 0; layer < tex.layers(); ++layer) {
 		for(std::size_t face = 0; face < tex.faces(); ++face) {
 			for(std::size_t level = 0; level < tex.levels(); ++level) {
-				vk::DeviceSize offset = static_cast<const char*>(tex.data()) - base;
+				vk::DeviceSize offset = static_cast<const char*>(tex.data(layer, face, level)) - base;
 				auto ext = tex.extent(level);
 				regions.emplace_back(offset, 0, 0, vk::ImageSubresourceLayers(
 														   vk::ImageAspectFlagBits::eColor, uint32_t(level),
