@@ -31,6 +31,8 @@ class descriptor_set_updater {
 	std::array<vk::WriteDescriptorSet, entries> writes_;
 	bool last = true;
 
+	friend class descriptor_set_updater<entries + 1, vk::DescriptorImageInfo>;
+	friend class descriptor_set_updater<entries + 1, vk::DescriptorBufferInfo>;
 	friend class descriptor_set_updater<entries - 1, vk::DescriptorImageInfo>;
 	friend class descriptor_set_updater<entries - 1, vk::DescriptorBufferInfo>;
 	friend class descriptor_set_updater<entries - 1, void>;
