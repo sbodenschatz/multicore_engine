@@ -183,19 +183,39 @@ public:
 	}
 
 	/// Allows access to the model::polygon_model from which this was loaded.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	const model::polygon_model_ptr& poly_model() const {
 		return poly_model_;
 	}
 
 	/// Binds the common vertex buffer for all meshes in the model to the given command buffer.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	void bind_vertices(vk::CommandBuffer cmd_buf) const;
 	/// Binds the index buffer for the given mesh to the given command buffer.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	void bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index) const;
 	/// \brief Records a draw call for the given mesh to the given command buffer, optionally drawing
 	/// multiple instances.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	void record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1) const;
 	/// \brief Binds the vertex and index buffer for the given mesh and records a draw call to the given
 	/// command buffer, optionally drawing multiple instances.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	void draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1) const;
 };
 } /* namespace rendering */

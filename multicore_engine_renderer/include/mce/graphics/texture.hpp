@@ -144,6 +144,10 @@ public:
 
 	/// \brief Returns a DescriptorImageInfo that can be used to bind the texture in a descriptor set
 	/// optionally using a given sampler.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	vk::DescriptorImageInfo bind(const sampler* sampler_to_use = nullptr) const;
 };
 
