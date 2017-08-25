@@ -34,26 +34,31 @@ void static_model::raise_error_flag(std::exception_ptr e) noexcept {
 
 void static_model::complete_loading(const model::polygon_model_ptr& polygon_mdl) noexcept {
 	std::unique_lock<std::mutex> lock(modification_mutex);
-	poly_model_ = polygon_mdl;
-	meshes_.reserve(polygon_mdl->meta_data().meshes.size());
-	std::transform(polygon_mdl->meta_data().meshes.begin(), polygon_mdl->meta_data().meshes.end(),
-				   std::back_inserter(meshes_), [this](const model::static_model_mesh_meta_data& data) {
-					   if(data.index_data_in_content.length() % 4)
-						   throw mce::invalid_data_exception("The index data section for " + data.group_name +
-															 "." + data.object_name +
-															 " has a size not divisible by 4");
-					   auto vertex_count = data.index_data_in_content.length() / 4;
-					   if(vertex_count > std::numeric_limits<uint32_t>::max())
-						   throw mce::invalid_data_exception("The size of the index data section for " +
-															 data.group_name + "." + data.object_name +
-															 " is too big (must fit in uint32_t).");
+	try {
+		poly_model_ = polygon_mdl;
+		meshes_.reserve(polygon_mdl->meta_data().meshes.size());
+		std::transform(polygon_mdl->meta_data().meshes.begin(), polygon_mdl->meta_data().meshes.end(),
+					   std::back_inserter(meshes_), [this](const model::static_model_mesh_meta_data& data) {
+						   if(data.index_data_in_content.length() % 4)
+							   throw mce::invalid_data_exception("The index data section for " +
+																 data.group_name + "." + data.object_name +
+																 " has a size not divisible by 4");
+						   auto vertex_count = data.index_data_in_content.length() / 4;
+						   if(vertex_count > std::numeric_limits<uint32_t>::max())
+							   throw mce::invalid_data_exception("The size of the index data section for " +
+																 data.group_name + "." + data.object_name +
+																 " is too big (must fit in uint32_t).");
 					   return mesh(this, data.object_name, data.group_name,
-								   data.index_data_in_content.begin(), uint32_t(vertex_count));
-				   });
-	vertex_index_buffer_ = graphics::buffer(
-			mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, polygon_mdl->content_data_size(),
-			vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer |
-					vk::BufferUsageFlagBits::eTransferDst);
+									   data.index_data_in_content.begin(), uint32_t(vertex_count));
+					   });
+		vertex_index_buffer_ = graphics::buffer(
+				mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, polygon_mdl->content_data_size(),
+				vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer |
+						vk::BufferUsageFlagBits::eTransferDst);
+	} catch(...) {
+		raise_error_flag(std::current_exception());
+	}
+
 	auto this_shared = this->shared_from_this();
 	current_state_ = state::staging;
 	lock.unlock();
