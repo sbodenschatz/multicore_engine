@@ -50,7 +50,27 @@ material::material(material_manager& mgr, const material_description& descriptio
 									 [tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
 }
 
-// void material::texture_loaded(const graphics::texture_ptr& tex) noexcept {}
+void material::texture_loaded(const graphics::texture_ptr&) noexcept {
+	std::unique_lock<std::mutex> lock(modification_mutex);
+	if(current_state_ == state::loading && albedo_map_->ready() && normal_map_->ready() &&
+	   material_map_->ready() && emission_map_->ready()) {
+		auto this_shared = std::static_pointer_cast<const material>(this->shared_from_this());
+		current_state_ = state::ready;
+		lock.unlock();
+		// From here on the material object is immutable and can therefore be read without holding a lock
+		for(auto& handler : completion_handlers) {
+			try {
+				handler(this_shared);
+			} catch(...) {
+				// Drop exceptions escaped from completion handlers
+			}
+		}
+		completion_handlers.clear();
+		error_handlers.clear();
+		completion_handlers.shrink_to_fit();
+		error_handlers.shrink_to_fit();
+	}
+}
 
 } /* namespace rendering */
 } /* namespace mce */
