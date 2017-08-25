@@ -44,12 +44,7 @@ private:
 
 	void raise_error_flag(std::exception_ptr e) noexcept;
 
-	bool try_obtain_load_ownership() noexcept {
-		state expected = state::initial;
-		return current_state_.compare_exchange_strong(expected, state::loading);
-	}
-
-	void start_loading(graphics::texture_manager& mgr, const material_description& description);
+	bool try_start_loading(graphics::texture_manager& mgr, const material_description& description) noexcept;
 
 	friend class material_manager;
 
