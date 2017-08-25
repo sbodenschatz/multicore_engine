@@ -19,7 +19,7 @@ class material_manager {
 	friend class material;
 
 public:
-	material_manager(graphics::texture_manager& tex_mgr) : tex_mgr{tex_mgr} {}
+	explicit material_manager(graphics::texture_manager& tex_mgr) : tex_mgr{tex_mgr} {}
 	~material_manager();
 };
 
