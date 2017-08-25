@@ -20,7 +20,7 @@
 namespace mce {
 namespace rendering {
 
-class material_library {
+class material_library : public std::enable_shared_from_this<static_model> {
 public:
 	/// Represents the status of a material_library.
 	enum class state { loading, ready, error };
@@ -65,7 +65,28 @@ public:
 	 * type material_library_completion_handler and error_handler.
 	 */
 	template <typename F, typename E>
-	void run_when_ready(F handler, E error_handler);
+	void run_when_ready(F handler, E error_handler) {
+		if(current_state_ == state::ready) {
+			handler(this->shared_from_this());
+			return;
+		} else if(current_state_ == state::error) {
+			error_handler(std::make_exception_ptr(
+					path_not_found_exception("Material '" + name() + "' was cached as failed.")));
+			return;
+		}
+		std::unique_lock<std::mutex> lock(modification_mutex);
+		if(current_state_ == state::ready) {
+			lock.unlock();
+			handler(this->shared_from_this());
+		} else if(current_state_ == state::error) {
+			lock.unlock();
+			error_handler(std::make_exception_ptr(
+					path_not_found_exception("Material '" + name() + "' was cached as failed.")));
+		} else {
+			completion_handlers.emplace_back(std::move(handler));
+			error_handlers.emplace_back(std::move(error_handler));
+		}
+	}
 	/// Checks if the material library is ready for use.
 	bool ready() const noexcept {
 		return current_state_ == state::ready;
