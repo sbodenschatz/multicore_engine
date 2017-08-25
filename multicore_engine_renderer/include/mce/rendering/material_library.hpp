@@ -7,6 +7,11 @@
 #ifndef MCE_RENDERING_MATERIAL_LIBRARY_HPP_
 #define MCE_RENDERING_MATERIAL_LIBRARY_HPP_
 
+/**
+ * \file
+ * Defines the material_library class.
+ */
+
 #include <atomic>
 #include <boost/container/flat_map.hpp>
 #include <mce/asset/asset_defs.hpp>
@@ -20,6 +25,8 @@
 namespace mce {
 namespace rendering {
 
+/// \brief Represents a library that defines one or more materials for the material system and that can be
+/// loaded into the material_manager.
 class material_library : public std::enable_shared_from_this<static_model> {
 public:
 	/// Represents the status of a material_library.
@@ -109,11 +116,19 @@ public:
 		return name_;
 	}
 	/// Allows read-access to the material descriptions in this material_library.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	const boost::container::flat_map<std::string, material_description>& material_descriptions() const {
 		return material_descriptions_;
 	}
 	/// \brief Attempts to look up the material with the given name and returns a pointer to it or a nullptr
 	/// if it doesn't exist in this library.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	const material_description* find_material_description(const std::string& name) const {
 		auto it = material_descriptions_.find(name);
 		if(it != material_descriptions_.end()) {
