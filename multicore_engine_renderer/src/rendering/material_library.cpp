@@ -58,8 +58,8 @@ void material_library::complete_loading(const asset::asset_ptr& lib_asset) noexc
 	} catch(...) {
 		raise_error_flag(std::current_exception());
 	}
-	current_state_ = state::ready;
 	auto this_shared = std::static_pointer_cast<const material_library>(this->shared_from_this());
+	current_state_ = state::ready;
 	lock.unlock();
 	// From here on the polygon model object is immutable and can therefore be read without holding a lock
 	for(auto& handler : completion_handlers) {
