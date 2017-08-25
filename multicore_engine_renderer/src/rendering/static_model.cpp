@@ -67,7 +67,7 @@ void static_model::complete_staging() noexcept {
 	current_state_ = state::ready;
 	auto this_shared = std::static_pointer_cast<const static_model>(this->shared_from_this());
 	lock.unlock();
-	// From here on the polygon model object is immutable and can therefore be read without holding a lock
+	// From here on the static model object is immutable and can therefore be read without holding a lock
 	for(auto& handler : completion_handlers) {
 		try {
 			handler(this_shared);
