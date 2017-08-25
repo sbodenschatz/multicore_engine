@@ -9,10 +9,6 @@
 namespace mce {
 namespace rendering {
 
-material_library::material_library() {
-	// TODO Auto-generated constructor stub
-}
-
 material_library::~material_library() {}
 
 } /* namespace rendering */
