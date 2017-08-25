@@ -19,13 +19,15 @@
 #include <vector>
 
 namespace mce {
+namespace graphics {
+class texture_manager;
+} // namespace graphics
 namespace rendering {
-class material_manager;
 
 class material : public std::enable_shared_from_this<material> {
 public:
 	/// Represents the status of a material.
-	enum class state { loading, ready, error };
+	enum class state { initial, loading, ready, error };
 
 private:
 	std::atomic<state> current_state_;
@@ -42,12 +44,22 @@ private:
 
 	void raise_error_flag(std::exception_ptr e) noexcept;
 
+	bool try_obtain_load_ownership() noexcept {
+		state expected = state::initial;
+		return current_state_.compare_exchange_strong(expected, state::loading);
+	}
+
+	void start_loading(graphics::texture_manager& mgr, const material_description& description);
+
 	friend class material_manager;
 
 public:
-	/// \brief Creates an material object for the given description. Should only be used within the
+	/// \brief Creates an material object with the given name. Should only be used within the
 	/// rendering system but can't be private due to being used in make_shared.
-	explicit material(material_manager& mgr, const material_description& description);
+	explicit material(const std::string& name) : current_state_{state::initial}, name_{name} {}
+	/// \brief Creates an material object with the given name. Should only be used within the
+	/// rendering system but can't be private due to being used in make_shared.
+	explicit material(std::string&& name) : current_state_{state::initial}, name_{name} {}
 	/// Destroys the material and releases the underlying resources.
 	~material();
 	/// Forbids copy-construction of material.

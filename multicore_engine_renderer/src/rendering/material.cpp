@@ -29,23 +29,19 @@ void material::raise_error_flag(std::exception_ptr e) noexcept {
 	completion_handlers.shrink_to_fit();
 }
 
-material::material(material_manager& mgr, const material_description& description)
-		: current_state_{state::loading}, name_{description.name} {
+void material::start_loading(graphics::texture_manager& mgr, const material_description& description) {
+	std::lock_guard<std::mutex> lock(modification_mutex);
 	auto tmp = shared_from_this();
-	albedo_map_ =
-			mgr.tex_mgr.load_texture(description.albedo_map_name,
+	albedo_map_ = mgr.load_texture(description.albedo_map_name,
+								   [tmp](const graphics::texture_ptr& tex) { tmp->texture_loaded(tex); },
+								   [tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
+	normal_map_ = mgr.load_texture(description.normal_map_name,
+								   [tmp](const graphics::texture_ptr& tex) { tmp->texture_loaded(tex); },
+								   [tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
+	material_map_ = mgr.load_texture(description.material_map_name,
 									 [tmp](const graphics::texture_ptr& tex) { tmp->texture_loaded(tex); },
 									 [tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
-	normal_map_ =
-			mgr.tex_mgr.load_texture(description.normal_map_name,
-									 [tmp](const graphics::texture_ptr& tex) { tmp->texture_loaded(tex); },
-									 [tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
-	material_map_ =
-			mgr.tex_mgr.load_texture(description.material_map_name,
-									 [tmp](const graphics::texture_ptr& tex) { tmp->texture_loaded(tex); },
-									 [tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
-	emission_map_ =
-			mgr.tex_mgr.load_texture(description.emission_map_name,
+	emission_map_ = mgr.load_texture(description.emission_map_name,
 									 [tmp](const graphics::texture_ptr& tex) { tmp->texture_loaded(tex); },
 									 [tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
 }
