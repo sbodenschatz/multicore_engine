@@ -78,7 +78,7 @@ public:
 			return;
 		} else if(current_state_ == state::error) {
 			error_handler(std::make_exception_ptr(
-					path_not_found_exception("Material '" + name() + "' was cached as failed.")));
+					path_not_found_exception("Material library '" + name() + "' was cached as failed.")));
 			return;
 		}
 		std::unique_lock<std::mutex> lock(modification_mutex);
@@ -88,7 +88,7 @@ public:
 		} else if(current_state_ == state::error) {
 			lock.unlock();
 			error_handler(std::make_exception_ptr(
-					path_not_found_exception("Material '" + name() + "' was cached as failed.")));
+					path_not_found_exception("Material library '" + name() + "' was cached as failed.")));
 		} else {
 			completion_handlers.emplace_back(std::move(handler));
 			error_handlers.emplace_back(std::move(error_handler));
