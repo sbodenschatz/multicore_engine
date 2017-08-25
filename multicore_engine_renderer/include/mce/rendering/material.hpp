@@ -23,11 +23,6 @@ namespace rendering {
 class material_manager;
 
 class material : public std::enable_shared_from_this<material> {
-	graphics::texture_ptr albedo_map_;
-	graphics::texture_ptr normal_map_;
-	graphics::texture_ptr material_map_; // Metallic,Roughness,Ambient occlusion
-	graphics::texture_ptr emission_map_;
-
 public:
 	/// Represents the status of a material.
 	enum class state { loading, ready, error };
@@ -38,7 +33,10 @@ private:
 	std::string name_;
 	std::vector<material_completion_handler> completion_handlers;
 	std::vector<asset::error_handler> error_handlers;
-	boost::container::flat_map<std::string, material_description> material_descriptions_;
+	graphics::texture_ptr albedo_map_;
+	graphics::texture_ptr normal_map_;
+	graphics::texture_ptr material_map_; // Metallic,Roughness,Ambient occlusion
+	graphics::texture_ptr emission_map_;
 
 	void texture_loaded(const graphics::texture_ptr& tex) noexcept;
 
@@ -110,6 +108,24 @@ public:
 	const std::string& name() const noexcept {
 		return name_;
 	}
+
+	const graphics::texture_ptr& albedo_map() const noexcept {
+		return albedo_map_;
+	}
+
+	const graphics::texture_ptr& emission_map() const noexcept {
+		return emission_map_;
+	}
+
+	const graphics::texture_ptr& material_map() const noexcept {
+		return material_map_;
+	}
+
+	const graphics::texture_ptr& normal_map() const noexcept {
+		return normal_map_;
+	}
+
+	// TODO Add bind member function
 };
 
 } /* namespace rendering */
