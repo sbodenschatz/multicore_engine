@@ -27,7 +27,7 @@ namespace rendering {
 
 /// \brief Represents a library that defines one or more materials for the material system and that can be
 /// loaded into the material_manager.
-class material_library : public std::enable_shared_from_this<static_model> {
+class material_library : public std::enable_shared_from_this<material_library> {
 public:
 	/// Represents the status of a material_library.
 	enum class state { loading, ready, error };
