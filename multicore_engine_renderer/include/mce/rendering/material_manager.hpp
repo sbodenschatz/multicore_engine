@@ -8,11 +8,18 @@
 #define MCE_RENDERING_MATERIAL_MANAGER_HPP_
 
 namespace mce {
+namespace graphics {
+class texture_manager;
+} // namespace graphics
 namespace rendering {
 
 class material_manager {
+	graphics::texture_manager& tex_mgr;
+
+	friend class material;
+
 public:
-	material_manager();
+	material_manager(graphics::texture_manager& tex_mgr) : tex_mgr{tex_mgr} {}
 	~material_manager();
 };
 

@@ -9,13 +9,7 @@
 namespace mce {
 namespace rendering {
 
-material_manager::material_manager() {
-	// TODO Auto-generated constructor stub
-}
-
-material_manager::~material_manager() {
-	// TODO Auto-generated destructor stub
-}
+material_manager::~material_manager() {}
 
 } /* namespace rendering */
 } /* namespace mce */

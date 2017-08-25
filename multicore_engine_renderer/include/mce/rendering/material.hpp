@@ -20,8 +20,9 @@
 
 namespace mce {
 namespace rendering {
+class material_manager;
 
-class material : public std::enable_shared_from_this<material_library> {
+class material : public std::enable_shared_from_this<material> {
 	graphics::texture_ptr albedo_map_;
 	graphics::texture_ptr normal_map_;
 	graphics::texture_ptr material_map_; // Metallic,Roughness,Ambient occlusion
@@ -39,19 +40,16 @@ private:
 	std::vector<asset::error_handler> error_handlers;
 	boost::container::flat_map<std::string, material_description> material_descriptions_;
 
-	void texture_loaded(const asset::asset_ptr& tex_asset, graphics::texture_ptr material::*map) noexcept;
+	void texture_loaded(const graphics::texture_ptr& tex) noexcept;
 
 	void raise_error_flag(std::exception_ptr e) noexcept;
 
 	friend class material_manager;
 
 public:
-	/// \brief Creates an material object with the given name. Should only be used within the
+	/// \brief Creates an material object for the given description. Should only be used within the
 	/// rendering system but can't be private due to being used in make_shared.
-	explicit material(const std::string& name) : current_state_{state::loading}, name_{name} {}
-	/// \brief Creates an material object with the given name. Should only be used within the
-	/// rendering system but can't be private due to being used in make_shared.
-	explicit material(std::string&& name) : current_state_{state::loading}, name_{std::move(name)} {}
+	explicit material(material_manager& mgr, const material_description& description);
 	/// Destroys the material and releases the underlying resources.
 	~material();
 	/// Forbids copy-construction of material.
