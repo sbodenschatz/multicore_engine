@@ -120,10 +120,18 @@ public:
 		return current_state_;
 	}
 	/// Allows access to the content data when the asset is loaded.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	const char* data() const noexcept {
 		return data_.get();
 	}
 	/// Returns a pointer to the content participating in ownership of the data block.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	const std::shared_ptr<const char>& data_shared() const noexcept {
 		return data_;
 	}
