@@ -34,6 +34,7 @@ class material_manager {
 	std::shared_ptr<material> internal_load_material(const std::string& name);
 	std::shared_ptr<material_library> internal_load_material_lib(const std::string& name);
 	void process_pending_material_loads(const material_library_ptr& lib);
+	void process_load_error(std::exception_ptr e);
 
 	friend class material;
 
