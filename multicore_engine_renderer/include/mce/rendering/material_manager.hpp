@@ -16,16 +16,20 @@
 #include <string>
 
 namespace mce {
+namespace asset {
+class asset_manager;
+} // namespace asset
 namespace graphics {
 class texture_manager;
 } // namespace graphics
 namespace rendering {
 
 class material_manager {
+	asset::asset_manager& amgr;
 	graphics::texture_manager& tex_mgr;
 	std::shared_timed_mutex rw_lock_;
 	boost::container::flat_map<std::string, std::shared_ptr<material>> loaded_materials_;
-	std::vector<std::shared_ptr<material_library>> loaded_material_libs_;
+	boost::container::flat_map<std::string, std::shared_ptr<material_library>> loaded_material_libs_;
 
 	std::shared_ptr<material> internal_load_material(const std::string& name);
 	std::shared_ptr<material_library> internal_load_material_lib(const std::string& name);
@@ -34,7 +38,8 @@ class material_manager {
 	friend class material;
 
 public:
-	explicit material_manager(graphics::texture_manager& tex_mgr) : tex_mgr{tex_mgr} {}
+	explicit material_manager(asset::asset_manager& asset_mgr, graphics::texture_manager& tex_mgr)
+			: amgr{asset_mgr}, tex_mgr{tex_mgr} {}
 	~material_manager();
 
 	/// Forbids copying the material_manager.

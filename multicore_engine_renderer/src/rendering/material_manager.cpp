@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/asset/asset_manager.hpp>
 #include <mce/rendering/material_manager.hpp>
 
 namespace mce {
@@ -27,6 +28,33 @@ void material_manager::process_pending_material_loads(const material_library_ptr
 	lock.unlock();
 	for(const auto& load : pending_loads) {
 		load.first->try_start_loading(tex_mgr, *(load.second));
+	}
+}
+
+std::shared_ptr<material_library> material_manager::internal_load_material_lib(const std::string& name) {
+	{
+		// Acquire read lock
+		std::shared_lock<std::shared_timed_mutex> lock(rw_lock_);
+		auto it = loaded_material_libs_.find(name);
+		if(it != loaded_material_libs_.end()) {
+			return it->second;
+		}
+	}
+	{
+		// Acquire write lock
+		std::unique_lock<std::shared_timed_mutex> lock(rw_lock_);
+		// Double check if the material lib is still not in the map.
+		auto it = loaded_material_libs_.find(name);
+		if(it != loaded_material_libs_.end()) {
+			return it->second;
+		} else {
+			auto tmp = std::make_shared<material_library>(name);
+			loaded_material_libs_[name] = tmp;
+			amgr.load_asset_async(
+					name, [tmp](const asset::asset_ptr& lib_asset) { tmp->complete_loading(lib_asset); },
+					[tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
+			return tmp;
+		}
 	}
 }
 
