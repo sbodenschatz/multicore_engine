@@ -6,11 +6,21 @@
 
 #include <mce/asset/asset_manager.hpp>
 #include <mce/graphics/texture_manager.hpp>
+#include <thread>
 
 namespace mce {
 namespace graphics {
 
-texture_manager::~texture_manager() {}
+texture_manager::~texture_manager() {
+	std::weak_ptr<const detail::texture_manager_dependencies> md = dependencies_;
+	dependencies_.reset();
+	while(!md.expired()) {
+		// A callback has locked the dependencies object. If we just would proceed, it would keep the
+		// dependencies object alive and it might outlive the objects it references. Unfortunately we can only
+		// wait for completion by spinning because we have no place to put a condition variable here.
+		std::this_thread::yield();
+	}
+}
 
 std::shared_ptr<texture> texture_manager::internal_load_texture(const std::string& name) {
 	{
