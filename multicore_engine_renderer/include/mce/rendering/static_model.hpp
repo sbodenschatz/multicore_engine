@@ -23,6 +23,9 @@
 namespace mce {
 namespace rendering {
 class model_manager;
+namespace detail {
+struct model_manager_dependencies;
+} // namespace detail
 
 /// Represents a non-animated model used in the rendering subsystem.
 /**
@@ -85,7 +88,7 @@ public:
 	};
 
 private:
-	model_manager& mgr_;
+	std::weak_ptr<const detail::model_manager_dependencies> mgr_deps;
 	std::atomic<state> current_state_;
 	mutable std::mutex modification_mutex;
 	std::string name_;
@@ -105,12 +108,14 @@ private:
 public:
 	/// \brief Creates an model object with the given name. Should only be used within the rendering system
 	/// but can't be private due to being used in make_shared.
-	explicit static_model(model_manager& mgr, const std::string& name)
-			: mgr_{mgr}, current_state_{state::loading}, name_{name} {}
+	explicit static_model(std::weak_ptr<const detail::model_manager_dependencies> mgr_deps,
+						  const std::string& name)
+			: mgr_deps{std::move(mgr_deps)}, current_state_{state::loading}, name_{name} {}
 	/// \brief Creates an model object with the given name. Should only be used within the rendering system
 	/// but can't be private due to being used in make_shared.
-	explicit static_model(model_manager& mgr, std::string&& name)
-			: mgr_{mgr}, current_state_{state::loading}, name_{std::move(name)} {}
+	explicit static_model(std::weak_ptr<const detail::model_manager_dependencies> mgr_deps,
+						  std::string&& name)
+			: mgr_deps{std::move(mgr_deps)}, current_state_{state::loading}, name_{std::move(name)} {}
 	/// Destroys the static_model and releases the underlying resources.
 	~static_model();
 	/// Forbids copy-construction of static_model.

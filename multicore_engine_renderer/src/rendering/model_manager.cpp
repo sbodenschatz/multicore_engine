@@ -30,10 +30,10 @@ std::shared_ptr<static_model> model_manager::internal_load_static_model(const st
 		if(it != loaded_static_models_.end()) {
 			return it->second;
 		} else {
-			auto tmp = std::make_shared<static_model>(*this, name);
+			auto tmp = std::make_shared<static_model>(dependencies_, name);
 			loaded_static_models_[name] = tmp;
 			lock.unlock();
-			model_data_mgr_.load_polygon_model(
+			dependencies_->model_data_mgr_.load_polygon_model(
 					name,
 					[tmp](const model::polygon_model_ptr& poly_model) { tmp->complete_loading(poly_model); },
 					[tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
