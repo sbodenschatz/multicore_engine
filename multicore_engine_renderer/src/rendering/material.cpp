@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/exceptions.hpp>
 #include <mce/graphics/texture_manager.hpp>
 #include <mce/rendering/material.hpp>
 #include <mce/rendering/material_manager.hpp>
@@ -120,6 +121,16 @@ void material::process_pending_material_loads(graphics::texture_manager& tex_mgr
 		}
 	}
 	if(--pending_lib_load_count == 0) check_load_fails();
+}
+
+void material::check_load_fails() {
+	std::unique_lock<std::mutex> lock(modification_mutex);
+	if(pending_lib_load_count > 0) return;
+	if(current_state_ == material::state::initial) {
+		lock.unlock();
+		try_raise_error_flag(std::make_exception_ptr(
+				mce::path_not_found_exception("Material '" + name_ + "' not found.")));
+	}
 }
 
 } /* namespace rendering */

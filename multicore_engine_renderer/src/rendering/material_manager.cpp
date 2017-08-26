@@ -82,6 +82,7 @@ std::shared_ptr<material> material_manager::internal_load_material(const std::st
 							tmp->process_pending_material_loads(tex_mgr, lib);
 						},
 						[tmp, this](std::exception_ptr) {
+							if(--(tmp->pending_lib_load_count) == 0) tmp->check_load_fails();
 						});
 			}
 			return tmp;
