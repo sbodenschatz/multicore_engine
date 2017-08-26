@@ -24,6 +24,10 @@ void material_manager::process_pending_material_loads(const material_library_ptr
 			}
 		}
 	}
+	lock.unlock();
+	for(const auto& load : pending_loads) {
+		load.first->try_start_loading(tex_mgr, *(load.second));
+	}
 }
 
 } /* namespace rendering */
