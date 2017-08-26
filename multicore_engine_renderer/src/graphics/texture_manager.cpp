@@ -29,10 +29,10 @@ std::shared_ptr<texture> texture_manager::internal_load_texture(const std::strin
 		if(it != loaded_textures_.end()) {
 			return it->second;
 		} else {
-			auto tmp = std::make_shared<texture>(*this, name);
+			auto tmp = std::make_shared<texture>(dependencies_, name);
 			loaded_textures_[name] = tmp;
 			lock.unlock();
-			asset_mgr_.load_asset_async(
+			dependencies_->asset_mgr_.load_asset_async(
 					name,
 					[tmp](const asset::asset_ptr& texture_asset) { tmp->complete_loading(texture_asset); },
 					[tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
