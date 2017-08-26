@@ -97,7 +97,7 @@ std::shared_ptr<material> material_manager::internal_load_material(const std::st
 			for(const auto& pl : pending_libs) {
 				pl->run_when_ready(
 						[tmp, this](const material_library_ptr& lib) { process_pending_material_loads(lib); },
-						[tmp](std::exception_ptr e) { process_load_error(e); });
+						[this](std::exception_ptr e) { process_load_error(e); });
 			}
 			return tmp;
 		}
