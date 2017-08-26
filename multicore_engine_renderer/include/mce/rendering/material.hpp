@@ -33,6 +33,7 @@ private:
 	std::atomic<state> current_state_;
 	mutable std::mutex modification_mutex;
 	std::string name_;
+	std::atomic<size_t> pending_lib_load_count;
 	std::vector<material_completion_handler> completion_handlers;
 	std::vector<asset::error_handler> error_handlers;
 	graphics::texture_ptr albedo_map_;
@@ -46,16 +47,20 @@ private:
 	void try_raise_error_flag(std::exception_ptr e) noexcept;
 
 	bool try_start_loading(graphics::texture_manager& mgr, const material_description& description) noexcept;
+	void check_load_fails();
+	void process_pending_material_loads(graphics::texture_manager& tex_mgr, const material_library_ptr& lib);
 
 	friend class material_manager;
 
 public:
 	/// \brief Creates an material object with the given name. Should only be used within the
 	/// rendering system but can't be private due to being used in make_shared.
-	explicit material(const std::string& name) : current_state_{state::initial}, name_{name} {}
+	explicit material(const std::string& name)
+			: current_state_{state::initial}, name_{name}, pending_lib_load_count{0} {}
 	/// \brief Creates an material object with the given name. Should only be used within the
 	/// rendering system but can't be private due to being used in make_shared.
-	explicit material(std::string&& name) : current_state_{state::initial}, name_{name} {}
+	explicit material(std::string&& name)
+			: current_state_{state::initial}, name_{name}, pending_lib_load_count{0} {}
 	/// Destroys the material and releases the underlying resources.
 	~material();
 	/// Forbids copy-construction of material.

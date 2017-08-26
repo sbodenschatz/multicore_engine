@@ -12,25 +12,6 @@ namespace rendering {
 
 material_manager::~material_manager() {}
 
-void material_manager::process_pending_material_loads(const material_library_ptr& lib) {
-	std::shared_lock<std::shared_timed_mutex> lock(rw_lock_);
-	// Collect pending loads first and attempt to run them after dropping the lock to avoid holding a lock
-	// while calling callbacks for recursion and deadlock avoidance.
-	std::vector<std::pair<std::shared_ptr<material>, const material_description*>> pending_loads;
-	for(const auto& mat : loaded_materials_) {
-		if(mat.second->current_state() == material::state::initial) {
-			auto desc = lib->find_material_description(mat.second->name());
-			if(desc) {
-				pending_loads.emplace_back(mat.second, desc);
-			}
-		}
-	}
-	lock.unlock();
-	for(const auto& load : pending_loads) {
-		load.first->try_start_loading(tex_mgr, *(load.second));
-	}
-}
-
 std::shared_ptr<material_library> material_manager::internal_load_material_lib(const std::string& name) {
 	{
 		// Acquire read lock
@@ -94,10 +75,14 @@ std::shared_ptr<material> material_manager::internal_load_material(const std::st
 				return tmp;
 			}
 			lock.unlock();
+			tmp->pending_lib_load_count += pending_libs.size();
 			for(const auto& pl : pending_libs) {
 				pl->run_when_ready(
-						[tmp, this](const material_library_ptr& lib) { process_pending_material_loads(lib); },
-						[this](std::exception_ptr e) { process_load_error(e); });
+						[tmp, this](const material_library_ptr& lib) {
+							tmp->process_pending_material_loads(tex_mgr, lib);
+						},
+						[tmp, this](std::exception_ptr) {
+						});
 			}
 			return tmp;
 		}

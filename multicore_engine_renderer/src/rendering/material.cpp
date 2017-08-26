@@ -107,5 +107,20 @@ void material::texture_loaded(const graphics::texture_ptr&) noexcept {
 	}
 }
 
+void material::process_pending_material_loads(graphics::texture_manager& tex_mgr,
+											  const material_library_ptr& lib) {
+	std::unique_lock<std::mutex> lock(modification_mutex);
+	if(current_state_ == material::state::initial) {
+		auto desc = lib->find_material_description(name_);
+		if(desc) {
+			lock.unlock();
+			try_start_loading(tex_mgr, *desc);
+			--pending_lib_load_count;
+			return;
+		}
+	}
+	if(--pending_lib_load_count == 0) check_load_fails();
+}
+
 } /* namespace rendering */
 } /* namespace mce */
