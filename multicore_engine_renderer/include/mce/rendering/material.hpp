@@ -43,6 +43,7 @@ private:
 	void texture_loaded(const graphics::texture_ptr& tex) noexcept;
 
 	void raise_error_flag(std::exception_ptr e) noexcept;
+	void try_raise_error_flag(std::exception_ptr e) noexcept;
 
 	bool try_start_loading(graphics::texture_manager& mgr, const material_description& description) noexcept;
 

@@ -32,6 +32,26 @@ void material::raise_error_flag(std::exception_ptr e) noexcept {
 	completion_handlers.shrink_to_fit();
 }
 
+void material::try_raise_error_flag(std::exception_ptr e) noexcept {
+	state expected = current_state_;
+	if(expected == state::ready || expected == state::error) return;
+	if(!current_state_.compare_exchange_strong(expected, state::error)) return;
+	// Sync with other threads working on the lock to ensure all other threads have seen the update to
+	// current_state_ after that drop lock again to not hold it during callback execution. After that the
+	// handlers containers can be modified by this thread because no other threads are using them anymore.
+	{ std::unique_lock<std::mutex> lock(modification_mutex); }
+	for(auto& handler : error_handlers) {
+		try {
+			handler(e);
+		} catch(...) {
+			// Drop exceptions escaped from completion handlers
+		}
+	}
+	error_handlers.clear();
+	completion_handlers.clear();
+	error_handlers.shrink_to_fit();
+	completion_handlers.shrink_to_fit();
+}
 
 bool material::try_start_loading(graphics::texture_manager& mgr,
 								 const material_description& description) noexcept {
