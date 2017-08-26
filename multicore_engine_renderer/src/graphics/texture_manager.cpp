@@ -31,6 +31,7 @@ std::shared_ptr<texture> texture_manager::internal_load_texture(const std::strin
 		} else {
 			auto tmp = std::make_shared<texture>(*this, name);
 			loaded_textures_[name] = tmp;
+			lock.unlock();
 			asset_mgr_.load_asset_async(
 					name,
 					[tmp](const asset::asset_ptr& texture_asset) { tmp->complete_loading(texture_asset); },
