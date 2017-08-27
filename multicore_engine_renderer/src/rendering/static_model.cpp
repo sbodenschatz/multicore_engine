@@ -33,8 +33,8 @@ void static_model::raise_error_flag(std::exception_ptr e) noexcept {
 }
 
 void static_model::complete_loading(const model::polygon_model_ptr& polygon_mdl) noexcept {
-	std::unique_lock<std::mutex> lock(modification_mutex);
 	try {
+		std::unique_lock<std::mutex> lock(modification_mutex);
 		poly_model_ = polygon_mdl;
 		meshes_.reserve(polygon_mdl->meta_data().meshes.size());
 		std::transform(polygon_mdl->meta_data().meshes.begin(), polygon_mdl->meta_data().meshes.end(),
@@ -51,20 +51,29 @@ void static_model::complete_loading(const model::polygon_model_ptr& polygon_mdl)
 						   return mesh(this, data.object_name, data.group_name, data.material_name,
 									   data.index_data_in_content.begin(), uint32_t(vertex_count));
 					   });
-		vertex_index_buffer_ = graphics::buffer(
-				mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, polygon_mdl->content_data_size(),
-				vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer |
-						vk::BufferUsageFlagBits::eTransferDst);
+		auto md = mgr_deps.lock();
+		if(md) {
+			vertex_index_buffer_ = graphics::buffer(
+					md->dev_, md->mem_mgr_, md->destruction_manager_, polygon_mdl->content_data_size(),
+					vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer |
+							vk::BufferUsageFlagBits::eTransferDst);
+
+			auto this_shared = this->shared_from_this();
+			current_state_ = state::staging;
+			lock.unlock();
+
+			md->transfer_mgr_.upload_buffer(polygon_mdl->content_data_shared(),
+											polygon_mdl->content_data_size(),
+											vertex_index_buffer_.native_buffer(), 0u,
+											[this_shared](vk::Buffer) { this_shared->complete_staging(); });
+		} else {
+			lock.unlock();
+			raise_error_flag(std::make_exception_ptr(
+					mce::async_state_exception("Manager object expired when required by callback.")));
+		}
 	} catch(...) {
 		raise_error_flag(std::current_exception());
 	}
-
-	auto this_shared = this->shared_from_this();
-	current_state_ = state::staging;
-	lock.unlock();
-	mgr_.transfer_mgr_.upload_buffer(polygon_mdl->content_data_shared(), polygon_mdl->content_data_size(),
-									 vertex_index_buffer_.native_buffer(), 0u,
-									 [this_shared](vk::Buffer) { this_shared->complete_staging(); });
 }
 
 void static_model::complete_staging() noexcept {

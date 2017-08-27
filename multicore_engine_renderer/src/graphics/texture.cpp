@@ -45,8 +45,10 @@ void texture::raise_error_flag(std::exception_ptr e) noexcept {
 
 template <typename T>
 base_image* texture::create_image(vk::Format format, const gli::texture& tex) {
-	image_ = T(mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, format,
-			   typename T::size_type(tex.extent()), uint32_t(tex.levels()),
+	auto md = mgr_deps.lock();
+	if(!md) throw mce::async_state_exception("Manager object expired when required by callback.");
+	image_ = T(md->dev_, md->mem_mgr_, md->destruction_manager_, format, typename T::size_type(tex.extent()),
+			   uint32_t(tex.levels()),
 			   vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
 	image_view_ = boost::strict_get<T>(image_).create_view();
 	img_handle = boost::strict_get<T>(image_).native_image();
@@ -56,7 +58,9 @@ base_image* texture::create_image(vk::Format format, const gli::texture& tex) {
 }
 template <typename T>
 base_image* texture::create_image_layered(vk::Format format, const gli::texture& tex) {
-	image_ = T(mgr_.dev_, mgr_.mem_mgr_, mgr_.destruction_manager_, format,
+	auto md = mgr_deps.lock();
+	if(!md) throw mce::async_state_exception("Manager object expired when required by callback.");
+	image_ = T(md->dev_, md->mem_mgr_, md->destruction_manager_, format,
 			   typename T::size_type(tex.extent(), uint32_t(tex.layers())), uint32_t(tex.levels()),
 			   vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
 	image_view_ = boost::strict_get<T>(image_).create_view();
@@ -104,10 +108,15 @@ void texture::complete_loading(const asset::asset_ptr& tex_asset) noexcept {
 				}
 			}
 		}
-
-		mgr_.transfer_mgr_.upload_image(tex.data(), tex.size(), *bimg,
-										vk::ImageLayout::eShaderReadOnlyOptimal, regions,
-										[this_shared](vk::Image) { this_shared->complete_staging(); });
+		auto md = mgr_deps.lock();
+		if(md) {
+			md->transfer_mgr_.upload_image(tex.data(), tex.size(), *bimg,
+										   vk::ImageLayout::eShaderReadOnlyOptimal, regions,
+										   [this_shared](vk::Image) { this_shared->complete_staging(); });
+		} else {
+			raise_error_flag(std::make_exception_ptr(
+					mce::async_state_exception("Manager object expired when required by callback.")));
+		}
 	} catch(...) {
 		raise_error_flag(std::current_exception());
 	}

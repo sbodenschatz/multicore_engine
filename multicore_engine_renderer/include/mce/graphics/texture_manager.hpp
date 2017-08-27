@@ -28,13 +28,19 @@ class device_memory_manager_interface;
 class destruction_queue_manager;
 class transfer_manager;
 
-/// Manages the loading and lifetime of textures in the renderer.
-class texture_manager {
+namespace detail {
+struct texture_manager_dependencies {
 	asset::asset_manager& asset_mgr_;
 	graphics::device& dev_;
 	graphics::device_memory_manager_interface& mem_mgr_;
 	graphics::destruction_queue_manager* destruction_manager_;
 	graphics::transfer_manager& transfer_mgr_;
+};
+} // namespace detail
+
+/// Manages the loading and lifetime of textures in the renderer.
+class texture_manager {
+	std::shared_ptr<const detail::texture_manager_dependencies> dependencies_;
 	std::shared_timed_mutex loaded_textures_rw_lock_;
 	boost::container::flat_map<std::string, std::shared_ptr<texture>> loaded_textures_;
 
@@ -49,8 +55,9 @@ public:
 							 graphics::device_memory_manager_interface& mem_mgr,
 							 graphics::destruction_queue_manager* destruction_manager,
 							 graphics::transfer_manager& transfer_mgr)
-			: asset_mgr_{asset_mgr}, dev_{dev}, mem_mgr_{mem_mgr}, destruction_manager_{destruction_manager},
-			  transfer_mgr_{transfer_mgr} {}
+			: dependencies_{std::make_shared<detail::texture_manager_dependencies>(
+					  detail::texture_manager_dependencies{asset_mgr, dev, mem_mgr, destruction_manager,
+														   transfer_mgr})} {}
 	/// Destroys the texture_manager and releases the underlying resources.
 	~texture_manager();
 

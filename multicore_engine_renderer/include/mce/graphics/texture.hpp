@@ -27,6 +27,9 @@ class texture;
 
 namespace mce {
 namespace graphics {
+namespace detail {
+struct texture_manager_dependencies;
+} // namespace detail
 class texture_manager;
 class sampler;
 class base_image;
@@ -41,7 +44,7 @@ public:
 	enum class state { loading, staging, ready, error };
 
 private:
-	texture_manager& mgr_;
+	std::weak_ptr<const detail::texture_manager_dependencies> mgr_deps;
 	std::atomic<state> current_state_;
 	mutable std::mutex modification_mutex;
 	std::string name_;
@@ -75,12 +78,13 @@ private:
 public:
 	/// \brief Creates an texture object with the given name. Should only be used within the rendering system
 	/// but can't be private due to being used in make_shared.
-	explicit texture(texture_manager& mgr, const std::string& name)
-			: mgr_{mgr}, current_state_{state::loading}, name_{name} {}
+	explicit texture(const std::weak_ptr<const detail::texture_manager_dependencies>& mgr_deps,
+					 const std::string& name)
+			: mgr_deps{mgr_deps}, current_state_{state::loading}, name_{name} {}
 	/// \brief Creates an texture object with the given name. Should only be used within the rendering system
 	/// but can't be private due to being used in make_shared.
-	explicit texture(texture_manager& mgr, std::string&& name)
-			: mgr_{mgr}, current_state_{state::loading}, name_{std::move(name)} {}
+	explicit texture(std::weak_ptr<const detail::texture_manager_dependencies>&& mgr_deps, std::string&& name)
+			: mgr_deps{std::move(mgr_deps)}, current_state_{state::loading}, name_{std::move(name)} {}
 	/// Destroys the texture and releases the underlying resources.
 	~texture();
 	/// Forbids copy-construction of texture objects.
