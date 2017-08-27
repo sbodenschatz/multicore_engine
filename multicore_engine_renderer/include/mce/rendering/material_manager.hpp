@@ -7,6 +7,10 @@
 #ifndef MCE_RENDERING_MATERIAL_MANAGER_HPP_
 #define MCE_RENDERING_MATERIAL_MANAGER_HPP_
 
+/**
+ * Defines the material_manager class.
+ */
+
 #include <boost/container/flat_map.hpp>
 #include <mce/rendering/material.hpp>
 #include <mce/rendering/material_library.hpp>
@@ -30,6 +34,7 @@ struct material_manager_dependencies {
 };
 } // namespace detail
 
+/// Manages the loading and lifetime of surface material objects in the renderer.
 class material_manager {
 	std::shared_ptr<const detail::material_manager_dependencies> dependencies_;
 	std::shared_timed_mutex rw_lock_;
@@ -42,9 +47,12 @@ class material_manager {
 	friend class material;
 
 public:
+	/// \brief Creates a material_manager using the given underlying asset::asset_manager and
+	/// graphics::texture_manager to load material descriptions and referenced textures.
 	explicit material_manager(asset::asset_manager& asset_mgr, graphics::texture_manager& tex_mgr)
 			: dependencies_{std::make_shared<detail::material_manager_dependencies>(
 					  detail::material_manager_dependencies{asset_mgr, tex_mgr})} {}
+	/// Destroys the material_manager and releases the underlying resources.
 	~material_manager();
 
 	/// Forbids copying the material_manager.
