@@ -44,16 +44,17 @@ public:
 		static_model* parent_;
 		std::string object_name_;
 		std::string group_name_;
+		std::string material_name_;
 		vk::DeviceSize offset_;
 		uint32_t vertex_count_;
 
 		friend class static_model;
 
 		// cppcheck-suppress passedByValue
-		mesh(static_model* parent, std::string object_name, std::string group_name, vk::DeviceSize offset,
-			 uint32_t vertex_count)
-				: parent_{parent}, object_name_{std::move(object_name)},
-				  group_name_{std::move(group_name)}, offset_{offset}, vertex_count_{vertex_count} {}
+		mesh(static_model* parent, std::string object_name, std::string group_name, std::string material_name,
+			 vk::DeviceSize offset, uint32_t vertex_count)
+				: parent_{parent}, object_name_{std::move(object_name)}, group_name_{std::move(group_name)},
+				  material_name_{std::move(material_name)}, offset_{offset}, vertex_count_{vertex_count} {}
 
 	public:
 		/// Returns the group name specified for this mesh in the model file.
@@ -64,6 +65,11 @@ public:
 		/// Returns the object name specified for this mesh in the model file.
 		const std::string& object_name() const {
 			return object_name_;
+		}
+
+		/// Returns the name of the material assigned to this mesh in the model file.
+		const std::string& material_name() const {
+			return material_name_;
 		}
 
 		/// Binds the common vertex buffer for all meshes in the model to the given command buffer.

@@ -29,7 +29,9 @@
 #include <mce/graphics/transfer_manager.hpp>
 #include <mce/graphics/window.hpp>
 #include <mce/model/model_data_manager.hpp>
+#include <mce/rendering/material_manager.hpp>
 #include <mce/rendering/model_manager.hpp>
+#include <mce/rendering/rendering_defs.hpp>
 
 namespace mce {
 namespace graphics {
@@ -47,8 +49,9 @@ class graphics_test {
 	command_pool render_cmd_pool_;
 	destruction_queue_manager dqm_;
 	transfer_manager tmgr_;
-	rendering::model_manager mmgr;
+	rendering::model_manager mmgr_;
 	graphics::texture_manager tex_mgr_;
+	rendering::material_manager mat_mgr_;
 	graphics_manager gmgr_;
 	vk::UniqueSemaphore tmp_semaphore_;
 	containers::dynamic_array<vk::UniqueSemaphore> acquire_semaphores_;
@@ -77,7 +80,7 @@ class graphics_test {
 	std::unique_ptr<framebuffer> fb_;
 	rendering::static_model_ptr mdl_;
 	glm::vec3 rot_angle;
-	graphics::texture_ptr tex_;
+	rendering::material_ptr mat_;
 
 	struct vertex {
 		glm::vec3 pos;
