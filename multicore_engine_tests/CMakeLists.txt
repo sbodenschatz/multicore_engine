@@ -4,7 +4,7 @@ project(multicore_engine_tests)
 
 make_src_groups()
 
-include_directories(${CMAKE_SOURCE_DIR}/multicore_engine_tests/include)
+include_directories(${PROJECT_SOURCE_DIR}/../multicore_engine_tests/include)
 
 set(TEST_BINARY_MODE "GROUPS" CACHE STRING "Granularity of test binaries (FULL,GROUPS,SINGLE)")
 
