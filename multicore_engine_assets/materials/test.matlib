@@ -1,0 +1,8 @@
+{
+	"test":{
+		"albedo":"textures/test",
+		"normal":"textures/test",
+		"material":"textures/test",
+		"emission":"textures/test"
+	}
+}

@@ -34,8 +34,8 @@ graphics_test::graphics_test()
 		  render_cmd_pool_(dev_, dev_.graphics_queue_index().first, true),
 		  dqm_(&dev_, uint32_t(win_.swapchain_images().size())),
 		  tmgr_(dev_, mem_mgr_, uint32_t(win_.swapchain_images().size())),
-		  mmgr(mdmgr, dev_, mem_mgr_, &dqm_, tmgr_), tex_mgr_(amgr_, dev_, mem_mgr_, &dqm_, tmgr_),
-		  gmgr_(dev_, &dqm_), tmp_semaphore_(dev_->createSemaphoreUnique({})),
+		  mmgr_(mdmgr, dev_, mem_mgr_, &dqm_, tmgr_), tex_mgr_(amgr_, dev_, mem_mgr_, &dqm_, tmgr_),
+		  mat_mgr_(amgr_, tex_mgr_), gmgr_(dev_, &dqm_), tmp_semaphore_(dev_->createSemaphoreUnique({})),
 		  acquire_semaphores_(win_.swapchain_images().size(), containers::generator_param([this](size_t) {
 								  return dev_->createSemaphoreUnique({});
 							  })),
@@ -163,7 +163,7 @@ graphics_test::graphics_test()
 						[this](vk::Buffer) { //
 							vb_ready_ = true;
 						});
-	mdl_ = mmgr.load_static_model(
+	mdl_ = mmgr_.load_static_model(
 			"models/cube",
 			[](rendering::static_model_ptr mdl) { //
 				std::cout << mdl->meshes().size() << std::endl;
@@ -173,7 +173,8 @@ graphics_test::graphics_test()
 										   mdl->meshes().at(0).vertex_count());
 			},
 			[](std::exception_ptr) {});
-	tex_ = tex_mgr_.load_texture("textures/test.dds");
+	mat_mgr_.load_material_library("materials/test");
+	mat_ = mat_mgr_.load_material("test");
 }
 
 graphics_test::~graphics_test() {
@@ -227,10 +228,11 @@ void graphics_test::run() {
 						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
 						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 2, clear),
 				vk::SubpassContents::eInline);
-		if(mdl_->ready() && tex_->ready()) {
+		if(mdl_->ready() && mat_->ready()) {
 			auto ds = descriptor_pools_[img_index].allocate_descriptor_set(uniform_dsl_);
 			ds.update()(0, 0, vk::DescriptorType::eUniformBuffer, uniform_buffers_[img_index].store(ud))(
-					1, 0, vk::DescriptorType::eCombinedImageSampler, tex_->bind(/*sampler_.get()*/));
+					1, 0, vk::DescriptorType::eCombinedImageSampler,
+					mat_->albedo_map()->bind(/*sampler_.get()*/));
 			ds.bind(render_cmb_buf.get(), pll_, 0, ds);
 			pl2_->bind(render_cmb_buf.get());
 			mdl_->draw_model_mesh(render_cmb_buf.get(), 0);
