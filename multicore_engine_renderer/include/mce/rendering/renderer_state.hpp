@@ -14,7 +14,7 @@ namespace rendering {
 
 class renderer_state : public core::system_state {
 public:
-	renderer_state(core::system* sys);
+	explicit renderer_state(core::system* sys);
 	~renderer_state();
 };
 
