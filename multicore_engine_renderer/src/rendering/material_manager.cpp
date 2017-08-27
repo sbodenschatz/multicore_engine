@@ -10,7 +10,16 @@
 namespace mce {
 namespace rendering {
 
-material_manager::~material_manager() {}
+material_manager::~material_manager() {
+	std::weak_ptr<const detail::material_manager_dependencies> md = dependencies_;
+	dependencies_.reset();
+	while(!md.expired()) {
+		// A callback has locked the dependencies object. If we just would proceed, it would keep the
+		// dependencies object alive and it might outlive the objects it references. Unfortunately we can only
+		// wait for completion by spinning because we have no place to put a condition variable here.
+		std::this_thread::yield();
+	}
+}
 
 std::shared_ptr<material_library> material_manager::internal_load_material_lib(const std::string& name) {
 	{
