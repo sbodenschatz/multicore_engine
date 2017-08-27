@@ -43,7 +43,7 @@ std::shared_ptr<texture> texture_manager::internal_load_texture(const std::strin
 			loaded_textures_[name] = tmp;
 			lock.unlock();
 			dependencies_->asset_mgr_.load_asset_async(
-					name,
+					name + ".dds",
 					[tmp](const asset::asset_ptr& texture_asset) { tmp->complete_loading(texture_asset); },
 					[tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
 			return tmp;

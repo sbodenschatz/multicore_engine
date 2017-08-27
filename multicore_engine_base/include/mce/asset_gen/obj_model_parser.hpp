@@ -45,14 +45,17 @@ private:
 	public:
 		std::string object_name;
 		std::string group_name;
+		std::string material_name;
 		std::vector<model::model_index> indices;
 		boost::container::flat_set<model::model_index> collision_vertices; // Contains each vertex used in the
 																		   // mesh exactly once. Is used to
 																		   // calculate collision_data.
 		model::static_model_mesh_collision_data collision_data;
 
-		mesh_data(const std::string& object_name, const std::string& group_name)
-				: object_name{object_name}, group_name{group_name}, collision_data{} {}
+		mesh_data(const std::string& object_name, const std::string& group_name,
+				  const std::string& material_name)
+				: object_name{object_name}, group_name{group_name}, material_name{material_name},
+				  collision_data{} {}
 	};
 	boost::filesystem::path refs_dir;
 	std::vector<glm::vec3> positions;
@@ -63,6 +66,7 @@ private:
 	boost::container::flat_map<glm::ivec3, model::model_index, tripple_comparator> vertex_indices;
 	std::string current_object_name;
 	std::string current_group_name = "default";
+	std::string current_material_name;
 
 	std::string sto_buffer;
 
