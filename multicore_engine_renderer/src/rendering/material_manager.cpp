@@ -42,7 +42,8 @@ std::shared_ptr<material_library> material_manager::internal_load_material_lib(c
 			loaded_material_libs_[name] = tmp;
 			lock.unlock();
 			dependencies_->amgr.load_asset_async(
-					name, [tmp](const asset::asset_ptr& lib_asset) { tmp->complete_loading(lib_asset); },
+					name + ".matlib",
+					[tmp](const asset::asset_ptr& lib_asset) { tmp->complete_loading(lib_asset); },
 					[tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
 			return tmp;
 		}
