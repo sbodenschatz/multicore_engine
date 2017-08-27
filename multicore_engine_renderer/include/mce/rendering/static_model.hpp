@@ -108,12 +108,12 @@ private:
 public:
 	/// \brief Creates an model object with the given name. Should only be used within the rendering system
 	/// but can't be private due to being used in make_shared.
-	explicit static_model(std::weak_ptr<const detail::model_manager_dependencies> mgr_deps,
+	explicit static_model(const std::weak_ptr<const detail::model_manager_dependencies>& mgr_deps,
 						  const std::string& name)
-			: mgr_deps{std::move(mgr_deps)}, current_state_{state::loading}, name_{name} {}
+			: mgr_deps{mgr_deps}, current_state_{state::loading}, name_{name} {}
 	/// \brief Creates an model object with the given name. Should only be used within the rendering system
 	/// but can't be private due to being used in make_shared.
-	explicit static_model(std::weak_ptr<const detail::model_manager_dependencies> mgr_deps,
+	explicit static_model(std::weak_ptr<const detail::model_manager_dependencies>&& mgr_deps,
 						  std::string&& name)
 			: mgr_deps{std::move(mgr_deps)}, current_state_{state::loading}, name_{std::move(name)} {}
 	/// Destroys the static_model and releases the underlying resources.
