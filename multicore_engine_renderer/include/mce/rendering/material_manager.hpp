@@ -23,10 +23,15 @@ namespace graphics {
 class texture_manager;
 } // namespace graphics
 namespace rendering {
-
-class material_manager {
+namespace detail {
+struct material_manager_dependencies {
 	asset::asset_manager& amgr;
 	graphics::texture_manager& tex_mgr;
+};
+} // namespace detail
+
+class material_manager {
+	std::shared_ptr<const detail::material_manager_dependencies> dependencies_;
 	std::shared_timed_mutex rw_lock_;
 	boost::container::flat_map<std::string, std::shared_ptr<material>> loaded_materials_;
 	boost::container::flat_map<std::string, std::shared_ptr<material_library>> loaded_material_libs_;
@@ -38,7 +43,8 @@ class material_manager {
 
 public:
 	explicit material_manager(asset::asset_manager& asset_mgr, graphics::texture_manager& tex_mgr)
-			: amgr{asset_mgr}, tex_mgr{tex_mgr} {}
+			: dependencies_{std::make_shared<detail::material_manager_dependencies>(
+					  detail::material_manager_dependencies{asset_mgr, tex_mgr})} {}
 	~material_manager();
 
 	/// Forbids copying the material_manager.

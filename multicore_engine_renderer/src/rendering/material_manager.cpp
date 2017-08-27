@@ -32,7 +32,7 @@ std::shared_ptr<material_library> material_manager::internal_load_material_lib(c
 			auto tmp = std::make_shared<material_library>(name);
 			loaded_material_libs_[name] = tmp;
 			lock.unlock();
-			amgr.load_asset_async(
+			dependencies_->amgr.load_asset_async(
 					name, [tmp](const asset::asset_ptr& lib_asset) { tmp->complete_loading(lib_asset); },
 					[tmp](std::exception_ptr e) { tmp->raise_error_flag(e); });
 			return tmp;
@@ -71,17 +71,24 @@ std::shared_ptr<material> material_manager::internal_load_material(const std::st
 			auto tmp = std::make_shared<material>(name);
 			loaded_materials_[name] = tmp;
 			if(desc) {
-				tmp->try_start_loading(tex_mgr, *desc);
+				tmp->try_start_loading(dependencies_->tex_mgr, *desc);
 				return tmp;
 			}
 			lock.unlock();
 			tmp->pending_lib_load_count += pending_libs.size();
+			std::weak_ptr<const detail::material_manager_dependencies> weak_deps = dependencies_;
 			for(const auto& pl : pending_libs) {
 				pl->run_when_ready(
-						[tmp, this](const material_library_ptr& lib) {
-							tmp->process_pending_material_loads(tex_mgr, lib);
+						[tmp, weak_deps](const material_library_ptr& lib) {
+							auto md = weak_deps.lock();
+							if(md) {
+								tmp->process_pending_material_loads(md->tex_mgr, lib);
+							} else {
+								tmp->raise_error_flag(std::make_exception_ptr(mce::async_state_exception(
+										"Manager object expired when required by callback.")));
+							}
 						},
-						[tmp, this](std::exception_ptr) {
+						[tmp](std::exception_ptr) {
 							if(--(tmp->pending_lib_load_count) == 0) tmp->check_load_fails();
 						});
 			}
