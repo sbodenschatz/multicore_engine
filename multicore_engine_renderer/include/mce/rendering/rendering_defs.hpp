@@ -38,12 +38,14 @@ using material_ptr = std::shared_ptr<const material>;
 /// Specifies the function wrapper type used to wrap completion handlers for material loading.
 using material_completion_handler = util::local_function<128, void(const material_ptr& mat)>;
 
+/// Represents a description of a material as loaded from a material library.
 struct material_description {
-	std::string name;
-	std::string albedo_map_name;
-	std::string normal_map_name;
+	std::string name;			 ///< The (unique) name of the defined material.
+	std::string albedo_map_name; ///< The name of the texture used as the albedo map.
+	std::string normal_map_name; ///< The name of the texture used as the normal map.
+	/// The name of the texture defining the metallicness, roughness and ambient occlusion parameters.
 	std::string material_map_name;
-	std::string emission_map_name;
+	std::string emission_map_name; ///< The name of the texture used as the emission map.
 };
 
 } // namespace rendering
