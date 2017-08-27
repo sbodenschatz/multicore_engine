@@ -7,6 +7,10 @@
 #ifndef MCE_RENDERING_MODEL_MANAGER_HPP_
 #define MCE_RENDERING_MODEL_MANAGER_HPP_
 
+/**
+ * Defines the model_manager class.
+ */
+
 #include <boost/container/flat_map.hpp>
 #include <mce/rendering/rendering_defs.hpp>
 #include <mce/rendering/static_model.hpp>
