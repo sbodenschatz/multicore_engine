@@ -29,13 +29,19 @@ class transfer_manager;
 namespace rendering {
 class static_model;
 
-/// Manages the loading and lifetime of renderable models in the renderer.
-class model_manager {
+namespace detail {
+struct model_manager_dependencies {
 	model::model_data_manager& model_data_mgr_;
 	graphics::device& dev_;
 	graphics::device_memory_manager_interface& mem_mgr_;
 	graphics::destruction_queue_manager* destruction_manager_;
 	graphics::transfer_manager& transfer_mgr_;
+};
+} // namespace detail
+
+/// Manages the loading and lifetime of renderable models in the renderer.
+class model_manager {
+	std::shared_ptr<const detail::model_manager_dependencies> dependencies_;
 	std::shared_timed_mutex loaded_static_models_rw_lock_;
 	boost::container::flat_map<std::string, std::shared_ptr<static_model>> loaded_static_models_;
 
@@ -50,8 +56,9 @@ public:
 						   graphics::device_memory_manager_interface& mem_mgr,
 						   graphics::destruction_queue_manager* destruction_manager,
 						   graphics::transfer_manager& transfer_mgr)
-			: model_data_mgr_{model_data_mgr}, dev_{dev}, mem_mgr_{mem_mgr},
-			  destruction_manager_{destruction_manager}, transfer_mgr_{transfer_mgr} {}
+			: dependencies_{
+					  std::make_shared<detail::model_manager_dependencies>(detail::model_manager_dependencies{
+							  model_data_mgr, dev, mem_mgr, destruction_manager, transfer_mgr})} {}
 	/// Destroys the model_manager and releases the underlying resources.
 	~model_manager();
 
