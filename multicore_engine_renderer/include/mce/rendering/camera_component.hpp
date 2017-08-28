@@ -48,6 +48,8 @@ public:
 	void near_plane(float near_plane) {
 		near_plane_ = near_plane;
 	}
+
+	static void fill_property_list(property_list& prop);
 };
 
 } /* namespace rendering */

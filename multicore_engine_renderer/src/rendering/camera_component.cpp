@@ -14,5 +14,11 @@ camera_component::camera_component(entity::entity& owner, entity::component_conf
 
 camera_component::~camera_component() {}
 
+void camera_component::fill_property_list(property_list& prop) {
+	REGISTER_COMPONENT_PROPERTY(prop, camera_component, float, fov);
+	REGISTER_COMPONENT_PROPERTY(prop, camera_component, float, near_plane);
+	REGISTER_COMPONENT_PROPERTY(prop, camera_component, float, far_plane);
+}
+
 } /* namespace rendering */
 } /* namespace mce */
