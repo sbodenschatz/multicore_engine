@@ -8,6 +8,7 @@
 #define MCE_RENDERING_STATIC_MODEL_COMPONENT_HPP_
 
 #include <mce/entity/component.hpp>
+#include <mce/rendering/rendering_defs.hpp>
 
 namespace mce {
 namespace entity {
@@ -15,11 +16,39 @@ class entity;
 class component_configuration;
 } // namespace entity
 namespace rendering {
+class renderer_system;
 
 class static_model_component : public entity::component {
+	renderer_system& sys;
+	std::string model_name_;
+	static_model_ptr model_;
+	std::string material_name_;
+	material_ptr material_;
+
 public:
-	static_model_component(entity::entity& owner, entity::component_configuration& conf);
+	static_model_component(renderer_system& sys, entity::entity& owner,
+						   entity::component_configuration& conf);
 	~static_model_component();
+
+	const material_ptr& material() const {
+		return material_;
+	}
+
+	std::string material_name() const {
+		return material_name_;
+	}
+
+	const static_model_ptr& model() const {
+		return model_;
+	}
+
+	std::string model_name() const {
+		return model_name_;
+	}
+
+	void material_name(const std::string& material_name);
+
+	void model_name(const std::string& model_name);
 };
 
 } /* namespace rendering */
