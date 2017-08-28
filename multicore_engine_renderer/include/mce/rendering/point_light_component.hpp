@@ -41,6 +41,8 @@ public:
 	void radius(float radius) {
 		radius_ = radius;
 	}
+
+	static void fill_property_list(property_list& prop);
 };
 
 } /* namespace rendering */

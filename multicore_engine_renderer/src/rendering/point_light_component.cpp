@@ -14,5 +14,10 @@ point_light_component::point_light_component(entity::entity& owner, entity::comp
 
 point_light_component::~point_light_component() {}
 
+void point_light_component::fill_property_list(property_list& prop) {
+	REGISTER_COMPONENT_PROPERTY(prop, point_light_component, glm::vec3, color);
+	REGISTER_COMPONENT_PROPERTY(prop, point_light_component, float, radius);
+}
+
 } /* namespace rendering */
 } /* namespace mce */
