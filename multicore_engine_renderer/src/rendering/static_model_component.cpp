@@ -12,11 +12,14 @@ namespace rendering {
 
 static_model_component::static_model_component(renderer_system& sys, entity::entity& owner,
 											   entity::component_configuration& conf)
-		: component(owner, conf), sys{sys} {
-	// TODO Auto-generated constructor stub
-}
+		: component(owner, conf), sys{sys} {}
 
 static_model_component::~static_model_component() {}
+
+void static_model_component::fill_property_list(property_list& prop) {
+	REGISTER_COMPONENT_PROPERTY(prop, static_model_component, std::string, material_name);
+	REGISTER_COMPONENT_PROPERTY(prop, static_model_component, std::string, model_name);
+}
 
 void static_model_component::material_name(const std::string& material_name) {
 	material_name_ = material_name;

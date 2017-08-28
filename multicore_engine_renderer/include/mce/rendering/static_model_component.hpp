@@ -49,6 +49,8 @@ public:
 	void material_name(const std::string& material_name);
 
 	void model_name(const std::string& model_name);
+
+	static void fill_property_list(property_list& prop);
 };
 
 } /* namespace rendering */
