@@ -17,8 +17,10 @@ class component_configuration;
 } // namespace entity
 namespace rendering {
 class renderer_system;
+class renderer_state;
 
 class static_model_component : public entity::component {
+	renderer_state& state;
 	renderer_system& sys;
 	std::string model_name_;
 	static_model_ptr model_;
@@ -26,7 +28,7 @@ class static_model_component : public entity::component {
 	material_ptr material_;
 
 public:
-	static_model_component(renderer_system& sys, entity::entity& owner,
+	static_model_component(renderer_state& state, entity::entity& owner,
 						   const entity::component_configuration& conf);
 	~static_model_component();
 

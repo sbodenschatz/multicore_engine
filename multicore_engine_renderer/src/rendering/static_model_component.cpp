@@ -4,15 +4,16 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/rendering/renderer_state.hpp>
 #include <mce/rendering/renderer_system.hpp>
 #include <mce/rendering/static_model_component.hpp>
 
 namespace mce {
 namespace rendering {
 
-static_model_component::static_model_component(renderer_system& sys, entity::entity& owner,
+static_model_component::static_model_component(renderer_state& state, entity::entity& owner,
 											   const entity::component_configuration& conf)
-		: component(owner, conf), sys{sys} {}
+		: component(owner, conf), state{state}, sys{*static_cast<renderer_system*>(state.system())} {}
 
 static_model_component::~static_model_component() {}
 
