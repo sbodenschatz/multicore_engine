@@ -4,14 +4,13 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/entity/entity_manager.hpp>
 #include <mce/rendering/renderer_state.hpp>
 
 namespace mce {
 namespace rendering {
 
-renderer_state::renderer_state(core::system* sys) : system_state(sys) {
-	// TODO Auto-generated constructor stub
-}
+renderer_state::renderer_state(core::system* sys) : system_state(sys) {}
 
 renderer_state::~renderer_state() {}
 

@@ -15,9 +15,7 @@ renderer_system::renderer_system(asset::asset_manager& asset_mgr, graphics::text
 								 graphics::destruction_queue_manager* destruction_manager,
 								 graphics::transfer_manager& transfer_mgr)
 		: mdl_mgr(model_data_mgr, dev, mem_mgr, destruction_manager, transfer_mgr),
-		  mat_mgr(asset_mgr, tex_mgr) {
-	// TODO Auto-generated constructor stub
-}
+		  mat_mgr(asset_mgr, tex_mgr) {}
 
 renderer_system::~renderer_system() {}
 
