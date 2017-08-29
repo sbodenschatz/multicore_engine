@@ -28,11 +28,6 @@ class renderer_system : public core::system {
 	friend class static_model_component;
 
 public:
-	renderer_system(asset::asset_manager& asset_mgr, graphics::texture_manager& tex_mgr,
-					model::model_data_manager& model_data_mgr, graphics::device& dev,
-					graphics::device_memory_manager_interface& mem_mgr,
-					graphics::destruction_queue_manager* destruction_manager,
-					graphics::transfer_manager& transfer_mgr);
 	renderer_system(core::engine& eng, graphics::graphics_system& gs);
 	~renderer_system();
 };
