@@ -73,7 +73,12 @@ public:
 		return model_name_;
 	}
 
-	/// Sets the model name and loads the the model with the given name (asynchronously).
+	/// \brief Asynchronously sets the model name, loads the the model with the given name and loads the
+	/// materials associated with the model.
+	/**
+	 * \warning Due to the asynchronous nature of this setter, the results will not become visible immediately
+	 * but only after the loading is complete.
+	 */
 	void model_name(const std::string& model_name);
 
 	/// Fills the given property_list with the properties available for this class.

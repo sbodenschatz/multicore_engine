@@ -38,9 +38,9 @@ void static_model_component::model_name(const std::string& model_name) {
 		}
 		pending_callbacks = true;
 	}
-	auto mdl = sys.mdl_mgr.load_static_model(
+	sys.mdl_mgr.load_static_model(
 			model_name,
-			[this](const static_model_ptr& model) {
+			[this, model_name](const static_model_ptr& model) {
 				std::vector<std::string> material_names;
 				std::transform(model->meshes().begin(), model->meshes().end(),
 							   std::back_inserter(material_names),
@@ -53,6 +53,8 @@ void static_model_component::model_name(const std::string& model_name) {
 					std::lock_guard<std::mutex> lock(mtx);
 					materials_ = materials;
 					material_names_ = material_names;
+					model_name_ = model_name;
+					model_ = model;
 					pending_callbacks = false;
 				}
 				callback_cv.notify_all();
@@ -64,9 +66,6 @@ void static_model_component::model_name(const std::string& model_name) {
 				}
 				callback_cv.notify_all();
 			});
-	std::lock_guard<std::mutex> lock(mtx);
-	model_name_ = model_name;
-	model_ = mdl;
 }
 
 } /* namespace rendering */
