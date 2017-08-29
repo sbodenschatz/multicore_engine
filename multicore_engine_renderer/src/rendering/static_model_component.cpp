@@ -13,26 +13,53 @@ namespace rendering {
 
 static_model_component::static_model_component(renderer_state& state, entity::entity& owner,
 											   const entity::component_configuration& conf)
-		: component(owner, conf), state{state}, sys{*static_cast<renderer_system*>(state.system())} {}
+		: component(owner, conf), pending_callbacks{false}, state{state}, sys{*static_cast<renderer_system*>(
+																				  state.system())} {}
 
-static_model_component::~static_model_component() {}
+static_model_component::~static_model_component() {
+	std::unique_lock<std::mutex> lock(mtx);
+	callback_cv.wait(lock, [this]() { return !pending_callbacks; });
+}
 
 void static_model_component::fill_property_list(property_list& prop) {
-	REGISTER_COMPONENT_PROPERTY(prop, static_model_component, std::vector<std::string>, material_names);
 	REGISTER_COMPONENT_PROPERTY(prop, static_model_component, std::string, model_name);
 }
 
-void static_model_component::material_names(const std::vector<std::string>& material_names) {
-	material_names_ = material_names;
-	materials_.clear();
-	for(const auto& mat_name : material_names_) {
-		materials_.push_back(sys.mat_mgr.load_material(mat_name));
-	}
-}
-
 void static_model_component::model_name(const std::string& model_name) {
+	{
+		std::unique_lock<std::mutex> lock(mtx);
+		callback_cv.wait(lock, [this]() { return !pending_callbacks; });
+		pending_callbacks = true;
+	}
+	auto mdl = sys.mdl_mgr.load_static_model(
+			model_name,
+			[this](const static_model_ptr& model) {
+				std::vector<std::string> material_names;
+				std::transform(model->meshes().begin(), model->meshes().end(),
+							   std::back_inserter(material_names),
+							   [](const static_model::mesh& msh) { return msh.material_name(); });
+				std::vector<material_ptr> materials;
+				for(const auto& mat_name : material_names) {
+					materials.push_back(sys.mat_mgr.load_material(mat_name));
+				}
+				{
+					std::lock_guard<std::mutex> lock(mtx);
+					materials_ = materials;
+					material_names_ = material_names;
+					pending_callbacks = false;
+				}
+				callback_cv.notify_all();
+			},
+			[this](std::exception_ptr) {
+				{
+					std::lock_guard<std::mutex> lock(mtx);
+					pending_callbacks = false;
+				}
+				callback_cv.notify_all();
+			});
+	std::lock_guard<std::mutex> lock(mtx);
 	model_name_ = model_name;
-	model_ = sys.mdl_mgr.load_static_model(model_name);
+	model_ = mdl;
 }
 
 } /* namespace rendering */

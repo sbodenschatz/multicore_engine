@@ -12,8 +12,10 @@
  * Defines the static_model_component class.
  */
 
+#include <condition_variable>
 #include <mce/entity/component.hpp>
 #include <mce/rendering/rendering_defs.hpp>
+#include <mutex>
 
 namespace mce {
 namespace entity {
@@ -26,6 +28,9 @@ class renderer_state;
 
 /// Makes the model a object that is drawn into the 3D scene using a static_model to represent it.
 class static_model_component : public entity::component {
+	mutable std::mutex mtx;
+	std::condition_variable callback_cv;
+	bool pending_callbacks;
 	renderer_state& state;
 	renderer_system& sys;
 	std::string model_name_;
@@ -41,28 +46,30 @@ public:
 	 */
 	static_model_component(renderer_state& state, entity::entity& owner,
 						   const entity::component_configuration& conf);
-	/// Destroys the static_model_component.
+	/// Destroys the static_model_component ensuring that there are no pending callbacks on it beforehand.
 	~static_model_component();
 
 	std::vector<material_ptr> materials() const {
+		std::lock_guard<std::mutex> lock(mtx);
 		return materials_;
 	}
 
 	std::vector<std::string> material_names() const {
+		std::lock_guard<std::mutex> lock(mtx);
 		return material_names_;
 	}
 
 	/// Returns the model that should be drawn.
 	const static_model_ptr& model() const {
+		std::lock_guard<std::mutex> lock(mtx);
 		return model_;
 	}
 
 	/// Returns the name of the model to draw.
 	std::string model_name() const {
+		std::lock_guard<std::mutex> lock(mtx);
 		return model_name_;
 	}
-
-	void material_names(const std::vector<std::string>& material_names);
 
 	/// Sets the model name and loads the the model with the given name (asynchronously).
 	void model_name(const std::string& model_name);
