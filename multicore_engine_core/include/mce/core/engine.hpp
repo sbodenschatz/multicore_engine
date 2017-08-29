@@ -24,6 +24,10 @@ namespace asset {
 class asset_manager;
 } // namespace asset
 
+namespace model {
+class model_data_manager;
+} // namespace model
+
 namespace core {
 class system;
 class game_state_machine;
@@ -33,6 +37,7 @@ struct frame_time;
 class engine {
 	std::atomic<bool> running_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
+	std::unique_ptr<model::model_data_manager> model_data_manager_;
 	std::vector<std::pair<util::type_id_t, std::unique_ptr<mce::core::system>>> systems_;
 	std::vector<std::pair<int, mce::core::system*>> systems_pre_phase_ordered;
 	std::vector<std::pair<int, mce::core::system*>> systems_post_phase_ordered;
@@ -98,6 +103,18 @@ public:
 	asset::asset_manager& asset_manager() {
 		assert(asset_manager_);
 		return *asset_manager_;
+	}
+
+	/// Allows access to the model_data_manager.
+	const model::model_data_manager& model_data_manager() const {
+		assert(model_data_manager_);
+		return *model_data_manager_;
+	}
+
+	/// Allows access to the model_data_manager.
+	model::model_data_manager& model_data_manager() {
+		assert(model_data_manager_);
+		return *model_data_manager_;
 	}
 
 	/// Allows access to the game_state_machine.
