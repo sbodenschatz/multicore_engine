@@ -43,6 +43,8 @@ public:
 								  const entity::component_configuration& configuration) {
 		return static_model_comps.emplace(sys, owner, configuration);
 	}
+
+	void register_with_entity_manager(entity::entity_manager& em);
 };
 
 } /* namespace rendering */
