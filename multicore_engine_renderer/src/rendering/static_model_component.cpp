@@ -11,7 +11,7 @@ namespace mce {
 namespace rendering {
 
 static_model_component::static_model_component(renderer_system& sys, entity::entity& owner,
-											   entity::component_configuration& conf)
+											   const entity::component_configuration& conf)
 		: component(owner, conf), sys{sys} {}
 
 static_model_component::~static_model_component() {}

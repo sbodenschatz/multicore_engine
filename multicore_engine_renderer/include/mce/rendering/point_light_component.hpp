@@ -23,7 +23,7 @@ private:
 	float radius_;
 
 public:
-	point_light_component(entity::entity& owner, entity::component_configuration& conf);
+	point_light_component(entity::entity& owner, const entity::component_configuration& conf);
 	~point_light_component();
 
 	glm::vec3 color() const {

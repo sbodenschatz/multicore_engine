@@ -9,7 +9,7 @@
 namespace mce {
 namespace rendering {
 
-camera_component::camera_component(entity::entity& owner, entity::component_configuration& conf)
+camera_component::camera_component(entity::entity& owner, const entity::component_configuration& conf)
 		: component(owner, conf), fov_{glm::radians(90.0f)}, near_plane_{1.0f}, far_plane_{100.0f} {}
 
 camera_component::~camera_component() {}

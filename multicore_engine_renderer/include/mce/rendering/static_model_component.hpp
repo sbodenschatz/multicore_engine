@@ -27,7 +27,7 @@ class static_model_component : public entity::component {
 
 public:
 	static_model_component(renderer_system& sys, entity::entity& owner,
-						   entity::component_configuration& conf);
+						   const entity::component_configuration& conf);
 	~static_model_component();
 
 	const material_ptr& material() const {

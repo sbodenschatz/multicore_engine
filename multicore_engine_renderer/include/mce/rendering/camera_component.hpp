@@ -22,7 +22,7 @@ class camera_component : public entity::component {
 	float far_plane_;
 
 public:
-	camera_component(entity::entity& owner, entity::component_configuration& conf);
+	camera_component(entity::entity& owner, const entity::component_configuration& conf);
 	~camera_component();
 
 	float far_plane() const {

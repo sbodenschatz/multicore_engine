@@ -9,7 +9,8 @@
 namespace mce {
 namespace rendering {
 
-point_light_component::point_light_component(entity::entity& owner, entity::component_configuration& conf)
+point_light_component::point_light_component(entity::entity& owner,
+											 const entity::component_configuration& conf)
 		: component(owner, conf), color_(1.0f, 1.0f, 1.0f), radius_(1000.0f) {}
 
 point_light_component::~point_light_component() {}
