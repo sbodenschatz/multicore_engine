@@ -60,7 +60,8 @@ public:
 
 	/// Adds the system implemented by the class supplied in T to the engine.
 	/**
-	 * An object of T is constructed using the given constructor arguments.
+	 * An object of T is constructed using the given constructor arguments prepended with a reference to the
+	 * engine object.
 	 * This member function may only be called when no other threads are using the systems collection.
 	 * Usually it is called in initialization code only.
 	 * Usually only one object of a given type should be added because a second one could not be looked-up
@@ -75,7 +76,7 @@ public:
 	template <typename T, typename... Args>
 	T* add_system(int pre_phase_ordering, int post_phase_ordering, Args&&... args) {
 		systems_.emplace_back(util::type_id<system>::id<T>(),
-							  std::make_unique<T>(std::forward<Args>(args)...));
+							  std::make_unique<T>(*this, std::forward<Args>(args)...));
 		auto sys = systems_.back().second.get();
 		systems_pre_phase_ordered.emplace_back(pre_phase_ordering, sys);
 		systems_post_phase_ordered.emplace_back(post_phase_ordering, sys);
