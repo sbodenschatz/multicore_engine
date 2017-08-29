@@ -24,20 +24,20 @@ class static_model_component : public entity::component {
 	renderer_system& sys;
 	std::string model_name_;
 	static_model_ptr model_;
-	std::string material_name_;
-	material_ptr material_;
+	std::vector<std::string> material_names_;
+	std::vector<material_ptr> materials_;
 
 public:
 	static_model_component(renderer_state& state, entity::entity& owner,
 						   const entity::component_configuration& conf);
 	~static_model_component();
 
-	const material_ptr& material() const {
-		return material_;
+	std::vector<material_ptr> materials() const {
+		return materials_;
 	}
 
-	std::string material_name() const {
-		return material_name_;
+	std::vector<std::string> material_names() const {
+		return material_names_;
 	}
 
 	const static_model_ptr& model() const {
@@ -48,7 +48,7 @@ public:
 		return model_name_;
 	}
 
-	void material_name(const std::string& material_name);
+	void material_names(const std::vector<std::string>& material_names);
 
 	void model_name(const std::string& model_name);
 

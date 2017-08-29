@@ -18,13 +18,16 @@ static_model_component::static_model_component(renderer_state& state, entity::en
 static_model_component::~static_model_component() {}
 
 void static_model_component::fill_property_list(property_list& prop) {
-	REGISTER_COMPONENT_PROPERTY(prop, static_model_component, std::string, material_name);
+	REGISTER_COMPONENT_PROPERTY(prop, static_model_component, std::vector<std::string>, material_names);
 	REGISTER_COMPONENT_PROPERTY(prop, static_model_component, std::string, model_name);
 }
 
-void static_model_component::material_name(const std::string& material_name) {
-	material_name_ = material_name;
-	material_ = sys.mat_mgr.load_material(material_name);
+void static_model_component::material_names(const std::vector<std::string>& material_names) {
+	material_names_ = material_names;
+	materials_.clear();
+	for(const auto& mat_name : material_names_) {
+		materials_.push_back(sys.mat_mgr.load_material(mat_name));
+	}
 }
 
 void static_model_component::model_name(const std::string& model_name) {
