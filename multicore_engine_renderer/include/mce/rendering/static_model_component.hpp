@@ -27,6 +27,10 @@ class renderer_system;
 class renderer_state;
 
 /// Makes the model a object that is drawn into the 3D scene using a static_model to represent it.
+/**
+ * Due to this component class working asynchronously for model and material loading it is internally
+ * thread-safe and has to block on destruction for pending callbacks to avoid use after destruction.
+ */
 class static_model_component : public entity::component {
 	mutable std::mutex mtx;
 	std::condition_variable callback_cv;
