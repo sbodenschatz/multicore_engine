@@ -75,7 +75,7 @@ public:
 		systems_pre_phase_ordered.emplace_back(pre_phase_ordering, sys);
 		systems_post_phase_ordered.emplace_back(post_phase_ordering, sys);
 		refresh_system_ordering();
-		return sys;
+		return static_cast<T*>(sys);
 	}
 
 	/// \brief Looks up a system object of the given type and returns a pointer to it or nullptr if no such
