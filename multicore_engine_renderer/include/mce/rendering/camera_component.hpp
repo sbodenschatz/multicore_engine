@@ -65,7 +65,7 @@ public:
 		near_plane_ = near_plane;
 	}
 
-	/// Fills the given property_list with the properties avilable for this class.
+	/// Fills the given property_list with the properties available for this class.
 	static void fill_property_list(property_list& prop);
 };
 
