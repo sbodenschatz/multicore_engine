@@ -24,12 +24,12 @@ void static_model_component::fill_property_list(property_list& prop) {
 
 void static_model_component::material_name(const std::string& material_name) {
 	material_name_ = material_name;
-	sys.mat_mgr.load_material(material_name);
+	material_ = sys.mat_mgr.load_material(material_name);
 }
 
 void static_model_component::model_name(const std::string& model_name) {
 	model_name_ = model_name;
-	sys.mdl_mgr.load_static_model(model_name);
+	model_ = sys.mdl_mgr.load_static_model(model_name);
 }
 
 } /* namespace rendering */
