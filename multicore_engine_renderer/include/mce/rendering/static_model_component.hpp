@@ -73,11 +73,18 @@ public:
 		return model_name_;
 	}
 
+	/// Returns true if the static_model_component is ready for rendering.
+	bool ready() const {
+		std::lock_guard<std::mutex> lock(mtx);
+		return bool(model_);
+	}
+
 	/// \brief Asynchronously sets the model name, loads the the model with the given name and loads the
 	/// materials associated with the model.
 	/**
 	 * \warning Due to the asynchronous nature of this setter, the results will not become visible immediately
-	 * but only after the loading is complete.
+	 * but only after the loading is complete. For the first assigned model ready() can be used to check if it
+	 * is fully loaded.
 	 */
 	void model_name(const std::string& model_name);
 
