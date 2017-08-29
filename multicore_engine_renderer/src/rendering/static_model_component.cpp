@@ -7,6 +7,7 @@
 #include <mce/rendering/renderer_state.hpp>
 #include <mce/rendering/renderer_system.hpp>
 #include <mce/rendering/static_model_component.hpp>
+#include <algorithm>
 
 namespace mce {
 namespace rendering {
@@ -66,6 +67,10 @@ void static_model_component::model_name(const std::string& model_name) {
 				}
 				callback_cv.notify_all();
 			});
+}
+bool static_model_component::ready() const {
+	std::lock_guard<std::mutex> lock(mtx);
+	return bool(model_) && std::all_of(materials_.begin(), materials_.end(), [](const material_ptr& ptr){return ptr->ready();});
 }
 
 } /* namespace rendering */

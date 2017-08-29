@@ -78,10 +78,7 @@ public:
 	}
 
 	/// Returns true if the static_model_component is ready for rendering.
-	bool ready() const {
-		std::lock_guard<std::mutex> lock(mtx);
-		return bool(model_);
-	}
+	bool ready() const ;
 
 	/// \brief Returns true if there are pending callbacks for model and material loading that will change
 	/// model and material data asynchronously.
@@ -94,11 +91,8 @@ public:
 	/// materials associated with the model.
 	/**
 	 * \warning Due to the asynchronous nature of this setter, the results will not become visible immediately
-	 * but only after the loading is complete. For the first assigned model ready() can be used to check if it
-	 * is fully loaded. For all assignments pending_callbacks() can be used to check if there are incomplete.
-	 * The state ready() == true, pending_callbacks() == true represents a subsequent assignment after the
-	 * first, for which the change will become visible in the future. Until this happens the previous state
-	 * will be visible.
+	 * but only after the loading is complete. For the first assigned model, ready() can be used to check if it
+	 * is fully loaded. For all assignments pending_callbacks() can be used to check if there are incomplete callbacks.
 	 */
 	void model_name(const std::string& model_name);
 
