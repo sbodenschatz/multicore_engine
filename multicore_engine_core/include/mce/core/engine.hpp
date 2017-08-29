@@ -65,7 +65,7 @@ public:
 	 * system::prerender are called before calling the game_state::process or game_state::render of the
 	 * current game_state. The systems are called sorted by pre_phase_ordering.
 	 * After the the game_state::process or game_state::render of the current game_state the member functions
-	 * system::postprocess or system::postrender are called sorted by post_phase_ordering.
+	 * system::postprocess or system::postrender are called sorted by post_phase_ordering in descending order.
 	 */
 	template <typename T, typename... Args>
 	T* add_system(int pre_phase_ordering, int post_phase_ordering, Args&&... args) {
