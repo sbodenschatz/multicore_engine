@@ -13,12 +13,12 @@ namespace rendering {
 
 static_model_component::static_model_component(renderer_state& state, entity::entity& owner,
 											   const entity::component_configuration& conf)
-		: component(owner, conf), pending_callbacks{false}, state{state}, sys{*static_cast<renderer_system*>(
+		: component(owner, conf), pending_callbacks_{false}, state{state}, sys{*static_cast<renderer_system*>(
 																				  state.system())} {}
 
 static_model_component::~static_model_component() {
 	std::unique_lock<std::mutex> lock(mtx);
-	callback_cv.wait(lock, [this]() { return !pending_callbacks; });
+	callback_cv.wait(lock, [this]() { return !pending_callbacks_; });
 }
 
 void static_model_component::fill_property_list(property_list& prop) {
@@ -28,7 +28,7 @@ void static_model_component::fill_property_list(property_list& prop) {
 void static_model_component::model_name(const std::string& model_name) {
 	{
 		std::unique_lock<std::mutex> lock(mtx);
-		callback_cv.wait(lock, [this]() { return !pending_callbacks; });
+		callback_cv.wait(lock, [this]() { return !pending_callbacks_; });
 		if(model_name.empty()) {
 			model_name_ = "";
 			model_ = nullptr;
@@ -36,7 +36,7 @@ void static_model_component::model_name(const std::string& model_name) {
 			materials_.clear();
 			return;
 		}
-		pending_callbacks = true;
+		pending_callbacks_ = true;
 	}
 	sys.mdl_mgr.load_static_model(
 			model_name,
@@ -55,14 +55,14 @@ void static_model_component::model_name(const std::string& model_name) {
 					material_names_ = material_names;
 					model_name_ = model_name;
 					model_ = model;
-					pending_callbacks = false;
+					pending_callbacks_ = false;
 				}
 				callback_cv.notify_all();
 			},
 			[this](std::exception_ptr) {
 				{
 					std::lock_guard<std::mutex> lock(mtx);
-					pending_callbacks = false;
+					pending_callbacks_ = false;
 				}
 				callback_cv.notify_all();
 			});
