@@ -29,6 +29,13 @@ void static_model_component::model_name(const std::string& model_name) {
 	{
 		std::unique_lock<std::mutex> lock(mtx);
 		callback_cv.wait(lock, [this]() { return !pending_callbacks; });
+		if(model_name.empty()) {
+			model_name_ = "";
+			model_ = nullptr;
+			material_names_.clear();
+			materials_.clear();
+			return;
+		}
 		pending_callbacks = true;
 	}
 	auto mdl = sys.mdl_mgr.load_static_model(
