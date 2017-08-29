@@ -49,11 +49,13 @@ public:
 	/// Destroys the static_model_component ensuring that there are no pending callbacks on it beforehand.
 	~static_model_component();
 
+	/// Returns the materials for the meshes of the model.
 	std::vector<material_ptr> materials() const {
 		std::lock_guard<std::mutex> lock(mtx);
 		return materials_;
 	}
 
+	/// Returns the names of the materials for the meshes of the model.
 	std::vector<std::string> material_names() const {
 		std::lock_guard<std::mutex> lock(mtx);
 		return material_names_;
