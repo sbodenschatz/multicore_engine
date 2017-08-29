@@ -12,6 +12,12 @@
 #include <mce/rendering/model_manager.hpp>
 
 namespace mce {
+namespace core {
+class engine;
+} // namespace core
+namespace graphics {
+class graphics_system;
+} // namespace graphics
 namespace rendering {
 
 class renderer_system : public core::system {
@@ -27,6 +33,7 @@ public:
 					graphics::device_memory_manager_interface& mem_mgr,
 					graphics::destruction_queue_manager* destruction_manager,
 					graphics::transfer_manager& transfer_mgr);
+	renderer_system(core::engine& eng, graphics::graphics_system& gs);
 	~renderer_system();
 };
 
