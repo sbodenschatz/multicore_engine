@@ -30,7 +30,7 @@ class camera_component : public entity::component {
 
 public:
 	/// \brief Creates a camera_component for the given entity to attach to and the given
-	/// component_configuration from which properties will be initialized..
+	/// component_configuration from which properties will be initialized.
 	camera_component(entity::entity& owner, const entity::component_configuration& conf);
 	/// Destroys the camera component.
 	~camera_component();

@@ -30,7 +30,7 @@ private:
 
 public:
 	/// \brief Creates a point_light_component for the given entity to attach to and the given
-	/// component_configuration from which properties will be initialized..
+	/// component_configuration from which properties will be initialized.
 	point_light_component(entity::entity& owner, const entity::component_configuration& conf);
 	/// Destroys the point_light_component.
 	~point_light_component();
