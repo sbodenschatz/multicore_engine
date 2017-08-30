@@ -25,6 +25,8 @@ bool ends_with_ignore_case(boost::string_view str, boost::string_view ending);
 bool starts_with(boost::string_view str, boost::string_view prefix);
 /// Checks if the given string view starts with the given prefix when character case is ignored.
 bool starts_with_ignore_case(boost::string_view str, boost::string_view prefix);
+/// Checks if the given string views are equal when character case is ignored.
+bool equal_ignore_case(boost::string_view str_a, boost::string_view str_b);
 
 /// Allows efficient processing of delimited strings in place using function objects.
 /**
