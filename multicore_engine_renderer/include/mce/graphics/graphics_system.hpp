@@ -42,9 +42,16 @@ class graphics_system : public core::system {
 	containers::dynamic_array<vk::UniqueSemaphore> present_semaphores_;
 	containers::dynamic_array<vk::UniqueFence> fences_;
 
+	uint32_t current_swapchain_image_;
+	std::vector<queued_handle<vk::UniqueCommandBuffer>> pending_command_buffers_;
+	std::vector<vk::CommandBuffer> cmd_buff_handles;
+
 public:
 	graphics_system(core::engine& eng, core::window_system& win_sys);
 	virtual ~graphics_system();
+
+	void prerender(const mce::core::frame_time& frame_time) override;
+	void postrender(const mce::core::frame_time& frame_time) override;
 
 	const graphics::destruction_queue_manager& destruction_queue_manager() const {
 		return destruction_queue_manager_;
@@ -108,6 +115,10 @@ public:
 
 	graphics::window& window() {
 		return window_;
+	}
+
+	uint32_t current_swapchain_image() const {
+		return current_swapchain_image_;
 	}
 };
 
