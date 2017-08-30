@@ -90,7 +90,7 @@ public:
 	T* get_system() const {
 		auto tid = util::type_id<system>::id<T>();
 		for(auto& sys : systems_) {
-			if(sys.first == tid) return sys.second.get();
+			if(sys.first == tid) return static_cast<T*>(sys.second.get());
 		}
 		return nullptr;
 	}
