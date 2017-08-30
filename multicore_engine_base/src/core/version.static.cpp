@@ -11,8 +11,12 @@ namespace mce {
 namespace core {
 
 version get_build_version_number() {
+	return parse_version_string(get_build_version());
+}
+
+version parse_version_string(const std::string& version_string) {
 	version v;
-	std::istringstream str(get_build_version());
+	std::istringstream str(version_string);
 	char skip;
 	str >> skip >> v.major;
 	str >> skip >> v.minor;

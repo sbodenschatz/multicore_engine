@@ -42,6 +42,9 @@ inline std::ostream& operator<<(std::ostream& str, const version& v) {
 /// Returns the version number of the code from which this binary was built.
 version get_build_version_number();
 
+/// Parses a string with version data from get_version_info in CMakeUtils.txt into a version struct.
+version parse_version_string(const std::string& version_string);
+
 } // namespace core
 } // namespace mce
 
