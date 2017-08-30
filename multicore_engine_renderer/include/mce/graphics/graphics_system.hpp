@@ -36,7 +36,9 @@ class graphics_system : public core::system {
 	graphics::graphics_manager graphics_manager_;
 
 public:
-	graphics_system(core::engine& eng, core::window_system& win_sys);
+	graphics_system(core::engine& eng, core::window_system& win_sys,
+					const std::vector<std::string>& extensions = {},
+					unsigned int validation_level = instance::default_validation_level);
 	virtual ~graphics_system();
 
 	const graphics::destruction_queue_manager& destruction_queue_manager() const {

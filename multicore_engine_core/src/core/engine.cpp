@@ -11,13 +11,16 @@
 #include <mce/core/engine.hpp>
 #include <mce/core/game_state_machine.hpp>
 #include <mce/core/system.hpp>
+#include <mce/core/version.hpp>
 #include <mce/model/model_data_manager.hpp>
 
 namespace mce {
 namespace core {
 
 engine::engine()
-		: running_{false}, asset_manager_{std::make_unique<asset::asset_manager>()},
+		: running_{false}, engine_metadata_{"mce", get_build_version_number()},
+		  application_metadata_{"mce-app", get_build_version_number()},
+		  asset_manager_{std::make_unique<asset::asset_manager>()},
 		  model_data_manager_{std::make_unique<model::model_data_manager>(asset_manager())} {
 	game_state_machine_ = std::make_unique<mce::core::game_state_machine>(this);
 }

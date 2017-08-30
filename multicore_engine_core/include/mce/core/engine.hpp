@@ -14,6 +14,7 @@
 
 #include <atomic>
 #include <cassert>
+#include <mce/core/version.hpp>
 #include <mce/util/type_id.hpp>
 #include <memory>
 #include <utility>
@@ -36,6 +37,8 @@ struct frame_time;
 /// Represents the central management class for the subsystems of the engine.
 class engine {
 	std::atomic<bool> running_;
+	software_metadata engine_metadata_;
+	software_metadata application_metadata_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
 	std::unique_ptr<model::model_data_manager> model_data_manager_;
 	std::vector<std::pair<util::type_id_t, std::unique_ptr<mce::core::system>>> systems_;
@@ -143,6 +146,26 @@ public:
 	/// Marks the engine as running.
 	void set_running() {
 		running_ = true;
+	}
+
+	/// Allows read-only access to the metadata for the application using this engine object.
+	const software_metadata& application_metadata() const {
+		return application_metadata_;
+	}
+
+	/// Allows read-write access to the metadata for the application using this engine object.
+	software_metadata& application_metadata() {
+		return application_metadata_;
+	}
+
+	/// Sets the metadata for the application using this engine object.
+	void application_metadata(const software_metadata& application_metadata) {
+		application_metadata_ = application_metadata;
+	}
+
+	/// Allows read-only access to the metadata for the engine.
+	const software_metadata& engine_metadata() const {
+		return engine_metadata_;
 	}
 };
 
