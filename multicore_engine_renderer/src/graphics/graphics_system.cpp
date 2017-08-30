@@ -12,7 +12,9 @@ namespace mce {
 namespace graphics {
 
 graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys)
-		: eng{eng}, device_(instance_), window_(instance_, win_sys.window(), device_),
+		: eng{eng},
+		  instance_(eng.engine_metadata(), eng.application_metadata()),
+		  device_(instance_), window_(instance_, win_sys.window(), device_),
 		  // TODO Parameterize
 		  memory_manager_(&device_, 1 << 27),
 		  destruction_queue_manager_(&device_, uint32_t(window_.swapchain_images().size())),
