@@ -21,11 +21,12 @@ class engine;
 
 class window_system : public system {
 	engine& eng;
+	std::string window_title_;
 	glfw::instance instance_;
 	std::unique_ptr<glfw::window> window_;
 
 public:
-	explicit window_system(engine& eng);
+	explicit window_system(engine& eng, const std::string& window_title);
 	virtual ~window_system();
 
 	void preprocess(const mce::core::frame_time& frame_time) override;
@@ -46,6 +47,10 @@ public:
 	glfw::window& window() {
 		assert(window_);
 		return *window_;
+	}
+
+	const std::string& window_title() const {
+		return window_title_;
 	}
 };
 
