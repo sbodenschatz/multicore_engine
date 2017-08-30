@@ -16,7 +16,6 @@ namespace core {
 
 window_system::window_system(engine& eng, const std::string& window_title)
 		: eng{eng}, instance_(), window_() {
-	// TODO Parameterize
 	auto mode = eng.config_store().resolve<std::string>("display_mode", "windowed");
 	auto mode_str = mode->value();
 	if(util::equal_ignore_case(mode_str, "windowed_fullscreen")) {
