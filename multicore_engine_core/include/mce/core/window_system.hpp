@@ -28,6 +28,8 @@ public:
 	window_system(engine& eng);
 	virtual ~window_system();
 
+	void preprocess(const mce::core::frame_time& frame_time) override;
+
 	const glfw::instance& instance() const {
 		return instance_;
 	}

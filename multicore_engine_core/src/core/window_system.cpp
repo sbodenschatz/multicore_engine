@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/core/engine.hpp>
 #include <mce/core/window_system.hpp>
 #include <mce/glfw/window.hpp>
 
@@ -16,6 +17,13 @@ window_system::window_system(engine& eng) : eng{eng}, instance_(), window_() {
 }
 
 window_system::~window_system() {}
+
+void window_system::preprocess(const mce::core::frame_time&) {
+	instance_.poll_events();
+	if(window_->should_close()) {
+		eng.stop();
+	}
+}
 
 } /* namespace core */
 } /* namespace mce */
