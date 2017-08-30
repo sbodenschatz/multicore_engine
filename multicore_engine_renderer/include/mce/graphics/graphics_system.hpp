@@ -7,6 +7,7 @@
 #ifndef MCE_GRAPHICS_GRAPHICS_SYSTEM_HPP_
 #define MCE_GRAPHICS_GRAPHICS_SYSTEM_HPP_
 
+#include <mce/containers/dynamic_array.hpp>
 #include <mce/core/system.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device.hpp>
@@ -16,6 +17,7 @@
 #include <mce/graphics/texture_manager.hpp>
 #include <mce/graphics/transfer_manager.hpp>
 #include <mce/graphics/window.hpp>
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace core {
@@ -34,6 +36,11 @@ class graphics_system : public core::system {
 	graphics::transfer_manager transfer_manager_;
 	graphics::texture_manager texture_manager_;
 	graphics::graphics_manager graphics_manager_;
+
+	vk::UniqueSemaphore tmp_semaphore_;
+	containers::dynamic_array<vk::UniqueSemaphore> acquire_semaphores_;
+	containers::dynamic_array<vk::UniqueSemaphore> present_semaphores_;
+	containers::dynamic_array<vk::UniqueFence> fences_;
 
 public:
 	graphics_system(core::engine& eng, core::window_system& win_sys);
