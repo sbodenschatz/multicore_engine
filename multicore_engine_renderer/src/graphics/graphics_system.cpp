@@ -36,7 +36,9 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 				  })),
 		  current_swapchain_image_{0} {}
 
-graphics_system::~graphics_system() {}
+graphics_system::~graphics_system() {
+	device_->waitIdle();
+}
 
 void graphics_system::prerender(const mce::core::frame_time&) {
 	auto acq_res =
