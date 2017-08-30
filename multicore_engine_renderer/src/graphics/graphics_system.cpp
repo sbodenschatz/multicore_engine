@@ -34,7 +34,24 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 					  return device_->createFenceUnique(
 							  vk::FenceCreateInfo(vk::FenceCreateFlagBits::eSignaled));
 				  })),
-		  current_swapchain_image_{0} {}
+		  current_swapchain_image_{0}, render_queue_cmd_pool_(device_, device_.graphics_queue_index().first),
+		  present_queue_cmd_pool_(device_, device_.transfer_queue_index().first),
+		  render_ownership_transfer_cmd_buffer_(
+				  window_.swapchain_images().size(), containers::generator_param([this](size_t) {
+					  auto cb = render_queue_cmd_pool_.allocate_primary_command_buffer();
+					  cb->begin(vk::CommandBufferBeginInfo({}, {}));
+					  // TODO Queue ownership transfer
+					  cb->end();
+					  return cb;
+				  })),
+		  present_ownership_transfer_cmd_buffer_(
+				  window_.swapchain_images().size(), containers::generator_param([this](size_t) {
+					  auto cb = present_queue_cmd_pool_.allocate_primary_command_buffer();
+					  cb->begin(vk::CommandBufferBeginInfo({}, {}));
+					  // TODO Queue ownership transfer
+					  cb->end();
+					  return cb;
+				  })) {}
 
 graphics_system::~graphics_system() {
 	device_->waitIdle();
@@ -57,15 +74,17 @@ void graphics_system::prerender(const mce::core::frame_time&) {
 	// TODO Handle non-success, non-failure (e.g. suboptimal)
 }
 void graphics_system::postrender(const mce::core::frame_time&) {
-	cmd_buff_handles.clear();
+	cmd_buff_handles_.clear();
 	std::transform(pending_command_buffers_.begin(), pending_command_buffers_.end(),
-				   std::back_inserter(cmd_buff_handles), [](const auto& h) { return h.get(); });
+				   std::back_inserter(cmd_buff_handles_), [](const auto& h) { return h.get(); });
 	auto acq_sema = acquire_semaphores_[current_swapchain_image_].get();
 	vk::PipelineStageFlags wait_ps = vk::PipelineStageFlagBits::eTopOfPipe;
 	auto present_sema = present_semaphores_[current_swapchain_image_].get();
-	device_.graphics_queue().submit({vk::SubmitInfo(1, &acq_sema, &wait_ps, uint32_t(cmd_buff_handles.size()),
-													cmd_buff_handles.data(), 1, &present_sema)},
-									fences_[current_swapchain_image_].get());
+	device_.graphics_queue().submit(
+			{vk::SubmitInfo(1, &acq_sema, &wait_ps, uint32_t(cmd_buff_handles_.size()),
+							cmd_buff_handles_.data(), 1, &present_sema)},
+			fences_[current_swapchain_image_].get());
+	// TODO Ownership transfer
 	auto swapchain_handle = window_.swapchain();
 	device_.present_queue().presentKHR(
 			vk::PresentInfoKHR(1, &present_sema, 1, &swapchain_handle, &current_swapchain_image_));

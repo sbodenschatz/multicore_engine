@@ -44,7 +44,12 @@ class graphics_system : public core::system {
 
 	uint32_t current_swapchain_image_;
 	std::vector<queued_handle<vk::UniqueCommandBuffer>> pending_command_buffers_;
-	std::vector<vk::CommandBuffer> cmd_buff_handles;
+	std::vector<vk::CommandBuffer> cmd_buff_handles_;
+
+	command_pool render_queue_cmd_pool_;
+	command_pool present_queue_cmd_pool_;
+	containers::dynamic_array<vk::UniqueCommandBuffer> render_ownership_transfer_cmd_buffer_;
+	containers::dynamic_array<vk::UniqueCommandBuffer> present_ownership_transfer_cmd_buffer_;
 
 public:
 	graphics_system(core::engine& eng, core::window_system& win_sys,
