@@ -157,7 +157,7 @@ public:
 	}
 
 	/// Creates a dynamic_array containing the values from the given std::initializer_list.
-	dynamic_array(std::initializer_list<value_type> values) : data_{nullptr}, size_{0} {
+	explicit dynamic_array(std::initializer_list<value_type> values) : data_{nullptr}, size_{0} {
 		allocate(values.size());
 		for(const auto& val : values) {
 			try {

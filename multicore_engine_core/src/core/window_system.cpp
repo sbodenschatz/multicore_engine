@@ -42,7 +42,6 @@ window_system::window_system(engine& eng, const std::string& window_title)
 												 video_modes.at(video_mode_index));
 	} else {
 		auto res = eng.config_store().resolve<glm::ivec2>("resolution", {800, 600});
-		// cppcheck-suppress useInitializationList
 		window_ = std::make_unique<glfw::window>(window_title, res->value());
 	}
 }
