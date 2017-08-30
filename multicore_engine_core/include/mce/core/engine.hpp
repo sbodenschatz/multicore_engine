@@ -28,6 +28,10 @@ namespace model {
 class model_data_manager;
 } // namespace model
 
+namespace config {
+class config_store;
+} // namespace config
+
 namespace core {
 class system;
 class game_state_machine;
@@ -37,6 +41,7 @@ struct frame_time;
 class engine {
 	std::atomic<bool> running_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
+	std::unique_ptr<config::config_store> config_store_;
 	std::unique_ptr<model::model_data_manager> model_data_manager_;
 	std::vector<std::pair<util::type_id_t, std::unique_ptr<mce::core::system>>> systems_;
 	std::vector<std::pair<int, mce::core::system*>> systems_pre_phase_ordered;
@@ -44,6 +49,7 @@ class engine {
 	std::unique_ptr<mce::core::game_state_machine> game_state_machine_;
 
 	void refresh_system_ordering();
+	void initialize_config();
 
 public:
 	/// Constructs the engine.
@@ -143,6 +149,18 @@ public:
 	/// Marks the engine as running.
 	void set_running() {
 		running_ = true;
+	}
+
+	/// Allows access to the config_store.
+	const config::config_store& config_store() const {
+		assert(config_store_);
+		return *config_store_;
+	}
+
+	/// Allows access to the config_store.
+	config::config_store& config_store() {
+		assert(config_store_);
+		return *config_store_;
 	}
 };
 
