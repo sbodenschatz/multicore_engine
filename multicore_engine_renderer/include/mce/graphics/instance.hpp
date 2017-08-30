@@ -12,6 +12,7 @@
  * Defines the instance level resource management of the application.
  */
 
+#include <mce/core/version.hpp>
 #include <mce/glfw/instance.hpp>
 #include <mutex>
 #include <string>
@@ -49,13 +50,17 @@ private:
 										const char* pLayerPrefix, const char* pMessage) const;
 
 public:
-	/// Constructs an instance with the given additional extensions and validation level.
+	/// Constructs an instance with the given metadata additional extensions and validation level.
 	/**
-	 * The given extensions are requested additionally to the ones required by glfw.
+	 * The given extensions are requested additionally to the ones required by glfw or the engine.
 	 * The validation level determines which debug callback messages are given to the debug output ranging
 	 * from 1 for error only to 5 for debug and above (all).
+	 * The given metadata structs are used to identify the engine and the application to the vulkan driver.
 	 */
-	instance(const std::vector<std::string>& extensions = {},
+	instance(const core::software_metadata& engine_metadata = {"mce", core::get_build_version_number()},
+			 const core::software_metadata& application_metadata = {"mce-app",
+																	core::get_build_version_number()},
+			 const std::vector<std::string>& extensions = {},
 			 unsigned int validation_level = default_validation_level);
 	/// Releases the instance resources.
 	~instance();
