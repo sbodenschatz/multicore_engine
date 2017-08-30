@@ -44,7 +44,7 @@ public:
 		return static_model_comps.emplace(sys, owner, configuration);
 	}
 
-	void register_with_entity_manager(entity::entity_manager& em);
+	void register_to_entity_manager(entity::entity_manager& em);
 };
 
 } /* namespace rendering */
