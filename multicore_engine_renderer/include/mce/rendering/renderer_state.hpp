@@ -10,6 +10,7 @@
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/core/system_state.hpp>
+#include <mce/memory/aligned_new.hpp>
 #include <mce/rendering/camera_component.hpp>
 #include <mce/rendering/point_light_component.hpp>
 #include <mce/rendering/static_model_component.hpp>
@@ -26,6 +27,8 @@ class renderer_state : public core::system_state {
 	containers::smart_object_pool<static_model_component> static_model_comps;
 
 public:
+	ALIGNED_NEW_AND_DELETE(renderer_state)
+
 	explicit renderer_state(core::system* sys);
 	~renderer_state();
 
