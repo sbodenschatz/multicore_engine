@@ -25,7 +25,7 @@ class window_system : public system {
 	std::unique_ptr<glfw::window> window_;
 
 public:
-	window_system(engine& eng);
+	explicit window_system(engine& eng);
 	virtual ~window_system();
 
 	void preprocess(const mce::core::frame_time& frame_time) override;
