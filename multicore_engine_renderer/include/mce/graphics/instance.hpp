@@ -30,11 +30,6 @@ private:
 	std::vector<std::string> extensions;
 	vk::UniqueInstance native_instance_;
 	vk::UniqueDebugReportCallbackEXT validation_report_cb;
-#ifdef DEBUG
-	static const unsigned int default_validation_level = 5;
-#else
-	static const unsigned int default_validation_level = 0;
-#endif
 	unsigned int validation_level;
 	mutable std::mutex validation_log_mtx;
 
@@ -50,6 +45,12 @@ private:
 										const char* pLayerPrefix, const char* pMessage) const;
 
 public:
+#ifdef DEBUG
+	static const unsigned int default_validation_level = 5;
+#else
+	static const unsigned int default_validation_level = 0;
+#endif
+
 	/// Constructs an instance with the given metadata additional extensions and validation level.
 	/**
 	 * The given extensions are requested additionally to the ones required by glfw or the engine.
