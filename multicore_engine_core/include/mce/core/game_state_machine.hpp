@@ -42,7 +42,9 @@ struct game_state_machine_context {
 /// Implements the stack state machine for game states.
 class game_state_machine {
 	mce::core::engine* engine;
-	util::stack_state_machine<game_state, detail::game_state_machine_context> state_machine;
+	util::stack_state_machine<game_state, detail::game_state_machine_context,
+							  detail::game_state_machine_policy>
+			state_machine;
 
 public:
 	/// Constructs a game_state_machine for the given engine object.
