@@ -47,7 +47,9 @@ class graphics_system : public core::system {
 	std::vector<vk::CommandBuffer> cmd_buff_handles;
 
 public:
-	graphics_system(core::engine& eng, core::window_system& win_sys);
+	graphics_system(core::engine& eng, core::window_system& win_sys,
+					const std::vector<std::string>& extensions = {},
+					unsigned int validation_level = instance::default_validation_level);
 	virtual ~graphics_system();
 
 	void prerender(const mce::core::frame_time& frame_time) override;
