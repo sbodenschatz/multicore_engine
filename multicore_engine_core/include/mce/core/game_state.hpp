@@ -46,7 +46,7 @@ protected:
 	T* add_system_state(Args&&... args) {
 		system_states_.emplace_back(util::type_id<system_state>::id<T>(),
 									std::make_unique<T>(std::forward<Args>(args)...));
-		return system_states_.back().second.get();
+		return static_cast<T*>(system_states_.back().second.get());
 	}
 
 public:
@@ -62,7 +62,7 @@ public:
 	T* get_system_state() const {
 		auto tid = util::type_id<system_state>::id<T>();
 		for(auto& sys : system_states_) {
-			if(sys.first == tid) return sys.second.get();
+			if(sys.first == tid) return static_cast<T*>(sys.second.get());
 		}
 		return nullptr;
 	}
