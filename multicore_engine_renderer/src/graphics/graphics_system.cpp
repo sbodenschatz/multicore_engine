@@ -11,9 +11,10 @@
 namespace mce {
 namespace graphics {
 
-graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys)
+graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys,
+								 const std::vector<std::string>& extensions, unsigned int validation_level)
 		: eng{eng},
-		  instance_(eng.engine_metadata(), eng.application_metadata()),
+		  instance_(eng.engine_metadata(), eng.application_metadata(), extensions, validation_level),
 		  device_(instance_), window_(instance_, win_sys.window(), device_),
 		  // TODO Parameterize
 		  memory_manager_(&device_, 1 << 27),
