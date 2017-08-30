@@ -15,7 +15,7 @@ version get_build_version_number() {
 }
 
 version parse_version_string(const std::string& version_string) {
-	version v;
+	version v{0, 0, 0, 0, ""};
 	std::istringstream str(version_string);
 	char skip;
 	str >> skip >> v.major;
