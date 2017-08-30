@@ -11,8 +11,9 @@
 namespace mce {
 namespace core {
 
-window_system::window_system(engine& eng) : eng{eng}, instance_(), window_() {
+window_system::window_system(engine& eng) : eng{eng}, instance_(), window_(nullptr) {
 	// TODO Parameterize
+	//cppcheck-suppress useInitializationList
 	window_ = std::make_unique<glfw::window>("multicore_engine", glm::ivec2{800, 600});
 }
 
