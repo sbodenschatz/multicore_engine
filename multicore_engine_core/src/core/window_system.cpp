@@ -7,6 +7,7 @@
 #include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/core/window_system.hpp>
+#include <mce/glfw/monitor.hpp>
 #include <mce/glfw/window.hpp>
 
 namespace mce {
@@ -15,9 +16,17 @@ namespace core {
 window_system::window_system(engine& eng, const std::string& window_title)
 		: eng{eng}, instance_(), window_() {
 	// TODO Parameterize
-	auto res = eng.config_store().resolve<glm::ivec2>("resolution", {800, 600});
-	//cppcheck-suppress useInitializationList
-	window_ = std::make_unique<glfw::window>(window_title, res->value());
+	auto fullscreen = eng.config_store().resolve<int>("fullscreen", 0);
+	if(fullscreen->value()) {
+		auto monitor = eng.config_store().resolve("monitor", 0);
+		auto monitors = glfw::monitor::monitors(instance_);
+		auto monitor_index = std::min<size_t>(monitor->value(), monitors.size() - 1);
+		window_ = std::make_unique<glfw::window>(window_title, monitors.at(monitor_index));
+	} else {
+		auto res = eng.config_store().resolve<glm::ivec2>("resolution", {800, 600});
+		// cppcheck-suppress useInitializationList
+		window_ = std::make_unique<glfw::window>(window_title, res->value());
+	}
 }
 
 window_system::~window_system() {}
