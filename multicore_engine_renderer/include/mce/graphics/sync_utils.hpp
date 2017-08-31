@@ -34,6 +34,7 @@ void buffer_queue_ownership_transfer(vk::Buffer buffer, vk::CommandBuffer cb_que
 									 vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
 									 vk::AccessFlags access_flags_dst);
 
+/// Records a queue ownership transfer on the given image into the given command buffers for both queues.
 void image_queue_ownership_transfer(vk::Image image, vk::ImageLayout layout, vk::CommandBuffer cb_queue_src,
 									vk::CommandBuffer cb_queue_dst, uint32_t queue_family_src,
 									uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
