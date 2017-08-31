@@ -21,7 +21,7 @@ class graphics_system;
 namespace rendering {
 
 class renderer_system : public core::system {
-
+	graphics::graphics_system& gs_;
 	model_manager mdl_mgr;
 	material_manager mat_mgr;
 

@@ -12,8 +12,8 @@ namespace mce {
 namespace rendering {
 
 renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& gs)
-		: mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
-				  &(gs.destruction_queue_manager()), gs.transfer_manager()),
+		: gs_{gs}, mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
+				  		   &(gs.destruction_queue_manager()), gs.transfer_manager()),
 		  mat_mgr(eng.asset_manager(), gs.texture_manager()) {}
 
 renderer_system::~renderer_system() {}
