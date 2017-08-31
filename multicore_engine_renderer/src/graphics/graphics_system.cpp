@@ -7,6 +7,7 @@
 #include <mce/core/engine.hpp>
 #include <mce/core/window_system.hpp>
 #include <mce/graphics/graphics_system.hpp>
+#include <mce/graphics/sync_utils.hpp>
 
 namespace mce {
 namespace graphics {
@@ -35,23 +36,39 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 							  vk::FenceCreateInfo(vk::FenceCreateFlagBits::eSignaled));
 				  })),
 		  current_swapchain_image_{0}, render_queue_cmd_pool_(device_, device_.graphics_queue_index().first),
-		  present_queue_cmd_pool_(device_, device_.transfer_queue_index().first),
-		  render_ownership_transfer_cmd_buffer_(
+		  present_queue_end_frame_cmd_pool_(device_, device_.transfer_queue_index().first),
+		  render_queue_end_frame_cmd_buffers_(
 				  window_.swapchain_images().size(), containers::generator_param([this](size_t) {
-					  auto cb = render_queue_cmd_pool_.allocate_primary_command_buffer();
-					  cb->begin(vk::CommandBufferBeginInfo({}, {}));
-					  // TODO Queue ownership transfer
-					  cb->end();
-					  return cb;
+					  return render_queue_cmd_pool_.allocate_primary_command_buffer();
 				  })),
-		  present_ownership_transfer_cmd_buffer_(
+		  present_queue_end_frame_cmd_buffers_(
 				  window_.swapchain_images().size(), containers::generator_param([this](size_t) {
-					  auto cb = present_queue_cmd_pool_.allocate_primary_command_buffer();
-					  cb->begin(vk::CommandBufferBeginInfo({}, {}));
-					  // TODO Queue ownership transfer
-					  cb->end();
-					  return cb;
-				  })) {}
+					  return present_queue_end_frame_cmd_pool_.allocate_primary_command_buffer();
+				  })) {
+	for(uint32_t i = 0; i < window_.swapchain_images().size(); ++i) {
+		render_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
+		present_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
+		render_queue_end_frame_cmd_buffers_[i]->pipelineBarrier(
+				vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
+				{base_image::generate_transition_native(
+						window_.swapchain_images()[i], vk::ImageLayout::eColorAttachmentOptimal,
+						vk::ImageLayout::ePresentSrcKHR,
+						allowed_flags_for_layout(vk::ImageLayout::eColorAttachmentOptimal),
+						~vk::AccessFlags{}, vk::ImageAspectFlagBits::eColor)});
+		if(device_.graphics_queue_index().first != device_.present_queue_index().first) {
+			image_queue_ownership_transfer(
+					window_.swapchain_images()[i], vk::ImageLayout::ePresentSrcKHR,
+					render_queue_end_frame_cmd_buffers_[i].get(),
+					present_queue_end_frame_cmd_buffers_[i].get(), device_.graphics_queue_index().first,
+					device_.present_queue_index().first, vk::PipelineStageFlagBits::eColorAttachmentOutput,
+					vk::PipelineStageFlagBits::eAllCommands,
+					vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
+					~vk::AccessFlags{}, vk::ImageAspectFlagBits::eColor);
+		}
+		render_queue_end_frame_cmd_buffers_[i]->end();
+		present_queue_end_frame_cmd_buffers_[i]->end();
+	}
+}
 
 graphics_system::~graphics_system() {
 	device_->waitIdle();
