@@ -39,6 +39,7 @@ class graphics_system : public core::system {
 
 	vk::UniqueSemaphore tmp_semaphore_;
 	containers::dynamic_array<vk::UniqueSemaphore> acquire_semaphores_;
+	containers::dynamic_array<vk::UniqueSemaphore> pre_present_semaphores_;
 	containers::dynamic_array<vk::UniqueSemaphore> present_semaphores_;
 	containers::dynamic_array<vk::UniqueFence> fences_;
 

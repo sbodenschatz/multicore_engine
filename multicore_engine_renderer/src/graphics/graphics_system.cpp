@@ -28,6 +28,9 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 		  acquire_semaphores_(window_.swapchain_images().size(), containers::generator_param([this](size_t) {
 								  return device_->createSemaphoreUnique({});
 							  })),
+		  pre_present_semaphores_(
+				  window_.swapchain_images().size(),
+				  containers::generator_param([this](size_t) { return device_->createSemaphoreUnique({}); })),
 		  present_semaphores_(window_.swapchain_images().size(), containers::generator_param([this](size_t) {
 								  return device_->createSemaphoreUnique({});
 							  })),
@@ -106,16 +109,27 @@ void graphics_system::prerender(const mce::core::frame_time&) {
 }
 void graphics_system::postrender(const mce::core::frame_time&) {
 	cmd_buff_handles_.clear();
+	cmd_buff_handles_.push_back(render_queue_start_frame_cmd_buffers_[current_swapchain_image_].get());
 	std::transform(pending_command_buffers_.begin(), pending_command_buffers_.end(),
 				   std::back_inserter(cmd_buff_handles_), [](const auto& h) { return h.get(); });
+	cmd_buff_handles_.push_back(render_queue_end_frame_cmd_buffers_[current_swapchain_image_].get());
 	auto acq_sema = acquire_semaphores_[current_swapchain_image_].get();
-	vk::PipelineStageFlags wait_ps = vk::PipelineStageFlagBits::eTopOfPipe;
+	vk::PipelineStageFlags wait_ps = vk::PipelineStageFlagBits::eAllCommands;
+	auto pre_present_sema = pre_present_semaphores_[current_swapchain_image_].get();
 	auto present_sema = present_semaphores_[current_swapchain_image_].get();
+	auto ownership_transfer_needed =
+			device_.graphics_queue_index().first != device_.present_queue_index().first;
 	device_.graphics_queue().submit(
 			{vk::SubmitInfo(1, &acq_sema, &wait_ps, uint32_t(cmd_buff_handles_.size()),
-							cmd_buff_handles_.data(), 1, &present_sema)},
+							cmd_buff_handles_.data(), 1,
+							ownership_transfer_needed ? &pre_present_sema : &present_sema)},
 			fences_[current_swapchain_image_].get());
-	// TODO Ownership transfer
+	if(ownership_transfer_needed) {
+		auto present_buff_handle = present_queue_end_frame_cmd_buffers_[current_swapchain_image_].get();
+		device_.present_queue().submit(
+				{vk::SubmitInfo(1, &pre_present_sema, &wait_ps, 1, &present_buff_handle, 1, &present_sema)},
+				vk::Fence{});
+	}
 	auto swapchain_handle = window_.swapchain();
 	device_.present_queue().presentKHR(
 			vk::PresentInfoKHR(1, &present_sema, 1, &swapchain_handle, &current_swapchain_image_));
