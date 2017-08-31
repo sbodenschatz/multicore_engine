@@ -26,6 +26,13 @@ class window_system : public system {
 	std::unique_ptr<glfw::window> window_;
 
 public:
+	int pre_phase_ordering() const noexcept override {
+		return 0x1000;
+	}
+	int post_phase_ordering() const noexcept override {
+		return 0x1000;
+	}
+
 	explicit window_system(engine& eng, const std::string& window_title);
 	virtual ~window_system();
 

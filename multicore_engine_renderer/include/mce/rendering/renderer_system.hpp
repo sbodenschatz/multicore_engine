@@ -28,6 +28,13 @@ class renderer_system : public core::system {
 	friend class static_model_component;
 
 public:
+	int pre_phase_ordering() const noexcept override {
+		return 0x1200;
+	}
+	int post_phase_ordering() const noexcept override {
+		return 0x1200;
+	}
+
 	renderer_system(core::engine& eng, graphics::graphics_system& gs);
 	~renderer_system();
 };

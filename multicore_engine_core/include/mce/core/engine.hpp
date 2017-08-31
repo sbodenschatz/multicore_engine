@@ -14,6 +14,7 @@
 
 #include <atomic>
 #include <cassert>
+#include <mce/core/system.hpp>
 #include <mce/core/version.hpp>
 #include <mce/util/type_id.hpp>
 #include <memory>
@@ -78,17 +79,19 @@ public:
 	 *
 	 * For the phases of a frame (process and render) the member functions system::preprocess or
 	 * system::prerender are called before calling the game_state::process or game_state::render of the
-	 * current game_state. The systems are called sorted by pre_phase_ordering.
+	 * current game_state. The systems are called sorted by the results of their pre_phase_ordering virtual
+	 * member functions.
 	 * After the the game_state::process or game_state::render of the current game_state the member functions
-	 * system::postprocess or system::postrender are called sorted by post_phase_ordering in descending order.
+	 * system::postprocess or system::postrender are called sorted by the results of their post_phase_ordering
+	 * virtual member functions in descending order.
 	 */
 	template <typename T, typename... Args>
-	T* add_system(int pre_phase_ordering, int post_phase_ordering, Args&&... args) {
+	T* add_system(Args&&... args) {
 		systems_.emplace_back(util::type_id<system>::id<T>(),
 							  std::make_unique<T>(*this, std::forward<Args>(args)...));
 		auto sys = systems_.back().second.get();
-		systems_pre_phase_ordered.emplace_back(pre_phase_ordering, sys);
-		systems_post_phase_ordered.emplace_back(post_phase_ordering, sys);
+		systems_pre_phase_ordered.emplace_back(sys->pre_phase_ordering(), sys);
+		systems_post_phase_ordered.emplace_back(sys->post_phase_ordering(), sys);
 		refresh_system_ordering();
 		return static_cast<T*>(sys);
 	}

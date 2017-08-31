@@ -52,6 +52,13 @@ class graphics_system : public core::system {
 	containers::dynamic_array<vk::UniqueCommandBuffer> present_ownership_transfer_cmd_buffer_;
 
 public:
+	int pre_phase_ordering() const noexcept override {
+		return 0x1100;
+	}
+	int post_phase_ordering() const noexcept override {
+		return 0x1100;
+	}
+
 	graphics_system(core::engine& eng, core::window_system& win_sys,
 					const std::vector<std::string>& extensions = {},
 					unsigned int validation_level = instance::default_validation_level);
