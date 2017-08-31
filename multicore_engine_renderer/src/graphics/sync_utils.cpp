@@ -46,5 +46,20 @@ vk::AccessFlags allowed_flags_for_layout(vk::ImageLayout layout) {
 	return required_flags_for_layout(layout) | optional_flags_for_layout(layout);
 }
 
+void buffer_queue_ownership_transfer(vk::Buffer buffer, vk::CommandBuffer cb_queue_src,
+									 vk::CommandBuffer cb_queue_dst, uint32_t queue_family_src,
+									 uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
+									 vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
+									 vk::AccessFlags access_flags_dst) {
+	cb_queue_src.pipelineBarrier(stage_mask_src, stage_mask_dst, {}, {},
+								 {vk::BufferMemoryBarrier(access_flags_src, {}, queue_family_src,
+														  queue_family_dst, buffer, 0, VK_WHOLE_SIZE)},
+								 {});
+	cb_queue_dst.pipelineBarrier(stage_mask_src, stage_mask_dst, {}, {},
+								 {vk::BufferMemoryBarrier({}, access_flags_dst, queue_family_src,
+														  queue_family_dst, buffer, 0, VK_WHOLE_SIZE)},
+								 {});
+}
+
 } /* namespace graphics */
 } /* namespace mce */
