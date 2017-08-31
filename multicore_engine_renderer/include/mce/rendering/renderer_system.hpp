@@ -37,6 +37,9 @@ public:
 
 	renderer_system(core::engine& eng, graphics::graphics_system& gs);
 	~renderer_system();
+
+	void prerender(const mce::core::frame_time& frame_time) override;
+	void postrender(const mce::core::frame_time& frame_time) override;
 };
 
 } /* namespace rendering */

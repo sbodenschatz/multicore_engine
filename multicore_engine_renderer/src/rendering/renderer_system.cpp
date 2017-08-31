@@ -18,5 +18,8 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 
 renderer_system::~renderer_system() {}
 
+void renderer_system::prerender(const mce::core::frame_time&) {}
+void renderer_system::postrender(const mce::core::frame_time&) {}
+
 } /* namespace rendering */
 } /* namespace mce */
