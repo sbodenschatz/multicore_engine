@@ -4,9 +4,11 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/graphics_system.hpp>
+#include <mce/graphics/sampler.hpp>
 #include <mce/rendering/renderer_system.hpp>
 
 namespace mce {
@@ -16,6 +18,16 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 		: gs_{gs}, mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
 						   &(gs.destruction_queue_manager()), gs.transfer_manager()),
 		  mat_mgr(eng.asset_manager(), gs.texture_manager()) {
+	auto anisotropy = eng.config_store().resolve("anisotropy", -1.0f);
+	boost::optional<float> max_anisotropy;
+	auto aniso_val = anisotropy->value();
+	if(aniso_val > 0.0f) {
+		max_anisotropy = aniso_val;
+	}
+	gs.graphics_manager().create_sampler(
+			"default", vk::Filter::eLinear, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear,
+			graphics::sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, max_anisotropy, {}, 0.0,
+			64.0f, vk::BorderColor::eIntOpaqueBlack);
 	gs_.graphics_manager().create_descriptor_set_layout(
 			"per_scene",
 			{graphics::descriptor_set_layout_binding_element{
