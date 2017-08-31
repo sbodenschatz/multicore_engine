@@ -24,7 +24,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	if(aniso_val > 0.0f) {
 		max_anisotropy = aniso_val;
 	}
-	gs.graphics_manager().create_sampler(
+	auto default_sampler = gs.graphics_manager().create_sampler(
 			"default", vk::Filter::eLinear, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear,
 			graphics::sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, max_anisotropy, {}, 0.0,
 			64.0f, vk::BorderColor::eIntOpaqueBlack);
@@ -38,22 +38,22 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 															 vk::DescriptorType::eCombinedImageSampler,
 															 1,
 															 vk::ShaderStageFlagBits::eFragment,
-															 {/*TODO*/}},
+															 {default_sampler->native_sampler()}},
 			 graphics::descriptor_set_layout_binding_element{1, // Normal map
 															 vk::DescriptorType::eCombinedImageSampler,
 															 1,
 															 vk::ShaderStageFlagBits::eFragment,
-															 {/*TODO*/}},
+															 {default_sampler->native_sampler()}},
 			 graphics::descriptor_set_layout_binding_element{2, // Material
 															 vk::DescriptorType::eCombinedImageSampler,
 															 1,
 															 vk::ShaderStageFlagBits::eFragment,
-															 {/*TODO*/}},
+															 {default_sampler->native_sampler()}},
 			 graphics::descriptor_set_layout_binding_element{3, // Emission
 															 vk::DescriptorType::eCombinedImageSampler,
 															 1,
 															 vk::ShaderStageFlagBits::eFragment,
-															 {/*TODO*/}}});
+															 {default_sampler->native_sampler()}}});
 	/* Currently unneeded because the model matrix can be passed using push constants.
 	 gs_.graphics_manager().create_descriptor_set_layout(
 			"per_scene",
