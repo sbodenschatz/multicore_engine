@@ -28,11 +28,11 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 			"default", vk::Filter::eLinear, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear,
 			graphics::sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, max_anisotropy, {}, 0.0,
 			64.0f, vk::BorderColor::eIntOpaqueBlack);
-	gs_.graphics_manager().create_descriptor_set_layout(
+	auto per_scene_dsl = gs_.graphics_manager().create_descriptor_set_layout(
 			"per_scene",
 			{graphics::descriptor_set_layout_binding_element{
 					0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eAllGraphics, {}}});
-	gs_.graphics_manager().create_descriptor_set_layout(
+	auto per_material_dsl = gs_.graphics_manager().create_descriptor_set_layout(
 			"per_material",
 			{graphics::descriptor_set_layout_binding_element{0, // Albedo
 															 vk::DescriptorType::eCombinedImageSampler,
@@ -59,6 +59,9 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 			"per_scene",
 			{{0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eAllGraphics, {}}});
 	*/
+	gs_.graphics_manager().create_pipeline_layout(
+			"forward_opaque", {per_scene_dsl, per_material_dsl},
+			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0, sizeof(glm::mat4))});
 }
 
 renderer_system::~renderer_system() {}
