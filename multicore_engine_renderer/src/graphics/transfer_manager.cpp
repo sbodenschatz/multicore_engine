@@ -99,17 +99,11 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk
 													allowed_flags_for_layout(final_layout), aspects,
 													mip_levels, layers)});
 	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
-		transfer_command_bufers[current_ring_index]->pipelineBarrier(
-				vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {},
-				{vk::ImageMemoryBarrier({}, {}, final_layout, final_layout, dev.transfer_queue_index().first,
-										dev.graphics_queue_index().first, dst_img,
-										vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
-		pending_ownership_command_buffers[current_ring_index]->pipelineBarrier(
-				vk::PipelineStageFlagBits::eBottomOfPipe, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
-				{vk::ImageMemoryBarrier({}, allowed_flags_for_layout(final_layout), final_layout,
-										final_layout, dev.transfer_queue_index().first,
-										dev.graphics_queue_index().first, dst_img,
-										vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers))});
+		image_queue_ownership_transfer(
+				dst_img, final_layout, transfer_command_bufers[current_ring_index].get(),
+				pending_ownership_command_buffers[current_ring_index].get(), dev.transfer_queue_index().first,
+				dev.graphics_queue_index().first, vk::PipelineStageFlagBits::eBottomOfPipe,
+				vk::PipelineStageFlagBits::eAllCommands, {}, allowed_flags_for_layout(final_layout), aspects);
 	}
 }
 
