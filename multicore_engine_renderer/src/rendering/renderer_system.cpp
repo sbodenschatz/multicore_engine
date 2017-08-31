@@ -10,6 +10,7 @@
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/sampler.hpp>
 #include <mce/rendering/renderer_system.hpp>
+#include <mce/rendering/uniforms_structs.hpp>
 
 namespace mce {
 namespace rendering {
@@ -61,7 +62,8 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	*/
 	gs_.graphics_manager().create_pipeline_layout(
 			"forward_opaque", {per_scene_dsl, per_material_dsl},
-			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0, sizeof(glm::mat4))});
+			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0,
+								   sizeof(per_object_push_constants))});
 }
 
 renderer_system::~renderer_system() {}
