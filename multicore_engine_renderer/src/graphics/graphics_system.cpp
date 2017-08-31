@@ -36,18 +36,31 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 							  vk::FenceCreateInfo(vk::FenceCreateFlagBits::eSignaled));
 				  })),
 		  current_swapchain_image_{0}, render_queue_cmd_pool_(device_, device_.graphics_queue_index().first),
-		  present_queue_end_frame_cmd_pool_(device_, device_.transfer_queue_index().first),
+		  present_queue_cmd_pool_(device_, device_.transfer_queue_index().first),
+		  render_queue_start_frame_cmd_buffers_(
+				  window_.swapchain_images().size(), containers::generator_param([this](size_t) {
+					  return render_queue_cmd_pool_.allocate_primary_command_buffer();
+				  })),
 		  render_queue_end_frame_cmd_buffers_(
 				  window_.swapchain_images().size(), containers::generator_param([this](size_t) {
 					  return render_queue_cmd_pool_.allocate_primary_command_buffer();
 				  })),
 		  present_queue_end_frame_cmd_buffers_(
 				  window_.swapchain_images().size(), containers::generator_param([this](size_t) {
-					  return present_queue_end_frame_cmd_pool_.allocate_primary_command_buffer();
+					  return present_queue_cmd_pool_.allocate_primary_command_buffer();
 				  })) {
 	for(uint32_t i = 0; i < window_.swapchain_images().size(); ++i) {
+		render_queue_start_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
 		render_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
 		present_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
+		// TODO Minimize barriers.
+		render_queue_start_frame_cmd_buffers_[i]->pipelineBarrier(
+				vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
+				{base_image::generate_transition_native(
+						window_.swapchain_images()[i], vk::ImageLayout::eUndefined,
+						vk::ImageLayout::eColorAttachmentOptimal, {},
+						allowed_flags_for_layout(vk::ImageLayout::eColorAttachmentOptimal),
+						vk::ImageAspectFlagBits::eColor)});
 		render_queue_end_frame_cmd_buffers_[i]->pipelineBarrier(
 				vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
 				{base_image::generate_transition_native(
@@ -65,6 +78,7 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 					vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
 					~vk::AccessFlags{}, vk::ImageAspectFlagBits::eColor);
 		}
+		render_queue_start_frame_cmd_buffers_[i]->end();
 		render_queue_end_frame_cmd_buffers_[i]->end();
 		present_queue_end_frame_cmd_buffers_[i]->end();
 	}

@@ -47,7 +47,8 @@ class graphics_system : public core::system {
 	std::vector<vk::CommandBuffer> cmd_buff_handles_;
 
 	command_pool render_queue_cmd_pool_;
-	command_pool present_queue_end_frame_cmd_pool_;
+	command_pool present_queue_cmd_pool_;
+	containers::dynamic_array<vk::UniqueCommandBuffer> render_queue_start_frame_cmd_buffers_;
 	containers::dynamic_array<vk::UniqueCommandBuffer> render_queue_end_frame_cmd_buffers_;
 	containers::dynamic_array<vk::UniqueCommandBuffer> present_queue_end_frame_cmd_buffers_;
 
