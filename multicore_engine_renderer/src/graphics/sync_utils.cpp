@@ -61,5 +61,22 @@ void buffer_queue_ownership_transfer(vk::Buffer buffer, vk::CommandBuffer cb_que
 								 {});
 }
 
+void image_queue_ownership_transfer(vk::Image image, vk::ImageLayout layout, vk::CommandBuffer cb_queue_src,
+									vk::CommandBuffer cb_queue_dst, uint32_t queue_family_src,
+									uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
+									vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
+									vk::AccessFlags access_flags_dst, vk::ImageAspectFlags aspects) {
+	cb_queue_src.pipelineBarrier(
+			stage_mask_src, stage_mask_dst, {}, {}, {},
+			{vk::ImageMemoryBarrier(access_flags_src, {}, layout, layout, queue_family_src, queue_family_dst,
+									image, vk::ImageSubresourceRange(aspects, 0, VK_REMAINING_MIP_LEVELS, 0,
+																	 VK_REMAINING_ARRAY_LAYERS))});
+	cb_queue_dst.pipelineBarrier(
+			stage_mask_src, stage_mask_dst, {}, {}, {},
+			{vk::ImageMemoryBarrier({}, access_flags_dst, layout, layout, queue_family_src, queue_family_dst,
+									image, vk::ImageSubresourceRange(aspects, 0, VK_REMAINING_MIP_LEVELS, 0,
+																	 VK_REMAINING_ARRAY_LAYERS))});
+}
+
 } /* namespace graphics */
 } /* namespace mce */

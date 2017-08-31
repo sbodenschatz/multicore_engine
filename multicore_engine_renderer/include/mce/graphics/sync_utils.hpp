@@ -33,6 +33,14 @@ void buffer_queue_ownership_transfer(vk::Buffer buffer, vk::CommandBuffer cb_que
 									 uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
 									 vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
 									 vk::AccessFlags access_flags_dst);
+
+void image_queue_ownership_transfer(vk::Image image, vk::ImageLayout layout, vk::CommandBuffer cb_queue_src,
+									vk::CommandBuffer cb_queue_dst, uint32_t queue_family_src,
+									uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
+									vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
+									vk::AccessFlags access_flags_dst,
+									vk::ImageAspectFlags aspects = vk::ImageAspectFlagBits::eColor);
+
 } /* namespace graphics */
 } /* namespace mce */
 
