@@ -31,7 +31,7 @@ class renderer_system : public core::system {
 	std::shared_ptr<const graphics::sampler> default_sampler_;
 	std::shared_ptr<const graphics::descriptor_set_layout> descriptor_set_layout_per_scene_;
 	std::shared_ptr<const graphics::descriptor_set_layout> descriptor_set_layout_per_material_;
-	std::shared_ptr<const graphics::pipeline_layout> pipeline_layout_forward_opaque_;
+	std::shared_ptr<const graphics::pipeline_layout> pipeline_layout_scene_pass_;
 
 	friend class static_model_component;
 

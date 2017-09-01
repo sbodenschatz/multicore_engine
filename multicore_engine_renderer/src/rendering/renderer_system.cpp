@@ -60,8 +60,8 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 			"per_scene",
 			{{0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eAllGraphics, {}}});
 	*/
-	pipeline_layout_forward_opaque_ = gs_.graphics_manager().create_pipeline_layout(
-			"forward_opaque", {descriptor_set_layout_per_scene_, descriptor_set_layout_per_material_},
+	pipeline_layout_scene_pass_ = gs_.graphics_manager().create_pipeline_layout(
+			"scene_pass", {descriptor_set_layout_per_scene_, descriptor_set_layout_per_material_},
 			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0,
 								   sizeof(per_object_push_constants))});
 }
