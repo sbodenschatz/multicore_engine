@@ -34,6 +34,7 @@ class renderer_system : public core::system {
 	std::shared_ptr<const graphics::pipeline_layout> pipeline_layout_scene_pass_;
 
 	friend class static_model_component;
+	friend class technique;
 
 public:
 	int pre_phase_ordering() const noexcept override {
