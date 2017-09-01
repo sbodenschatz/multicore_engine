@@ -70,12 +70,14 @@ pipeline
     <id>Relation</id>
     <coordinates>
       <x>528</x>
-      <y>66</y>
+      <y>55</y>
       <w>165</w>
-      <h>33</h>
+      <h>55</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>130.0;10.0;10.0;10.0</additional_attributes>
+    <panel_attributes>lt=&lt;-
+m1=1
+</panel_attributes>
+    <additional_attributes>130.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
