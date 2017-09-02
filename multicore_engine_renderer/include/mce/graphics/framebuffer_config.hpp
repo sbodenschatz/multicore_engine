@@ -62,8 +62,8 @@ public:
 	}
 };
 
-/// \brief Represents the parts of a framebuffer (subset of attachments) used by a compatibility equivalence
-/// class of render passes.
+/// \brief Represents the configuration for the parts of a framebuffer (subset of attachments) used by a
+/// compatibility equivalence class of render passes.
 /**
  * The abstraction framebuffer class represents a collection of attachments that can be used by multiple
  * render passes. However in vulkan a framebuffer object can only be used with render passes that are
