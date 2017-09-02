@@ -66,31 +66,41 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 					   return view.apply_visitor(v);
 				   });
 
-	static_cast<void>(compatible_passes);
-	/* TODO Adapt for multiple passes.
-	auto sci_pos_it =
-			std::find_if(config_->attachment_configs().begin(), config_->attachment_configs().end(),
-						 [](const framebuffer_attachment_config& cfg) { return cfg.is_swapchain_image(); });
-	if(sci_pos_it != config_->attachment_configs().end()) {
-		auto sci_pos = std::distance(config_->attachment_configs().begin(), sci_pos_it);
-		for(uint32_t index = 0; index < win.swapchain_image_views().size(); ++index) {
-			views[sci_pos] = win.swapchain_image_views()[index].get();
-			frames_.push_back(
-					framebuffer_frame(index, queued_handle<vk::UniqueFramebuffer>(
-													 dev->createFramebufferUnique(vk::FramebufferCreateInfo(
-															 {}, compatible_pass, uint32_t(views.size()),
-															 views.data(), size_.x, size_.y, 1u)),
-													 destruction_manager),
-									  *this));
+	std::vector<vk::ImageView> pass_views;
+	for(uint32_t pass_i = 0; pass_i < config_->passes().size(); ++pass_i) {
+		const auto& used_attachments = config_->passes()[pass_i].used_attachments();
+		auto sci_pos_it = std::find_if(
+				used_attachments.begin(), used_attachments.end(), [this](uint32_t attachment_index) {
+					return config_->attachment_configs().at(attachment_index).is_swapchain_image();
+				});
+		std::vector<framebuffer_frame> frames;
+		pass_views.clear();
+		pass_views.reserve(used_attachments.size());
+		std::transform(used_attachments.begin(), used_attachments.end(), std::back_inserter(pass_views),
+					   [&views](uint32_t attachment_index) { return views.at(attachment_index); });
+		if(sci_pos_it != used_attachments.end()) {
+			auto sci_pos = std::distance(used_attachments.begin(), sci_pos_it);
+			for(uint32_t index = 0; index < win.swapchain_image_views().size(); ++index) {
+				pass_views[sci_pos] = win.swapchain_image_views()[index].get();
+				frames.push_back(framebuffer_frame(
+						index, queued_handle<vk::UniqueFramebuffer>(
+									   dev->createFramebufferUnique(vk::FramebufferCreateInfo(
+											   {}, compatible_passes.at(pass_i), uint32_t(pass_views.size()),
+											   pass_views.data(), size_.x, size_.y, 1u)),
+									   destruction_manager),
+						*this, pass_i));
+			}
+		} else {
+			frames.push_back(framebuffer_frame(
+					0, queued_handle<vk::UniqueFramebuffer>(
+							   dev->createFramebufferUnique(vk::FramebufferCreateInfo(
+									   {}, compatible_passes.at(pass_i), uint32_t(pass_views.size()),
+									   pass_views.data(), size_.x, size_.y, 1u)),
+							   destruction_manager),
+					*this, pass_i));
 		}
-	} else {
-		frames_.push_back(framebuffer_frame(0, queued_handle<vk::UniqueFramebuffer>(
-													   dev->createFramebufferUnique(vk::FramebufferCreateInfo(
-															   {}, compatible_pass, uint32_t(views.size()),
-															   views.data(), size_.x, size_.y, 1u)),
-													   destruction_manager),
-											*this));
-	}*/
+		passes_.push_back(framebuffer_pass(std::move(frames)));
+	}
 }
 
 framebuffer::~framebuffer() {}
