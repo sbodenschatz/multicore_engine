@@ -62,21 +62,39 @@ public:
 	}
 };
 
+class framebuffer_pass_config {
+	std::vector<uint32_t> used_attachments_;
+
+public:
+	framebuffer_pass_config(std::vector<uint32_t> used_attachments)
+			: used_attachments_{std::move(used_attachments)} {}
+
+	const std::vector<uint32_t>& used_attachments() const {
+		return used_attachments_;
+	}
+};
+
 /// Describes the configuration for a framebuffer (composed of framebuffer_attachment_config entries).
 class framebuffer_config {
 	std::vector<framebuffer_attachment_config> attachment_configs_;
+	std::vector<framebuffer_pass_config> passes_;
 
 	friend class window;
 
 public:
 	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
 	// cppcheck-suppress passedByValue
-	explicit framebuffer_config(std::vector<framebuffer_attachment_config> attachment_configs)
-			: attachment_configs_{std::move(attachment_configs)} {}
+	explicit framebuffer_config(std::vector<framebuffer_attachment_config> attachment_configs,
+								std::vector<framebuffer_pass_config> passes)
+			: attachment_configs_{std::move(attachment_configs)}, passes_{std::move(passes)} {}
 
 	/// Allows access to the framebuffer_attachment_config entries.
 	const std::vector<framebuffer_attachment_config>& attachment_configs() const {
 		return attachment_configs_;
+	}
+
+	const std::vector<framebuffer_pass_config>& passes() const {
+		return passes_;
 	}
 };
 

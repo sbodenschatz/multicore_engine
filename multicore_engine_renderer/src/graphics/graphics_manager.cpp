@@ -45,23 +45,25 @@ graphics_manager::create_descriptor_set_layout(const std::string& name,
 std::shared_ptr<const framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name,
 											// cppcheck-suppress passedByValue
-											std::vector<framebuffer_attachment_config> attachment_configs) {
+											std::vector<framebuffer_attachment_config> attachment_configs,
+											std::vector<framebuffer_pass_config> passes) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
-	entry = std::make_shared<framebuffer_config>(std::move(attachment_configs));
+	entry = std::make_shared<framebuffer_config>(std::move(attachment_configs), std::move(passes));
 	return entry;
 }
 
 std::shared_ptr<const framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name, window& swapchain_window,
 											// cppcheck-suppress passedByValue
-											std::vector<framebuffer_attachment_config> attachment_configs) {
+											std::vector<framebuffer_attachment_config> attachment_configs,
+											std::vector<framebuffer_pass_config> passes) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
 	entry = std::make_shared<framebuffer_config>(
-			swapchain_window.make_framebuffer_config(std::move(attachment_configs)));
+			swapchain_window.make_framebuffer_config(std::move(attachment_configs), std::move(passes)));
 	return entry;
 }
 
@@ -103,17 +105,18 @@ std::shared_ptr<const render_pass> graphics_manager::create_render_pass(
 		// cppcheck-suppress passedByValue
 		const std::string& name, std::shared_ptr<const subpass_graph> subpasses,
 		// cppcheck-suppress passedByValue
-		std::shared_ptr<const framebuffer_config> fb_config,
+		std::shared_ptr<const framebuffer_config> fb_config, uint32_t fb_pass_config,
 		vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = render_passes_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");
 	entry = std::make_shared<render_pass>(*dev_, dqm_, std::move(subpasses), std::move(fb_config),
-										  attachment_access_modes);
+										  fb_pass_config, attachment_access_modes);
 	return entry;
 }
 std::shared_ptr<const render_pass> graphics_manager::create_render_pass(
 		const std::string& name, const std::string& subpass_graph_name, const std::string& fb_config_name,
+		uint32_t fb_pass_config,
 		vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = render_passes_[name];
@@ -124,15 +127,15 @@ std::shared_ptr<const render_pass> graphics_manager::create_render_pass(
 	auto fbcfg_it = framebuffer_configs_.find(fb_config_name);
 	if(fbcfg_it == framebuffer_configs_.end() || !(fbcfg_it->second))
 		throw mce::key_not_found_exception("Framebuffer config '" + fb_config_name + "' not found.");
-	entry = std::make_shared<render_pass>(*dev_, dqm_, subpasses_it->second, fbcfg_it->second,
+	entry = std::make_shared<render_pass>(*dev_, dqm_, subpasses_it->second, fbcfg_it->second, fb_pass_config,
 										  attachment_access_modes);
 	return entry;
 }
 std::shared_ptr<const subpass_graph>
-// cppcheck-suppress passedByValue
-graphics_manager::create_subpass_graph(const std::string& name, std::vector<subpass_entry> subpasses,
-									   // cppcheck-suppress passedByValue
-									   std::vector<vk::SubpassDependency> dependencies) {
+		// cppcheck-suppress passedByValue
+		graphics_manager::create_subpass_graph(const std::string& name, std::vector<subpass_entry> subpasses,
+											   // cppcheck-suppress passedByValue
+											   std::vector<vk::SubpassDependency> dependencies) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = subpass_graphs_[name];
 	if(entry) throw mce::key_already_used_exception("The given name is already in use.");

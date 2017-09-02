@@ -37,6 +37,7 @@ class descriptor_set_layout;
 class sampler;
 class destruction_queue_manager;
 class framebuffer_attachment_config;
+class framebuffer_pass_config;
 struct descriptor_set_layout_binding_element;
 class sampler_addressing_mode;
 struct subpass_entry;
@@ -128,13 +129,15 @@ public:
 	/// the given name.
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name,
-							  std::vector<framebuffer_attachment_config> attachment_configs);
+							  std::vector<framebuffer_attachment_config> attachment_configs,
+							  std::vector<framebuffer_pass_config> passes);
 
 	/// \brief Creates a framebuffer_config containing a config for a swapchain attachment from the given
 	/// window and the given attachment configurations and stores it under the given name.
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name, window& swapchain_window,
-							  std::vector<framebuffer_attachment_config> attachment_configs);
+							  std::vector<framebuffer_attachment_config> attachment_configs,
+							  std::vector<framebuffer_pass_config> passes);
 
 	/// \brief Creates a pipeline_layout consisting of the given descriptor_set_layout objects and using the
 	/// given push_constant_ranges and stores it under the given name.
@@ -179,7 +182,7 @@ public:
 	/// modes and stores it under the given name.
 	std::shared_ptr<const render_pass>
 	create_render_pass(const std::string& name, std::shared_ptr<const subpass_graph> subpasses,
-					   std::shared_ptr<const framebuffer_config> fb_config,
+					   std::shared_ptr<const framebuffer_config> fb_config, uint32_t fb_pass_config,
 					   vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 	/// \brief Creates a render_pass using the subpass_graph and framebuffer_config with the given names and
 	/// the given attachment access modes and stores it under the given name.
@@ -189,7 +192,7 @@ public:
 	 */
 	std::shared_ptr<const render_pass>
 	create_render_pass(const std::string& name, const std::string& subpass_graph_name,
-					   const std::string& fb_config_name,
+					   const std::string& fb_config_name, uint32_t fb_pass_config,
 					   vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 
 	/// Releases ownership of the descriptor_set_layout object with the given name.

@@ -106,7 +106,7 @@ public:
 	 */
 	render_pass(device& device_, destruction_queue_manager* dqm,
 				std::shared_ptr<const subpass_graph> subpasses,
-				std::shared_ptr<const framebuffer_config> fb_config,
+				std::shared_ptr<const framebuffer_config> fb_config, uint32_t fb_pass_config,
 				vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 	/// Destroys the render_pass and releases the wrapped native render_pass to the destruction_queue_manager.
 	~render_pass();

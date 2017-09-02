@@ -33,13 +33,16 @@ class framebuffer_frame {
 	uint32_t swapchain_image_index_;
 	queued_handle<vk::UniqueFramebuffer> native_framebuffer_;
 	framebuffer* owner_;
+	uint32_t owning_pass_;
 
 	framebuffer_frame(uint32_t swapchain_image_index, queued_handle<vk::UniqueFramebuffer> native_framebuffer,
-					  framebuffer& owner_)
+					  framebuffer& owner_, uint32_t owning_pass)
 			: swapchain_image_index_{swapchain_image_index},
-			  native_framebuffer_{std::move(native_framebuffer)}, owner_{&owner_} {}
+			  native_framebuffer_{std::move(native_framebuffer)}, owner_{&owner_}, owning_pass_{owning_pass} {
+	}
 
 	friend class framebuffer;
+	friend class framebuffer_pass;
 
 public:
 	/// Allows access to the native vulkan framebuffer.
@@ -61,6 +64,24 @@ public:
 	framebuffer& owner() {
 		return *owner_;
 	}
+
+	uint32_t owning_pass() const {
+		return owning_pass_;
+	}
+};
+
+class framebuffer_pass {
+	std::vector<framebuffer_frame> frames_;
+
+	framebuffer_pass(std::vector<framebuffer_frame> frames) : frames_{std::move(frames)} {}
+
+	friend class framebuffer;
+
+public:
+	/// Returns the associated framebuffer_frame objects.
+	const std::vector<framebuffer_frame>& frames() const {
+		return frames_;
+	}
 };
 
 /// \brief Encapsulates the management of a framebuffer consisting of (optionally) a number of swapchain
@@ -74,7 +95,7 @@ private:
 	std::vector<image_var> attachments_;
 	std::vector<image_view_var> attachment_views_;
 	std::shared_ptr<const framebuffer_config> config_;
-	std::vector<framebuffer_frame> frames_;
+	std::vector<framebuffer_pass> passes_;
 
 	class imgview_visitor : public boost::static_visitor<> {
 		framebuffer* fb;
@@ -117,9 +138,13 @@ public:
 	/// to be compatible with the given render pass.
 	framebuffer(device& dev, window& win, device_memory_manager_interface& mem_mgr,
 				destruction_queue_manager* destruction_manager,
-				std::shared_ptr<const framebuffer_config> config, vk::RenderPass compatible_pass);
+				std::shared_ptr<const framebuffer_config> config,
+				std::vector<vk::RenderPass> compatible_passes);
 	/// Destroys the framebuffer and releases the resources to the destruction_manager given on construction.
 	~framebuffer();
+
+	framebuffer(const framebuffer&) = delete;
+	framebuffer& operator=(const framebuffer&) = delete;
 
 	/// Allows access to the framebuffer_config describing the structure of the framebuffer.
 	const std::shared_ptr<const framebuffer_config>& config() const {
@@ -129,11 +154,6 @@ public:
 	/// Returns the size of the framebuffer.
 	const glm::uvec2& size() const {
 		return size_;
-	}
-
-	/// Returns the associated framebuffer_frame objects.
-	const std::vector<framebuffer_frame>& frames() const {
-		return frames_;
 	}
 
 	/// Returns the attachments of the framebuffer.
@@ -150,6 +170,10 @@ public:
 	 */
 	const std::vector<image_view_var>& attachment_views() const {
 		return attachment_views_;
+	}
+
+	const std::vector<framebuffer_pass>& passes() const {
+		return passes_;
 	}
 };
 

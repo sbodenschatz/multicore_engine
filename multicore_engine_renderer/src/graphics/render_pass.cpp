@@ -20,7 +20,7 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 						 // cppcheck-suppress passedByValue
 						 std::shared_ptr<const subpass_graph> subpasses,
 						 // cppcheck-suppress passedByValue
-						 std::shared_ptr<const framebuffer_config> fb_config,
+						 std::shared_ptr<const framebuffer_config> fb_config, uint32_t fb_pass_config,
 						 vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes)
 		: device_(device_), subpasses_{std::move(subpasses)}, fb_config_{std::move(fb_config)} {
 
@@ -30,6 +30,8 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 	}
 
 	boost::container::small_vector<vk::AttachmentDescription, 16> att_desc;
+	static_cast<void>(fb_pass_config);
+	/* TODO Adapt for multiple passes.
 	for(uint32_t i = 0; i < fb_config_->attachment_configs().size(); ++i) {
 		vk::AttachmentDescription ad;
 		ad.flags = fb_config_->attachment_configs()[i].flags();
@@ -43,6 +45,8 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 		ad.stencilStoreOp = attachment_access_modes.data()[i].stencil_store_op;
 		att_desc.push_back(ad);
 	}
+	*/
+
 	if(std::any_of(subpasses_->subpasses().begin(), subpasses_->subpasses().end(),
 				   [](const subpass_entry& e) {
 					   return !((e.color.size() == e.resolve.size()) || (e.resolve.size() == 0));

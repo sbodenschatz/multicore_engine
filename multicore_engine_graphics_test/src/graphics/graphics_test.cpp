@@ -55,7 +55,8 @@ graphics_test::graphics_test()
 	fbcfg_ = gmgr_.create_framebuffer_config(
 			"test_fbcfg", win_,
 			{framebuffer_attachment_config(dev_.best_supported_depth_attachment_format(),
-										   image_aspect_mode::depth)});
+										   image_aspect_mode::depth)},
+			{framebuffer_pass_config({0})});
 	sampler_ = gmgr_.create_sampler("test_sampler", vk::Filter::eLinear, vk::Filter::eLinear,
 									vk::SamplerMipmapMode::eLinear,
 									sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, 16.0f, {},
@@ -82,7 +83,7 @@ graphics_test::graphics_test()
 						   {}}},
 			{});
 	rp_ = gmgr_.create_render_pass(
-			"test_rp", spg_, fbcfg_,
+			"test_rp", spg_, fbcfg_, 0,
 			{render_pass_attachment_access{vk::ImageLayout::eUndefined, vk::ImageLayout::ePresentSrcKHR,
 										   vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eStore,
 										   vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare},
@@ -153,7 +154,8 @@ graphics_test::graphics_test()
 	pl_ = gmgr_.find_pipeline("test_pl");
 	plc2_ = gmgr_.find_pipeline_config("test_pl2");
 	pl2_ = gmgr_.find_pipeline("test_pl2");
-	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_, rp_->native_render_pass());
+	fb_ = std::make_unique<framebuffer>(dev_, win_, mem_mgr_, &dqm_, fbcfg_,
+										std::vector<vk::RenderPass>({rp_->native_render_pass()}));
 	vertex vertices[] = {{{0.0f, -1.0f, 0.2f}, {1.0f, 0.0f, 0.0f}}, {{-1.0f, 1.0f, 0.2f}, {0.0f, 1.0f, 0.0f}},
 						 {{1.0f, 1.0f, 0.2f}, {0.0f, 0.0f, 1.0f}},
 
@@ -225,7 +227,8 @@ void graphics_test::run() {
 				vk::ClearDepthStencilValue(1.0f)};
 		render_cmb_buf->beginRenderPass(
 				vk::RenderPassBeginInfo(
-						rp_->native_render_pass(), fb_->frames()[img_index].native_framebuffer(),
+						rp_->native_render_pass(),
+						fb_->passes().at(0).frames()[img_index].native_framebuffer(),
 						vk::Rect2D({0, 0}, {win_.swapchain_size().x, win_.swapchain_size().y}), 2, clear),
 				vk::SubpassContents::eInline);
 		if(mdl_->ready() && mat_->ready()) {

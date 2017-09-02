@@ -15,7 +15,8 @@ namespace graphics {
 framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interface& mem_mgr,
 						 destruction_queue_manager* destruction_manager,
 						 // cppcheck-suppress passedByValue
-						 std::shared_ptr<const framebuffer_config> config, vk::RenderPass compatible_pass)
+						 std::shared_ptr<const framebuffer_config> config,
+						 std::vector<vk::RenderPass> compatible_passes)
 		: dev_{&dev}, win_{&win}, size_{win.glfw_window().framebuffer_size()}, config_{std::move(config)} {
 	if(std::count_if(config_->attachment_configs().begin(), config_->attachment_configs().end(),
 					 [](const framebuffer_attachment_config& cfg) { return cfg.is_swapchain_image(); }) > 1)
@@ -63,6 +64,9 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 					   view_visitor v;
 					   return view.apply_visitor(v);
 				   });
+
+	static_cast<void>(compatible_passes);
+	/* TODO Adapt for multiple passes.
 	auto sci_pos_it =
 			std::find_if(config_->attachment_configs().begin(), config_->attachment_configs().end(),
 						 [](const framebuffer_attachment_config& cfg) { return cfg.is_swapchain_image(); });
@@ -85,7 +89,7 @@ framebuffer::framebuffer(device& dev, window& win, device_memory_manager_interfa
 															   views.data(), size_.x, size_.y, 1u)),
 													   destruction_manager),
 											*this));
-	}
+	}*/
 }
 
 framebuffer::~framebuffer() {}
