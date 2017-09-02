@@ -56,7 +56,7 @@ graphics_test::graphics_test()
 			"test_fbcfg", win_,
 			{framebuffer_attachment_config(dev_.best_supported_depth_attachment_format(),
 										   image_aspect_mode::depth)},
-			{framebuffer_pass_config({0})});
+			{framebuffer_pass_config({0, 1})});
 	sampler_ = gmgr_.create_sampler("test_sampler", vk::Filter::eLinear, vk::Filter::eLinear,
 									vk::SamplerMipmapMode::eLinear,
 									sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, 16.0f, {},
