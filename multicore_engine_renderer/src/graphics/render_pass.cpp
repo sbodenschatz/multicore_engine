@@ -30,12 +30,12 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 	}
 
 	boost::container::small_vector<vk::AttachmentDescription, 16> att_desc;
-	static_cast<void>(fb_pass_config);
-	/* TODO Adapt for multiple passes.
-	for(uint32_t i = 0; i < fb_config_->attachment_configs().size(); ++i) {
+	const auto& used_attachments = fb_config_->passes().at(fb_pass_config).used_attachments();
+	for(uint32_t i = 0; i < used_attachments.size(); ++i) {
+		auto index = used_attachments.at(i);
 		vk::AttachmentDescription ad;
-		ad.flags = fb_config_->attachment_configs()[i].flags();
-		ad.format = fb_config_->attachment_configs()[i].format();
+		ad.flags = fb_config_->attachment_configs()[index].flags();
+		ad.format = fb_config_->attachment_configs()[index].format();
 		ad.samples = vk::SampleCountFlagBits::e1;
 		ad.initialLayout = attachment_access_modes.data()[i].initial_layout;
 		ad.finalLayout = attachment_access_modes.data()[i].final_layout;
@@ -45,7 +45,6 @@ render_pass::render_pass(device& device_, destruction_queue_manager* dqm,
 		ad.stencilStoreOp = attachment_access_modes.data()[i].stencil_store_op;
 		att_desc.push_back(ad);
 	}
-	*/
 
 	if(std::any_of(subpasses_->subpasses().begin(), subpasses_->subpasses().end(),
 				   [](const subpass_entry& e) {
