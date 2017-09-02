@@ -73,7 +73,8 @@ public:
 class framebuffer_pass {
 	std::vector<framebuffer_frame> frames_;
 
-	framebuffer_pass(std::vector<framebuffer_frame> frames) : frames_{std::move(frames)} {}
+	// cppcheck-suppress passedByValue
+	explicit framebuffer_pass(std::vector<framebuffer_frame> frames) : frames_{std::move(frames)} {}
 
 	friend class framebuffer;
 

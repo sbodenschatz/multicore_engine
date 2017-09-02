@@ -66,7 +66,8 @@ class framebuffer_pass_config {
 	std::vector<uint32_t> used_attachments_;
 
 public:
-	framebuffer_pass_config(std::vector<uint32_t> used_attachments)
+	// cppcheck-suppress passedByValue
+	explicit framebuffer_pass_config(std::vector<uint32_t> used_attachments)
 			: used_attachments_{std::move(used_attachments)} {}
 
 	const std::vector<uint32_t>& used_attachments() const {
@@ -85,6 +86,7 @@ public:
 	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
 	// cppcheck-suppress passedByValue
 	explicit framebuffer_config(std::vector<framebuffer_attachment_config> attachment_configs,
+								// cppcheck-suppress passedByValue
 								std::vector<framebuffer_pass_config> passes)
 			: attachment_configs_{std::move(attachment_configs)}, passes_{std::move(passes)} {}
 

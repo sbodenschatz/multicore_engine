@@ -46,6 +46,7 @@ std::shared_ptr<const framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name,
 											// cppcheck-suppress passedByValue
 											std::vector<framebuffer_attachment_config> attachment_configs,
+											// cppcheck-suppress passedByValue
 											std::vector<framebuffer_pass_config> passes) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
@@ -58,6 +59,7 @@ std::shared_ptr<const framebuffer_config>
 graphics_manager::create_framebuffer_config(const std::string& name, window& swapchain_window,
 											// cppcheck-suppress passedByValue
 											std::vector<framebuffer_attachment_config> attachment_configs,
+											// cppcheck-suppress passedByValue
 											std::vector<framebuffer_pass_config> passes) {
 	std::lock_guard<std::mutex> lock(manager_mutex_);
 	auto& entry = framebuffer_configs_[name];
