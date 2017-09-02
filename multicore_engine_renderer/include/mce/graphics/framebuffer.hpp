@@ -65,11 +65,23 @@ public:
 		return *owner_;
 	}
 
+	/// Indicates in which pass of the owning framebuffer object this framebuffer_frame is used.
 	uint32_t owning_pass() const {
 		return owning_pass_;
 	}
 };
 
+/// \brief Represents the parts of a framebuffer (subset of attachments) used by a compatibility equivalence
+/// class of render passes.
+/**
+ * The abstraction framebuffer class represents a collection of attachments that can be used by multiple
+ * render passes. However in vulkan a framebuffer object can only be used with render passes that are
+ * compatible with the one they were constructed for. This essentially limits a framebuffer to use with render
+ * passes that use the same set of attachments of the framebuffer as the same attachment type.
+ * Therefore the framebuffer object contains multiple framebuffer_pass objects. These take a subset of the
+ * attachments in the high-level framebuffer and creates a vulkan framebuffer for that subset (or one for each
+ * swapchain image if it contains a swapchain image attachment).
+ */
 class framebuffer_pass {
 	std::vector<framebuffer_frame> frames_;
 
@@ -173,6 +185,7 @@ public:
 		return attachment_views_;
 	}
 
+	/// Allows access to the framebuffer_pass objects in this framebuffer.
 	const std::vector<framebuffer_pass>& passes() const {
 		return passes_;
 	}
