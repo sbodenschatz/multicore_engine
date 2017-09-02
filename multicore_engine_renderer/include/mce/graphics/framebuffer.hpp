@@ -86,8 +86,8 @@ public:
 };
 
 /// \brief Encapsulates the management of a framebuffer consisting of (optionally) a number of swapchain
-/// images, a number of additional attachment images and framebuffer_frames holding the native vulkan
-/// framebuffers.
+/// images, a number of additional attachment images and framebuffer_pass objects representing the parts of
+/// the buffer used for a specific render_pass.
 class framebuffer {
 private:
 	device* dev_;

@@ -99,8 +99,8 @@ private:
 	std::shared_ptr<const framebuffer_config> fb_config_;
 
 public:
-	/// \brief Creates a render_pass on the given device with the given subpass and framebuffer structure and
-	/// using the given destruction_queue_manager.
+	/// \brief Creates a render_pass on the given device with the given subpass and framebuffer structure,
+	/// framebuffer pass index and using the given destruction_queue_manager.
 	/**
 	 * The created object participates in ownership of the given subpass_graph and framebuffer_config.
 	 */

@@ -28,7 +28,7 @@ class framebuffer_attachment_config {
 	friend class window;
 
 public:
-	/// Constructs a framebuffer_attachment_config with the given parameters for a non-swapchain-image
+	/// \brief Constructs a framebuffer_attachment_config with the given parameters for a non-swapchain-image
 	/// attachment.
 	/**
 	 * A framebuffer_attachment_config object for a swapchain-image can only be created by the window managing
@@ -75,7 +75,8 @@ public:
 	}
 };
 
-/// Describes the configuration for a framebuffer (composed of framebuffer_attachment_config entries).
+/// \brief Describes the configuration for a framebuffer (composed of framebuffer_attachment_config and
+/// framebuffer_pass_config entries).
 class framebuffer_config {
 	std::vector<framebuffer_attachment_config> attachment_configs_;
 	std::vector<framebuffer_pass_config> passes_;
@@ -83,7 +84,8 @@ class framebuffer_config {
 	friend class window;
 
 public:
-	/// Constructs a framebuffer_config from the given framebuffer_attachment_config entries.
+	/// \brief Constructs a framebuffer_config from the given framebuffer_attachment_config and
+	/// framebuffer_pass_config entries.
 	// cppcheck-suppress passedByValue
 	explicit framebuffer_config(std::vector<framebuffer_attachment_config> attachment_configs,
 								// cppcheck-suppress passedByValue

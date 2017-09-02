@@ -125,15 +125,15 @@ public:
 	create_descriptor_set_layout(const std::string& name,
 								 std::vector<descriptor_set_layout_binding_element> bindings);
 
-	/// \brief Creates a framebuffer_config containing the given attachment configurations and stores it under
-	/// the given name.
+	/// \brief Creates a framebuffer_config containing the given attachment and pass configurations and stores
+	/// it under the given name.
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name,
 							  std::vector<framebuffer_attachment_config> attachment_configs,
 							  std::vector<framebuffer_pass_config> passes);
 
 	/// \brief Creates a framebuffer_config containing a config for a swapchain attachment from the given
-	/// window and the given attachment configurations and stores it under the given name.
+	/// window and the given attachment and pass configurations and stores it under the given name.
 	std::shared_ptr<const framebuffer_config>
 	create_framebuffer_config(const std::string& name, window& swapchain_window,
 							  std::vector<framebuffer_attachment_config> attachment_configs,
@@ -178,14 +178,14 @@ public:
 	std::shared_ptr<const shader_module> create_shader_module(const std::string& name,
 															  const asset::asset& ready_shader_binary_asset);
 
-	/// \brief Creates a render_pass using the given subpass_graph, framebuffer_config and attachment access
-	/// modes and stores it under the given name.
+	/// \brief Creates a render_pass using the given subpass_graph, framebuffer_config, framebuffer pass index
+	/// and attachment access modes and stores it under the given name.
 	std::shared_ptr<const render_pass>
 	create_render_pass(const std::string& name, std::shared_ptr<const subpass_graph> subpasses,
 					   std::shared_ptr<const framebuffer_config> fb_config, uint32_t fb_pass_config,
 					   vk::ArrayProxy<const render_pass_attachment_access> attachment_access_modes);
 	/// \brief Creates a render_pass using the subpass_graph and framebuffer_config with the given names and
-	/// the given attachment access modes and stores it under the given name.
+	/// the given attachment access modes and framebuffer pass index and stores it under the given name.
 	/**
 	 * Avoids the overhead of separately retrieving the subpass_graph and framebuffer_config up-front, taking
 	 * a lock for each access.
