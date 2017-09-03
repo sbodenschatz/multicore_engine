@@ -20,6 +20,7 @@ namespace graphics {
 class instance;
 class device;
 class framebuffer_attachment_config;
+class framebuffer_pass_config;
 class framebuffer_config;
 
 /// Implements the window handling for the graphics subsystem.
@@ -52,7 +53,8 @@ public:
 	/// \brief Creates a framebuffer_config containing a swapchain image from the swapchain belonging to this
 	/// window as the first element.
 	framebuffer_config
-	make_framebuffer_config(std::vector<framebuffer_attachment_config> additional_attachments);
+	make_framebuffer_config(std::vector<framebuffer_attachment_config> additional_attachments,
+							std::vector<framebuffer_pass_config> passes);
 
 	/// Returns the vulkan surface held by this window.
 	const vk::SurfaceKHR& surface() const {
