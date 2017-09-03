@@ -7,6 +7,7 @@
 #include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
+#include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/sampler.hpp>
 #include <mce/rendering/renderer_system.hpp>
@@ -64,6 +65,11 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 			"scene_pass", {descriptor_set_layout_per_scene_, descriptor_set_layout_per_material_},
 			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0,
 								   sizeof(per_object_push_constants))});
+	auto main_fbcfg = gs_.graphics_manager().create_framebuffer_config(
+			"main_fbcfg", gs_.window(),
+			{graphics::framebuffer_attachment_config(gs_.device().best_supported_depth_attachment_format(),
+													 graphics::image_aspect_mode::depth)},
+			{graphics::framebuffer_pass_config({0, 1})});
 }
 
 renderer_system::~renderer_system() {}
