@@ -7,9 +7,18 @@
 #ifndef MCE_GRAPHICS_SHADER_LOADER_HPP_
 #define MCE_GRAPHICS_SHADER_LOADER_HPP_
 
+#include <boost/container/flat_map.hpp>
+#include <condition_variable>
+#include <mutex>
+#include <string>
+
 namespace mce {
+namespace asset {
+class asset_manager;
+} // namespace asset
 namespace graphics {
 class shader_module;
+class graphics_manager;
 
 class shader_loader {
 	asset::asset_manager& amgr;
