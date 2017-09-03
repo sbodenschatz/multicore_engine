@@ -7,6 +7,11 @@
 #ifndef MCE_RENDERING_RENDERER_STATE_HPP_
 #define MCE_RENDERING_RENDERER_STATE_HPP_
 
+/**
+ * \file
+ * Defines the renderer_state class.
+ */
+
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/core/system_state.hpp>
@@ -21,6 +26,11 @@ class entity_manager;
 } // namespace entity
 namespace rendering {
 
+/// Provides the game_state specific data management for the renderer_system.
+/**
+ * Keeps the component objects for the renderer_system bound to the entities in the state to which the
+ * renderer_state is bound.
+ */
 class renderer_state : public core::system_state {
 	containers::smart_object_pool<camera_component, 64> camera_comps;
 	containers::smart_object_pool<point_light_component> point_light_comps;
@@ -29,24 +39,33 @@ class renderer_state : public core::system_state {
 public:
 	ALIGNED_NEW_AND_DELETE(renderer_state)
 
+	/// Creates the renderer_state for the given system (must be a pointer to a renderer_system object).
+	/**
+	 * Should be called by core::game_state::add_system_state.
+	 */
 	explicit renderer_state(core::system* sys);
+	/// Destroys the renderer_state and releases the used resources.
 	~renderer_state();
 
+	/// Creates a camera_component for the given entity and using the given configuration.
 	containers::smart_pool_ptr<camera_component>
 	create_camera_component(entity::entity& owner, const entity::component_configuration& configuration) {
 		return camera_comps.emplace(owner, configuration);
 	}
+	/// Creates a point_light_component for the given entity and using the given configuration.
 	containers::smart_pool_ptr<point_light_component>
 	create_point_light_component(entity::entity& owner,
 								 const entity::component_configuration& configuration) {
 		return point_light_comps.emplace(owner, configuration);
 	}
+	/// Creates a static_model_component for the given entity and using the given configuration.
 	containers::smart_pool_ptr<static_model_component>
 	create_static_model_component(renderer_state& sys, entity::entity& owner,
 								  const entity::component_configuration& configuration) {
 		return static_model_comps.emplace(sys, owner, configuration);
 	}
 
+	/// Registers the component types managed by renderer_state to the given entity_manager object.
 	void register_to_entity_manager(entity::entity_manager& em);
 };
 
