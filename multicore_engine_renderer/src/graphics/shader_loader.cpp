@@ -10,11 +10,12 @@ namespace mce {
 namespace graphics {
 
 shader_loader::shader_loader(asset::asset_manager& amgr, graphics_manager& gmgr)
-		: amgr{amgr}, gmgr{gmgr}, pending_loads{0} {
-	// TODO Auto-generated constructor stub
-}
+		: amgr{amgr}, gmgr{gmgr}, pending_loads{0} {}
 
-shader_loader::~shader_loader() {}
+shader_loader::~shader_loader() {
+	std::unique_lock<std::mutex> lock(shaders_mtx);
+	shaders_cv.wait(lock, [this]() { return pending_loads == 0; });
+}
 
 } /* namespace graphics */
 } /* namespace mce */
