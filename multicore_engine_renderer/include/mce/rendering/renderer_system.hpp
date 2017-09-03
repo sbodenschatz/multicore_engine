@@ -26,6 +26,7 @@ class sampler;
 class descriptor_set_layout;
 class pipeline_layout;
 class render_pass;
+class framebuffer;
 } // namespace graphics
 namespace rendering {
 
@@ -40,6 +41,7 @@ class renderer_system : public core::system {
 	std::shared_ptr<const graphics::descriptor_set_layout> descriptor_set_layout_per_material_;
 	std::shared_ptr<const graphics::pipeline_layout> pipeline_layout_scene_pass_;
 	std::shared_ptr<const graphics::render_pass> main_render_pass_;
+	std::unique_ptr<graphics::framebuffer> main_framebuffer_;
 
 	friend class static_model_component;
 	friend class technique;

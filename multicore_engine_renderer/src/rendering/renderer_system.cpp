@@ -7,6 +7,7 @@
 #include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
+#include <mce/graphics/framebuffer.hpp>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/render_pass.hpp>
@@ -90,6 +91,9 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 					 vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthStencilAttachmentOptimal,
 					 vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eDontCare,
 					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare}});
+	main_framebuffer_ = std::make_unique<graphics::framebuffer>(
+			gs_.device(), gs_.window(), gs_.memory_manager(), &(gs_.destruction_queue_manager()), main_fbcfg,
+			std::vector<vk::RenderPass>{main_render_pass_->native_render_pass()});
 }
 
 renderer_system::~renderer_system() {}
