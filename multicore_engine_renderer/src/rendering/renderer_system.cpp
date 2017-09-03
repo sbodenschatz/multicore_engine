@@ -9,6 +9,7 @@
 #include <mce/graphics/descriptor_set_layout.hpp>
 #include <mce/graphics/framebuffer_config.hpp>
 #include <mce/graphics/graphics_system.hpp>
+#include <mce/graphics/render_pass.hpp>
 #include <mce/graphics/sampler.hpp>
 #include <mce/rendering/renderer_system.hpp>
 #include <mce/rendering/uniforms_structs.hpp>
@@ -70,6 +71,15 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 			{graphics::framebuffer_attachment_config(gs_.device().best_supported_depth_attachment_format(),
 													 graphics::image_aspect_mode::depth)},
 			{graphics::framebuffer_pass_config({0, 1})});
+	auto main_spg = gs_.graphics_manager().create_subpass_graph(
+			"main_spg",
+			{graphics::subpass_entry{
+					{},
+					{vk::AttachmentReference(0, vk::ImageLayout::eColorAttachmentOptimal)},
+					{},
+					vk::AttachmentReference(1, vk::ImageLayout::eDepthStencilAttachmentOptimal),
+					{}}},
+			{});
 }
 
 renderer_system::~renderer_system() {}
