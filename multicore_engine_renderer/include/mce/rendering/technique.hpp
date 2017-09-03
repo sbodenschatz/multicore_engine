@@ -29,7 +29,8 @@ class technique {
 
 public:
 	technique(core::engine& eng, renderer_system& sys, std::string name, graphics::window& swapchain_window,
-			  std::vector<graphics::framebuffer_attachment_config> attachment_configs);
+			  std::vector<graphics::framebuffer_attachment_config> attachment_configs,
+			  std::vector<graphics::framebuffer_pass_config> passes);
 	~technique();
 };
 

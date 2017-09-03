@@ -14,10 +14,11 @@ namespace rendering {
 
 technique::technique(core::engine& eng, renderer_system& sys, std::string name,
 					 graphics::window& swapchain_window,
-					 std::vector<graphics::framebuffer_attachment_config> attachment_configs)
+					 std::vector<graphics::framebuffer_attachment_config> attachment_configs,
+					 std::vector<graphics::framebuffer_pass_config> passes)
 		: eng{eng}, sys{sys}, name_{std::move(name)} {
 	framebuffer_config_ = sys.gs_.graphics_manager().create_framebuffer_config(
-			name_ + "_fbcfg", swapchain_window, std::move(attachment_configs));
+			name_ + "_fbcfg", swapchain_window, std::move(attachment_configs), std::move(passes));
 }
 
 technique::~technique() {}
