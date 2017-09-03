@@ -80,6 +80,16 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 					vk::AttachmentReference(1, vk::ImageLayout::eDepthStencilAttachmentOptimal),
 					{}}},
 			{});
+	main_render_pass_ = gs.graphics_manager().create_render_pass(
+			"main_rp", main_spg, main_fbcfg, 0,
+			{graphics::render_pass_attachment_access{
+					 vk::ImageLayout::eUndefined, vk::ImageLayout::eColorAttachmentOptimal,
+					 vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eStore,
+					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare},
+			 graphics::render_pass_attachment_access{
+					 vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthStencilAttachmentOptimal,
+					 vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eDontCare,
+					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare}});
 }
 
 renderer_system::~renderer_system() {}
