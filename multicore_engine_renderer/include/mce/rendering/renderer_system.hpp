@@ -7,6 +7,11 @@
 #ifndef MCE_RENDERING_RENDERER_SYSTEM_HPP_
 #define MCE_RENDERING_RENDERER_SYSTEM_HPP_
 
+/**
+ * \file
+ * Defines the renderer_system class.
+ */
+
 #include <mce/core/system.hpp>
 #include <mce/rendering/material_manager.hpp>
 #include <mce/rendering/model_manager.hpp>
@@ -23,6 +28,7 @@ class pipeline_layout;
 } // namespace graphics
 namespace rendering {
 
+/// Provides the high-level rendering functionality for entities in a scene for the engine.
 class renderer_system : public core::system {
 	graphics::graphics_system& gs_;
 	model_manager mdl_mgr;
@@ -37,17 +43,27 @@ class renderer_system : public core::system {
 	friend class technique;
 
 public:
+	/// Returns the phase ordering index for pre hooks for this system.
 	int pre_phase_ordering() const noexcept override {
 		return 0x1200;
 	}
+	/// Returns the phase ordering index for post hooks for this system.
 	int post_phase_ordering() const noexcept override {
 		return 0x1200;
 	}
 
+	/// Creates the renderer_system taking the graphics_system as a dependency.
+	/**
+	 * Should only be called in core::engine::add_system, but can't be made private and friended with engine
+	 * because the construction takes place in std::make_unique.
+	 */
 	renderer_system(core::engine& eng, graphics::graphics_system& gs);
+	/// Destroys the renderer_system and releases underlying resources.
 	~renderer_system();
 
+	/// Implements the hooked logic that happens at the beginning of the frame.
 	void prerender(const mce::core::frame_time& frame_time) override;
+	/// Implements the hooked logic that happens at the end of the frame.
 	void postrender(const mce::core::frame_time& frame_time) override;
 };
 
