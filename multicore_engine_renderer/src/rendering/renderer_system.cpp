@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <cassert>
 #include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/graphics/descriptor_set_layout.hpp>
@@ -13,6 +14,7 @@
 #include <mce/graphics/render_pass.hpp>
 #include <mce/graphics/sampler.hpp>
 #include <mce/graphics/shader_loader.hpp>
+#include <mce/rendering/model_format.hpp>
 #include <mce/rendering/renderer_system.hpp>
 #include <mce/rendering/uniforms_structs.hpp>
 
@@ -35,6 +37,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	create_pipeline_layouts();
 	create_render_passes_and_framebuffers();
 	shader_ldr.wait_for_completion();
+	create_pipelines();
 }
 
 renderer_system::~renderer_system() {}
@@ -123,6 +126,41 @@ void renderer_system::create_render_passes_and_framebuffers() {
 	main_framebuffer_ = std::make_unique<graphics::framebuffer>(
 			gs_.device(), gs_.window(), gs_.memory_manager(), &(gs_.destruction_queue_manager()), main_fbcfg,
 			std::vector<vk::RenderPass>{main_render_pass_->native_render_pass()});
+}
+
+void renderer_system::create_pipelines() {
+	auto main_forward_pcfg = std::make_shared<graphics::pipeline_config>();
+
+	auto main_forward_vertex_shader =
+			gs_.graphics_manager().find_shader_module(settings_.main_forward_vertex_shader_name);
+	assert(main_forward_vertex_shader);
+	auto main_forward_fragment_shader =
+			gs_.graphics_manager().find_shader_module(settings_.main_forward_fragment_shader_name);
+	assert(main_forward_fragment_shader);
+
+	main_forward_pcfg->shader_stages() = {
+			{vk::ShaderStageFlagBits::eVertex, main_forward_vertex_shader, "main"},
+			{vk::ShaderStageFlagBits::eFragment, main_forward_fragment_shader, "main"}};
+	main_forward_pcfg->input_state() = model_vertex_input_config();
+	main_forward_pcfg->assembly_state() = {{}, vk::PrimitiveTopology::eTriangleList};
+	main_forward_pcfg->viewport_state() = graphics::pipeline_config::viewport_state_config{
+			{{0.0, 0.0, float(gs_.window().swapchain_size().x), float(gs_.window().swapchain_size().y), 0.0f,
+			  1.0f}},
+			{{{0, 0}, {gs_.window().swapchain_size().x, gs_.window().swapchain_size().y}}}};
+	main_forward_pcfg->rasterization_state().lineWidth = 1.0f;
+	main_forward_pcfg->multisample_state() = vk::PipelineMultisampleStateCreateInfo{};
+	main_forward_pcfg->depth_stencil_state() =
+			vk::PipelineDepthStencilStateCreateInfo({}, true, true, vk::CompareOp::eLess);
+	vk::PipelineColorBlendAttachmentState pcbas_set;
+	pcbas_set.colorWriteMask = ~vk::ColorComponentFlags();
+	main_forward_pcfg->color_blend_state() = graphics::pipeline_config::color_blend_state_config{{pcbas_set}};
+	main_forward_pcfg->layout(pipeline_layout_scene_pass_);
+	main_forward_pcfg->compatible_render_pass(main_render_pass_);
+	main_forward_pcfg->compatible_subpass(0);
+	gs_.graphics_manager().add_pending_pipeline("main_forward_pl", main_forward_pcfg);
+
+	gs_.graphics_manager().compile_pending_pipelines();
+	main_forward_pipeline_ = gs_.graphics_manager().find_pipeline("main_forward_pl");
 }
 
 } /* namespace rendering */

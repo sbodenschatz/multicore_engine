@@ -27,6 +27,7 @@ class descriptor_set_layout;
 class pipeline_layout;
 class render_pass;
 class framebuffer;
+class pipeline;
 } // namespace graphics
 namespace rendering {
 
@@ -49,6 +50,7 @@ class renderer_system : public core::system {
 	std::shared_ptr<const graphics::pipeline_layout> pipeline_layout_scene_pass_;
 	std::shared_ptr<const graphics::render_pass> main_render_pass_;
 	std::unique_ptr<graphics::framebuffer> main_framebuffer_;
+	std::shared_ptr<const graphics::pipeline> main_forward_pipeline_;
 
 	friend class static_model_component;
 	friend class technique;
@@ -57,6 +59,7 @@ class renderer_system : public core::system {
 	void create_descriptor_sets();
 	void create_pipeline_layouts();
 	void create_render_passes_and_framebuffers();
+	void create_pipelines();
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
