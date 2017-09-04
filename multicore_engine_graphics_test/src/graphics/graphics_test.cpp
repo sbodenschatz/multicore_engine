@@ -93,9 +93,9 @@ graphics_test::graphics_test()
 					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare}});
 	auto loader = std::make_shared<asset::load_unit_asset_loader>(std::vector<asset::path_prefix>(
 			{{std::make_unique<asset::pack_file_reader>(), "assets.pack"},
-			 {std::make_unique<asset::pack_file_reader>(), "../multicore_engine_assets/assets.pack"},
+			 {std::make_unique<asset::pack_file_reader>(), "../multicore_engine_test_assets/assets.pack"},
 			 {std::make_unique<asset::pack_file_reader>(),
-			  ((exe_path.parent_path() / "multicore_engine_assets") / "assets.pack").string()}}));
+			  ((exe_path.parent_path() / "multicore_engine_test_assets") / "assets.pack").string()}}));
 	amgr_.add_asset_loader(loader);
 	amgr_.start_pin_load_unit("shaders");
 	amgr_.start_pin_load_unit("models_geo");
