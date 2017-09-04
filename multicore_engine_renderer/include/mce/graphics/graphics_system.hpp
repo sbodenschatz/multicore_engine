@@ -12,6 +12,7 @@
  * Defines the graphics_system class.
  */
 
+#include <boost/variant.hpp>
 #include <mce/containers/dynamic_array.hpp>
 #include <mce/core/system.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
@@ -60,7 +61,8 @@ class graphics_system : public core::system {
 	containers::dynamic_array<vk::UniqueFence> fences_;
 
 	uint32_t current_swapchain_image_;
-	std::vector<queued_handle<vk::UniqueCommandBuffer>> pending_command_buffers_;
+	std::vector<boost::variant<queued_handle<vk::UniqueCommandBuffer>, vk::CommandBuffer>>
+			pending_command_buffers_;
 	std::vector<vk::CommandBuffer> cmd_buff_handles_;
 
 	command_pool render_queue_cmd_pool_;
@@ -197,6 +199,10 @@ public:
 	void enqueue_command_buffer(vk::UniqueCommandBuffer&& buffer_handle) {
 		pending_command_buffers_.emplace_back(queued_handle<vk::UniqueCommandBuffer>(
 				std::move(buffer_handle), &destruction_queue_manager_));
+	}
+	
+	void enqueue_command_buffer(vk::CommandBuffer buffer_handle) {
+		pending_command_buffers_.emplace_back(buffer_handle);
 	}
 };
 

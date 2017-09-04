@@ -245,8 +245,9 @@ void transfer_manager::process_ready_callbacks(std::vector<transfer_job>& jobs) 
 	}
 }
 
-std::vector<queued_handle<vk::UniqueCommandBuffer>> transfer_manager::retrieve_ready_ownership_transfers() {
-	std::vector<queued_handle<vk::UniqueCommandBuffer>> res;
+std::vector<boost::variant<queued_handle<vk::UniqueCommandBuffer>, vk::CommandBuffer>>
+transfer_manager::retrieve_ready_ownership_transfers() {
+	std::vector<boost::variant<queued_handle<vk::UniqueCommandBuffer>, vk::CommandBuffer>> res;
 	std::unique_lock<std::mutex> lock(manager_mutex);
 	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
 		using std::swap;

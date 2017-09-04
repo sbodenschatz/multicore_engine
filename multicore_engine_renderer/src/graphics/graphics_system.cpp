@@ -110,8 +110,17 @@ void graphics_system::prerender(const mce::core::frame_time&) {
 void graphics_system::postrender(const mce::core::frame_time&) {
 	cmd_buff_handles_.clear();
 	cmd_buff_handles_.push_back(render_queue_start_frame_cmd_buffers_[current_swapchain_image_].get());
+	struct handle_transformer : boost::static_visitor<vk::CommandBuffer> {
+		vk::CommandBuffer operator()(vk::CommandBuffer cb) const {
+			return cb;
+		}
+		vk::CommandBuffer operator()(const queued_handle<vk::UniqueCommandBuffer>& cb) const {
+			return cb.get();
+		}
+	} ht;
 	std::transform(pending_command_buffers_.begin(), pending_command_buffers_.end(),
-				   std::back_inserter(cmd_buff_handles_), [](const auto& h) { return h.get(); });
+				   std::back_inserter(cmd_buff_handles_),
+				   [&ht](const auto& h) { return h.apply_visitor(ht); });
 	cmd_buff_handles_.push_back(render_queue_end_frame_cmd_buffers_[current_swapchain_image_].get());
 	auto acq_sema = acquire_semaphores_[current_swapchain_image_].get();
 	vk::PipelineStageFlags wait_ps = vk::PipelineStageFlagBits::eAllCommands;
