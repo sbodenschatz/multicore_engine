@@ -16,6 +16,7 @@
 #include <mce/containers/dynamic_array.hpp>
 #include <mce/containers/per_thread.hpp>
 #include <mce/core/system.hpp>
+#include <mce/graphics/command_pool.hpp>
 #include <mce/rendering/material_manager.hpp>
 #include <mce/rendering/model_manager.hpp>
 
@@ -50,6 +51,7 @@ class renderer_system : public core::system {
 	renderer_system_settings settings_;
 	rendering::model_manager mdl_mgr;
 	rendering::material_manager mat_mgr;
+	graphics::command_pool primary_cmd_pool;
 
 	std::shared_ptr<const graphics::sampler> default_sampler_;
 	std::shared_ptr<const graphics::descriptor_set_layout> descriptor_set_layout_per_scene_;

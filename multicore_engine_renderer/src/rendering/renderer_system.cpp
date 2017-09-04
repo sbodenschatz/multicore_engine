@@ -26,7 +26,8 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 		: eng_{eng}, gs_{gs}, settings_{std::move(settings)},
 		  mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
 				  &(gs.destruction_queue_manager()), gs.transfer_manager()),
-		  mat_mgr(eng.asset_manager(), gs.texture_manager()) {
+		  mat_mgr(eng.asset_manager(), gs.texture_manager()),
+		  primary_cmd_pool(gs_.device(), gs_.device().graphics_queue_index().first, true, true) {
 
 	graphics::shader_loader shader_ldr(eng.asset_manager(), gs_.graphics_manager());
 	shader_ldr.load_shader(settings_.main_forward_vertex_shader_name);
