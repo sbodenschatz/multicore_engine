@@ -33,33 +33,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	create_samplers();
 	create_descriptor_sets();
 	create_pipeline_layouts();
-	auto main_fbcfg = gs_.graphics_manager().create_framebuffer_config(
-			"main_fbcfg", gs_.window(),
-			{graphics::framebuffer_attachment_config(gs_.device().best_supported_depth_attachment_format(),
-													 graphics::image_aspect_mode::depth)},
-			{graphics::framebuffer_pass_config({0, 1})});
-	auto main_spg = gs_.graphics_manager().create_subpass_graph(
-			"main_spg",
-			{graphics::subpass_entry{
-					{},
-					{vk::AttachmentReference(0, vk::ImageLayout::eColorAttachmentOptimal)},
-					{},
-					vk::AttachmentReference(1, vk::ImageLayout::eDepthStencilAttachmentOptimal),
-					{}}},
-			{});
-	main_render_pass_ = gs.graphics_manager().create_render_pass(
-			"main_rp", main_spg, main_fbcfg, 0,
-			{graphics::render_pass_attachment_access{
-					 vk::ImageLayout::eUndefined, vk::ImageLayout::eColorAttachmentOptimal,
-					 vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eStore,
-					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare},
-			 graphics::render_pass_attachment_access{
-					 vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthStencilAttachmentOptimal,
-					 vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eDontCare,
-					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare}});
-	main_framebuffer_ = std::make_unique<graphics::framebuffer>(
-			gs_.device(), gs_.window(), gs_.memory_manager(), &(gs_.destruction_queue_manager()), main_fbcfg,
-			std::vector<vk::RenderPass>{main_render_pass_->native_render_pass()});
+	create_render_passes_and_framebuffers();
 	shader_ldr.wait_for_completion();
 }
 
@@ -120,6 +94,35 @@ void renderer_system::create_pipeline_layouts() {
 			"scene_pass", {descriptor_set_layout_per_scene_, descriptor_set_layout_per_material_},
 			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0,
 								   sizeof(per_object_push_constants))});
+}
+void renderer_system::create_render_passes_and_framebuffers() {
+	auto main_fbcfg = gs_.graphics_manager().create_framebuffer_config(
+			"main_fbcfg", gs_.window(),
+			{graphics::framebuffer_attachment_config(gs_.device().best_supported_depth_attachment_format(),
+													 graphics::image_aspect_mode::depth)},
+			{graphics::framebuffer_pass_config({0, 1})});
+	auto main_spg = gs_.graphics_manager().create_subpass_graph(
+			"main_spg",
+			{graphics::subpass_entry{
+					{},
+					{vk::AttachmentReference(0, vk::ImageLayout::eColorAttachmentOptimal)},
+					{},
+					vk::AttachmentReference(1, vk::ImageLayout::eDepthStencilAttachmentOptimal),
+					{}}},
+			{});
+	main_render_pass_ = gs_.graphics_manager().create_render_pass(
+			"main_rp", main_spg, main_fbcfg, 0,
+			{graphics::render_pass_attachment_access{
+					 vk::ImageLayout::eUndefined, vk::ImageLayout::eColorAttachmentOptimal,
+					 vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eStore,
+					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare},
+			 graphics::render_pass_attachment_access{
+					 vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthStencilAttachmentOptimal,
+					 vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eDontCare,
+					 vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare}});
+	main_framebuffer_ = std::make_unique<graphics::framebuffer>(
+			gs_.device(), gs_.window(), gs_.memory_manager(), &(gs_.destruction_queue_manager()), main_fbcfg,
+			std::vector<vk::RenderPass>{main_render_pass_->native_render_pass()});
 }
 
 } /* namespace rendering */

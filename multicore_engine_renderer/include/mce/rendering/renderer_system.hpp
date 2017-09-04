@@ -50,6 +50,7 @@ class renderer_system : public core::system {
 	void create_samplers();
 	void create_descriptor_sets();
 	void create_pipeline_layouts();
+	void create_render_passes_and_framebuffers();
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
