@@ -189,6 +189,15 @@ public:
 	uint32_t current_swapchain_image() const {
 		return current_swapchain_image_;
 	}
+	
+	void enqueue_command_buffer(queued_handle<vk::UniqueCommandBuffer>&& buffer_handle) {
+		pending_command_buffers_.emplace_back(std::move(buffer_handle));
+	}
+	
+	void enqueue_command_buffer(vk::UniqueCommandBuffer&& buffer_handle) {
+		pending_command_buffers_.emplace_back(queued_handle<vk::UniqueCommandBuffer>(
+				std::move(buffer_handle), &destruction_queue_manager_));
+	}
 };
 
 } /* namespace graphics */
