@@ -21,6 +21,10 @@
 #include <utility>
 #include <vector>
 
+namespace tbb {
+class task_scheduler_init;
+} // namespace tbb
+
 namespace mce {
 namespace asset {
 class asset_manager;
@@ -41,6 +45,8 @@ struct frame_time;
 
 /// Represents the central management class for the subsystems of the engine.
 class engine {
+	uint32_t max_general_concurrency_;
+	std::unique_ptr<tbb::task_scheduler_init> tsi;
 	std::atomic<bool> running_;
 	software_metadata engine_metadata_;
 	software_metadata application_metadata_;
@@ -187,6 +193,14 @@ public:
 	/// Allows read-only access to the metadata for the engine.
 	const software_metadata& engine_metadata() const {
 		return engine_metadata_;
+	}
+
+	uint32_t max_general_concurrency() const {
+		return max_general_concurrency_;
+	}
+
+	void max_general_concurrency(uint32_t max_general_concurrency) {
+		max_general_concurrency_ = max_general_concurrency;
 	}
 };
 

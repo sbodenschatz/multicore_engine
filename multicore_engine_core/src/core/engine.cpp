@@ -16,12 +16,14 @@
 #include <mce/core/version.hpp>
 #include <mce/model/model_data_manager.hpp>
 #include <sstream>
+#include <tbb/task_scheduler_init.h>
 
 namespace mce {
 namespace core {
 
 engine::engine()
-		: running_{false}, engine_metadata_{"mce", get_build_version_number()},
+		: max_general_concurrency_{std::thread::hardware_concurrency()}, running_{false},
+		  engine_metadata_{"mce", get_build_version_number()},
 		  application_metadata_{"mce-app", get_build_version_number()},
 		  asset_manager_{std::make_unique<asset::asset_manager>()},
 		  model_data_manager_{std::make_unique<model::model_data_manager>(asset_manager())} {
@@ -48,6 +50,7 @@ void engine::initialize_config() {
 }
 
 void engine::run() {
+	tsi = std::make_unique<tbb::task_scheduler_init>(max_general_concurrency_);
 	auto old_t = std::chrono::high_resolution_clock::now();
 	running_ = true;
 	while(running()) {
