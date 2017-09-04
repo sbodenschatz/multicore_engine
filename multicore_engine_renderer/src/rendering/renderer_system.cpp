@@ -42,6 +42,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	create_pipelines();
 	create_per_frame_data();
 	create_per_thread_data();
+	create_per_frame_per_thread_data();
 }
 
 renderer_system::~renderer_system() {
@@ -193,6 +194,16 @@ void renderer_system::create_per_thread_data() {
 				return per_thread_data_t{
 						{gs_.device(), gs_.device().graphics_queue_index().first, true, true}};
 			}));
+}
+void renderer_system::create_per_frame_per_thread_data() {
+	per_frame_per_thread_data_ = {gs_.window().swapchain_images().size(), eng_.max_general_concurrency(),
+								  containers::generator_param([this](size_t) {
+									  return containers::generator_param([this](size_t i) {
+										  return per_frame_per_thread_data_t{
+												  (per_thread_data_->begin() +
+												   i)->command_pool.allocate_secondary_command_buffer()};
+									  });
+								  })};
 }
 
 } /* namespace rendering */

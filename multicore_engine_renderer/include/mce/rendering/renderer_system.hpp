@@ -48,7 +48,9 @@ class renderer_system : public core::system {
 	struct per_thread_data_t {
 		graphics::command_pool command_pool;
 	};
-	struct per_frame_per_thread_data_t {};
+	struct per_frame_per_thread_data_t {
+		vk::UniqueCommandBuffer command_buffer;
+	};
 
 	core::engine& eng_;
 	graphics::graphics_system& gs_;
@@ -79,6 +81,7 @@ class renderer_system : public core::system {
 	void create_pipelines();
 	void create_per_frame_data();
 	void create_per_thread_data();
+	void create_per_frame_per_thread_data();
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
