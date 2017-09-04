@@ -32,10 +32,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 
 	create_samplers();
 	create_descriptor_sets();
-	pipeline_layout_scene_pass_ = gs_.graphics_manager().create_pipeline_layout(
-			"scene_pass", {descriptor_set_layout_per_scene_, descriptor_set_layout_per_material_},
-			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0,
-								   sizeof(per_object_push_constants))});
+	create_pipeline_layouts();
 	auto main_fbcfg = gs_.graphics_manager().create_framebuffer_config(
 			"main_fbcfg", gs_.window(),
 			{graphics::framebuffer_attachment_config(gs_.device().best_supported_depth_attachment_format(),
@@ -116,6 +113,13 @@ void renderer_system::create_descriptor_sets() {
 			"per_scene",
 			{{0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eAllGraphics, {}}});
 	*/
+}
+
+void renderer_system::create_pipeline_layouts() {
+	pipeline_layout_scene_pass_ = gs_.graphics_manager().create_pipeline_layout(
+			"scene_pass", {descriptor_set_layout_per_scene_, descriptor_set_layout_per_material_},
+			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0,
+								   sizeof(per_object_push_constants))});
 }
 
 } /* namespace rendering */
