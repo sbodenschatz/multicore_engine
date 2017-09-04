@@ -20,7 +20,7 @@ TEST(model_collision_model_test, load_example_collision_model) {
 	using namespace std::chrono_literals;
 	asset::asset_manager am;
 	auto loader = std::make_shared<asset::load_unit_asset_loader>(std::vector<asset::path_prefix>(
-			{{std::make_unique<asset::pack_file_reader>(), "../multicore_engine_assets/assets.pack"}}));
+			{{std::make_unique<asset::pack_file_reader>(), "../multicore_engine_test_assets/assets.pack"}}));
 	am.add_asset_loader(loader);
 	std::atomic<bool> load_unit_ready{false};
 	std::atomic<bool> load_unit_failed{false};
@@ -49,7 +49,7 @@ TEST(model_collision_model_test, load_example_polygon_model) {
 	using namespace std::chrono_literals;
 	asset::asset_manager am;
 	auto loader = std::make_shared<asset::load_unit_asset_loader>(std::vector<asset::path_prefix>(
-			{{std::make_unique<asset::pack_file_reader>(), "../multicore_engine_assets/assets.pack"}}));
+			{{std::make_unique<asset::pack_file_reader>(), "../multicore_engine_test_assets/assets.pack"}}));
 	am.add_asset_loader(loader);
 	std::atomic<bool> load_unit_ready{false};
 	std::atomic<bool> load_unit_failed{false};
