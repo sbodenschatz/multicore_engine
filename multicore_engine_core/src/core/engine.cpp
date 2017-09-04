@@ -31,6 +31,9 @@ engine::engine()
 
 engine::~engine() {
 	game_state_machine_.reset(); // Ensure that the game_state_machine is cleaned up first.
+	while(!systems_.empty()) {
+		systems_.pop_back();
+	}
 }
 
 void engine::initialize_config() {
