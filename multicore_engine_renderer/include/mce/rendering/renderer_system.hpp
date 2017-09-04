@@ -71,6 +71,8 @@ class renderer_system : public core::system {
 	std::unique_ptr<containers::per_thread<per_thread_data_t>> per_thread_data_;
 	containers::dynamic_array<containers::per_thread<per_frame_per_thread_data_t>> per_frame_per_thread_data_;
 
+	std::vector<vk::CommandBuffer> secondary_cmdbuff_handles_tmp;
+
 	friend class static_model_component;
 	friend class technique;
 
