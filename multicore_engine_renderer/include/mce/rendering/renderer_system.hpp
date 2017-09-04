@@ -13,6 +13,8 @@
  */
 
 #include <cassert>
+#include <mce/containers/dynamic_array.hpp>
+#include <mce/containers/per_thread.hpp>
 #include <mce/core/system.hpp>
 #include <mce/rendering/material_manager.hpp>
 #include <mce/rendering/model_manager.hpp>
@@ -39,6 +41,10 @@ struct renderer_system_settings {
 
 /// Provides the high-level rendering functionality for entities in a scene for the engine.
 class renderer_system : public core::system {
+	struct per_frame_data_t {};
+	struct per_thread_data_t {};
+	struct per_frame_per_thread_data_t {};
+
 	core::engine& eng_;
 	graphics::graphics_system& gs_;
 	renderer_system_settings settings_;
@@ -52,6 +58,10 @@ class renderer_system : public core::system {
 	std::shared_ptr<const graphics::render_pass> main_render_pass_;
 	std::unique_ptr<graphics::framebuffer> main_framebuffer_;
 	std::shared_ptr<const graphics::pipeline> main_forward_pipeline_;
+
+	containers::dynamic_array<per_frame_data_t> per_frame_data_;
+	std::unique_ptr<containers::per_thread<per_thread_data_t>> per_thread_data_;
+	containers::dynamic_array<containers::per_thread<per_frame_per_thread_data_t>> per_frame_per_thread_data_;
 
 	friend class static_model_component;
 	friend class technique;
