@@ -12,6 +12,7 @@
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/render_pass.hpp>
 #include <mce/graphics/sampler.hpp>
+#include <mce/graphics/shader_loader.hpp>
 #include <mce/rendering/renderer_system.hpp>
 #include <mce/rendering/uniforms_structs.hpp>
 
@@ -22,6 +23,13 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 		: gs_{gs}, mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
 						   &(gs.destruction_queue_manager()), gs.transfer_manager()),
 		  mat_mgr(eng.asset_manager(), gs.texture_manager()) {
+
+	graphics::shader_loader shader_ldr(eng.asset_manager(), gs_.graphics_manager());
+	std::string main_forward_vertex_shader_name = "shaders/main_forward.vert";
+	shader_ldr.load_shader(main_forward_vertex_shader_name);
+	std::string main_forward_fragment_shader_name = "shaders/main_forward.frag";
+	shader_ldr.load_shader(main_forward_fragment_shader_name);
+
 	auto anisotropy = eng.config_store().resolve("anisotropy", -1.0f);
 	boost::optional<float> max_anisotropy;
 	auto aniso_val = anisotropy->value();
@@ -94,6 +102,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	main_framebuffer_ = std::make_unique<graphics::framebuffer>(
 			gs_.device(), gs_.window(), gs_.memory_manager(), &(gs_.destruction_queue_manager()), main_fbcfg,
 			std::vector<vk::RenderPass>{main_render_pass_->native_render_pass()});
+	shader_ldr.wait_for_completion();
 }
 
 renderer_system::~renderer_system() {}
