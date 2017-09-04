@@ -19,16 +19,16 @@
 namespace mce {
 namespace rendering {
 
-renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& gs)
-		: eng_{eng}, gs_{gs}, mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
-									  &(gs.destruction_queue_manager()), gs.transfer_manager()),
+renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& gs,
+								 renderer_system_settings settings)
+		: eng_{eng}, gs_{gs}, settings_{std::move(settings)},
+		  mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
+				  &(gs.destruction_queue_manager()), gs.transfer_manager()),
 		  mat_mgr(eng.asset_manager(), gs.texture_manager()) {
 
 	graphics::shader_loader shader_ldr(eng.asset_manager(), gs_.graphics_manager());
-	std::string main_forward_vertex_shader_name = "shaders/main_forward.vert";
-	shader_ldr.load_shader(main_forward_vertex_shader_name);
-	std::string main_forward_fragment_shader_name = "shaders/main_forward.frag";
-	shader_ldr.load_shader(main_forward_fragment_shader_name);
+	shader_ldr.load_shader(settings_.main_forward_vertex_shader_name);
+	shader_ldr.load_shader(settings_.main_forward_fragment_shader_name);
 
 	create_samplers();
 	create_descriptor_sets();

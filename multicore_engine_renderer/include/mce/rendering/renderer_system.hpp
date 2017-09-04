@@ -30,10 +30,16 @@ class framebuffer;
 } // namespace graphics
 namespace rendering {
 
+struct renderer_system_settings {
+	std::string main_forward_vertex_shader_name = "shaders/main_forward.vert";
+	std::string main_forward_fragment_shader_name = "shaders/main_forward.frag";
+};
+
 /// Provides the high-level rendering functionality for entities in a scene for the engine.
 class renderer_system : public core::system {
 	core::engine& eng_;
 	graphics::graphics_system& gs_;
+	renderer_system_settings settings_;
 	model_manager mdl_mgr;
 	material_manager mat_mgr;
 
@@ -67,7 +73,7 @@ public:
 	 * Should only be called in core::engine::add_system, but can't be made private and friended with engine
 	 * because the construction takes place in std::make_unique.
 	 */
-	renderer_system(core::engine& eng, graphics::graphics_system& gs);
+	renderer_system(core::engine& eng, graphics::graphics_system& gs, renderer_system_settings settings = {});
 	/// Destroys the renderer_system and releases underlying resources.
 	~renderer_system();
 
