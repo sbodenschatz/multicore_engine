@@ -12,6 +12,7 @@
  * Defines the renderer_system class.
  */
 
+#include <cassert>
 #include <mce/core/system.hpp>
 #include <mce/rendering/material_manager.hpp>
 #include <mce/rendering/model_manager.hpp>
@@ -84,6 +85,43 @@ public:
 	void prerender(const mce::core::frame_time& frame_time) override;
 	/// Implements the hooked logic that happens at the end of the frame.
 	void postrender(const mce::core::frame_time& frame_time) override;
+
+	const graphics::sampler& default_sampler() const {
+		assert(default_sampler_);
+		return *default_sampler_;
+	}
+
+	const std::shared_ptr<const graphics::descriptor_set_layout>& descriptor_set_layout_per_material() const {
+		return descriptor_set_layout_per_material_;
+	}
+
+	const std::shared_ptr<const graphics::descriptor_set_layout>& descriptor_set_layout_per_scene() const {
+		return descriptor_set_layout_per_scene_;
+	}
+
+	const graphics::pipeline& main_forward_pipeline() const {
+		assert(main_forward_pipeline_);
+		return *main_forward_pipeline_;
+	}
+
+	graphics::framebuffer& main_framebuffer() const {
+		assert(main_framebuffer_);
+		return *main_framebuffer_;
+	}
+
+	const graphics::render_pass& main_render_pass() const {
+		assert(main_render_pass_);
+		return *main_render_pass_;
+	}
+
+	const graphics::pipeline_layout& pipeline_layout_scene_pass() const {
+		assert(pipeline_layout_scene_pass_);
+		return *pipeline_layout_scene_pass_;
+	}
+
+	const renderer_system_settings& settings() const {
+		return settings_;
+	}
 };
 
 } /* namespace rendering */
