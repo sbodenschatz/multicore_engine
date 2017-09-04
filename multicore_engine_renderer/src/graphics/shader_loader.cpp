@@ -36,7 +36,7 @@ void shader_loader::load_shader(const std::string& name) {
 							  } catch(...) {
 								  {
 									  std::lock_guard<std::mutex> lock(shaders_mtx);
-									  failed_assets.push_back(std::move(name));
+									  failed_assets.push_back(name);
 									  --pending_loads;
 								  }
 								  shaders_cv.notify_one();
@@ -45,7 +45,7 @@ void shader_loader::load_shader(const std::string& name) {
 						  [name, this](std::exception_ptr) {
 							  {
 								  std::lock_guard<std::mutex> lock(shaders_mtx);
-								  failed_assets.push_back(std::move(name));
+								  failed_assets.push_back(name);
 								  --pending_loads;
 							  }
 							  shaders_cv.notify_one();
