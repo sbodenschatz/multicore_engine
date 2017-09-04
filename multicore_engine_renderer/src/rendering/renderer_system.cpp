@@ -17,6 +17,7 @@
 #include <mce/rendering/model_format.hpp>
 #include <mce/rendering/renderer_system.hpp>
 #include <mce/rendering/uniforms_structs.hpp>
+#include <mce/util/array_utils.hpp>
 
 namespace mce {
 namespace rendering {
@@ -46,8 +47,21 @@ renderer_system::~renderer_system() {
 	gs_.device()->waitIdle();
 }
 
-void renderer_system::prerender(const mce::core::frame_time&) {}
-void renderer_system::postrender(const mce::core::frame_time&) {}
+void renderer_system::prerender(const mce::core::frame_time&) {
+	auto& pcmdb = per_frame_data_[gs_.current_swapchain_image()].primary_command_buffer;
+	// pcmdb->reset({});
+	pcmdb->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+	std::array<vk::ClearValue, 2> clear = {
+			vk::ClearColorValue(util::make_array<float>(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f)),
+			vk::ClearDepthStencilValue(1.0f)};
+	main_render_pass_->begin(pcmdb.get(), main_framebuffer_->pass(0).frame(gs_.current_swapchain_image()),
+							 clear, vk::SubpassContents::eSecondaryCommandBuffers);
+}
+void renderer_system::postrender(const mce::core::frame_time&) {
+	auto& pcmdb = per_frame_data_[gs_.current_swapchain_image()].primary_command_buffer;
+	pcmdb->endRenderPass();
+	pcmdb->end();
+}
 
 void renderer_system::create_samplers() {
 	auto anisotropy = eng_.config_store().resolve("anisotropy", -1.0f);
