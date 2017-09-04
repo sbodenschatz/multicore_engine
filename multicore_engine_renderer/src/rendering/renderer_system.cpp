@@ -52,8 +52,8 @@ void renderer_system::prerender(const mce::core::frame_time&) {
 	// pcmdb->reset({});
 	pcmdb->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
 	std::array<vk::ClearValue, 2> clear = {
-			vk::ClearColorValue(util::make_array<float>(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f)),
-			vk::ClearDepthStencilValue(1.0f)};
+			{vk::ClearColorValue(util::make_array<float>(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f)),
+			vk::ClearDepthStencilValue(1.0f)}};
 	main_render_pass_->begin(pcmdb.get(), main_framebuffer_->pass(0).frame(gs_.current_swapchain_image()),
 							 clear, vk::SubpassContents::eSecondaryCommandBuffers);
 }
