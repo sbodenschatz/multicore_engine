@@ -7,6 +7,7 @@
 #include <mce/asset/asset_manager.hpp>
 #include <mce/graphics/graphics_manager.hpp>
 #include <mce/graphics/shader_loader.hpp>
+#include <numeric>
 
 namespace mce {
 namespace graphics {
@@ -31,20 +32,31 @@ void shader_loader::load_shader(const std::string& name) {
 							  } catch(...) {
 								  {
 									  std::lock_guard<std::mutex> lock(shaders_mtx);
-									  errors = true;
+									  failed_assets.push_back(std::move(name));
 									  --pending_loads;
 								  }
 								  shaders_cv.notify_one();
 							  }
 						  },
-						  [this](std::exception_ptr) {
+						  [name, this](std::exception_ptr) {
 							  {
 								  std::lock_guard<std::mutex> lock(shaders_mtx);
-								  errors = true;
+								  failed_assets.push_back(std::move(name));
 								  --pending_loads;
 							  }
 							  shaders_cv.notify_one();
 						  });
+}
+
+void shader_loader::wait_for_completion() {
+	std::unique_lock<std::mutex> lock(shaders_mtx);
+	shaders_cv.wait(lock, [this]() { return pending_loads == 0; });
+	if(!failed_assets.empty()) {
+		throw mce::graphics_exception(
+				"Couldn't load the following shaders: " +
+				std::accumulate(failed_assets.begin() + 1, failed_assets.end(), failed_assets.front(),
+								[](const auto& a, const auto& b) { return a + ", " + b; }));
+	}
 }
 
 } /* namespace graphics */

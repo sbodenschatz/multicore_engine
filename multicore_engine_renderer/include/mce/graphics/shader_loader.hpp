@@ -7,10 +7,10 @@
 #ifndef MCE_GRAPHICS_SHADER_LOADER_HPP_
 #define MCE_GRAPHICS_SHADER_LOADER_HPP_
 
-#include <boost/container/flat_map.hpp>
 #include <condition_variable>
 #include <mutex>
 #include <string>
+#include <vector>
 
 namespace mce {
 namespace asset {
@@ -24,9 +24,9 @@ class shader_loader {
 	asset::asset_manager& amgr;
 	graphics_manager& gmgr;
 	size_t pending_loads = 0;
-	bool errors = false;
 	mutable std::mutex shaders_mtx;
 	mutable std::condition_variable shaders_cv;
+	std::vector<std::string> failed_assets;
 
 public:
 	shader_loader(asset::asset_manager& amgr, graphics_manager& gmgr);
