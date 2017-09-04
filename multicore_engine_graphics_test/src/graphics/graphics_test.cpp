@@ -241,7 +241,7 @@ void graphics_test::run() {
 			ds.update()(0, 0, vk::DescriptorType::eUniformBuffer, uniform_buffers_[img_index].store(ud))(
 					1, 0, vk::DescriptorType::eCombinedImageSampler,
 					mat_->albedo_map()->bind(/*sampler_.get()*/));
-			ds.bind(render_cmb_buf.get(), pll_, 0, ds);
+			ds.bind(render_cmb_buf.get(), *pll_, 0, ds);
 			pl2_->bind(render_cmb_buf.get());
 			mdl_->draw_model_mesh(render_cmb_buf.get(), 0);
 		}
