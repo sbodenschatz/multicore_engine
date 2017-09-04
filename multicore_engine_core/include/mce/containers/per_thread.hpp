@@ -27,7 +27,7 @@ public:
 	using size_type = std::size_t;
 
 	/// Creates a per_thread with the given number of slots for the threads.
-	per_thread_index(size_type slots)
+	explicit per_thread_index(size_type slots)
 			: total_slots_{slots}, used_slots_{0}, owners_(slots, std::thread::id()) {}
 
 	/// Forbids copying.
