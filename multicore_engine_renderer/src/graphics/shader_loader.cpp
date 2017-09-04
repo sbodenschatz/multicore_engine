@@ -20,6 +20,10 @@ shader_loader::~shader_loader() {
 }
 
 void shader_loader::load_shader(const std::string& name) {
+	{
+		std::lock_guard<std::mutex> lock(shaders_mtx);
+		++pending_loads;
+	}
 	amgr.load_asset_async(name + ".spv",
 						  [name, this](const asset::asset_ptr& shader_asset) {
 							  try {
