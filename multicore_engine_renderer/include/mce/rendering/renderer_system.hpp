@@ -42,7 +42,9 @@ struct renderer_system_settings {
 
 /// Provides the high-level rendering functionality for entities in a scene for the engine.
 class renderer_system : public core::system {
-	struct per_frame_data_t {};
+	struct per_frame_data_t {
+		vk::UniqueCommandBuffer primary_command_buffer;
+	};
 	struct per_thread_data_t {};
 	struct per_frame_per_thread_data_t {};
 
@@ -73,6 +75,7 @@ class renderer_system : public core::system {
 	void create_pipeline_layouts();
 	void create_render_passes_and_framebuffers();
 	void create_pipelines();
+	void create_per_frame_data();
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.

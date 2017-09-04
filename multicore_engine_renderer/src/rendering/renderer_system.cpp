@@ -39,9 +39,12 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	create_render_passes_and_framebuffers();
 	shader_ldr.wait_for_completion();
 	create_pipelines();
+	create_per_frame_data();
 }
 
-renderer_system::~renderer_system() {}
+renderer_system::~renderer_system() {
+	gs_.device()->waitIdle();
+}
 
 void renderer_system::prerender(const mce::core::frame_time&) {}
 void renderer_system::postrender(const mce::core::frame_time&) {}
@@ -162,6 +165,11 @@ void renderer_system::create_pipelines() {
 
 	gs_.graphics_manager().compile_pending_pipelines();
 	main_forward_pipeline_ = gs_.graphics_manager().find_pipeline("main_forward_pl");
+}
+void renderer_system::create_per_frame_data() {
+	per_frame_data_ = {gs_.window().swapchain_images().size(), containers::generator_param([this](size_t) {
+						   return per_frame_data_t{primary_cmd_pool.allocate_primary_command_buffer()};
+					   })};
 }
 
 } /* namespace rendering */
