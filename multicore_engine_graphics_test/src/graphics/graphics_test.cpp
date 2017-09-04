@@ -19,6 +19,7 @@
 #include <mce/graphics/pipeline_layout.hpp>
 #include <mce/graphics/render_pass.hpp>
 #include <mce/graphics/sampler.hpp>
+#include <mce/graphics/shader_loader.hpp>
 #include <mce/model/dump_model.hpp>
 #include <mce/rendering/model_format.hpp>
 #include <mce/util/array_utils.hpp>
@@ -99,10 +100,18 @@ graphics_test::graphics_test()
 	amgr_.add_asset_loader(loader);
 	amgr_.start_pin_load_unit("shaders");
 	amgr_.start_pin_load_unit("models_geo");
-	auto vert_shader_bin = amgr_.load_asset_sync("shaders/test_shader.vert.spv");
-	vert_shader_ = gmgr_.create_shader_module("test_vert_shader", *vert_shader_bin);
-	auto frag_shader_bin = amgr_.load_asset_sync("shaders/test_shader.frag.spv");
-	frag_shader_ = gmgr_.create_shader_module("test_frag_shader", *frag_shader_bin);
+
+	shader_loader shader_ldr(amgr_, gmgr_);
+	shader_ldr.load_shader("shaders/test_shader.vert");
+	shader_ldr.load_shader("shaders/test_shader.frag");
+	shader_ldr.load_shader("shaders/test_shader2.vert");
+	shader_ldr.load_shader("shaders/test_shader2.frag");
+	shader_ldr.wait_for_completion();
+	vert_shader_ = gmgr_.find_shader_module("shaders/test_shader.vert");
+	frag_shader_ = gmgr_.find_shader_module("shaders/test_shader.frag");
+	vert_shader2_ = gmgr_.find_shader_module("shaders/test_shader2.vert");
+	frag_shader2_ = gmgr_.find_shader_module("shaders/test_shader2.frag");
+
 	auto pcfg = std::make_shared<pipeline_config>();
 	pcfg->shader_stages() = {{vk::ShaderStageFlagBits::eVertex, vert_shader_, "main"},
 							 {vk::ShaderStageFlagBits::eFragment, frag_shader_, "main"}};
@@ -125,10 +134,6 @@ graphics_test::graphics_test()
 	pcfg->compatible_subpass(0);
 	gmgr_.add_pending_pipeline("test_pl", pcfg);
 
-	auto vert_shader2_bin = amgr_.load_asset_sync("shaders/test_shader2.vert.spv");
-	vert_shader2_ = gmgr_.create_shader_module("test_vert_shader2", *vert_shader2_bin);
-	auto frag_shader2_bin = amgr_.load_asset_sync("shaders/test_shader2.frag.spv");
-	frag_shader2_ = gmgr_.create_shader_module("test_frag_shader2", *frag_shader2_bin);
 	auto pcfg2 = std::make_shared<pipeline_config>();
 	pcfg2->shader_stages() = {{vk::ShaderStageFlagBits::eVertex, vert_shader2_, "main"},
 							  {vk::ShaderStageFlagBits::eFragment, frag_shader2_, "main"}};
