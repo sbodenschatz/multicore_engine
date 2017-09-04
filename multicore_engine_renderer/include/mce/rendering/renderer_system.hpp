@@ -42,8 +42,8 @@ class renderer_system : public core::system {
 	core::engine& eng_;
 	graphics::graphics_system& gs_;
 	renderer_system_settings settings_;
-	model_manager mdl_mgr;
-	material_manager mat_mgr;
+	rendering::model_manager mdl_mgr;
+	rendering::material_manager mat_mgr;
 
 	std::shared_ptr<const graphics::sampler> default_sampler_;
 	std::shared_ptr<const graphics::descriptor_set_layout> descriptor_set_layout_per_scene_;
@@ -121,6 +121,22 @@ public:
 
 	const renderer_system_settings& settings() const {
 		return settings_;
+	}
+
+	const rendering::model_manager& model_manager() const {
+		return mdl_mgr;
+	}
+
+	rendering::model_manager& model_manager() {
+		return mdl_mgr;
+	}
+
+	const rendering::material_manager& material_manager() const {
+		return mat_mgr;
+	}
+
+	rendering::material_manager& material_manager() {
+		return mat_mgr;
 	}
 };
 
