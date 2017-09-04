@@ -41,6 +41,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	shader_ldr.wait_for_completion();
 	create_pipelines();
 	create_per_frame_data();
+	create_per_thread_data();
 }
 
 renderer_system::~renderer_system() {
@@ -53,7 +54,7 @@ void renderer_system::prerender(const mce::core::frame_time&) {
 	pcmdb->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
 	std::array<vk::ClearValue, 2> clear = {
 			{vk::ClearColorValue(util::make_array<float>(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f)),
-			vk::ClearDepthStencilValue(1.0f)}};
+			 vk::ClearDepthStencilValue(1.0f)}};
 	main_render_pass_->begin(pcmdb.get(), main_framebuffer_->pass(0).frame(gs_.current_swapchain_image()),
 							 clear, vk::SubpassContents::eSecondaryCommandBuffers);
 }
@@ -185,6 +186,13 @@ void renderer_system::create_per_frame_data() {
 	per_frame_data_ = {gs_.window().swapchain_images().size(), containers::generator_param([this](size_t) {
 						   return per_frame_data_t{primary_cmd_pool.allocate_primary_command_buffer()};
 					   })};
+}
+void renderer_system::create_per_thread_data() {
+	per_thread_data_ = std::make_unique<containers::per_thread<per_thread_data_t>>(
+			eng_.max_general_concurrency(), containers::generator_param([this](size_t) {
+				return per_thread_data_t{
+						{gs_.device(), gs_.device().graphics_queue_index().first, true, true}};
+			}));
 }
 
 } /* namespace rendering */
