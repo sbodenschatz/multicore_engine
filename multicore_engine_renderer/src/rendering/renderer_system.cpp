@@ -61,6 +61,7 @@ void renderer_system::postrender(const mce::core::frame_time&) {
 	auto& pcmdb = per_frame_data_[gs_.current_swapchain_image()].primary_command_buffer;
 	pcmdb->endRenderPass();
 	pcmdb->end();
+	gs_.enqueue_command_buffer(pcmdb.get());
 }
 
 void renderer_system::create_samplers() {
