@@ -75,7 +75,7 @@ void renderer_system::postrender(const mce::core::frame_time&) {
 		secondary_cmdbuff_handles_tmp.push_back(pftd.command_buffer.get());
 	}
 	auto& pcmdb = per_frame_data_[gs_.current_swapchain_image()].primary_command_buffer;
-	pcmdb->executeCommands(secondary_cmdbuff_handles_tmp);
+	if(!secondary_cmdbuff_handles_tmp.empty()) pcmdb->executeCommands(secondary_cmdbuff_handles_tmp);
 	pcmdb->endRenderPass();
 	pcmdb->end();
 	gs_.enqueue_command_buffer(pcmdb.get());
