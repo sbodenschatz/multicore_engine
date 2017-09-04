@@ -48,6 +48,7 @@ class renderer_system : public core::system {
 	friend class technique;
 
 	void create_samplers();
+	void create_descriptor_sets();
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.

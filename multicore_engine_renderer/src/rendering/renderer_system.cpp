@@ -31,37 +31,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	shader_ldr.load_shader(main_forward_fragment_shader_name);
 
 	create_samplers();
-	descriptor_set_layout_per_scene_ = gs_.graphics_manager().create_descriptor_set_layout(
-			"per_scene",
-			{graphics::descriptor_set_layout_binding_element{
-					0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eAllGraphics, {}}});
-	descriptor_set_layout_per_material_ = gs_.graphics_manager().create_descriptor_set_layout(
-			"per_material",
-			{graphics::descriptor_set_layout_binding_element{0, // Albedo
-															 vk::DescriptorType::eCombinedImageSampler,
-															 1,
-															 vk::ShaderStageFlagBits::eFragment,
-															 {default_sampler_->native_sampler()}},
-			 graphics::descriptor_set_layout_binding_element{1, // Normal map
-															 vk::DescriptorType::eCombinedImageSampler,
-															 1,
-															 vk::ShaderStageFlagBits::eFragment,
-															 {default_sampler_->native_sampler()}},
-			 graphics::descriptor_set_layout_binding_element{2, // Material
-															 vk::DescriptorType::eCombinedImageSampler,
-															 1,
-															 vk::ShaderStageFlagBits::eFragment,
-															 {default_sampler_->native_sampler()}},
-			 graphics::descriptor_set_layout_binding_element{3, // Emission
-															 vk::DescriptorType::eCombinedImageSampler,
-															 1,
-															 vk::ShaderStageFlagBits::eFragment,
-															 {default_sampler_->native_sampler()}}});
-	/* Currently unneeded because the model matrix can be passed using push constants.
-	 gs_.graphics_manager().create_descriptor_set_layout(
-			"per_scene",
-			{{0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eAllGraphics, {}}});
-	*/
+	create_descriptor_sets();
 	pipeline_layout_scene_pass_ = gs_.graphics_manager().create_pipeline_layout(
 			"scene_pass", {descriptor_set_layout_per_scene_, descriptor_set_layout_per_material_},
 			{vk::PushConstantRange(vk::ShaderStageFlagBits::eAllGraphics, 0,
@@ -112,6 +82,40 @@ void renderer_system::create_samplers() {
 			"default", vk::Filter::eLinear, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear,
 			graphics::sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, max_anisotropy, {}, 0.0,
 			64.0f, vk::BorderColor::eIntOpaqueBlack);
+}
+
+void renderer_system::create_descriptor_sets() {
+	descriptor_set_layout_per_scene_ = gs_.graphics_manager().create_descriptor_set_layout(
+			"per_scene",
+			{graphics::descriptor_set_layout_binding_element{
+					0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eAllGraphics, {}}});
+	descriptor_set_layout_per_material_ = gs_.graphics_manager().create_descriptor_set_layout(
+			"per_material",
+			{graphics::descriptor_set_layout_binding_element{0, // Albedo
+															 vk::DescriptorType::eCombinedImageSampler,
+															 1,
+															 vk::ShaderStageFlagBits::eFragment,
+															 {default_sampler_->native_sampler()}},
+			 graphics::descriptor_set_layout_binding_element{1, // Normal map
+															 vk::DescriptorType::eCombinedImageSampler,
+															 1,
+															 vk::ShaderStageFlagBits::eFragment,
+															 {default_sampler_->native_sampler()}},
+			 graphics::descriptor_set_layout_binding_element{2, // Material
+															 vk::DescriptorType::eCombinedImageSampler,
+															 1,
+															 vk::ShaderStageFlagBits::eFragment,
+															 {default_sampler_->native_sampler()}},
+			 graphics::descriptor_set_layout_binding_element{3, // Emission
+															 vk::DescriptorType::eCombinedImageSampler,
+															 1,
+															 vk::ShaderStageFlagBits::eFragment,
+															 {default_sampler_->native_sampler()}}});
+	/* Currently unneeded because the model matrix can be passed using push constants.
+	 gs_.graphics_manager().create_descriptor_set_layout(
+			"per_scene",
+			{{0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eAllGraphics, {}}});
+	*/
 }
 
 } /* namespace rendering */
