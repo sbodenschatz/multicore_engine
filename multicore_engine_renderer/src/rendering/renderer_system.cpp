@@ -20,8 +20,8 @@ namespace mce {
 namespace rendering {
 
 renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& gs)
-		: gs_{gs}, mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
-						   &(gs.destruction_queue_manager()), gs.transfer_manager()),
+		: eng_{eng}, gs_{gs}, mdl_mgr(eng.model_data_manager(), gs.device(), gs.memory_manager(),
+									  &(gs.destruction_queue_manager()), gs.transfer_manager()),
 		  mat_mgr(eng.asset_manager(), gs.texture_manager()) {
 
 	graphics::shader_loader shader_ldr(eng.asset_manager(), gs_.graphics_manager());
@@ -30,16 +30,7 @@ renderer_system::renderer_system(core::engine& eng, graphics::graphics_system& g
 	std::string main_forward_fragment_shader_name = "shaders/main_forward.frag";
 	shader_ldr.load_shader(main_forward_fragment_shader_name);
 
-	auto anisotropy = eng.config_store().resolve("anisotropy", -1.0f);
-	boost::optional<float> max_anisotropy;
-	auto aniso_val = anisotropy->value();
-	if(aniso_val > 0.0f) {
-		max_anisotropy = aniso_val;
-	}
-	default_sampler_ = gs.graphics_manager().create_sampler(
-			"default", vk::Filter::eLinear, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear,
-			graphics::sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, max_anisotropy, {}, 0.0,
-			64.0f, vk::BorderColor::eIntOpaqueBlack);
+	create_samplers();
 	descriptor_set_layout_per_scene_ = gs_.graphics_manager().create_descriptor_set_layout(
 			"per_scene",
 			{graphics::descriptor_set_layout_binding_element{
@@ -109,6 +100,19 @@ renderer_system::~renderer_system() {}
 
 void renderer_system::prerender(const mce::core::frame_time&) {}
 void renderer_system::postrender(const mce::core::frame_time&) {}
+
+void renderer_system::create_samplers() {
+	auto anisotropy = eng_.config_store().resolve("anisotropy", -1.0f);
+	boost::optional<float> max_anisotropy;
+	auto aniso_val = anisotropy->value();
+	if(aniso_val > 0.0f) {
+		max_anisotropy = aniso_val;
+	}
+	default_sampler_ = gs_.graphics_manager().create_sampler(
+			"default", vk::Filter::eLinear, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear,
+			graphics::sampler_addressing_mode(vk::SamplerAddressMode::eRepeat), 0.0f, max_anisotropy, {}, 0.0,
+			64.0f, vk::BorderColor::eIntOpaqueBlack);
+}
 
 } /* namespace rendering */
 } /* namespace mce */

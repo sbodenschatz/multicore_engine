@@ -32,6 +32,7 @@ namespace rendering {
 
 /// Provides the high-level rendering functionality for entities in a scene for the engine.
 class renderer_system : public core::system {
+	core::engine& eng_;
 	graphics::graphics_system& gs_;
 	model_manager mdl_mgr;
 	material_manager mat_mgr;
@@ -45,6 +46,8 @@ class renderer_system : public core::system {
 
 	friend class static_model_component;
 	friend class technique;
+
+	void create_samplers();
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
