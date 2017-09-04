@@ -17,6 +17,7 @@ get_version_info()
 if(NOT STATIC_ANALYSIS_ONLY)
 	bootstrap_tools()
 	add_subdirectory(multicore_engine_assets)
+	add_subdirectory(multicore_engine_test_assets)
 endif()
 
 add_subdirectory(multicore_engine_parsers)
