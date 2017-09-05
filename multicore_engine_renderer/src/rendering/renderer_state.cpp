@@ -50,11 +50,19 @@ void renderer_state::record_render_task(const render_task& task,
 	static_cast<void>(local_data);
 }
 void renderer_state::collect_scene_uniforms() {
-	// TODO: Implement
+	auto sys = static_cast<renderer_system*>(system_);
+	// TODO: Implement camera selection.
+	auto cam = camera_comps.begin();
+	scene_uniforms.view = glm::inverse(cam->owner().calculate_transform());
+	scene_uniforms.projection = glm::perspectiveFov(cam->fov(), float(sys->gs_.window().swapchain_size().x),
+													float(sys->gs_.window().swapchain_size().y),
+													cam->near_plane(), cam->far_plane());
+	/// TODO: Implement light collection.
 }
 void renderer_state::render(const mce::core::frame_time&) {
 	auto sys = static_cast<renderer_system*>(system_);
 	auto& frame_data = sys->per_frame_data();
+	if(camera_comps.empty()) return;
 	collect_scene_uniforms();
 	auto scene_uniform_descriptor = frame_data.uniform_buffer.store(scene_uniforms);
 	frame_data.scene_descriptor_set =
