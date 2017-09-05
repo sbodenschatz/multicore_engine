@@ -15,6 +15,7 @@
 #include <boost/container/small_vector.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
 #include <mce/containers/generic_flat_map.hpp>
@@ -121,6 +122,14 @@ public:
 	/// Sets the position of the entity to the given value.
 	void position(const entity_position_t& position) {
 		position_ = position;
+	}
+
+	glm::mat4 calculate_transform() const {
+		glm::mat4 transform = glm::toMat4(orientation_);
+		transform[3].x = position_.x;
+		transform[3].y = position_.y;
+		transform[3].z = position_.z;
+		return transform;
 	}
 };
 
