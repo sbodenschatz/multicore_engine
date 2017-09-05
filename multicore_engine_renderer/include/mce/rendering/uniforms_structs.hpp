@@ -17,8 +17,9 @@ namespace rendering {
 /// Defines the uniform data required for each point light.
 struct per_point_light_uniforms {
 	glm::vec3 position; ///< The position of the light in world coordinates.
-	glm::vec3 color;	///< The color of the light.
 	float radius;		///< The radius of influence of the light.
+	glm::vec3 color;	///< The color of the light.
+	float brightness;   ///< The brightness of the light.
 };
 
 /// The maximum number of lights supported in the forward rendering pass.
