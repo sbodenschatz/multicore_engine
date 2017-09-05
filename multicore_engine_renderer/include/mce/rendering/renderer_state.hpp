@@ -15,6 +15,7 @@
 #include <glm/matrix.hpp>
 #include <mce/containers/scratch_pad_pool.hpp>
 #include <mce/containers/smart_object_pool.hpp>
+#include <mce/containers/smart_object_pool_range.hpp>
 #include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/core/system_state.hpp>
 #include <mce/memory/aligned_new.hpp>
@@ -22,6 +23,7 @@
 #include <mce/rendering/point_light_component.hpp>
 #include <mce/rendering/static_model.hpp>
 #include <mce/rendering/static_model_component.hpp>
+#include <tbb/parallel_reduce.h>
 
 namespace mce {
 namespace entity {
@@ -46,6 +48,17 @@ class renderer_state : public core::system_state {
 	};
 
 	containers::scratch_pad_pool<std::vector<render_task>> render_task_buffer_pool;
+
+	struct task_reducer {
+		renderer_state& rs;
+		containers::scratch_pad_pool<std::vector<render_task>>::object buffer;
+		task_reducer(renderer_state& rs) : rs{rs}, buffer{rs.render_task_buffer_pool.get()} {}
+		task_reducer(const task_reducer& other, tbb::split)
+				: rs{other.rs}, buffer{rs.render_task_buffer_pool.get()} {}
+		void operator()(const containers::smart_object_pool_range<
+						containers::smart_object_pool<static_model_component>::const_iterator>& range);
+		void join(const task_reducer& other);
+	};
 
 public:
 	ALIGNED_NEW_AND_DELETE(renderer_state)
