@@ -17,6 +17,8 @@
 #include <mce/containers/per_thread.hpp>
 #include <mce/core/system.hpp>
 #include <mce/graphics/command_pool.hpp>
+#include <mce/graphics/simple_descriptor_pool.hpp>
+#include <mce/graphics/simple_uniform_buffer.hpp>
 #include <mce/rendering/material_manager.hpp>
 #include <mce/rendering/model_manager.hpp>
 
@@ -44,12 +46,15 @@ struct renderer_system_settings {
 class renderer_system : public core::system {
 	struct per_frame_data_t {
 		vk::UniqueCommandBuffer primary_command_buffer;
+		graphics::simple_uniform_buffer uniform_buffer;
+		graphics::simple_descriptor_pool discriptor_pool;
 	};
 	struct per_thread_data_t {
 		graphics::command_pool command_pool;
 	};
 	struct per_frame_per_thread_data_t {
 		vk::UniqueCommandBuffer command_buffer;
+		graphics::growing_simple_descriptor_pool discriptor_pool;
 	};
 
 	core::engine& eng_;

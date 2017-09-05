@@ -200,7 +200,11 @@ void renderer_system::create_pipelines() {
 }
 void renderer_system::create_per_frame_data() {
 	per_frame_data_ = {gs_.window().swapchain_images().size(), containers::generator_param([this](size_t) {
-						   return per_frame_data_t{primary_cmd_pool.allocate_primary_command_buffer()};
+						   return per_frame_data_t{
+								   primary_cmd_pool.allocate_primary_command_buffer(),
+								   {gs_.device(), gs_.memory_manager(), nullptr, 1024},
+								   {gs_.device(), graphics::descriptor_set_resources(
+														  *descriptor_set_layout_per_scene_, 1)}};
 					   })};
 }
 void renderer_system::create_per_thread_data() {
@@ -211,14 +215,16 @@ void renderer_system::create_per_thread_data() {
 			}));
 }
 void renderer_system::create_per_frame_per_thread_data() {
-	per_frame_per_thread_data_ = {gs_.window().swapchain_images().size(), eng_.max_general_concurrency(),
-								  containers::generator_param([this](size_t) {
-									  return containers::generator_param([this](size_t i) {
-										  return per_frame_per_thread_data_t{
-												  (per_thread_data_->begin() +
-												   i)->command_pool.allocate_secondary_command_buffer()};
-									  });
-								  })};
+	per_frame_per_thread_data_ = {
+			gs_.window().swapchain_images().size(), eng_.max_general_concurrency(),
+			containers::generator_param([this](size_t) {
+				return containers::generator_param([this](size_t i) {
+					return per_frame_per_thread_data_t{
+							(per_thread_data_->begin() + i)->command_pool.allocate_secondary_command_buffer(),
+							{gs_.device(),
+							 graphics::descriptor_set_resources(*descriptor_set_layout_per_material_, 1024)}};
+				});
+			})};
 }
 renderer_system::per_frame_data_t& renderer_system::per_frame_data() {
 	return per_frame_data_[gs_.current_swapchain_image()];
