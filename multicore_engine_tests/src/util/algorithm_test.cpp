@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <gtest.hpp>
 #include <mce/util/algorithm.hpp>
 #include <vector>
@@ -141,6 +142,43 @@ TEST(util_algorithm, n_unique_partial_groups) {
 		}
 		ASSERT_TRUE(data == data_expected);
 	}
+}
+
+TEST(util_algorithm, grouped_foreach_1_grouping) {
+	using element = std::array<int, 3>;
+	std::string res;
+	std::vector<element> elements = {{0, 0, 0}, {0, 0, 1}, {0, 0, 2}, {2, 0, 0}, {2, 1, 0},
+									 {2, 1, 1}, {3, 0, 0}, {3, 0, 1}, {3, 1, 0}, {3, 1, 1}};
+	grouped_foreach(elements.begin(), elements.end(),
+					[&res](const element& e) {
+						res += "(" + std::to_string(e[0]) + " " + std::to_string(e[1]) + " " +
+							   std::to_string(e[2]) + ")";
+					},
+					make_foreach_grouping([](const element& e1, const element& e2) { return e1[0] == e2[0]; },
+										  [&res](const element&) { res += "A["; },
+										  [&res](const element&) { res += "]A"; }));
+	ASSERT_EQ("A[(0 0 0)(0 0 1)(0 0 2)]AA[(2 0 0)(2 1 0)(2 1 1)]AA[(3 0 0)(3 0 1)(3 1 0)(3 1 1)]A", res);
+}
+
+TEST(util_algorithm, grouped_foreach_2_groupings) {
+	using element = std::array<int, 3>;
+	std::string res;
+	std::vector<element> elements = {{0, 0, 0}, {0, 0, 1}, {0, 0, 2}, {2, 0, 0}, {2, 1, 0},
+									 {2, 1, 1}, {3, 0, 0}, {3, 0, 1}, {3, 1, 0}, {3, 1, 1}};
+	grouped_foreach(elements.begin(), elements.end(),
+					[&res](const element& e) {
+						res += "(" + std::to_string(e[0]) + " " + std::to_string(e[1]) + " " +
+							   std::to_string(e[2]) + ")";
+					},
+					make_foreach_grouping([](const element& e1, const element& e2) { return e1[0] == e2[0]; },
+										  [&res](const element&) { res += "A["; },
+										  [&res](const element&) { res += "]A"; }),
+					make_foreach_grouping([](const element& e1, const element& e2) { return e1[1] == e2[1]; },
+										  [&res](const element&) { res += "B["; },
+										  [&res](const element&) { res += "]B"; }));
+	ASSERT_EQ("A[B[(0 0 0)(0 0 1)(0 0 2)]B]AA[B[(2 0 0)]BB[(2 1 0)(2 1 1)]B]A"
+			  "A[B[(3 0 0)(3 0 1)]BB[(3 1 0)(3 1 1)]B]A",
+			  res);
 }
 
 } // namespace util
