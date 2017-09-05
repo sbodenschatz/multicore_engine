@@ -29,7 +29,6 @@ struct smart_object_pool_range {
 	It upper; ///< The end of this range
 	/// Creates a range from a given start and end iterator.
 	smart_object_pool_range(It lower, It upper) : lower{lower}, upper{upper.make_limiter()} {
-		if(!lower.target.containing_block) throw logic_exception("Start of block can't be end iterator.");
 	}
 	/// Tests if the range is empty (doesn't contain objects to process).
 	bool empty() const noexcept {
@@ -37,6 +36,7 @@ struct smart_object_pool_range {
 	}
 	/// Tests if the range can be divided into smaller ranges.
 	bool is_divisible() const noexcept {
+		if(lower == It()) return false;
 		auto x = lower;
 		if(x == upper) return false;
 		x++;
@@ -45,8 +45,7 @@ struct smart_object_pool_range {
 	/// Splits this range and stores on part in *this and the other part in other.
 	smart_object_pool_range(smart_object_pool_range& other, tbb::split)
 			: lower{other.lower}, upper{other.upper} {
-		if(!lower.target.containing_block || !lower.pool)
-			throw logic_exception("Start of block can't be end iterator.");
+		if(!lower.target.containing_block || !lower.pool) throw logic_exception("Can't split empty range.");
 		size_t i0 = lower.target.containing_block->block_index * lower.pool_block_size() +
 					(lower.target.entry - lower.target.containing_block->entries);
 		size_t i1 = lower.pool->block_count.load() * lower.pool_block_size();
