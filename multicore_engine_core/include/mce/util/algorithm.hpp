@@ -183,13 +183,13 @@ It grouped_foreach(It begin, It end, ElementFunc element_func, ParentPred parent
 	auto pred = [&parent_pred, &group](const auto& a, const auto& b) {
 		return parent_pred(a, b) && group.eq_pred(a, b);
 	};
-	auto group_key = *begin;
-	group.pre(group_key);
+	auto group_key = begin;
+	group.pre(*group_key);
 	do {
 		element_func(*begin);
 		++begin;
-	} while((begin != end) && pred(group_key, *begin));
-	group.post(group_key);
+	} while((begin != end) && pred(*group_key, *begin));
+	group.post(*group_key);
 	return begin;
 }
 
@@ -199,12 +199,12 @@ It grouped_foreach(It begin, It end, ElementFunc element_func, ParentPred parent
 	auto pred = [&parent_pred, &group](const auto& a, const auto& b) {
 		return parent_pred(a, b) && group.eq_pred(a, b);
 	};
-	auto group_key = *begin;
-	group.pre(group_key);
+	auto group_key = begin;
+	group.pre(*group_key);
 	do {
 		begin = grouped_foreach(begin, end, element_func, pred, groups...);
-	} while((begin != end) && pred(group_key, *begin));
-	group.post(group_key);
+	} while((begin != end) && pred(*group_key, *begin));
+	group.post(*group_key);
 	return begin;
 }
 
@@ -223,7 +223,7 @@ It grouped_foreach(It begin, It end, ElementFunc element_func, ParentPred parent
  * When a group is started, the pre function object of the grouping is called.
  * When a group ends, the post function object of the grouping is called.
  *
- * At the start of a group, the first element is copied and used as the group key.
+ * At the start of a group, the iterator to the first element is stored as the iterator to the group key.
  * The group g ends when the current element is no longer equal to the group key according to the eq_pred of
  * any of the groupings not nested deeper than the grouping of g.
  * Only the groups for which eq_pred returns false and further nested groups are exited.
