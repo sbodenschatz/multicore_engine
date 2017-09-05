@@ -49,9 +49,18 @@ void renderer_state::record_render_task(const render_task& task,
 	static_cast<void>(task);
 	static_cast<void>(local_data);
 }
+void renderer_state::collect_scene_uniforms() {
+	// TODO: Implement
+}
 void renderer_state::render(const mce::core::frame_time&) {
 	auto sys = static_cast<renderer_system*>(system_);
 	auto& frame_data = sys->per_frame_data();
+	collect_scene_uniforms();
+	auto scene_uniform_descriptor = frame_data.uniform_buffer.store(scene_uniforms);
+	frame_data.scene_descriptor_set =
+			frame_data.discriptor_pool.allocate_descriptor_set(sys->descriptor_set_layout_per_scene_);
+	frame_data.scene_descriptor_set.get().update()(0, 0, vk::DescriptorType::eUniformBuffer,
+												   {scene_uniform_descriptor});
 	for(renderer_system::per_frame_per_thread_data_t& local_data :
 		sys->per_frame_per_thread_data_[sys->gs_.current_swapchain_image()].all()) {
 		record_per_scene_data(local_data, frame_data);

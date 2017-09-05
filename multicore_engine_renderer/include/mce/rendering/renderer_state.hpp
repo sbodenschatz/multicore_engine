@@ -24,6 +24,7 @@
 #include <mce/rendering/renderer_system.hpp>
 #include <mce/rendering/static_model.hpp>
 #include <mce/rendering/static_model_component.hpp>
+#include <mce/rendering/uniforms_structs.hpp>
 #include <tbb/parallel_reduce.h>
 
 namespace mce {
@@ -41,6 +42,8 @@ class renderer_state : public core::system_state {
 	containers::smart_object_pool<camera_component, 4> camera_comps;
 	containers::smart_object_pool<point_light_component> point_light_comps;
 	containers::smart_object_pool<static_model_component> static_model_comps;
+
+	per_scene_uniforms scene_uniforms;
 
 	struct render_task {
 		const material* used_material;
@@ -72,6 +75,7 @@ class renderer_state : public core::system_state {
 							  renderer_system::per_frame_per_thread_data_t& local_data) const;
 	void record_render_task(const render_task& task,
 							renderer_system::per_frame_per_thread_data_t& local_data) const;
+	void collect_scene_uniforms();
 
 public:
 	ALIGNED_NEW_AND_DELETE(renderer_state)
