@@ -59,6 +59,9 @@ struct smart_object_pool_range;
  */
 template <typename T, size_t block_size = 0x10000u>
 class smart_object_pool {
+	template <typename It>
+	friend struct smart_object_pool_range;
+
 private:
 	static const int cacheline_alignment = 64;
 
@@ -343,7 +346,7 @@ private:
 
 	ALIGNED_NEW_AND_DELETE(smart_object_pool)
 
-	std::atomic<size_t> active_iterators{0};
+	mutable std::atomic<size_t> active_iterators{0};
 
 	alignas(cacheline_alignment) std::atomic<size_t> active_objects{0};
 
@@ -520,7 +523,7 @@ public:
 	template <typename It_T, typename Target_T>
 	class iterator_ : public std::iterator<std::forward_iterator_tag, It_T> {
 		Target_T target;
-		smart_object_pool<T, block_size>* pool;
+		const smart_object_pool<T, block_size>* pool;
 		bool is_limiter = false;
 		friend class smart_object_pool<T, block_size>;
 		template <typename It>
@@ -528,12 +531,13 @@ public:
 
 		struct no_skip_tag {};
 
-		iterator_(Target_T target, smart_object_pool<T, block_size>* pool, no_skip_tag)
+		iterator_(Target_T target, const smart_object_pool<T, block_size>* pool, no_skip_tag)
 				: target(target), pool{pool} {
 			++(pool->active_iterators);
 		}
 
-		iterator_(Target_T target, smart_object_pool<T, block_size>* pool) : target(target), pool{pool} {
+		iterator_(Target_T target, const smart_object_pool<T, block_size>* pool)
+				: target(target), pool{pool} {
 			++(pool->active_iterators);
 			skip_until_valid();
 		}
@@ -541,7 +545,22 @@ public:
 		void drop_iterator() {
 			if(pool) {
 				if(--(pool->active_iterators) == 0) {
-					pool->process_deferred_destruction();
+					// A const_cast is necessary here because a const iterator needs to be able to be
+					// constructed from a const pool object and must therefore point to the pool object by
+					// const pointer, but can keep objects alive as long as they are observable through the
+					// iterator. It therefore needs to destroy those deferred objects after the last observing
+					// iterator is dropped. The two main potential problems with const_cast are avoided here:
+					// 1. Casting away const allows a function with a contract to not modify the state of the
+					// object to modify it. This is avoided here because process_deferred_destruction doesn't
+					// modify the observable state of the pool in a way that is not caused by other operations
+					// (e.g. dropping a smart_pool_ptr). These operations are only deferred. This however
+					// implies that externally observable side effects of the destruction of objects become
+					// observable after the last iterator is destroyed.
+					// 2. Casting away const interferes with thread-safety because according to the standard
+					// library spec const objects should not be observably not thread-safe. This problem is
+					// avoided here due to process_deferred_destruction being internally synchronized in
+					// respect to the thread-safety contract of smart_object_pool.
+					const_cast<smart_object_pool<T, block_size>*>(pool)->process_deferred_destruction();
 				}
 			}
 		}
