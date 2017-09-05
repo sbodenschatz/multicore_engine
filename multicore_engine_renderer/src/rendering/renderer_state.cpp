@@ -7,6 +7,7 @@
 #include <cassert>
 #include <glm/gtc/matrix_transform.hpp>
 #include <mce/entity/entity_manager.hpp>
+#include <mce/graphics/graphics_system.hpp>
 #include <mce/rendering/renderer_state.hpp>
 #include <mce/util/algorithm.hpp>
 #include <tbb/parallel_sort.h>
@@ -24,9 +25,11 @@ void renderer_state::register_to_entity_manager(entity::entity_manager& em) {
 	REGISTER_COMPONENT_TYPE_SIMPLE(em, static_model,
 								   this->create_static_model_component(*this, owner, config), this);
 }
-void renderer_state::record_per_scene_data(renderer_system::per_frame_per_thread_data_t& local_data) const {
+void renderer_state::record_per_scene_data(renderer_system::per_frame_per_thread_data_t& local_data,
+										   renderer_system::per_frame_data_t& frame_data) const {
 	// TODO: Implement
 	static_cast<void>(local_data);
+	static_cast<void>(frame_data);
 }
 void renderer_state::record_per_material_data(
 		const material* used_material, renderer_system::per_frame_per_thread_data_t& local_data) const {
@@ -48,7 +51,11 @@ void renderer_state::record_render_task(const render_task& task,
 }
 void renderer_state::render(const mce::core::frame_time&) {
 	auto sys = static_cast<renderer_system*>(system_);
-	// TODO: Prepare command buffers and record per scene data into them.
+	auto& frame_data = sys->per_frame_data();
+	for(renderer_system::per_frame_per_thread_data_t& local_data :
+		sys->per_frame_per_thread_data_[sys->gs_.current_swapchain_image()].all()) {
+		record_per_scene_data(local_data, frame_data);
+	}
 	task_reducer red(*this);
 	tbb::parallel_reduce(containers::make_pool_const_range(static_model_comps), red);
 	tbb::parallel_sort(*(red.buffer));
@@ -76,7 +83,6 @@ void renderer_state::render(const mce::core::frame_time&) {
 						},
 						[](const render_task&) {}));
 	});
-	// TODO: Finish command buffers.
 }
 void renderer_state::task_reducer::
 operator()(const containers::smart_object_pool_range<

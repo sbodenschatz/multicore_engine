@@ -64,7 +64,8 @@ class renderer_state : public core::system_state {
 		void join(const task_reducer& other);
 	};
 
-	void record_per_scene_data(renderer_system::per_frame_per_thread_data_t& local_data) const;
+	void record_per_scene_data(renderer_system::per_frame_per_thread_data_t& local_data,
+							   renderer_system::per_frame_data_t& frame_data) const;
 	void record_per_material_data(const material* used_material,
 								  renderer_system::per_frame_per_thread_data_t& local_data) const;
 	void record_per_mesh_data(const static_model::mesh* used_mesh,
