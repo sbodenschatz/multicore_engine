@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <mce/entity/entity_manager.hpp>
 #include <mce/graphics/graphics_system.hpp>
+#include <mce/graphics/pipeline.hpp>
 #include <mce/rendering/renderer_state.hpp>
 #include <mce/util/algorithm.hpp>
 #include <tbb/parallel_sort.h>
@@ -27,9 +28,10 @@ void renderer_state::register_to_entity_manager(entity::entity_manager& em) {
 }
 void renderer_state::record_per_scene_data(renderer_system::per_frame_per_thread_data_t& local_data,
 										   renderer_system::per_frame_data_t& frame_data) const {
-	// TODO: Implement
-	static_cast<void>(local_data);
-	static_cast<void>(frame_data);
+	auto sys = static_cast<renderer_system*>(system_);
+	sys->main_forward_pipeline_->bind(local_data.command_buffer.get());
+	graphics::descriptor_set::bind(local_data.command_buffer.get(), *(sys->pipeline_layout_scene_pass_), 0,
+								   {frame_data.scene_descriptor_set.get()}, {});
 }
 void renderer_state::record_per_material_data(
 		const material* used_material, renderer_system::per_frame_per_thread_data_t& local_data) const {
