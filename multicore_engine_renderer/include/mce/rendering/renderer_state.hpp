@@ -38,7 +38,7 @@ namespace rendering {
  * renderer_state is bound.
  */
 class renderer_state : public core::system_state {
-	containers::smart_object_pool<camera_component, 64> camera_comps;
+	containers::smart_object_pool<camera_component, 4> camera_comps;
 	containers::smart_object_pool<point_light_component> point_light_comps;
 	containers::smart_object_pool<static_model_component> static_model_comps;
 
