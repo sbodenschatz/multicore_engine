@@ -85,6 +85,12 @@ class renderer_system : public core::system {
 	void create_per_thread_data();
 	void create_per_frame_per_thread_data();
 
+	friend class renderer_state;
+
+	per_frame_data_t& per_frame_data();
+	per_frame_per_thread_data_t& per_frame_per_thread_data();
+	per_thread_data_t& per_thread_data();
+
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
 	int pre_phase_ordering() const noexcept override {

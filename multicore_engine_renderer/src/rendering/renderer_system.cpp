@@ -220,6 +220,17 @@ void renderer_system::create_per_frame_per_thread_data() {
 									  });
 								  })};
 }
+renderer_system::per_frame_data_t& renderer_system::per_frame_data() {
+	return per_frame_data_[gs_.current_swapchain_image()];
+}
+
+renderer_system::per_frame_per_thread_data_t& renderer_system::per_frame_per_thread_data() {
+	return per_frame_per_thread_data_[gs_.current_swapchain_image()].get();
+}
+
+renderer_system::per_thread_data_t& renderer_system::per_thread_data() {
+	return per_thread_data_->get();
+}
 
 } /* namespace rendering */
 } /* namespace mce */
