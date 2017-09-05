@@ -162,6 +162,60 @@ auto preference_sort(ValRange& val_range, const PrefRange& pref_range) {
 	return preference_sort(val_range.begin(), val_range.end(), pref_range.begin(), pref_range.end());
 }
 
+template <typename EqPred, typename Pre, typename Post>
+struct foreach_grouping {
+	EqPred eq_pred;
+	Pre pre;
+	Post post;
+};
+
+template <typename EqPred, typename Pre, typename Post>
+foreach_grouping<EqPred, Pre, Post> make_foreach_grouping(EqPred eq_pred, Pre pre, Post post) {
+	return {eq_pred, pre, post};
+}
+
+namespace detail {
+
+template <typename It, typename ElementFunc, typename ParentPred, typename Group, typename... Groups>
+It grouped_foreach(It begin, It end, ElementFunc element_func, ParentPred parent_pred, Group group) {
+	auto pred = [&parent_pred, &group](const auto& a, const auto& b) {
+		return parent_pred(a, b) && group.eq_pred(a, b);
+	};
+	auto group_key = *begin;
+	group.pre(group_key);
+	do {
+		element_func(*begin);
+		++begin;
+	} while((begin != end) && pred(group_key, *begin));
+	group.post(group_key);
+	return begin;
+}
+
+template <typename It, typename ElementFunc, typename ParentPred, typename Group, typename... Groups>
+It grouped_foreach(It begin, It end, ElementFunc element_func, ParentPred parent_pred, Group group,
+				   Groups... groups) {
+	auto pred = [&parent_pred, &group](const auto& a, const auto& b) {
+		return parent_pred(a, b) && group.eq_pred(a, b);
+	};
+	auto group_key = *begin;
+	group.pre(group_key);
+	do {
+		begin = grouped_foreach(begin, end, element_func, pred, groups...);
+	} while((begin != end) && pred(group_key, *begin));
+	group.post(group_key);
+	return begin;
+}
+
+} // namespace detail
+
+template <typename It, typename ElementFunc, typename... Groups>
+void grouped_foreach(It begin, It end, ElementFunc element_func, Groups&&... groups) {
+	do {
+		begin = detail::grouped_foreach(begin, end, element_func,
+										[](const auto&, const auto&) { return true; }, groups...);
+	} while(begin != end);
+}
+
 } // namespace util
 } // namespace mce
 
