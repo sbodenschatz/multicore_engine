@@ -12,6 +12,7 @@
  * Defines the renderer_system class.
  */
 
+#include <boost/optional.hpp>
 #include <cassert>
 #include <mce/containers/dynamic_array.hpp>
 #include <mce/containers/per_thread.hpp>
@@ -48,6 +49,7 @@ class renderer_system : public core::system {
 		vk::UniqueCommandBuffer primary_command_buffer;
 		graphics::simple_uniform_buffer uniform_buffer;
 		graphics::simple_descriptor_pool discriptor_pool;
+		boost::optional<graphics::descriptor_set> scene_descriptor_set;
 	};
 	struct per_thread_data_t {
 		graphics::command_pool command_pool;

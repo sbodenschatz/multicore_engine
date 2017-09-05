@@ -58,8 +58,9 @@ void renderer_system::prerender(const mce::core::frame_time&) {
 				vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit |
 												   vk::CommandBufferUsageFlagBits::eRenderPassContinue,
 										   &cbii));
+		pftd.discriptor_pool.reset();
 	}
-	auto& pcmdb = per_frame_data_[gs_.current_swapchain_image()].primary_command_buffer;
+	auto& pcmdb = per_frame_data().primary_command_buffer;
 	// pcmdb->reset({});
 	pcmdb->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
 	std::array<vk::ClearValue, 2> clear = {
@@ -67,6 +68,8 @@ void renderer_system::prerender(const mce::core::frame_time&) {
 			 vk::ClearDepthStencilValue(1.0f)}};
 	main_render_pass_->begin(pcmdb.get(), main_framebuffer_->pass(0).frame(gs_.current_swapchain_image()),
 							 clear, vk::SubpassContents::eSecondaryCommandBuffers);
+	per_frame_data().uniform_buffer.reset();
+	per_frame_data().discriptor_pool.reset();
 }
 void renderer_system::postrender(const mce::core::frame_time&) {
 	secondary_cmdbuff_handles_tmp.clear();
@@ -78,6 +81,7 @@ void renderer_system::postrender(const mce::core::frame_time&) {
 	if(!secondary_cmdbuff_handles_tmp.empty()) pcmdb->executeCommands(secondary_cmdbuff_handles_tmp);
 	pcmdb->endRenderPass();
 	pcmdb->end();
+	per_frame_data().uniform_buffer.flush();
 	gs_.enqueue_command_buffer(pcmdb.get());
 }
 
@@ -203,8 +207,9 @@ void renderer_system::create_per_frame_data() {
 						   return per_frame_data_t{
 								   primary_cmd_pool.allocate_primary_command_buffer(),
 								   {gs_.device(), gs_.memory_manager(), nullptr, 1024},
-								   {gs_.device(), graphics::descriptor_set_resources(
-														  *descriptor_set_layout_per_scene_, 1)}};
+								   {gs_.device(),
+									graphics::descriptor_set_resources(*descriptor_set_layout_per_scene_, 1)},
+								   {}};
 					   })};
 }
 void renderer_system::create_per_thread_data() {
