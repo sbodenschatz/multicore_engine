@@ -55,7 +55,7 @@ class renderer_state : public core::system_state {
 	struct task_reducer {
 		renderer_state& rs;
 		containers::scratch_pad_pool<std::vector<render_task>>::object buffer;
-		task_reducer(renderer_state& rs) : rs{rs}, buffer{rs.render_task_buffer_pool.get()} {}
+		explicit task_reducer(renderer_state& rs) : rs{rs}, buffer{rs.render_task_buffer_pool.get()} {}
 		task_reducer(const task_reducer& other, tbb::split)
 				: rs{other.rs}, buffer{rs.render_task_buffer_pool.get()} {}
 		void operator()(const containers::smart_object_pool_range<
