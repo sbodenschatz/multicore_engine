@@ -45,6 +45,9 @@ class renderer_state : public core::system_state {
 		const material* used_material;
 		const static_model::mesh* used_mesh;
 		glm::mat4 transform;
+		friend bool operator<(const render_task& a, const render_task& b) {
+			return std::tie(a.used_material, a.used_mesh) < std::tie(b.used_material, b.used_mesh);
+		}
 	};
 
 	containers::scratch_pad_pool<std::vector<render_task>> render_task_buffer_pool;

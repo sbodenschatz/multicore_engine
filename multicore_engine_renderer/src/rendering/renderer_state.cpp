@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <mce/entity/entity_manager.hpp>
 #include <mce/rendering/renderer_state.hpp>
+#include <tbb/parallel_sort.h>
 
 namespace mce {
 namespace rendering {
@@ -26,6 +27,7 @@ void renderer_state::register_to_entity_manager(entity::entity_manager& em) {
 void renderer_state::render(const mce::core::frame_time&) {
 	task_reducer red(*this);
 	tbb::parallel_reduce(containers::make_pool_const_range(static_model_comps), red);
+	tbb::parallel_sort(*(red.buffer));
 }
 void renderer_state::task_reducer::
 operator()(const containers::smart_object_pool_range<
