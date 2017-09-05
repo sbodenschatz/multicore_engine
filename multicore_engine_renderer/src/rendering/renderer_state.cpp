@@ -4,6 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <cassert>
+#include <glm/gtc/matrix_transform.hpp>
 #include <mce/entity/entity_manager.hpp>
 #include <mce/rendering/renderer_state.hpp>
 
@@ -22,7 +24,27 @@ void renderer_state::register_to_entity_manager(entity::entity_manager& em) {
 }
 
 void renderer_state::render(const mce::core::frame_time&) {
-	
+	task_reducer red(*this);
+	tbb::parallel_reduce(containers::make_pool_const_range(static_model_comps), red);
+}
+void renderer_state::task_reducer::
+operator()(const containers::smart_object_pool_range<
+		   containers::smart_object_pool<static_model_component>::const_iterator>& range) {
+	for(const static_model_component& c : range) {
+		if(c.ready()) {
+			assert(c.model());
+			assert(c.materials().size() == c.model()->meshes().size());
+			for(size_t i = 0; i < c.model()->meshes().size(); ++i) {
+				const auto& mesh = c.model()->meshes()[i];
+				auto mat = c.materials()[i].get();
+				auto transform = c.owner().calculate_transform();
+				buffer->push_back(render_task{mat, &mesh, transform});
+			}
+		}
+	}
+}
+void renderer_state::task_reducer::join(const task_reducer& other) {
+	buffer->insert(buffer->end(), other.buffer->begin(), other.buffer->end());
 }
 
 } /* namespace rendering */

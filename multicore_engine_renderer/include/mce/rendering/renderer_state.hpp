@@ -42,8 +42,8 @@ class renderer_state : public core::system_state {
 	containers::smart_object_pool<static_model_component> static_model_comps;
 
 	struct render_task {
-		material* used_material;
-		static_model::mesh* used_mesh;
+		const material* used_material;
+		const static_model::mesh* used_mesh;
 		glm::mat4 transform;
 	};
 
