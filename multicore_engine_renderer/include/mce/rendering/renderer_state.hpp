@@ -63,6 +63,8 @@ class renderer_state : public core::system_state {
 		void join(const task_reducer& other);
 	};
 
+	void record_render_task(const render_task& task) const;
+
 public:
 	ALIGNED_NEW_AND_DELETE(renderer_state)
 

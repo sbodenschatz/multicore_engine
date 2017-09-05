@@ -24,10 +24,20 @@ void renderer_state::register_to_entity_manager(entity::entity_manager& em) {
 								   this->create_static_model_component(*this, owner, config), this);
 }
 
+void renderer_state::record_render_task(const render_task& task) const {
+	// TODO: Implement
+	static_cast<void>(task);
+}
 void renderer_state::render(const mce::core::frame_time&) {
 	task_reducer red(*this);
 	tbb::parallel_reduce(containers::make_pool_const_range(static_model_comps), red);
 	tbb::parallel_sort(*(red.buffer));
+	using range = tbb::blocked_range<decltype(red.buffer->begin())>;
+	tbb::parallel_for(range(red.buffer->begin(), red.buffer->end()), [this](const range& r) {
+		for(const render_task& task : r) {
+			record_render_task(task);
+		}
+	});
 }
 void renderer_state::task_reducer::
 operator()(const containers::smart_object_pool_range<
