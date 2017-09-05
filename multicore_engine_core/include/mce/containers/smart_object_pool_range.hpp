@@ -68,6 +68,14 @@ struct smart_object_pool_range {
 		lower.skip_until_valid();
 		if(lower >= upper) lower = upper;
 	}
+
+	It begin() const noexcept {
+		return lower;
+	}
+
+	It end() const noexcept {
+		return upper;
+	}
 };
 
 /// Makes a smart_object_pool_range for the given smart_object_pool.
