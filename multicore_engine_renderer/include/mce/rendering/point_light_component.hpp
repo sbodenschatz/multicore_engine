@@ -27,6 +27,7 @@ class point_light_component : public entity::component {
 private:
 	glm::vec3 color_;
 	float radius_;
+	float brightness_;
 
 public:
 	/// \brief Creates a point_light_component for the given entity to attach to and the given
@@ -53,6 +54,16 @@ public:
 	/// Changes the influence radius of the light.
 	void radius(float radius) {
 		radius_ = radius;
+	}
+
+	/// Returns the brightness of the light.
+	float brightness() const {
+		return brightness_;
+	}
+
+	/// Changes the brightness of the light.
+	void brightness(float brightness) {
+		brightness_ = brightness;
 	}
 
 	/// Fills the given property_list with the properties available for this class.
