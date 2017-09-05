@@ -12,12 +12,15 @@
  * Defines the renderer_state class.
  */
 
+#include <glm/matrix.hpp>
+#include <mce/containers/scratch_pad_pool.hpp>
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/core/system_state.hpp>
 #include <mce/memory/aligned_new.hpp>
 #include <mce/rendering/camera_component.hpp>
 #include <mce/rendering/point_light_component.hpp>
+#include <mce/rendering/static_model.hpp>
 #include <mce/rendering/static_model_component.hpp>
 
 namespace mce {
@@ -35,6 +38,14 @@ class renderer_state : public core::system_state {
 	containers::smart_object_pool<camera_component, 64> camera_comps;
 	containers::smart_object_pool<point_light_component> point_light_comps;
 	containers::smart_object_pool<static_model_component> static_model_comps;
+
+	struct render_task {
+		material* used_material;
+		static_model::mesh* used_mesh;
+		glm::mat4 transform;
+	};
+
+	containers::scratch_pad_pool<std::vector<render_task>> render_task_buffer_pool;
 
 public:
 	ALIGNED_NEW_AND_DELETE(renderer_state)
@@ -67,6 +78,8 @@ public:
 
 	/// Registers the component types managed by renderer_state to the given entity_manager object.
 	void register_to_entity_manager(entity::entity_manager& em);
+
+	void render(const mce::core::frame_time& frame_time) override;
 };
 
 } /* namespace rendering */

@@ -21,5 +21,9 @@ void renderer_state::register_to_entity_manager(entity::entity_manager& em) {
 								   this->create_static_model_component(*this, owner, config), this);
 }
 
+void renderer_state::render(const mce::core::frame_time&) {
+	
+}
+
 } /* namespace rendering */
 } /* namespace mce */
