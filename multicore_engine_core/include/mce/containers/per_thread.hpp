@@ -150,7 +150,7 @@ public:
 	}
 	/// Returns an read-only iterator referring to the beginning of the used part of the objects array.
 	const_iterator cbegin() const noexcept {
-		return values_.begin();
+		return values_.cbegin();
 	}
 	/// Returns an read-write iterator referring to the end of the used part of the objects array.
 	iterator end() noexcept {
@@ -162,7 +162,7 @@ public:
 	}
 	/// Returns an read-only iterator referring to the end of the used part of the objects array.
 	const_iterator cend() const noexcept {
-		return values_.begin() + index_mapping_.used_slots();
+		return values_.cbegin() + index_mapping_.used_slots();
 	}
 	/// \brief Returns an read-write iterator referring to the beginning of the used part of the objects array
 	/// in reverse order.
@@ -177,7 +177,7 @@ public:
 	/// \brief Returns an read-only iterator referring to the beginning of the used part of the objects array
 	/// in reverse order.
 	const_reverse_iterator crbegin() const noexcept {
-		return end();
+		return cend();
 	}
 	/// \brief Returns an read-write iterator referring to the end of the used part of the objects array in
 	/// reverse order.
@@ -191,17 +191,17 @@ public:
 	}
 	/// \brief Returns an read-only iterator referring to the end of the used part of the objects array in
 	/// reverse order.
-	const_reverse_iterator crend() const {
-		return begin();
+	const_reverse_iterator crend() const noexcept {
+		return cbegin();
 	}
 
 	/// Returns the total number of slots in the pool.
-	size_type total_slots() const {
+	size_type total_slots() const noexcept {
 		return index_mapping_.total_slots();
 	}
 
 	/// Returns the number of slots used by / assigned to a thread.
-	size_type used_slots() const {
+	size_type used_slots() const noexcept {
 		return index_mapping_.used_slots();
 	}
 };
