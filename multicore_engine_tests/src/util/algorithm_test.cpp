@@ -147,8 +147,8 @@ TEST(util_algorithm, n_unique_partial_groups) {
 TEST(util_algorithm, grouped_foreach_1_grouping) {
 	using element = std::array<int, 3>;
 	std::string res;
-	std::vector<element> elements = {{0, 0, 0}, {0, 0, 1}, {0, 0, 2}, {2, 0, 0}, {2, 1, 0},
-									 {2, 1, 1}, {3, 0, 0}, {3, 0, 1}, {3, 1, 0}, {3, 1, 1}};
+	std::vector<element> elements = {{{0, 0, 0}}, {{0, 0, 1}}, {{0, 0, 2}}, {{2, 0, 0}}, {{2, 1, 0}},
+									 {{2, 1, 1}}, {{3, 0, 0}}, {{3, 0, 1}}, {{3, 1, 0}}, {{3, 1, 1}}};
 	grouped_foreach(elements.begin(), elements.end(),
 					[&res](const element& e) {
 						res += "(" + std::to_string(e[0]) + " " + std::to_string(e[1]) + " " +
@@ -163,8 +163,8 @@ TEST(util_algorithm, grouped_foreach_1_grouping) {
 TEST(util_algorithm, grouped_foreach_2_groupings) {
 	using element = std::array<int, 3>;
 	std::string res;
-	std::vector<element> elements = {{0, 0, 0}, {0, 0, 1}, {0, 0, 2}, {2, 0, 0}, {2, 1, 0},
-									 {2, 1, 1}, {3, 0, 0}, {3, 0, 1}, {3, 1, 0}, {3, 1, 1}};
+	std::vector<element> elements = {{{0, 0, 0}}, {{0, 0, 1}}, {{0, 0, 2}}, {{2, 0, 0}}, {{2, 1, 0}},
+									 {{2, 1, 1}}, {{3, 0, 0}}, {{3, 0, 1}}, {{3, 1, 0}}, {{3, 1, 1}}};
 	grouped_foreach(elements.begin(), elements.end(),
 					[&res](const element& e) {
 						res += "(" + std::to_string(e[0]) + " " + std::to_string(e[1]) + " " +
