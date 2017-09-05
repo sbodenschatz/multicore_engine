@@ -21,6 +21,7 @@
 #include <mce/memory/aligned_new.hpp>
 #include <mce/rendering/camera_component.hpp>
 #include <mce/rendering/point_light_component.hpp>
+#include <mce/rendering/renderer_system.hpp>
 #include <mce/rendering/static_model.hpp>
 #include <mce/rendering/static_model_component.hpp>
 #include <tbb/parallel_reduce.h>
@@ -63,10 +64,13 @@ class renderer_state : public core::system_state {
 		void join(const task_reducer& other);
 	};
 
-	void record_per_scene_data() const;
-	void record_per_material_data(const material* used_material) const;
-	void record_per_mesh_data(const static_model::mesh* used_mesh) const;
-	void record_render_task(const render_task& task) const;
+	void record_per_scene_data(renderer_system::per_frame_per_thread_data_t& local_data) const;
+	void record_per_material_data(const material* used_material,
+								  renderer_system::per_frame_per_thread_data_t& local_data) const;
+	void record_per_mesh_data(const static_model::mesh* used_mesh,
+							  renderer_system::per_frame_per_thread_data_t& local_data) const;
+	void record_render_task(const render_task& task,
+							renderer_system::per_frame_per_thread_data_t& local_data) const;
 
 public:
 	ALIGNED_NEW_AND_DELETE(renderer_state)

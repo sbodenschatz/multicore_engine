@@ -24,39 +24,56 @@ void renderer_state::register_to_entity_manager(entity::entity_manager& em) {
 	REGISTER_COMPONENT_TYPE_SIMPLE(em, static_model,
 								   this->create_static_model_component(*this, owner, config), this);
 }
-void renderer_state::record_per_scene_data() const {
+void renderer_state::record_per_scene_data(renderer_system::per_frame_per_thread_data_t& local_data) const {
 	// TODO: Implement
+	static_cast<void>(local_data);
 }
-void renderer_state::record_per_material_data(const material* used_material) const {
+void renderer_state::record_per_material_data(
+		const material* used_material, renderer_system::per_frame_per_thread_data_t& local_data) const {
 	// TODO: Implement
 	static_cast<void>(used_material);
+	static_cast<void>(local_data);
 }
-void renderer_state::record_per_mesh_data(const static_model::mesh* used_mesh) const {
+void renderer_state::record_per_mesh_data(const static_model::mesh* used_mesh,
+										  renderer_system::per_frame_per_thread_data_t& local_data) const {
 	// TODO: Implement
 	static_cast<void>(used_mesh);
+	static_cast<void>(local_data);
 }
-void renderer_state::record_render_task(const render_task& task) const {
+void renderer_state::record_render_task(const render_task& task,
+										renderer_system::per_frame_per_thread_data_t& local_data) const {
 	// TODO: Implement
 	static_cast<void>(task);
+	static_cast<void>(local_data);
 }
 void renderer_state::render(const mce::core::frame_time&) {
+	auto sys = static_cast<renderer_system*>(system_);
 	// TODO: Prepare command buffers and record per scene data into them.
 	task_reducer red(*this);
 	tbb::parallel_reduce(containers::make_pool_const_range(static_model_comps), red);
 	tbb::parallel_sort(*(red.buffer));
 	using range = tbb::blocked_range<decltype(red.buffer->begin())>;
-	tbb::parallel_for(range(red.buffer->begin(), red.buffer->end()), [this](const range& r) {
+	tbb::parallel_for(range(red.buffer->begin(), red.buffer->end()), [this, sys](const range& r) {
+		// auto& per_thread_data = sys->per_thread_data();
+		auto& per_frame_per_thread_data = sys->per_frame_per_thread_data();
 		util::grouped_foreach(
-				r.begin(), r.end(), [this](const render_task& task) { record_render_task(task); },
+				r.begin(), r.end(),
+				[this, &per_frame_per_thread_data](const render_task& task) {
+					record_render_task(task, per_frame_per_thread_data);
+				},
 				util::make_foreach_grouping(
 						[](const render_task& a, const render_task& b) {
 							return a.used_material == b.used_material;
 						},
-						[this](const render_task& task) { record_per_material_data(task.used_material); },
+						[this, &per_frame_per_thread_data](const render_task& task) {
+							record_per_material_data(task.used_material, per_frame_per_thread_data);
+						},
 						[](const render_task&) {}),
 				util::make_foreach_grouping(
 						[](const render_task& a, const render_task& b) { return a.used_mesh == b.used_mesh; },
-						[this](const render_task& task) { record_per_mesh_data(task.used_mesh); },
+						[this, &per_frame_per_thread_data](const render_task& task) {
+							record_per_mesh_data(task.used_mesh, per_frame_per_thread_data);
+						},
 						[](const render_task&) {}));
 	});
 	// TODO: Finish command buffers.
