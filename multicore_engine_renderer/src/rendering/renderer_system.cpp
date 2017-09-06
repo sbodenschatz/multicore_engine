@@ -53,7 +53,7 @@ void renderer_system::prerender(const mce::core::frame_time&) {
 	vk::CommandBufferInheritanceInfo cbii(
 			main_render_pass_->native_render_pass(), 0,
 			main_framebuffer_->pass(0).frame(gs_.current_swapchain_image()).native_framebuffer());
-	for(auto& pftd : per_frame_per_thread_data_[gs_.current_swapchain_image()]) {
+	for(auto& pftd : per_frame_per_thread_data_[gs_.current_swapchain_image()].all()) {
 		pftd.command_buffer->begin(
 				vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit |
 												   vk::CommandBufferUsageFlagBits::eRenderPassContinue,
@@ -73,7 +73,7 @@ void renderer_system::prerender(const mce::core::frame_time&) {
 }
 void renderer_system::postrender(const mce::core::frame_time&) {
 	secondary_cmdbuff_handles_tmp.clear();
-	for(auto& pftd : per_frame_per_thread_data_[gs_.current_swapchain_image()]) {
+	for(auto& pftd : per_frame_per_thread_data_[gs_.current_swapchain_image()].all()) {
 		pftd.command_buffer->end();
 		secondary_cmdbuff_handles_tmp.push_back(pftd.command_buffer.get());
 	}
@@ -206,7 +206,7 @@ void renderer_system::create_per_frame_data() {
 	per_frame_data_ = {gs_.window().swapchain_images().size(), containers::generator_param([this](size_t) {
 						   return per_frame_data_t{
 								   primary_cmd_pool.allocate_primary_command_buffer(),
-								   {gs_.device(), gs_.memory_manager(), nullptr, 1024},
+								   {gs_.device(), gs_.memory_manager(), nullptr, 1u << 20},
 								   {gs_.device(),
 									graphics::descriptor_set_resources(*descriptor_set_layout_per_scene_, 1)},
 								   {}};
