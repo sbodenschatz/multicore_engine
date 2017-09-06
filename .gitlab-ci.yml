@@ -55,6 +55,7 @@ stages:
     - cmake -E copy build/multicore_engine_model_converter/mce_model_converter ${BUILD_COMPILER_NAME}/model_converter
     - cmake -E copy build/multicore_engine_assets/engine.pack ${BUILD_COMPILER_NAME}/engine.pack
     - cmake -E copy build/multicore_engine_test_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
+    - glslangValidator -v
 
 .mingw-build-template: &mingw-build-task
     stage: build
@@ -77,6 +78,7 @@ stages:
     - cmake -E copy build/multicore_engine_model_converter/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
     - cmake -E copy build/multicore_engine_assets/engine.pack %BUILD_COMPILER_NAME%/engine.pack
     - cmake -E copy build/multicore_engine_test_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - glslangValidator -v
 
 .msbuild-build-template: &msbuild-build-task
     stage: build
@@ -102,6 +104,7 @@ stages:
     - cmake -E copy build/multicore_engine_test_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
     #- cmake -E remove_directory build/multicore_engine_assets
     #- cmake -E remove_directory build/multicore_engine_test_assets
+    - glslangValidator -v
 
 .package-task-template: &package-task
     stage: package
