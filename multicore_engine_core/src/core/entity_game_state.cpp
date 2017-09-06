@@ -13,7 +13,9 @@ entity_game_state::entity_game_state(mce::core::engine* engine, mce::core::game_
 									 mce::core::game_state* parent_state)
 		: game_state(engine, state_machine, parent_state), entity_manager_(engine) {}
 
-entity_game_state::~entity_game_state() {}
+entity_game_state::~entity_game_state() {
+	entity_manager_.clear_entities_and_entity_configurations();
+}
 
 } /* namespace core */
 } /* namespace mce */
