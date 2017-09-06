@@ -9,6 +9,7 @@
 #include <mce/entity/entity_manager.hpp>
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/pipeline.hpp>
+#include <mce/graphics/pipeline_layout.hpp>
 #include <mce/rendering/renderer_state.hpp>
 #include <mce/util/algorithm.hpp>
 #include <tbb/parallel_sort.h>
@@ -46,9 +47,11 @@ void renderer_state::record_per_mesh_data(const static_model::mesh* used_mesh,
 }
 void renderer_state::record_render_task(const render_task& task,
 										renderer_system::per_frame_per_thread_data_t& local_data) const {
-	// TODO: Implement
-	static_cast<void>(task);
-	static_cast<void>(local_data);
+	auto sys = static_cast<renderer_system*>(system_);
+	local_data.command_buffer->pushConstants<decltype(task.push_constants)>(
+			sys->pipeline_layout_scene_pass_->native_layout(), vk::ShaderStageFlagBits::eAllGraphics, 0,
+			task.push_constants);
+	task.used_mesh->record_draw_call(local_data.command_buffer.get());
 }
 void renderer_state::collect_scene_uniforms() {
 	auto sys = static_cast<renderer_system*>(system_);
@@ -113,7 +116,7 @@ operator()(const containers::smart_object_pool_range<
 				const auto& mesh = c.model()->meshes()[i];
 				auto mat = c.materials()[i].get();
 				auto transform = c.owner().calculate_transform();
-				buffer->push_back(render_task{mat, &mesh, transform});
+				buffer->push_back(render_task{mat, &mesh, {transform}});
 			}
 		}
 	}
