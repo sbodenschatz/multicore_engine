@@ -5,6 +5,7 @@
  */
 
 #include <mce/exceptions.hpp>
+#include <mce/graphics/descriptor_set.hpp>
 #include <mce/graphics/texture_manager.hpp>
 #include <mce/rendering/material.hpp>
 #include <mce/rendering/material_manager.hpp>
@@ -131,6 +132,10 @@ void material::check_load_fails() {
 		try_raise_error_flag(std::make_exception_ptr(
 				mce::path_not_found_exception("Material '" + name_ + "' not found.")));
 	}
+}
+void material::bind(graphics::descriptor_set& ds) const {
+	ds.update()(0, 0, vk::DescriptorType::eCombinedImageSampler,
+				{albedo_map_->bind(), normal_map_->bind(), material_map_->bind(), emission_map_->bind()});
 }
 
 } /* namespace rendering */
