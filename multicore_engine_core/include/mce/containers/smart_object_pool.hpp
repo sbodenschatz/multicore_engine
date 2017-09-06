@@ -509,7 +509,7 @@ public:
 	/// requirements
 	/// of ForwardIterator.
 	/**
-	 * To facilitate block-base parallelism this iterator class provides two types of iterator object:
+	 * To facilitate block-based parallelism this iterator class provides two types of iterator object:
 	 * - normal:
 	 * 	Skips over empty object slots and thus ensures that the iterator always either references a living
 	 * object or is a past-end-iterator.
@@ -650,7 +650,8 @@ public:
 					target.entry <= it.target.entry) ||
 				   (it.is_limiter && target.containing_block && it.target.containing_block &&
 					it.target.containing_block->block_index <= target.containing_block->block_index &&
-					it.target.entry <= target.entry);
+					it.target.entry <= target.entry) ||
+				   (is_limiter && !(it.target.entry)) || (it.is_limiter && !(target.entry));
 		}
 
 		/// Compares *this with it and returns true if they are considered not equal.
