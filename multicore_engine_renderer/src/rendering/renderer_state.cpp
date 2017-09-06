@@ -36,9 +36,11 @@ void renderer_state::record_per_scene_data(renderer_system::per_frame_per_thread
 }
 void renderer_state::record_per_material_data(
 		const material* used_material, renderer_system::per_frame_per_thread_data_t& local_data) const {
-	// TODO: Implement
-	static_cast<void>(used_material);
-	static_cast<void>(local_data);
+	auto sys = static_cast<renderer_system*>(system_);
+	auto ds = local_data.discriptor_pool.allocate_descriptor_set(sys->descriptor_set_layout_per_material_);
+	used_material->bind(ds);
+	graphics::descriptor_set::bind(local_data.command_buffer.get(), *(sys->pipeline_layout_scene_pass_), 1,
+								   {ds}, {});
 }
 void renderer_state::record_per_mesh_data(const static_model::mesh* used_mesh,
 										  renderer_system::per_frame_per_thread_data_t& local_data) const {
