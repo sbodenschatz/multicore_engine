@@ -16,6 +16,8 @@ get_version_info()
 
 if(NOT STATIC_ANALYSIS_ONLY)
 	bootstrap_tools()
+	set(BOOTSTRAP_LOAD_UNIT_GEN ${BOOTSTRAP_LOAD_UNIT_GEN} PARENT_SCOPE)
+	set(BOOTSTRAP_PACK_FILE_GEN ${BOOTSTRAP_PACK_FILE_GEN} PARENT_SCOPE)
 	add_subdirectory(multicore_engine_assets)
 	add_subdirectory(multicore_engine_test_assets)
 endif()
