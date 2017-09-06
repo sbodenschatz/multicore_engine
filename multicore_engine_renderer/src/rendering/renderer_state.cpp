@@ -41,9 +41,8 @@ void renderer_state::record_per_material_data(
 }
 void renderer_state::record_per_mesh_data(const static_model::mesh* used_mesh,
 										  renderer_system::per_frame_per_thread_data_t& local_data) const {
-	// TODO: Implement
-	static_cast<void>(used_mesh);
-	static_cast<void>(local_data);
+	used_mesh->bind_vertices(local_data.command_buffer.get());
+	used_mesh->bind_indices(local_data.command_buffer.get());
 }
 void renderer_state::record_render_task(const render_task& task,
 										renderer_system::per_frame_per_thread_data_t& local_data) const {
