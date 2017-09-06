@@ -45,12 +45,12 @@ public:
 		far_plane_ = far_plane;
 	}
 
-	/// Returns the field-of-view angle (the opening angle of the view frustum).
+	/// Returns the field-of-view angle (the opening angle of the view frustum) in degrees.
 	float fov() const {
 		return fov_;
 	}
 
-	/// Changes the field-of-view angle (the opening angle of the view frustum).
+	/// Changes the field-of-view angle (the opening angle of the view frustum) in degrees.
 	void fov(float fov) {
 		fov_ = fov;
 	}

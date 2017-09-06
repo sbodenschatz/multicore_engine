@@ -60,9 +60,9 @@ void renderer_state::collect_scene_uniforms() {
 	// TODO: Implement camera selection.
 	auto cam = camera_comps.begin();
 	scene_uniforms.view = glm::inverse(cam->owner().calculate_transform());
-	scene_uniforms.projection = glm::perspectiveFov(cam->fov(), float(sys->gs_.window().swapchain_size().x),
-													float(sys->gs_.window().swapchain_size().y),
-													cam->near_plane(), cam->far_plane());
+	scene_uniforms.projection = glm::perspectiveFov(
+			glm::radians(cam->fov()), float(sys->gs_.window().swapchain_size().x),
+			float(sys->gs_.window().swapchain_size().y), cam->near_plane(), cam->far_plane());
 	scene_uniforms.active_lights = 0;
 	for(const point_light_component& plc : point_light_comps) {
 		if(scene_uniforms.active_lights < max_forward_lights) {
