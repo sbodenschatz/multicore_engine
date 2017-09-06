@@ -63,7 +63,17 @@ void renderer_state::collect_scene_uniforms() {
 	scene_uniforms.projection = glm::perspectiveFov(cam->fov(), float(sys->gs_.window().swapchain_size().x),
 													float(sys->gs_.window().swapchain_size().y),
 													cam->near_plane(), cam->far_plane());
-	/// TODO: Implement light collection.
+	scene_uniforms.active_lights = 0;
+	for(const point_light_component& plc : point_light_comps) {
+		if(scene_uniforms.active_lights < max_forward_lights) {
+			auto& l = scene_uniforms.forward_lights[scene_uniforms.active_lights];
+			l.brightness = plc.brightness();
+			l.color = plc.color();
+			l.radius = plc.radius();
+			l.position = plc.owner().position();
+			scene_uniforms.active_lights++;
+		}
+	}
 }
 void renderer_state::render(const mce::core::frame_time&) {
 	auto sys = static_cast<renderer_system*>(system_);
