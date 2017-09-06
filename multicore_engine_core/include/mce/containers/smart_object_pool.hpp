@@ -586,14 +586,14 @@ public:
 		}
 
 		/// Allows copying of the iterator.
-		iterator_(const iterator_<T, block_entry_link>& it) noexcept
+		iterator_(const iterator_& it) noexcept
 				: target{it.target.entry, it.target.containing_block}, pool{it.pool}, is_limiter{
 																							  it.is_limiter} {
 			if(pool) ++(pool->active_iterators);
 		}
 
 		/// Allows copying of the iterator.
-		iterator_& operator=(const iterator_<T, block_entry_link>& it) noexcept {
+		iterator_& operator=(const iterator_& it) noexcept {
 			is_limiter = it.is_limiter;
 			target = {it.target.entry, it.target.containing_block};
 			if(pool != it.pool) {
@@ -605,7 +605,7 @@ public:
 		}
 
 		/// Allows moving of the iterator.
-		iterator_(iterator_<T, block_entry_link>&& it) noexcept
+		iterator_(iterator_&& it) noexcept
 				: target{it.target.entry, it.target.containing_block}, pool{it.pool}, is_limiter{
 																							  it.is_limiter} {
 			it.target.entry = nullptr;
@@ -615,7 +615,7 @@ public:
 		}
 
 		/// Allows moving of the iterator.
-		iterator_& operator=(iterator_<T, block_entry_link>&& it) noexcept {
+		iterator_& operator=(iterator_&& it) noexcept {
 			is_limiter = it.is_limiter;
 			target = {it.target.entry, it.target.containing_block};
 			drop_iterator();
