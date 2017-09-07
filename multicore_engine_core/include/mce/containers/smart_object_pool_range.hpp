@@ -28,8 +28,7 @@ struct smart_object_pool_range {
 	It lower; ///< The start of this range
 	It upper; ///< The end of this range
 	/// Creates a range from a given start and end iterator.
-	smart_object_pool_range(It lower, It upper) : lower{lower}, upper{upper.make_limiter()} {
-	}
+	smart_object_pool_range(It lower, It upper) : lower{lower}, upper{upper.make_limiter()} {}
 	/// Tests if the range is empty (doesn't contain objects to process).
 	bool empty() const noexcept {
 		return lower == upper;
@@ -68,10 +67,12 @@ struct smart_object_pool_range {
 		if(lower >= upper) lower = upper;
 	}
 
+	/// Returns lower to allow compatibility with range-based for.
 	It begin() const noexcept {
 		return lower;
 	}
 
+	/// Returns upper to allow compatibility with range-based for.
 	It end() const noexcept {
 		return upper;
 	}

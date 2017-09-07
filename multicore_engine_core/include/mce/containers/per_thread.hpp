@@ -27,7 +27,7 @@ public:
 	using size_type = std::size_t;
 
 	/// Creates a per_thread with the given number of slots for the threads.
-	per_thread_index(size_type slots)
+	explicit per_thread_index(size_type slots)
 			: total_slots_{slots}, used_slots_{0}, owners_(slots, std::thread::id()) {}
 
 	/// Forbids copying.
@@ -68,6 +68,18 @@ public:
 	/// Returns the number of slots used by / assigned to a thread.
 	size_type used_slots() const {
 		return used_slots_.load();
+	}
+
+	/// Clears the index assignment and causes threads to reselect indices on next slot_index().
+	/**
+	 * \warning This function is not inherently thread-safe and needs to be externally synchronized to not
+	 * execute concurrently with any other operation on this object.
+	 */
+	void clear() {
+		for(size_type i = 0; i < total_slots_; ++i) {
+			owners_[i] = std::thread::id();
+		}
+		used_slots_ = 0;
 	}
 };
 
@@ -203,6 +215,15 @@ public:
 	/// Returns the number of slots used by / assigned to a thread.
 	size_type used_slots() const noexcept {
 		return index_mapping_.used_slots();
+	}
+
+	/// Clears the ownership map for the objects and causes threads to reselect objects on next get().
+	/**
+	 * \warning This function is not inherently thread-safe and needs to be externally synchronized to not
+	 * execute concurrently with any other operation on this object.
+	 */
+	void clear_ownership() {
+		index_mapping_.clear();
 	}
 
 	/// \brief Proxy class used to provide const access to the full range of the objects array instead of just

@@ -33,6 +33,11 @@ bool starts_with_ignore_case(boost::string_view str, boost::string_view prefix) 
 	return std::equal(str.begin(), str.begin() + prefix.size(), prefix.begin(), prefix.end(),
 					  [](auto a, auto b) { return std::tolower(a) == std::tolower(b); });
 }
+bool equal_ignore_case(boost::string_view str_a, boost::string_view str_b) {
+	if(str_a.size() != str_b.size()) return false;
+	return std::equal(str_a.begin(), str_a.end(), str_b.begin(), str_b.end(),
+					  [](auto a, auto b) { return std::tolower(a) == std::tolower(b); });
+}
 
 } /* namespace util */
 } /* namespace mce */

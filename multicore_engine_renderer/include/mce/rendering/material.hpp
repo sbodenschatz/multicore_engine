@@ -26,6 +26,7 @@
 namespace mce {
 namespace graphics {
 class texture_manager;
+class descriptor_set;
 } // namespace graphics
 namespace rendering {
 
@@ -167,7 +168,8 @@ public:
 		return normal_map_;
 	}
 
-	// TODO Add bind member function
+	/// Updates the given descriptor_set to contain the data for the material.
+	void bind(graphics::descriptor_set& ds) const;
 };
 
 } /* namespace rendering */

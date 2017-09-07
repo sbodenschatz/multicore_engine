@@ -45,6 +45,7 @@ private:
 										const char* pLayerPrefix, const char* pMessage) const;
 
 public:
+/// Defines the default value for the validation level depending on the build mode (Debug vs. Release).
 #ifdef DEBUG
 	static const unsigned int default_validation_level = 5;
 #else

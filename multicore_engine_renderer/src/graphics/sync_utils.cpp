@@ -22,6 +22,7 @@ vk::AccessFlags required_flags_for_layout(vk::ImageLayout layout) {
 	case vk::ImageLayout::eShaderReadOnlyOptimal: return vk::AccessFlags{};
 	case vk::ImageLayout::eTransferSrcOptimal: return vk::AccessFlagBits::eTransferRead;
 	case vk::ImageLayout::eUndefined: return vk::AccessFlags{};
+	case vk::ImageLayout::ePresentSrcKHR: return vk::AccessFlagBits::eMemoryRead;
 	default: return vk::AccessFlags{};
 	}
 }
@@ -39,11 +40,44 @@ vk::AccessFlags optional_flags_for_layout(vk::ImageLayout layout) {
 		return vk::AccessFlagBits::eInputAttachmentRead | vk::AccessFlagBits::eShaderRead;
 	case vk::ImageLayout::eTransferSrcOptimal: return vk::AccessFlags{};
 	case vk::ImageLayout::eUndefined: return vk::AccessFlags{};
+	case vk::ImageLayout::ePresentSrcKHR: return vk::AccessFlags{};
 	default: return ~vk::AccessFlags{};
 	}
 }
 vk::AccessFlags allowed_flags_for_layout(vk::ImageLayout layout) {
 	return required_flags_for_layout(layout) | optional_flags_for_layout(layout);
+}
+
+void buffer_queue_ownership_transfer(vk::Buffer buffer, vk::CommandBuffer cb_queue_src,
+									 vk::CommandBuffer cb_queue_dst, uint32_t queue_family_src,
+									 uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
+									 vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
+									 vk::AccessFlags access_flags_dst) {
+	cb_queue_src.pipelineBarrier(stage_mask_src, stage_mask_dst, {}, {},
+								 {vk::BufferMemoryBarrier(access_flags_src, {}, queue_family_src,
+														  queue_family_dst, buffer, 0, VK_WHOLE_SIZE)},
+								 {});
+	cb_queue_dst.pipelineBarrier(stage_mask_src, stage_mask_dst, {}, {},
+								 {vk::BufferMemoryBarrier({}, access_flags_dst, queue_family_src,
+														  queue_family_dst, buffer, 0, VK_WHOLE_SIZE)},
+								 {});
+}
+
+void image_queue_ownership_transfer(vk::Image image, vk::ImageLayout layout, vk::CommandBuffer cb_queue_src,
+									vk::CommandBuffer cb_queue_dst, uint32_t queue_family_src,
+									uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
+									vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
+									vk::AccessFlags access_flags_dst, vk::ImageAspectFlags aspects) {
+	cb_queue_src.pipelineBarrier(
+			stage_mask_src, stage_mask_dst, {}, {}, {},
+			{vk::ImageMemoryBarrier(access_flags_src, {}, layout, layout, queue_family_src, queue_family_dst,
+									image, vk::ImageSubresourceRange(aspects, 0, VK_REMAINING_MIP_LEVELS, 0,
+																	 VK_REMAINING_ARRAY_LAYERS))});
+	cb_queue_dst.pipelineBarrier(
+			stage_mask_src, stage_mask_dst, {}, {}, {},
+			{vk::ImageMemoryBarrier({}, access_flags_dst, layout, layout, queue_family_src, queue_family_dst,
+									image, vk::ImageSubresourceRange(aspects, 0, VK_REMAINING_MIP_LEVELS, 0,
+																	 VK_REMAINING_ARRAY_LAYERS))});
 }
 
 } /* namespace graphics */

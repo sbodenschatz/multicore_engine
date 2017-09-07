@@ -124,6 +124,8 @@ public:
 		position_ = position;
 	}
 
+	/// \brief Calculates the 4x4 matrix to transform the local coordinate system of the entity to the world
+	/// coordinate system.
 	glm::mat4 calculate_transform() const {
 		glm::mat4 transform = glm::toMat4(orientation_);
 		transform[3].x = position_.x;
