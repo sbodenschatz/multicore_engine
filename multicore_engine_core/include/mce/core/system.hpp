@@ -26,6 +26,12 @@ public:
 	virtual void prerender(const mce::core::frame_time& frame_time);
 	/// Hook function called at the end of the rendering phase of the frame.
 	virtual void postrender(const mce::core::frame_time& frame_time);
+	/// \brief Is called when the system is added to the engine to determine the order in which the preprocess
+	/// and prerender hooks of the system should be called in relation to other systems.
+	virtual int pre_phase_ordering() const noexcept = 0;
+	/// \brief Is called when the system is added to the engine to determine the order in which the
+	/// postprocess and postrender hooks of the system should be called in relation to other systems.
+	virtual int post_phase_ordering() const noexcept = 0;
 };
 
 } /* namespace core */

@@ -425,7 +425,8 @@ public:
 	static vk::ImageMemoryBarrier
 	generate_transition_native(vk::Image img, vk::ImageLayout old_layout, vk::ImageLayout new_layout,
 							   vk::AccessFlags src_access, vk::AccessFlags dst_access,
-							   vk::ImageAspectFlags aspects, uint32_t mip_levels, uint32_t layers) {
+							   vk::ImageAspectFlags aspects, uint32_t mip_levels = VK_REMAINING_MIP_LEVELS,
+							   uint32_t layers = VK_REMAINING_ARRAY_LAYERS) {
 		vk::ImageMemoryBarrier b(src_access, dst_access, old_layout, new_layout, VK_QUEUE_FAMILY_IGNORED,
 								 VK_QUEUE_FAMILY_IGNORED, img,
 								 vk::ImageSubresourceRange(aspects, 0, mip_levels, 0, layers));

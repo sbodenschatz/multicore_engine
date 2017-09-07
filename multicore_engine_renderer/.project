@@ -3,7 +3,6 @@
 	<name>multicore_engine_renderer</name>
 	<comment></comment>
 	<projects>
-		<project>multicore_engine_core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

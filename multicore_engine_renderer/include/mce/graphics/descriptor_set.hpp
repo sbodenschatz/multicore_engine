@@ -190,8 +190,8 @@ public:
 	void update(vk::ArrayProxy<const write_descriptor_set> writes);
 
 	/// Binds the given descriptor sets in the given command buffer using the given additional parameters.
-	static void bind(vk::CommandBuffer cb, const std::shared_ptr<const pipeline_layout>& layout,
-					 uint32_t first_set, vk::ArrayProxy<const descriptor_set> sets,
+	static void bind(vk::CommandBuffer cb, const pipeline_layout& layout, uint32_t first_set,
+					 vk::ArrayProxy<const std::reference_wrapper<const descriptor_set>> sets,
 					 vk::ArrayProxy<const uint32_t> dynamic_offsets = {});
 };
 

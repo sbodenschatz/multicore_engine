@@ -95,6 +95,11 @@ public:
 	const std::vector<framebuffer_frame>& frames() const {
 		return frames_;
 	}
+
+	/// Provides access to the framebuffer_frame with the given index.
+	framebuffer_frame& frame(uint32_t index) {
+		return frames_[index];
+	}
 };
 
 /// \brief Encapsulates the management of a framebuffer consisting of (optionally) a number of swapchain
@@ -188,6 +193,11 @@ public:
 	/// Allows access to the framebuffer_pass objects in this framebuffer.
 	const std::vector<framebuffer_pass>& passes() const {
 		return passes_;
+	}
+
+	/// Provides access to the framebuffer_pass with the given index.
+	framebuffer_pass& pass(uint32_t index) {
+		return passes_[index];
 	}
 };
 

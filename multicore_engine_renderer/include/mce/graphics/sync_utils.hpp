@@ -27,6 +27,21 @@ vk::AccessFlags optional_flags_for_layout(vk::ImageLayout layout);
 /// Returns all access flags that are valid for layout transitions from / to the given layout.
 vk::AccessFlags allowed_flags_for_layout(vk::ImageLayout layout);
 
+/// Records a queue ownership transfer on the given buffer into the given command buffers for both queues.
+void buffer_queue_ownership_transfer(vk::Buffer buffer, vk::CommandBuffer cb_queue_src,
+									 vk::CommandBuffer cb_queue_dst, uint32_t queue_family_src,
+									 uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
+									 vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
+									 vk::AccessFlags access_flags_dst);
+
+/// Records a queue ownership transfer on the given image into the given command buffers for both queues.
+void image_queue_ownership_transfer(vk::Image image, vk::ImageLayout layout, vk::CommandBuffer cb_queue_src,
+									vk::CommandBuffer cb_queue_dst, uint32_t queue_family_src,
+									uint32_t queue_family_dst, vk::PipelineStageFlags stage_mask_src,
+									vk::PipelineStageFlags stage_mask_dst, vk::AccessFlags access_flags_src,
+									vk::AccessFlags access_flags_dst,
+									vk::ImageAspectFlags aspects = vk::ImageAspectFlagBits::eColor);
+
 } /* namespace graphics */
 } /* namespace mce */
 
