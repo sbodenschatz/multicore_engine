@@ -14,7 +14,7 @@ namespace input {
 
 class input_state : public core::system_state {
 public:
-	input_state(mce::core::system* system);
+	explicit input_state(mce::core::system* system);
 	~input_state();
 };
 
