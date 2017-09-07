@@ -22,6 +22,7 @@ vk::AccessFlags required_flags_for_layout(vk::ImageLayout layout) {
 	case vk::ImageLayout::eShaderReadOnlyOptimal: return vk::AccessFlags{};
 	case vk::ImageLayout::eTransferSrcOptimal: return vk::AccessFlagBits::eTransferRead;
 	case vk::ImageLayout::eUndefined: return vk::AccessFlags{};
+	case vk::ImageLayout::ePresentSrcKHR: return vk::AccessFlagBits::eMemoryRead;
 	default: return vk::AccessFlags{};
 	}
 }
@@ -39,6 +40,7 @@ vk::AccessFlags optional_flags_for_layout(vk::ImageLayout layout) {
 		return vk::AccessFlagBits::eInputAttachmentRead | vk::AccessFlagBits::eShaderRead;
 	case vk::ImageLayout::eTransferSrcOptimal: return vk::AccessFlags{};
 	case vk::ImageLayout::eUndefined: return vk::AccessFlags{};
+	case vk::ImageLayout::ePresentSrcKHR: return vk::AccessFlags{};
 	default: return ~vk::AccessFlags{};
 	}
 }
