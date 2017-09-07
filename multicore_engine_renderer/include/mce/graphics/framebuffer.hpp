@@ -96,6 +96,7 @@ public:
 		return frames_;
 	}
 
+	/// Provides access to the framebuffer_frame with the given index.
 	framebuffer_frame& frame(uint32_t index) {
 		return frames_[index];
 	}
@@ -194,6 +195,7 @@ public:
 		return passes_;
 	}
 
+	/// Provides access to the framebuffer_pass with the given index.
 	framebuffer_pass& pass(uint32_t index) {
 		return passes_[index];
 	}
