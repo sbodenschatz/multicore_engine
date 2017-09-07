@@ -74,11 +74,11 @@ class graphics_system : public core::system {
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
 	int pre_phase_ordering() const noexcept override {
-		return 0x1100;
+		return 0x2000;
 	}
 	/// Returns the phase ordering index for post hooks for this system.
 	int post_phase_ordering() const noexcept override {
-		return 0x1100;
+		return 0x2000;
 	}
 
 	/// \brief Creates the graphics_system taking the window_system as a dependency and optionally allows to

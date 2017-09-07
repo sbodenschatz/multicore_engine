@@ -21,6 +21,15 @@ class input_system : public core::system {
 	core::window_system& win_sys;
 
 public:
+	/// Returns the phase ordering index for pre hooks for this system.
+	int pre_phase_ordering() const noexcept override {
+		return 0x1100;
+	}
+	/// Returns the phase ordering index for post hooks for this system.
+	int post_phase_ordering() const noexcept override {
+		return 0x1100;
+	}
+
 	input_system(core::engine& eng, core::window_system& win_sys);
 	~input_system();
 };
