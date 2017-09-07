@@ -9,12 +9,11 @@
 namespace mce {
 namespace input {
 
-input_system::input_system() {
+input_system::input_system(core::engine& eng, core::window_system& win_sys) : eng{eng}, win_sys{win_sys} {
 	// TODO Auto-generated constructor stub
 }
 
-input_system::~input_system() {
-}
+input_system::~input_system() {}
 
 } /* namespace input */
 } /* namespace mce */

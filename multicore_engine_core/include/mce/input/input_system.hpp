@@ -10,11 +10,18 @@
 #include <mce/core/system.hpp>
 
 namespace mce {
+namespace core {
+class engine;
+class window_system;
+} // namespace core
 namespace input {
 
 class input_system : public core::system {
+	core::engine& eng;
+	core::window_system& win_sys;
+
 public:
-	input_system();
+	input_system(core::engine& eng, core::window_system& win_sys);
 	~input_system();
 };
 
