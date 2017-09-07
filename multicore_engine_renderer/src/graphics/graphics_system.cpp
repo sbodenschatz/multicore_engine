@@ -70,7 +70,7 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 						window_.swapchain_images()[i], vk::ImageLayout::eColorAttachmentOptimal,
 						vk::ImageLayout::ePresentSrcKHR,
 						allowed_flags_for_layout(vk::ImageLayout::eColorAttachmentOptimal),
-						~vk::AccessFlags{}, vk::ImageAspectFlagBits::eColor)});
+						allowed_flags_for_layout(vk::ImageLayout::ePresentSrcKHR), vk::ImageAspectFlagBits::eColor)});
 		if(device_.graphics_queue_index().first != device_.present_queue_index().first) {
 			image_queue_ownership_transfer(
 					window_.swapchain_images()[i], vk::ImageLayout::ePresentSrcKHR,
