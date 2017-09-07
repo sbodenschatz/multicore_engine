@@ -18,7 +18,7 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1830712584" name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.1309551844" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.169021340" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
-							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_debug/multicore_engine_renderer" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1864019754" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_debug" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.1864019754" incrementalBuildTarget="mce_renderer" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.318561499" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.2103179112" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
@@ -29,6 +29,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1459155580" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -43,6 +45,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.708417641" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -59,6 +63,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.362269587" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -100,7 +106,7 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.103059433." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.541781603" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.312912805" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
-							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_release/multicore_engine_renderer" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="org.eclipse.cdt.build.core.settings.default.builder.964515743" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_release" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="org.eclipse.cdt.build.core.settings.default.builder.964515743" incrementalBuildTarget="mce_renderer" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.832309887" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.567735645" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
@@ -111,6 +117,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2072545442" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -125,6 +133,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.494437666" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -141,6 +151,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.458810890" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -182,7 +194,7 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.545489244.704202571." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.82007975" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.1371813223" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
-							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_debug/multicore_engine_renderer" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="false" id="org.eclipse.cdt.build.core.settings.default.builder.1680536037" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<builder arguments="-j16" autoBuildTarget="all" buildPath="${workspace_loc:}/eclipse_build_debug" cleanBuildTarget="clean" command="make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="false" id="org.eclipse.cdt.build.core.settings.default.builder.1680536037" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.240754681" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.1705425198" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multicore_engine_core/include}&quot;"/>
@@ -193,6 +205,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.365241325" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -207,6 +221,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.809694774" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -223,6 +239,8 @@
 									<listOptionValue builtIn="false" value="&quot;${env_var:VK_SDK_PATH}/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\glfw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Libs\TBB\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\gli\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Libs\vkglformat\include&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1584369689" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="GLM_FORCE_DEPTH_ZERO_TO_ONE"/>
@@ -255,11 +273,11 @@
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="debug"/>
 		<configuration configurationName="release"/>
-		<configuration configurationName="Default">
-			<resource resourceType="PROJECT" workspacePath="/mutlicore_engine_core"/>
-		</configuration>
 		<configuration configurationName="no_build">
 			<resource resourceType="PROJECT" workspacePath="/multicore_engine_demo"/>
+		</configuration>
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/mutlicore_engine_core"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>

@@ -3,7 +3,6 @@
 	<name>multicore_engine_base</name>
 	<comment></comment>
 	<projects>
-		<project>multicore_engine_parsers</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

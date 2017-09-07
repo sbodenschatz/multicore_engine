@@ -4,3 +4,7 @@ models zip(9) {
 	"models_col.lup";
 	"models_geo.lup";
 }
+shaders zip(9) {
+	"shaders.lup";
+	"shaders.lum";
+}

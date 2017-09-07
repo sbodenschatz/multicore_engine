@@ -123,9 +123,11 @@ void window::create_swapchain() {
 }
 
 framebuffer_config
-// cppcheck-suppress passedByValue
-window::make_framebuffer_config(std::vector<framebuffer_attachment_config> additional_attachments) {
-	framebuffer_config res{std::move(additional_attachments)};
+		// cppcheck-suppress passedByValue
+		window::make_framebuffer_config(std::vector<framebuffer_attachment_config> additional_attachments,
+										// cppcheck-suppress passedByValue
+										std::vector<framebuffer_pass_config> passes) {
+	framebuffer_config res{std::move(additional_attachments), std::move(passes)};
 	framebuffer_attachment_config swapchain_attachment(surface_format_);
 	swapchain_attachment.is_swapchain_image_ = true;
 	res.attachment_configs_.insert(res.attachment_configs_.begin(), swapchain_attachment);

@@ -23,6 +23,9 @@
 namespace mce {
 namespace rendering {
 class model_manager;
+namespace detail {
+struct model_manager_dependencies;
+} // namespace detail
 
 /// Represents a non-animated model used in the rendering subsystem.
 /**
@@ -41,16 +44,17 @@ public:
 		static_model* parent_;
 		std::string object_name_;
 		std::string group_name_;
+		std::string material_name_;
 		vk::DeviceSize offset_;
 		uint32_t vertex_count_;
 
 		friend class static_model;
 
 		// cppcheck-suppress passedByValue
-		mesh(static_model* parent, std::string object_name, std::string group_name, vk::DeviceSize offset,
-			 uint32_t vertex_count)
-				: parent_{parent}, object_name_{std::move(object_name)},
-				  group_name_{std::move(group_name)}, offset_{offset}, vertex_count_{vertex_count} {}
+		mesh(static_model* parent, std::string object_name, std::string group_name, std::string material_name,
+			 vk::DeviceSize offset, uint32_t vertex_count)
+				: parent_{parent}, object_name_{std::move(object_name)}, group_name_{std::move(group_name)},
+				  material_name_{std::move(material_name)}, offset_{offset}, vertex_count_{vertex_count} {}
 
 	public:
 		/// Returns the group name specified for this mesh in the model file.
@@ -63,19 +67,34 @@ public:
 			return object_name_;
 		}
 
+		/// Returns the name of the material assigned to this mesh in the model file.
+		const std::string& material_name() const {
+			return material_name_;
+		}
+
 		/// Binds the common vertex buffer for all meshes in the model to the given command buffer.
-		void bind_vertices(vk::CommandBuffer cmd_buf);
+		void bind_vertices(vk::CommandBuffer cmd_buf) const;
 		/// Binds the index buffer to the given command buffer.
-		void bind_indices(vk::CommandBuffer cmd_buf);
+		void bind_indices(vk::CommandBuffer cmd_buf) const;
 		/// \brief Records a draw call to the given command buffer, optionally drawing multiple instances.
-		void record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances = 1);
+		void record_draw_call(vk::CommandBuffer cmd_buf, uint32_t instances = 1) const;
 		/// \brief Binds the vertex and index buffer for the given mesh and records a draw call to the given
 		/// command buffer, optionally drawing multiple instances.
-		void draw(vk::CommandBuffer cmd_buf, uint32_t instances = 1);
+		void draw(vk::CommandBuffer cmd_buf, uint32_t instances = 1) const;
+
+		/// Returns the offset of the index data of this mesh from the vertex and index buffer.
+		vk::DeviceSize indices_offset() const {
+			return offset_;
+		}
+
+		/// Returns the number of (indexed) vertices in this mesh.
+		uint32_t vertex_count() const {
+			return vertex_count_;
+		}
 	};
 
 private:
-	model_manager& mgr_;
+	std::weak_ptr<const detail::model_manager_dependencies> mgr_deps;
 	std::atomic<state> current_state_;
 	mutable std::mutex modification_mutex;
 	std::string name_;
@@ -95,12 +114,14 @@ private:
 public:
 	/// \brief Creates an model object with the given name. Should only be used within the rendering system
 	/// but can't be private due to being used in make_shared.
-	explicit static_model(model_manager& mgr, const std::string& name)
-			: mgr_{mgr}, current_state_{state::loading}, name_{name} {}
+	explicit static_model(const std::weak_ptr<const detail::model_manager_dependencies>& mgr_deps,
+						  const std::string& name)
+			: mgr_deps{mgr_deps}, current_state_{state::loading}, name_{name} {}
 	/// \brief Creates an model object with the given name. Should only be used within the rendering system
 	/// but can't be private due to being used in make_shared.
-	explicit static_model(model_manager& mgr, std::string&& name)
-			: mgr_{mgr}, current_state_{state::loading}, name_{std::move(name)} {}
+	explicit static_model(std::weak_ptr<const detail::model_manager_dependencies>&& mgr_deps,
+						  std::string&& name)
+			: mgr_deps{std::move(mgr_deps)}, current_state_{state::loading}, name_{std::move(name)} {}
 	/// Destroys the static_model and releases the underlying resources.
 	~static_model();
 	/// Forbids copy-construction of static_model.
@@ -111,12 +132,11 @@ public:
 	/// loading and was transfered to the graphics device or to run the error_handler if an error occurred
 	/// during loading or transfer.
 	/**
-	 * The handler function object must have the signature <code>void(const static_model_ptr&
-	 * model)</code>.
+	 * The handler function object must have the signature <code>void(const static_model_ptr& model)</code>.
 	 * The error_handler function object must have the signature <code>void(std::exception_ptr)</code>.
-	 * Both handlers are called either on the thread calling this function or on a worker thread of the asset
-	 * system. Both must fit into their respective handler function wrapper type
-	 * static_model_completion_handler and error_handler.
+	 * Both handlers are called on the thread calling this function, on the thread running
+	 * transfer_manager::start_frame or on a worker thread of the asset system. Both must fit into their
+	 * respective handler function wrapper type static_model_completion_handler and error_handler.
 	 */
 	template <typename F, typename E>
 	void run_when_ready(F handler, E error_handler) {
@@ -135,7 +155,7 @@ public:
 		} else if(current_state_ == state::error) {
 			lock.unlock();
 			error_handler(std::make_exception_ptr(
-					path_not_found_exception("Polygon model '" + name() + "' was cached as failed.")));
+					path_not_found_exception("Static model '" + name() + "' was cached as failed.")));
 		} else {
 			completion_handlers.emplace_back(std::move(handler));
 			error_handlers.emplace_back(std::move(error_handler));
@@ -167,16 +187,41 @@ public:
 		return meshes_;
 	}
 
+	/// Allows access to the model::polygon_model from which this was loaded.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
+	const model::polygon_model_ptr& poly_model() const {
+		return poly_model_;
+	}
+
 	/// Binds the common vertex buffer for all meshes in the model to the given command buffer.
-	void bind_vertices(vk::CommandBuffer cmd_buf);
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
+	void bind_vertices(vk::CommandBuffer cmd_buf) const;
 	/// Binds the index buffer for the given mesh to the given command buffer.
-	void bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index);
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
+	void bind_indices(vk::CommandBuffer cmd_buf, size_t mesh_index) const;
 	/// \brief Records a draw call for the given mesh to the given command buffer, optionally drawing
 	/// multiple instances.
-	void record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1);
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
+	void record_draw_call(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1) const;
 	/// \brief Binds the vertex and index buffer for the given mesh and records a draw call to the given
 	/// command buffer, optionally drawing multiple instances.
-	void draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1);
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
+	void draw_model_mesh(vk::CommandBuffer cmd_buf, size_t mesh_index, uint32_t instances = 1) const;
 };
 } /* namespace rendering */
 } /* namespace mce */

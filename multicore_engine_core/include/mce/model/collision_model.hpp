@@ -124,7 +124,8 @@ public:
 	}
 	/// Allows access to the collision data stored in the model.
 	/**
-	 * Requires the model to be ready for use.
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
 	 */
 	const static_model_collision_data& data() const noexcept {
 		return data_;

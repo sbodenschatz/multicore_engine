@@ -42,6 +42,7 @@ std::shared_ptr<polygon_model> model_data_manager::internal_load_polygon_model(c
 		} else {
 			auto tmp = std::make_shared<polygon_model>(name);
 			loaded_polygon_models[name] = tmp;
+			lock.unlock();
 			asset_manager.load_asset_async(
 					name + ".model",
 					[tmp](const asset::asset_ptr& polygon_asset) { tmp->complete_loading(polygon_asset); },
@@ -69,6 +70,7 @@ std::shared_ptr<collision_model> model_data_manager::internal_load_collision_mod
 		} else {
 			auto tmp = std::make_shared<collision_model>(name);
 			loaded_collision_models[name] = tmp;
+			lock.unlock();
 			asset_manager.load_asset_async(name + ".col",
 										   [tmp](const asset::asset_ptr& collision_asset) {
 											   tmp->complete_loading(collision_asset);

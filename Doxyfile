@@ -777,7 +777,6 @@ WARN_LOGFILE           = doc/warnings.log
 
 INPUT                  = multicore_engine_base \
                          multicore_engine_core \
-                         multicore_engine_demo \
 						 multicore_engine_renderer \
                          multicore_engine_load_unit_gen \
                          multicore_engine_model_converter \

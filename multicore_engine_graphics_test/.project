@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>multicore_engine_demo</name>
+	<name>multicore_engine_graphics_test</name>
 	<comment></comment>
 	<projects>
-		<project>multicore_engine_core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

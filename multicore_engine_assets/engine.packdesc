@@ -1,0 +1,4 @@
+shaders zip(9) {
+	"shaders.lup";
+	"shaders.lum";
+}

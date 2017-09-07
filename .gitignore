@@ -15,3 +15,4 @@ build_clang_debug/
 build_clang_release/
 build_gcc_debug/
 build_gcc_release/
+licenses/

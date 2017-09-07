@@ -27,7 +27,7 @@ public:
 	using size_type = std::size_t;
 
 	/// Creates a per_thread with the given number of slots for the threads.
-	per_thread_index(size_type slots)
+	explicit per_thread_index(size_type slots)
 			: total_slots_{slots}, used_slots_{0}, owners_(slots, std::thread::id()) {}
 
 	/// Forbids copying.
@@ -68,6 +68,18 @@ public:
 	/// Returns the number of slots used by / assigned to a thread.
 	size_type used_slots() const {
 		return used_slots_.load();
+	}
+
+	/// Clears the index assignment and causes threads to reselect indices on next slot_index().
+	/**
+	 * \warning This function is not inherently thread-safe and needs to be externally synchronized to not
+	 * execute concurrently with any other operation on this object.
+	 */
+	void clear() {
+		for(size_type i = 0; i < total_slots_; ++i) {
+			owners_[i] = std::thread::id();
+		}
+		used_slots_ = 0;
 	}
 };
 
@@ -150,7 +162,7 @@ public:
 	}
 	/// Returns an read-only iterator referring to the beginning of the used part of the objects array.
 	const_iterator cbegin() const noexcept {
-		return values_.begin();
+		return values_.cbegin();
 	}
 	/// Returns an read-write iterator referring to the end of the used part of the objects array.
 	iterator end() noexcept {
@@ -162,7 +174,7 @@ public:
 	}
 	/// Returns an read-only iterator referring to the end of the used part of the objects array.
 	const_iterator cend() const noexcept {
-		return values_.begin() + index_mapping_.used_slots();
+		return values_.cbegin() + index_mapping_.used_slots();
 	}
 	/// \brief Returns an read-write iterator referring to the beginning of the used part of the objects array
 	/// in reverse order.
@@ -177,7 +189,7 @@ public:
 	/// \brief Returns an read-only iterator referring to the beginning of the used part of the objects array
 	/// in reverse order.
 	const_reverse_iterator crbegin() const noexcept {
-		return end();
+		return cend();
 	}
 	/// \brief Returns an read-write iterator referring to the end of the used part of the objects array in
 	/// reverse order.
@@ -191,18 +203,141 @@ public:
 	}
 	/// \brief Returns an read-only iterator referring to the end of the used part of the objects array in
 	/// reverse order.
-	const_reverse_iterator crend() const {
-		return begin();
+	const_reverse_iterator crend() const noexcept {
+		return cbegin();
 	}
 
 	/// Returns the total number of slots in the pool.
-	size_type total_slots() const {
+	size_type total_slots() const noexcept {
 		return index_mapping_.total_slots();
 	}
 
 	/// Returns the number of slots used by / assigned to a thread.
-	size_type used_slots() const {
+	size_type used_slots() const noexcept {
 		return index_mapping_.used_slots();
+	}
+
+	/// Clears the ownership map for the objects and causes threads to reselect objects on next get().
+	/**
+	 * \warning This function is not inherently thread-safe and needs to be externally synchronized to not
+	 * execute concurrently with any other operation on this object.
+	 */
+	void clear_ownership() {
+		index_mapping_.clear();
+	}
+
+	/// \brief Proxy class used to provide const access to the full range of the objects array instead of just
+	/// the used part.
+	class const_all_range {
+		const dynamic_array<T>& values_;
+		explicit const_all_range(const dynamic_array<T>& values) : values_{values} {}
+
+		friend class per_thread<T>;
+
+	public:
+		/// Returns an read-only iterator referring to the beginning of the objects array.
+		const_iterator begin() const noexcept {
+			return values_.begin();
+		}
+		/// Returns an read-only iterator referring to the beginning of the objects array.
+		const_iterator cbegin() const noexcept {
+			return values_.cbegin();
+		}
+		/// Returns an read-only iterator referring to the end of the objects array.
+		const_iterator end() const noexcept {
+			return values_.end();
+		}
+		/// Returns an read-only iterator referring to the end of the objects array.
+		const_iterator cend() const noexcept {
+			return values_.cend();
+		}
+		/// Returns an read-only iterator referring to the beginning of the objects array in reverse order.
+		const_reverse_iterator rbegin() const noexcept {
+			return end();
+		}
+		/// Returns an read-only iterator referring to the beginning of the objects array in reverse order.
+		const_reverse_iterator crbegin() const noexcept {
+			return end();
+		}
+		/// Returns an read-only iterator referring to the end of the objects array in reverse order.
+		const_reverse_iterator rend() const noexcept {
+			return begin();
+		}
+		/// Returns an read-only iterator referring to the end of the objects array in reverse order.
+		const_reverse_iterator crend() const noexcept {
+			return begin();
+		}
+	};
+
+	/// \brief Proxy class used to provide access to the full range of the objects array instead of just
+	/// the used part.
+	class all_range {
+		dynamic_array<T>& values_;
+		explicit all_range(dynamic_array<T>& values) : values_{values} {}
+
+		friend class per_thread<T>;
+
+	public:
+		/// Returns an read-write iterator referring to the beginning of the objects array.
+		iterator begin() noexcept {
+			return values_.begin();
+		}
+		/// Returns an read-only iterator referring to the beginning of the objects array.
+		const_iterator begin() const noexcept {
+			return values_.begin();
+		}
+		/// Returns an read-only iterator referring to the beginning of the objects array.
+		const_iterator cbegin() const noexcept {
+			return values_.cbegin();
+		}
+		/// Returns an read-write iterator referring to the end of the objects array.
+		iterator end() noexcept {
+			return values_.end();
+		}
+		/// Returns an read-only iterator referring to the end of the objects array.
+		const_iterator end() const noexcept {
+			return values_.end();
+		}
+		/// Returns an read-only iterator referring to the end of the objects array.
+		const_iterator cend() const noexcept {
+			return values_.cend();
+		}
+		/// Returns an read-write iterator referring to the beginning of the objects array in reverse order.
+		reverse_iterator rbegin() noexcept {
+			return end();
+		}
+		/// Returns an read-only iterator referring to the beginning of the objects array in reverse order.
+		const_reverse_iterator rbegin() const noexcept {
+			return end();
+		}
+		/// Returns an read-only iterator referring to the beginning of the objects array in reverse order.
+		const_reverse_iterator crbegin() const noexcept {
+			return cend();
+		}
+		/// Returns an read-write iterator referring to the end of the objects array in reverse order.
+		reverse_iterator rend() noexcept {
+			return begin();
+		}
+		/// Returns an read-only iterator referring to the end of the objects array in reverse order.
+		const_reverse_iterator rend() const noexcept {
+			return begin();
+		}
+		/// Returns an read-only iterator referring to the end of the objects array in reverse order.
+		const_reverse_iterator crend() const noexcept {
+			return cbegin();
+		}
+	};
+
+	/// Returns a proxy range object that provides access over the full range of the objects array instead of
+	/// just the used part.
+	all_range all() noexcept {
+		return all_range(values_);
+	}
+
+	/// Returns a proxy range object that provides const access over the full range of the objects array
+	/// instead of just the used part.
+	const_all_range all() const noexcept {
+		return const_all_range(values_);
 	}
 };
 

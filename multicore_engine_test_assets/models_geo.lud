@@ -1,0 +1,5 @@
+models_geo{
+	"models/cube.model";
+	"materials/test.matlib"d;
+	"textures/test.dds"d;
+}

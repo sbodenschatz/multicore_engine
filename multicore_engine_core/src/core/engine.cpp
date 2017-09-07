@@ -6,24 +6,51 @@
 
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <mce/asset/asset_manager.hpp>
+#include <mce/config/config_store.hpp>
 #include <mce/core/core_defs.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/core/game_state_machine.hpp>
 #include <mce/core/system.hpp>
+#include <mce/core/version.hpp>
+#include <mce/model/model_data_manager.hpp>
+#include <sstream>
+#include <tbb/task_scheduler_init.h>
 
 namespace mce {
 namespace core {
 
-engine::engine() : running_{false}, asset_manager_{std::make_unique<asset::asset_manager>()} {
+engine::engine()
+		: max_general_concurrency_{std::thread::hardware_concurrency()}, running_{false},
+		  engine_metadata_{"mce", get_build_version_number()},
+		  application_metadata_{"mce-app", get_build_version_number()},
+		  asset_manager_{std::make_unique<asset::asset_manager>()},
+		  model_data_manager_{std::make_unique<model::model_data_manager>(asset_manager())} {
+	initialize_config();
 	game_state_machine_ = std::make_unique<mce::core::game_state_machine>(this);
 }
 
 engine::~engine() {
 	game_state_machine_.reset(); // Ensure that the game_state_machine is cleaned up first.
+	while(!systems_.empty()) {
+		systems_.pop_back();
+	}
+}
+
+void engine::initialize_config() {
+	std::string user_cfg_name = "config.cfg";
+	std::ifstream user_cfg(user_cfg_name);
+	std::stringstream default_cfg("");
+	config_store_ = std::make_unique<config::config_store>(
+			user_cfg, default_cfg, [user_cfg_name](config::config_store::config_storer& cs) {
+				std::ofstream user_cfg(user_cfg_name);
+				cs.store(user_cfg);
+			});
 }
 
 void engine::run() {
+	tsi = std::make_unique<tbb::task_scheduler_init>(max_general_concurrency_);
 	auto old_t = std::chrono::high_resolution_clock::now();
 	running_ = true;
 	while(running()) {
@@ -58,7 +85,7 @@ void engine::refresh_system_ordering() {
 	std::stable_sort(systems_pre_phase_ordered.begin(), systems_pre_phase_ordered.end(),
 					 [](const auto& a, const auto& b) { return a.first < b.first; });
 	std::stable_sort(systems_post_phase_ordered.begin(), systems_post_phase_ordered.end(),
-					 [](const auto& a, const auto& b) { return a.first < b.first; });
+					 [](const auto& a, const auto& b) { return a.first > b.first; });
 }
 
 } // namespace core

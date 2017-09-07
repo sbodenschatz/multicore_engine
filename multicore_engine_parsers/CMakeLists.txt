@@ -7,8 +7,8 @@ target_include_directories(mce_parsers PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
 		PRIVATE
-		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/multicore_engine_base/include>
-		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/multicore_engine_core/include>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/../multicore_engine_base/include>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/../multicore_engine_core/include>
 	)
 target_link_libraries(mce_parsers 
 		mce_compiler_settings 

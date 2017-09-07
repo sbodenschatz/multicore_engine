@@ -1,0 +1,4 @@
+shaders{
+	"shaders/main_forward.vert.spv";
+	"shaders/main_forward.frag.spv";
+}

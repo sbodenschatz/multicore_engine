@@ -48,7 +48,7 @@ class unique_descriptor_pool {
 
 	friend class descriptor_set_deleter;
 
-	void free(vk::DescriptorSet set, const std::shared_ptr<descriptor_set_layout>& layout);
+	void free(vk::DescriptorSet set, const std::shared_ptr<const descriptor_set_layout>& layout);
 
 public:
 	/// \brief Creates a unique_descriptor_pool for the given device with the given number sets and the given
@@ -120,13 +120,13 @@ public:
 
 	/// \brief Allocates a descriptor set of the given layout optionally using the given
 	/// destruction_queue_manager for queued destruction.
-	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<const descriptor_set_layout>& layout,
 										   destruction_queue_manager* dqm = nullptr);
 
 	///\brief Allocates descriptor sets for each of the given layouts optionally using the given
 	/// destruction_queue_manager for queued destruction.
 	std::vector<descriptor_set>
-	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<const descriptor_set_layout>>& layouts,
 							 destruction_queue_manager* dqm = nullptr);
 
 	/// \brief Allocates descriptor sets for each of the given layouts optionally using the given
@@ -136,7 +136,7 @@ public:
 	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
-	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
+	allocate_descriptor_sets(const std::array<std::shared_ptr<const descriptor_set_layout>, size>& layouts,
 							 destruction_queue_manager* dqm = nullptr) {
 		descriptor_set_resources req;
 		for(const auto& layout : layouts) {
@@ -144,8 +144,9 @@ public:
 		}
 		std::array<vk::DescriptorSetLayout, size> nlayouts;
 		std::array<vk::DescriptorSet, size> nsets;
-		std::transform(layouts.begin(), layouts.end(), nlayouts.begin(),
-					   [](const std::shared_ptr<descriptor_set_layout>& l) { return l->native_layout(); });
+		std::transform(
+				layouts.begin(), layouts.end(), nlayouts.begin(),
+				[](const std::shared_ptr<const descriptor_set_layout>& l) { return l->native_layout(); });
 		vk::DescriptorSetAllocateInfo ai(native_pool_.get(), size, nlayouts.data());
 		{
 			std::lock_guard<std::mutex> lock(pool_mutex_);
@@ -160,7 +161,7 @@ public:
 		}
 		return mce::util::array_transform<descriptor_set>(
 				nsets, layouts,
-				[dqm, this](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
+				[dqm, this](vk::DescriptorSet ds, const std::shared_ptr<const descriptor_set_layout>& l) {
 					return descriptor_set(*dev_, ds, this, dqm, l);
 				});
 	}
@@ -290,7 +291,7 @@ public:
 	/**
 	 * The required resources must not exceed the resources per block.
 	 */
-	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<const descriptor_set_layout>& layout,
 										   destruction_queue_manager* dqm = nullptr);
 
 	/// \brief Allocates descriptor sets for each of the given layouts optionally using the given
@@ -300,7 +301,7 @@ public:
 	 * blocks is not supported to reduce overhead.
 	 */
 	std::vector<descriptor_set>
-	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<const descriptor_set_layout>>& layouts,
 							 destruction_queue_manager* dqm = nullptr);
 
 	/// \brief Allocates descriptor sets for each of the given layouts optionally using the given
@@ -313,7 +314,7 @@ public:
 	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
-	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
+	allocate_descriptor_sets(const std::array<std::shared_ptr<const descriptor_set_layout>, size>& layouts,
 							 destruction_queue_manager* dqm = nullptr) {
 		descriptor_set_resources req;
 		for(const auto& layout : layouts) {

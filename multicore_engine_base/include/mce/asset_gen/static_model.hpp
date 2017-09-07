@@ -23,6 +23,7 @@ namespace asset_gen {
 struct static_model_mesh {
 	std::string object_name;				 ///< The object name of the mesh.
 	std::string group_name;					 ///< The group name of the mesh.
+	std::string material_name;				 ///< The name of the material assigned to the mesh.
 	std::vector<model::model_index> indices; ///< The index data for the triangles of the mesh.
 };
 

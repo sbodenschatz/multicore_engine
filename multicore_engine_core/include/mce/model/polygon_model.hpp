@@ -127,7 +127,8 @@ public:
 	}
 	/// Allows access to the meta data of the model.
 	/**
-	 * Requires the model to be ready for use.
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
 	 */
 	const static_model_meta_data& meta_data() const noexcept {
 		return meta_data_;
@@ -138,19 +139,25 @@ public:
 	}
 	/// Returns a pointer to the content data.
 	/**
-	 * Requires the model to be ready for use.
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
 	 */
 	const char* content_data() const {
 		return content_data_.get();
 	}
 	/// Returns a pointer to the content data participating in ownership.
 	/**
-	 * Requires the model to be ready for use.
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
 	 */
 	const std::shared_ptr<const char>& content_data_shared() const {
 		return content_data_;
 	}
 	/// Returns the size of the content data of the file.
+	/**
+	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
+	 * undefined behavior due to a race condition.
+	 */
 	uint64_t content_data_size() const {
 		return meta_data_.content_range.length();
 	}

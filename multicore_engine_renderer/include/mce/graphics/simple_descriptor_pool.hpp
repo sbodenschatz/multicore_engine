@@ -110,7 +110,7 @@ public:
 	 * overhead. If the layout information is needed in the descriptor_set object, storing it can be enabled
 	 * using the store_layout parameter.
 	 */
-	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<const descriptor_set_layout>& layout,
 										   bool store_layout = false);
 
 	/// Allocates descriptor sets for each of the given layouts.
@@ -120,7 +120,7 @@ public:
 	 * using the store_layout parameter.
 	 */
 	std::vector<descriptor_set>
-	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<const descriptor_set_layout>>& layouts,
 							 bool store_layout = false);
 
 	/// Allocates descriptor sets for each of the given layouts.
@@ -133,7 +133,7 @@ public:
 	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
-	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
+	allocate_descriptor_sets(const std::array<std::shared_ptr<const descriptor_set_layout>, size>& layouts,
 							 bool store_layout = false) {
 		descriptor_set_resources req;
 		for(const auto& layout : layouts) {
@@ -145,8 +145,9 @@ public:
 		}
 		std::array<vk::DescriptorSetLayout, size> nlayouts;
 		std::array<vk::DescriptorSet, size> nsets;
-		std::transform(layouts.begin(), layouts.end(), nlayouts.begin(),
-					   [](const std::shared_ptr<descriptor_set_layout>& l) { return l->native_layout(); });
+		std::transform(
+				layouts.begin(), layouts.end(), nlayouts.begin(),
+				[](const std::shared_ptr<const descriptor_set_layout>& l) { return l->native_layout(); });
 		vk::DescriptorSetAllocateInfo ai(native_pool_.get(), size, nlayouts.data());
 		auto res = (*dev_)->allocateDescriptorSets(&ai, nsets.data());
 		if(res != vk::Result::eSuccess) {
@@ -155,9 +156,10 @@ public:
 		available_resources_ -= req;
 		return mce::util::array_transform<descriptor_set>(
 				nsets, layouts,
-				[this, store_layout](vk::DescriptorSet ds, const std::shared_ptr<descriptor_set_layout>& l) {
+				[this, store_layout](vk::DescriptorSet ds,
+									 const std::shared_ptr<const descriptor_set_layout>& l) {
 					return descriptor_set(*dev_, ds,
-										  store_layout ? l : std::shared_ptr<descriptor_set_layout>());
+										  store_layout ? l : std::shared_ptr<const descriptor_set_layout>());
 
 				});
 	}
@@ -215,7 +217,7 @@ public:
 	 * overhead. If the layout information is needed in the descriptor_set object, storing it can be enabled
 	 * using the store_layout parameter.
 	 */
-	descriptor_set allocate_descriptor_set(const std::shared_ptr<descriptor_set_layout>& layout,
+	descriptor_set allocate_descriptor_set(const std::shared_ptr<const descriptor_set_layout>& layout,
 										   bool store_layout = false);
 
 	/// Allocates descriptor sets for each of the given layouts.
@@ -228,7 +230,7 @@ public:
 	 * using the store_layout parameter.
 	 */
 	std::vector<descriptor_set>
-	allocate_descriptor_sets(const std::vector<std::shared_ptr<descriptor_set_layout>>& layouts,
+	allocate_descriptor_sets(const std::vector<std::shared_ptr<const descriptor_set_layout>>& layouts,
 							 bool store_layout = false);
 	/// Allocates descriptor sets for each of the given layouts.
 	/**
@@ -243,7 +245,7 @@ public:
 	 */
 	template <size_t size>
 	std::array<descriptor_set, size>
-	allocate_descriptor_sets(const std::array<std::shared_ptr<descriptor_set_layout>, size>& layouts,
+	allocate_descriptor_sets(const std::array<std::shared_ptr<const descriptor_set_layout>, size>& layouts,
 							 bool store_layout = false) {
 		descriptor_set_resources req;
 		for(const auto& layout : layouts) {

@@ -57,7 +57,9 @@ VKAPI_ATTR void VKAPI_CALL vkDebugReportMessageEXT(VkInstance instance, VkDebugR
 namespace mce {
 namespace graphics {
 
-instance::instance(const std::vector<std::string>& exts, unsigned int validation_level)
+instance::instance(const core::software_metadata& engine_metadata,
+				   const core::software_metadata& application_metadata, const std::vector<std::string>& exts,
+				   unsigned int validation_level)
 		: validation_level(validation_level) {
 
 	if(!glfw_instance.vulkan_supported())
@@ -76,11 +78,12 @@ instance::instance(const std::vector<std::string>& exts, unsigned int validation
 
 	vk::ApplicationInfo app_info;
 	app_info.apiVersion = VK_MAKE_VERSION(1, 0, VK_HEADER_VERSION);
-	auto v = core::get_build_version_number();
-	app_info.applicationVersion = VK_MAKE_VERSION(v.major, v.minor, v.patch);
-	app_info.engineVersion = VK_MAKE_VERSION(v.major, v.minor, v.patch);
-	app_info.pApplicationName = "Demo";
-	app_info.pEngineName = "mce";
+	auto& av = application_metadata.version;
+	auto& ev = engine_metadata.version;
+	app_info.applicationVersion = VK_MAKE_VERSION(av.major, av.minor, av.patch);
+	app_info.engineVersion = VK_MAKE_VERSION(ev.major, ev.minor, ev.patch);
+	app_info.pApplicationName = application_metadata.name.c_str();
+	app_info.pEngineName = engine_metadata.name.c_str();
 
 	std::vector<const char*> layer_names;
 	layer_names.reserve(layers.size());

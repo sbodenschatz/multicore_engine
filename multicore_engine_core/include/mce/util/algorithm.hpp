@@ -162,6 +162,84 @@ auto preference_sort(ValRange& val_range, const PrefRange& pref_range) {
 	return preference_sort(val_range.begin(), val_range.end(), pref_range.begin(), pref_range.end());
 }
 
+/// Describes a grouping for grouped_foreach.
+template <typename EqPred, typename Pre, typename Post>
+struct foreach_grouping {
+	EqPred eq_pred; ///< A binary predicate on elements that tests if both belong to the same group.
+	Pre pre;		///< A function object that is called on the group key at the start of a group.
+	Post post;		///< A function object that is called on the group key at the end of a group.
+};
+
+/// Provides template argument deduction (in pre-C++17) for foreach_grouping.
+template <typename EqPred, typename Pre, typename Post>
+foreach_grouping<EqPred, Pre, Post> make_foreach_grouping(EqPred eq_pred, Pre pre, Post post) {
+	return {eq_pred, pre, post};
+}
+
+namespace detail {
+
+template <typename It, typename ElementFunc, typename ParentPred, typename Group, typename... Groups>
+It grouped_foreach(It begin, It end, ElementFunc element_func, ParentPred parent_pred, Group group) {
+	auto pred = [&parent_pred, &group](const auto& a, const auto& b) {
+		return parent_pred(a, b) && group.eq_pred(a, b);
+	};
+	auto group_key = begin;
+	group.pre(*group_key);
+	do {
+		element_func(*begin);
+		++begin;
+	} while((begin != end) && pred(*group_key, *begin));
+	group.post(*group_key);
+	return begin;
+}
+
+template <typename It, typename ElementFunc, typename ParentPred, typename Group, typename... Groups>
+It grouped_foreach(It begin, It end, ElementFunc element_func, ParentPred parent_pred, Group group,
+				   Groups... groups) {
+	auto pred = [&parent_pred, &group](const auto& a, const auto& b) {
+		return parent_pred(a, b) && group.eq_pred(a, b);
+	};
+	auto group_key = begin;
+	group.pre(*group_key);
+	do {
+		begin = grouped_foreach(begin, end, element_func, pred, groups...);
+	} while((begin != end) && pred(*group_key, *begin));
+	group.post(*group_key);
+	return begin;
+}
+
+} // namespace detail
+
+/// \brief Applies element_func to each element in the sorted range [begin,end) and groups the elements into
+/// nested groups defined by foreach_grouping objects in the groups parameter.
+/**
+ * The range is required to be sorted according to the grouping criteria.
+ * The groupings are defined using foreach_grouping object.
+ * The helper function make_foreach_grouping provides template argument deduction for creating
+ * foreach_grouping objects if no C++17 class template argument deduction is available.
+ *
+ * The foreach_grouping objects contain a binary predicate eq_pred that tests if two elements belong to the
+ * same group.
+ * When a group is started, the pre function object of the grouping is called.
+ * When a group ends, the post function object of the grouping is called.
+ *
+ * At the start of a group, the iterator to the first element is stored as the iterator to the group key.
+ * The group g ends when the current element is no longer equal to the group key according to the eq_pred of
+ * any of the groupings not nested deeper than the grouping of g.
+ * Only the groups for which eq_pred returns false and further nested groups are exited.
+ *
+ * The pre and post function objects are called using the group key as a parameter.
+ * Because this is always the first element of the group, only the properties related to the grouping should
+ * be evaluated (e.g. the member variables queried in eq_pred).
+ */
+template <typename It, typename ElementFunc, typename... Groups>
+void grouped_foreach(It begin, It end, ElementFunc element_func, Groups&&... groups) {
+	do {
+		begin = detail::grouped_foreach(begin, end, element_func,
+										[](const auto&, const auto&) { return true; }, groups...);
+	} while(begin != end);
+}
+
 } // namespace util
 } // namespace mce
 

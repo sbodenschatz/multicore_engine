@@ -36,6 +36,7 @@ void static_model_exporter::export_model(const static_model& model_data,
 					   model::static_model_mesh_meta_data meta_data;
 					   meta_data.object_name = mesh.object_name;
 					   meta_data.group_name = mesh.group_name;
+					   meta_data.material_name = mesh.material_name;
 					   meta_data.index_data_in_content.begin(next_offset);
 					   meta_data.index_data_in_content.length(mesh.indices.size() *
 															  sizeof(decltype(mesh.indices)::value_type));

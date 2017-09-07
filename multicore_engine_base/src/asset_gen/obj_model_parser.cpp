@@ -127,8 +127,8 @@ void obj_model_parser::parse_vertex_parameter(boost::string_view) {
 	throw unimplemented_exception("Vertex parameters not supported yet");
 }
 void obj_model_parser::parse_usemtl(boost::string_view line) {
-	// throw unimplemented_exception("Materials not supported yet");
-	UNUSED(line);
+	current_material_name.clear();
+	current_material_name.append(line.data(), line.size());
 }
 void obj_model_parser::parse_object(boost::string_view line) {
 	current_object_name.clear();
@@ -148,9 +148,13 @@ void obj_model_parser::parse_smoothing(boost::string_view line) {
 	}
 }
 void obj_model_parser::parse_face(boost::string_view line) {
+	if(current_material_name.empty()) {
+		throw syntax_exception("Attempt to create face without a defined material.");
+	}
 	if(meshes.empty() || meshes.back().object_name != current_object_name ||
-	   meshes.back().group_name != current_group_name) {
-		meshes.emplace_back(current_object_name, current_group_name);
+	   meshes.back().group_name != current_group_name ||
+	   meshes.back().material_name != current_material_name) {
+		meshes.emplace_back(current_object_name, current_group_name, current_material_name);
 	}
 	size_t face_vertex = 0;
 	std::array<glm::ivec3, 3> vert_tripples;
@@ -234,6 +238,7 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 				});
 		mesh.collision_data.object_name = mesh.object_name;
 		mesh.collision_data.group_name = mesh.group_name;
+		mesh.collision_data.material_name = mesh.material_name;
 	}
 	model::static_model_collision_data model_colision_data;
 	model_colision_data.meshes.reserve(meshes.size());
@@ -247,6 +252,7 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 		static_model_mesh mesh;
 		mesh.object_name = m.object_name;
 		mesh.group_name = m.group_name;
+		mesh.material_name = m.material_name;
 		mesh.indices = m.indices;
 		return mesh;
 	});

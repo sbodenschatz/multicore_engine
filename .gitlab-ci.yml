@@ -48,11 +48,14 @@ stages:
     - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a ${BUILD_COMPILER_NAME}/libmce_parsers.a
     - cmake -E copy build/multicore_engine_base/libmce_base.a ${BUILD_COMPILER_NAME}/libmce_base.a
     - cmake -E copy build/multicore_engine_core/libmce_core.a ${BUILD_COMPILER_NAME}/libmce_core.a
-    - cmake -E copy build/multicore_engine_demo/mce_demo ${BUILD_COMPILER_NAME}/demo
+    - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a ${BUILD_COMPILER_NAME}/libmce_renderer.a
+    - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test ${BUILD_COMPILER_NAME}/graphics_test
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
     - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
     - cmake -E copy build/multicore_engine_model_converter/mce_model_converter ${BUILD_COMPILER_NAME}/model_converter
-    - cmake -E copy build/multicore_engine_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
+    - cmake -E copy build/multicore_engine_assets/engine.pack ${BUILD_COMPILER_NAME}/engine.pack
+    - cmake -E copy build/multicore_engine_test_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
+    - glslangValidator -v
 
 .mingw-build-template: &mingw-build-task
     stage: build
@@ -67,12 +70,15 @@ stages:
     - cmake -E make_directory %BUILD_COMPILER_NAME%
     - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a %BUILD_COMPILER_NAME%/libmce_parsers.a
     - cmake -E copy build/multicore_engine_base/libmce_base.a %BUILD_COMPILER_NAME%/libmce_base.a
-    - cmake -E copy build/multicore_engine_core/libmce_core.a %BUILD_COMPILER_NAME%/libmulticore_engine_core.a
-    - cmake -E copy build/multicore_engine_demo/mce_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E copy build/multicore_engine_core/libmce_core.a %BUILD_COMPILER_NAME%/libmce_core.a
+    - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a %BUILD_COMPILER_NAME%/libmce_renderer.a
+    - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
     - cmake -E copy build/multicore_engine_model_converter/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
-    - cmake -E copy build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - cmake -E copy build/multicore_engine_assets/engine.pack %BUILD_COMPILER_NAME%/engine.pack
+    - cmake -E copy build/multicore_engine_test_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - glslangValidator -v
 
 .msbuild-build-template: &msbuild-build-task
     stage: build
@@ -90,12 +96,15 @@ stages:
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/mce_base.lib %BUILD_COMPILER_NAME%/mce_base.lib) ELSE (echo Skipping LTCG Lib)
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core.lib %BUILD_COMPILER_NAME%/mce_core.lib) ELSE (echo Skipping LTCG Lib)
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_renderer/%BUILD_TYPE%/mce_renderer.lib %BUILD_COMPILER_NAME%/mce_renderer.lib) ELSE (echo Skipping LTCG Lib)
-    - cmake -E copy build/multicore_engine_demo/%BUILD_TYPE%/mce_demo.exe %BUILD_COMPILER_NAME%/demo.exe
+    - cmake -E copy build/multicore_engine_graphics_test/%BUILD_TYPE%/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E copy build/multicore_engine_pack_file_gen/%BUILD_TYPE%/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
     - cmake -E copy build/multicore_engine_model_converter/%BUILD_TYPE%/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
-    - cmake -E copy build/multicore_engine_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
-    - cmake -E remove_directory build/multicore_engine_assets
+    - cmake -E copy build/multicore_engine_assets/engine.pack %BUILD_COMPILER_NAME%/engine.pack
+    - cmake -E copy build/multicore_engine_test_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    #- cmake -E remove_directory build/multicore_engine_assets
+    #- cmake -E remove_directory build/multicore_engine_test_assets
+    - glslangValidator -v
 
 .package-task-template: &package-task
     stage: package
@@ -272,24 +281,7 @@ license-pack-windows:
     dependencies: []
     stage: auxiliary
     script:
-    - mkdir licenses\windows
-    - cd licenses\windows
-    - mkdir Boost glfw gli glm TBB vulkan-sdk zlib mingw-w64\mingw-w64
-    - copy C:\Libs\Boost\LICENSE_1_0.txt Boost
-    - copy C:\Libs\glfw\COPYING.txt glfw
-    - copy C:\Libs\gli\copying.txt gli
-    - copy C:\Libs\glm\copying.txt glm
-    - copy C:\Libs\TBB\LICENSE TBB
-    - copy %VULKAN_SDK%\LICENSE.txt vulkan-sdk
-    - copy %VULKAN_SDK%\SDK_LICENSE.rtf vulkan-sdk
-    - copy C:\Libs\zlib\README zlib
-    - cmake -E copy_directory C:/mingw-w64/mingw64/licenses/winpthreads mingw-w64/winpthreads
-    - cmake -E copy_directory C:/mingw-w64/mingw64/licenses/gcc mingw-w64/gcc
-    - copy C:\mingw-w64\mingw64\licenses\mingw-w64\COPYING.MinGW-w64-runtime.txt mingw-w64
-    - copy C:\Libs\gtest\GMOCK-LICENSE.txt
-    - copy C:\Libs\gtest\GMOCK-CONTRIBUTORS.txt
-    - copy C:\Libs\gtest\GTEST-LICENSE.txt
-    - copy C:\Libs\gtest\GTEST-CONTRIBUTORS.txt
+    - create_license_pack_windows.bat
     tags:
     - win-cpp
     artifacts:
@@ -302,27 +294,7 @@ license-pack-linux:
     dependencies: []
     stage: auxiliary
     script:
-    - mkdir -p licenses/linux
-    - cd licenses/linux
-    - mkdir Boost glfw gli glm TBB vulkan-sdk zlib libc++ libstdc++ libgcc llvm-runtime g++ gcc-base gtest gmock
-    - cp /usr/local/share/doc/boost/LICENSE_1_0.txt Boost
-    - cp /usr/share/doc/libglfw3/copyright glfw
-    - cp /usr/share/doc/libgli-dev/copyright gli
-    - cp /usr/share/doc/libglm-dev/copyright glm
-    - cp /usr/share/doc/libtbb-dev/copyright TBB
-    - cp /usr/local/share/doc/vulkan-sdk/LICENSE.txt vulkan-sdk
-    - cp /usr/local/share/doc/vulkan-sdk/sdk_license.html vulkan-sdk
-    - cp /usr/share/doc/zlib1g-dev/copyright zlib
-    - cp /usr/share/doc/libc++-dev/copyright libc++
-    - cp /usr/share/doc/libstdc++-6-dev/copyright libstdc++
-    - cp /usr/share/doc/libgcc-6-dev/copyright libgcc
-    - cp /usr/share/doc/llvm-3.8-runtime/copyright llvm-runtime
-    - cp /usr/share/doc/g++-6/copyright g++
-    - cp /usr/share/doc/gcc-6-base/copyright gcc-base
-    - cp /usr/local/share/doc/googletest/LICENSE gtest
-    - cp /usr/local/share/doc/googletest/CONTRIBUTORS gtest
-    - cp /usr/local/share/doc/googlemock/LICENSE gmock
-    - cp /usr/local/share/doc/googlemock/CONTRIBUTORS gmock
+    - ./create_license_pack_linux.sh
     tags:
     - cpp
     artifacts:
