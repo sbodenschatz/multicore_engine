@@ -55,7 +55,7 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 	for(uint32_t i = 0; i < window_.swapchain_images().size(); ++i) {
 		render_queue_start_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
 		render_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
-		present_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
+		present_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eSimultaneousUse, {}));
 		// TODO Minimize barriers.
 		render_queue_start_frame_cmd_buffers_[i]->pipelineBarrier(
 				vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
