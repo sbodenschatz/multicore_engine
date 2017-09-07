@@ -69,7 +69,12 @@ public:
 	size_type used_slots() const {
 		return used_slots_.load();
 	}
-	
+
+	/// Clears the index assignment and causes threads to reselect indices on next slot_index().
+	/**
+	 * \warning This function is not inherently thread-safe and needs to be externally synchronized to not
+	 * execute concurrently with any other operation on this object.
+	 */
 	void clear() {
 		for(size_type i = 0; i < total_slots_; ++i) {
 			owners_[i] = std::thread::id();
@@ -212,6 +217,11 @@ public:
 		return index_mapping_.used_slots();
 	}
 
+	/// Clears the ownership map for the objects and causes threads to reselect objects on next get().
+	/**
+	 * \warning This function is not inherently thread-safe and needs to be externally synchronized to not
+	 * execute concurrently with any other operation on this object.
+	 */
 	void clear_ownership() {
 		index_mapping_.clear();
 	}
