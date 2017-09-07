@@ -109,6 +109,7 @@ public:
 	/// Registers the component types managed by renderer_state to the given entity_manager object.
 	void register_to_entity_manager(entity::entity_manager& em);
 
+	/// Hook function in the main loop that performs the actual rendering.
 	void render(const mce::core::frame_time& frame_time) override;
 };
 
