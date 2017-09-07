@@ -195,10 +195,24 @@ public:
 		return engine_metadata_;
 	}
 
+	/// Returns the maximum number of threads used on the core processing and rendering loop.
+	/**
+	 * The number doesn't include worker threads in e.g. the asset system that work asynchronously with the
+	 * main loop and are blocked on IO or waiting for tasks most of the time.
+	 */
 	uint32_t max_general_concurrency() const {
 		return max_general_concurrency_;
 	}
 
+	/// \brief Allows the application to set the maximum number of threads used on the core processing and
+	/// rendering loop.
+	/**
+	 * The number doesn't include worker threads in e.g. the asset system that work asynchronously with the
+	 * main loop and are blocked on IO or waiting for tasks most of the time.
+	 *
+	 * \warning Must only be called before adding systems because most systems use the value during their
+	 * initialization.
+	 */
 	void max_general_concurrency(uint32_t max_general_concurrency) {
 		max_general_concurrency_ = max_general_concurrency;
 	}
