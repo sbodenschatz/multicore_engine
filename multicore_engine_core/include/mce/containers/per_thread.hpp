@@ -69,6 +69,13 @@ public:
 	size_type used_slots() const {
 		return used_slots_.load();
 	}
+	
+	void clear() {
+		for(size_type i = 0; i < total_slots_; ++i) {
+			owners_[i] = std::thread::id();
+		}
+		used_slots_ = 0;
+	}
 };
 
 /// \brief Provides a fixed size pool of objects that are associated to using threads but can also be accessed
@@ -203,6 +210,10 @@ public:
 	/// Returns the number of slots used by / assigned to a thread.
 	size_type used_slots() const noexcept {
 		return index_mapping_.used_slots();
+	}
+
+	void clear_ownership() {
+		index_mapping_.clear();
 	}
 
 	/// \brief Proxy class used to provide const access to the full range of the objects array instead of just

@@ -53,6 +53,8 @@ void renderer_system::prerender(const mce::core::frame_time&) {
 	vk::CommandBufferInheritanceInfo cbii(
 			main_render_pass_->native_render_pass(), 0,
 			main_framebuffer_->pass(0).frame(gs_.current_swapchain_image()).native_framebuffer());
+	per_frame_per_thread_data_[gs_.current_swapchain_image()].clear_ownership();
+	per_thread_data_->clear_ownership();
 	for(auto& pftd : per_frame_per_thread_data_[gs_.current_swapchain_image()].all()) {
 		pftd.command_buffer->begin(
 				vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit |
