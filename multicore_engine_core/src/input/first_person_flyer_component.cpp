@@ -11,11 +11,18 @@ namespace input {
 
 first_person_flyer_component::first_person_flyer_component(
 		entity::entity& owner, const entity::component_configuration& configuration)
-		: component(owner, configuration) {
-	// TODO Auto-generated constructor stub
-}
+		: component(owner, configuration) {}
 
 first_person_flyer_component::~first_person_flyer_component() {}
+
+void first_person_flyer_component::fill_property_list(property_list& prop) {
+	REGISTER_COMPONENT_PROPERTY_NAME_PROXY(prop, first_person_flyer_component, std::string, forward_key);
+	REGISTER_COMPONENT_PROPERTY_NAME_PROXY(prop, first_person_flyer_component, std::string, backward_key);
+	REGISTER_COMPONENT_PROPERTY_NAME_PROXY(prop, first_person_flyer_component, std::string, left_key);
+	REGISTER_COMPONENT_PROPERTY_NAME_PROXY(prop, first_person_flyer_component, std::string, right_key);
+	REGISTER_COMPONENT_PROPERTY_NAME_PROXY(prop, first_person_flyer_component, std::string, upward_key);
+	REGISTER_COMPONENT_PROPERTY_NAME_PROXY(prop, first_person_flyer_component, std::string, downward_key);
+}
 
 } /* namespace input */
 } /* namespace mce */
