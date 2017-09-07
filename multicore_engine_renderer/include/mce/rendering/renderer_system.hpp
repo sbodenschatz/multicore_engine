@@ -38,8 +38,14 @@ class pipeline;
 } // namespace graphics
 namespace rendering {
 
+/// Encapsulates settings of the renderer that are tweakable by the application using the engine.
+/**
+ * The settings are provided to the renderer_system as an optional constructor parameter.
+ */
 struct renderer_system_settings {
+	/// Specifies the name of the vertex shader to use for the main forward rendering pass.
 	std::string main_forward_vertex_shader_name = "shaders/main_forward.vert";
+	/// Specifies the name of the fragment shader to use for the main forward rendering pass.
 	std::string main_forward_fragment_shader_name = "shaders/main_forward.frag";
 };
 
@@ -122,55 +128,69 @@ public:
 	/// Implements the hooked logic that happens at the end of the frame.
 	void postrender(const mce::core::frame_time& frame_time) override;
 
+	/// \brief Provides access to a sampler object that can be used for regular texture sampling without
+	/// special requirements.
 	const graphics::sampler& default_sampler() const {
 		assert(default_sampler_);
 		return *default_sampler_;
 	}
 
+	/// Provides access to the descriptor_set_layout for the descriptor_set providing per-material resources.
 	const std::shared_ptr<const graphics::descriptor_set_layout>& descriptor_set_layout_per_material() const {
 		return descriptor_set_layout_per_material_;
 	}
 
+	/// Provides access to the descriptor_set_layout for the descriptor_set providing per-scene resources.
 	const std::shared_ptr<const graphics::descriptor_set_layout>& descriptor_set_layout_per_scene() const {
 		return descriptor_set_layout_per_scene_;
 	}
 
+	/// Provides access to the graphics::pipeline used for the main forward rendering pass.
 	const graphics::pipeline& main_forward_pipeline() const {
 		assert(main_forward_pipeline_);
 		return *main_forward_pipeline_;
 	}
 
+	/// Provides access to the main framebuffer object.
 	graphics::framebuffer& main_framebuffer() const {
 		assert(main_framebuffer_);
 		return *main_framebuffer_;
 	}
 
+	/// Provides access to the render_pass object used for the main forward rendering pass.
 	const graphics::render_pass& main_render_pass() const {
 		assert(main_render_pass_);
 		return *main_render_pass_;
 	}
 
+	/// \brief Provides access to the pipeline_layout used for pipeline in scene passes (drawing objects in
+	/// the scene).
 	const graphics::pipeline_layout& pipeline_layout_scene_pass() const {
 		assert(pipeline_layout_scene_pass_);
 		return *pipeline_layout_scene_pass_;
 	}
 
+	/// Allows read-only access to the settings specified on construction.
 	const renderer_system_settings& settings() const {
 		return settings_;
 	}
 
+	/// Allows access to the model_manager.
 	const rendering::model_manager& model_manager() const {
 		return mdl_mgr;
 	}
 
+	/// Allows access to the model_manager.
 	rendering::model_manager& model_manager() {
 		return mdl_mgr;
 	}
 
+	/// Allows access to the material_manager.
 	const rendering::material_manager& material_manager() const {
 		return mat_mgr;
 	}
 
+	/// Allows access to the material_manager.
 	rendering::material_manager& material_manager() {
 		return mat_mgr;
 	}
