@@ -191,16 +191,19 @@ public:
 	uint32_t current_swapchain_image() const {
 		return current_swapchain_image_;
 	}
-	
+
+	/// Adds the given command buffer to the collection of command buffer to submit at the end of the frame.
 	void enqueue_command_buffer(queued_handle<vk::UniqueCommandBuffer>&& buffer_handle) {
 		pending_command_buffers_.emplace_back(std::move(buffer_handle));
 	}
-	
+
+	/// Adds the given command buffer to the collection of command buffer to submit at the end of the frame.
 	void enqueue_command_buffer(vk::UniqueCommandBuffer&& buffer_handle) {
 		pending_command_buffers_.emplace_back(queued_handle<vk::UniqueCommandBuffer>(
 				std::move(buffer_handle), &destruction_queue_manager_));
 	}
-	
+
+	/// Adds the given command buffer to the collection of command buffer to submit at the end of the frame.
 	void enqueue_command_buffer(vk::CommandBuffer buffer_handle) {
 		pending_command_buffers_.emplace_back(buffer_handle);
 	}
