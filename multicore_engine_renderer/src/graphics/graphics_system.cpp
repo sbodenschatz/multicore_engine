@@ -76,7 +76,7 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 					window_.swapchain_images()[i], vk::ImageLayout::ePresentSrcKHR,
 					render_queue_end_frame_cmd_buffers_[i].get(),
 					present_queue_end_frame_cmd_buffers_[i].get(), device_.graphics_queue_index().first,
-					device_.present_queue_index().first, vk::PipelineStageFlagBits::eColorAttachmentOutput,
+					device_.present_queue_index().first, vk::PipelineStageFlagBits::eAllCommands,
 					vk::PipelineStageFlagBits::eAllCommands,
 					vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
 					~vk::AccessFlags{}, vk::ImageAspectFlagBits::eColor);
