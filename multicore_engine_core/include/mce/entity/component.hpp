@@ -121,4 +121,18 @@ protected:
 #define REGISTER_COMPONENT_PROPERTY_DIRECT(LIST, COMP, TYPE, NAME)                                           \
 	register_component_property<TYPE, COMP>(LIST, #NAME, &COMP::NAME)
 
+/// \brief Allows more comfortable registration of properties by applying the convention that the property
+/// uses a getter and a setter that are both named like the property suffixed by "_name" and differentiate by
+/// signature.
+#define REGISTER_COMPONENT_PROPERTY_NAME_PROXY(LIST, COMP, TYPE, NAME)                                       \
+	register_component_property<TYPE, COMP>(                                                                 \
+			LIST, #NAME, static_cast<mce::reflection::linked_property<                                       \
+								 component, TYPE, COMP, mce::entity::abstract_component_property_assignment, \
+								 mce::entity::component_property_assignment, mce::core::engine*>::getter_t>( \
+								 &COMP::NAME##_name),                                                        \
+			static_cast<mce::reflection::linked_property<                                                    \
+					component, TYPE, COMP, mce::entity::abstract_component_property_assignment,              \
+					mce::entity::component_property_assignment, mce::core::engine*>::setter_t>(              \
+					&COMP::NAME##_name))
+
 #endif /* ENTITY_COMPONENT_HPP_ */
