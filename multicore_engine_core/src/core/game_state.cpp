@@ -58,7 +58,7 @@ void game_state::process_leave_push() {
 	}
 }
 void game_state::process_reenter(const boost::any& parameter) {
-	process_reenter(parameter);
+	reenter(parameter);
 	for(auto& sys_state : system_states_) {
 		sys_state.second->reenter(parameter);
 	}
