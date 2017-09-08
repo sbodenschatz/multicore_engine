@@ -36,6 +36,8 @@ class input_system : public core::system {
 	mouse_state current_mouse_state_;
 	mouse_state last_mouse_state_;
 
+	friend class input_state;
+
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
 	int pre_phase_ordering() const noexcept override {

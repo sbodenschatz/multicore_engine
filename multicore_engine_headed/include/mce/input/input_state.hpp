@@ -29,6 +29,8 @@ public:
 		return first_person_flyer_comps.emplace(owner, configuration);
 	}
 
+	void reenter(const boost::any& parameter) override;
+
 	/// Registers the component types managed by input_state to the given entity_manager object.
 	void register_to_entity_manager(entity::entity_manager& em);
 };

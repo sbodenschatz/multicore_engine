@@ -5,12 +5,21 @@
  */
 
 #include <mce/entity/entity_manager.hpp>
+#include <mce/glfw/window.hpp>
 #include <mce/input/input_state.hpp>
+#include <mce/input/input_system.hpp>
+#include <mce/windowing/window_system.hpp>
 
 namespace mce {
 namespace input {
 
-input_state::input_state(mce::core::system* system) : system_state(system) {}
+input_state::input_state(mce::core::system* system) : system_state(system) {
+	static_cast<input_system*>(system_)->win_sys.window().cursor_mode(glfw::cursor_mode::disabled);
+}
+
+void input_state::reenter(const boost::any&) {
+	static_cast<input_system*>(system_)->win_sys.window().cursor_mode(glfw::cursor_mode::disabled);
+}
 
 input_state::~input_state() {}
 
