@@ -20,7 +20,7 @@ namespace input {
 class input_system;
 
 class input_state : public core::system_state {
-	containers::smart_object_pool<first_person_flyer_component> first_person_flyer_comps;
+	containers::smart_object_pool<first_person_flyer_component, 4> first_person_flyer_comps;
 
 public:
 	using owner_system = input_system;
@@ -38,6 +38,8 @@ public:
 	}
 
 	void reenter(const boost::any& parameter) override;
+
+	void process(const mce::core::frame_time& frame_time) override;
 
 	/// Registers the component types managed by input_state to the given entity_manager object.
 	void register_to_entity_manager(entity::entity_manager& em);

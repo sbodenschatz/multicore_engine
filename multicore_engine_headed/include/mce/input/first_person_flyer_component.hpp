@@ -13,18 +13,21 @@
 
 namespace mce {
 namespace input {
+class input_system;
 
 class first_person_flyer_component : public entity::component {
 	glfw::key forward_key_ = glfw::key::k_w;
 	glfw::key backward_key_ = glfw::key::k_s;
 	glfw::key left_key_ = glfw::key::k_a;
 	glfw::key right_key_ = glfw::key::k_d;
-	glfw::key upward_key_ = glfw::key::k_w;
-	glfw::key downward_key_ = glfw::key::k_s;
+	glfw::key upward_key_ = glfw::key::k_r;
+	glfw::key downward_key_ = glfw::key::k_f;
 
 public:
 	first_person_flyer_component(entity::entity& owner, const entity::component_configuration& configuration);
 	~first_person_flyer_component();
+
+	void process(const mce::core::frame_time& frame_time, const input_system& sys);
 
 	std::string backward_key_name() const {
 		return glfw::to_string(backward_key_);
