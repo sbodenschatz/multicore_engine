@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/input/input_system.hpp
+ * File /multicore_engine_headed/include/mce/input/input_system.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
@@ -12,13 +12,15 @@
 namespace mce {
 namespace core {
 class engine;
-class window_system;
 } // namespace core
+namespace windowing {
+class window_system;
+} // namespace windowing
 namespace input {
 
 class input_system : public core::system {
 	core::engine& eng;
-	core::window_system& win_sys;
+	windowing::window_system& win_sys;
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
@@ -30,7 +32,7 @@ public:
 		return 0x1100;
 	}
 
-	input_system(core::engine& eng, core::window_system& win_sys);
+	input_system(core::engine& eng, windowing::window_system& win_sys);
 	~input_system();
 };
 

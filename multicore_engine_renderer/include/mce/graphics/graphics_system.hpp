@@ -28,8 +28,10 @@
 namespace mce {
 namespace core {
 class engine;
-class window_system;
 } // namespace core
+namespace windowing {
+class window_system;
+} // namespace windowing
 namespace graphics {
 
 /// Implements a system providing basic graphics resources and functionality.
@@ -87,7 +89,7 @@ public:
 	 * Should only be called in core::engine::add_system, but can't be made private and friended with engine
 	 * because the construction takes place in std::make_unique.
 	 */
-	graphics_system(core::engine& eng, core::window_system& win_sys,
+	graphics_system(core::engine& eng, windowing::window_system& win_sys,
 					const std::vector<std::string>& extensions = {},
 					unsigned int validation_level = instance::default_validation_level);
 	/// Destroys the graphics_system and releases the underlying resources.

@@ -1,11 +1,11 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/core/window_system.hpp
+ * File /multicore_engine_headed/include/mce/windowing/window_system.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef MCE_CORE_WINDOW_SYSTEM_HPP_
-#define MCE_CORE_WINDOW_SYSTEM_HPP_
+#ifndef MCE_WINDOWING_WINDOW_SYSTEM_HPP_
+#define MCE_WINDOWING_WINDOW_SYSTEM_HPP_
 
 /**
  * \file
@@ -23,10 +23,12 @@ class window;
 } // namespace glfw
 namespace core {
 class engine;
+} // namespace core
+namespace windowing {
 
 /// Provides window functionality for the engine by opening a window and processing input from it.
-class window_system : public system {
-	engine& eng;
+class window_system : public core::system {
+	core::engine& eng;
 	std::string window_title_;
 	glfw::instance instance_;
 	std::unique_ptr<glfw::window> window_;
@@ -56,7 +58,7 @@ public:
 	 * - "monitor" specifies the index of the monitor to use for (windowed_)fullscreen mode.
 	 * - "video_mode" specifies the index of the video mode of the used monitor to use in fullscreen mode.
 	 */
-	explicit window_system(engine& eng, const std::string& window_title);
+	explicit window_system(core::engine& eng, const std::string& window_title);
 	/// Destroys the window_system and releases the used resources.
 	virtual ~window_system();
 
@@ -94,7 +96,7 @@ public:
 	}
 };
 
-} /* namespace core */
+} /* namespace windowing */
 } /* namespace mce */
 
-#endif /* MCE_CORE_WINDOW_SYSTEM_HPP_ */
+#endif /* MCE_WINDOWING_WINDOW_SYSTEM_HPP_ */

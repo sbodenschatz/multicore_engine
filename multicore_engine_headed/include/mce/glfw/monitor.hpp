@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/glfw/monitor.hpp
+ * File /multicore_engine_headed/include/mce/glfw/monitor.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 

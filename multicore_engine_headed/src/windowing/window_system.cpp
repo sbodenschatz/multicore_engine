@@ -1,20 +1,20 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/core/window_system.cpp
+ * File /multicore_engine_headed/src/windowing/window_system.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
 #include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
-#include <mce/core/window_system.hpp>
 #include <mce/glfw/monitor.hpp>
 #include <mce/glfw/window.hpp>
 #include <mce/util/string_tools.hpp>
+#include <mce/windowing/window_system.hpp>
 
 namespace mce {
-namespace core {
+namespace windowing {
 
-window_system::window_system(engine& eng, const std::string& window_title)
+window_system::window_system(core::engine& eng, const std::string& window_title)
 		: eng{eng}, instance_(), window_() {
 	auto mode = eng.config_store().resolve<std::string>("display_mode", "windowed");
 	auto mode_str = mode->value();
@@ -55,5 +55,5 @@ void window_system::preprocess(const mce::core::frame_time&) {
 	}
 }
 
-} /* namespace core */
+} /* namespace windowing */
 } /* namespace mce */

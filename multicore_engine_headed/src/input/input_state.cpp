@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/input/input_state.cpp
+ * File /multicore_engine_headed/src/input/input_state.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 

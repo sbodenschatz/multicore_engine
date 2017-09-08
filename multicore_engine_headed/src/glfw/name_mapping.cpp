@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/glfw/name_mapping.cpp
+ * File /multicore_engine_headed/src/glfw/name_mapping.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 

@@ -10,6 +10,7 @@ target_include_directories(mce_renderer PUBLIC
 	)
 target_link_libraries(mce_renderer 
 		mce_core
+		mce_headed
 		deps.vulkan
 		deps.gli
 		deps.vkglformat

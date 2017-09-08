@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/input/first_person_flyer_component.cpp
+ * File /multicore_engine_headed/src/input/first_person_flyer_component.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
