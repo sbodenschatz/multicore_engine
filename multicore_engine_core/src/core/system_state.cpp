@@ -10,5 +10,9 @@ namespace mce {
 namespace core {
 void system_state::process(const mce::core::frame_time&) {}
 void system_state::render(const mce::core::frame_time&) {}
+void system_state::leave_pop() {}
+void system_state::leave_push() {}
+void system_state::reenter(const boost::any&) {}
+
 } /* namespace core */
 } /* namespace mce */

@@ -29,6 +29,17 @@ struct game_state_machine_policy
 		return std::make_unique<T>(state_machine.context().engine, state_machine.context().game_state_machine,
 								   parent_state, std::forward<Args>(args)...);
 	}
+	template <typename... Args>
+	void leave_state_push(const typename game_state_machine_policy::ptr_t& state) {
+		state->process_leave_push();
+	}
+	void leave_state_pop(const typename game_state_machine_policy::ptr_t& state) {
+		state->process_leave_pop();
+	}
+	template <typename... Args>
+	void reenter_state(const typename game_state_machine_policy::ptr_t& state, Args&&... args) {
+		state->process_reenter(std::forward<Args>(args)...);
+	}
 	static constexpr bool pop_states_on_destruction = true;
 };
 

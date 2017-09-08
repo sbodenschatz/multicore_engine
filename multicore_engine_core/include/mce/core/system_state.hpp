@@ -7,6 +7,8 @@
 #ifndef CORE_SYSTEM_STATE_HPP_
 #define CORE_SYSTEM_STATE_HPP_
 
+#include <boost/any.hpp>
+
 namespace mce {
 namespace core {
 class system;
@@ -27,6 +29,20 @@ public:
 	virtual void process(const mce::core::frame_time& frame_time);
 	/// Hook function called for the rendering phase of a frame.
 	virtual void render(const mce::core::frame_time& frame_time);
+
+	/// \brief Provides a hook for subclasses when the owning game_state is left because a new game_state was
+	/// pushed on top.
+	virtual void leave_pop();
+	/// Provides a hook for subclasses when the owning game_state is left because it was popped.
+	virtual void leave_push();
+
+	/// \brief Provides a hook for subclasses when the owning game_state is reentered because the game_state
+	/// on top of it was popped.
+	/**
+	 * Arbitrary parameter data can be passed using an any object. What parameter types are expected /
+	 * accepted depends on the subclass.
+	 */
+	virtual void reenter(const boost::any& parameter);
 
 	/// Allows access to the system to which this system state belongs.
 	mce::core::system* system() const {

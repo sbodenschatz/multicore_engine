@@ -15,6 +15,10 @@
 
 namespace mce {
 namespace core {
+namespace detail {
+template <typename State_Machine>
+struct game_state_machine_policy;
+} // namespace detail
 class engine;
 class game_state_machine;
 class system_state;
@@ -30,6 +34,13 @@ class game_state {
 	mce::core::engine* engine_;
 	mce::core::game_state_machine* state_machine_;
 	mce::core::game_state* parent_state_;
+
+	void process_leave_pop();
+	void process_leave_push();
+	void process_reenter(const boost::any& parameter);
+
+	template <typename T>
+	friend struct detail::game_state_machine_policy;
 
 protected:
 	/// Adds the system_state implemented by the class supplied in T to the game_state.

@@ -45,5 +45,24 @@ void game_state::leave_pop() {}
 void game_state::leave_push() {}
 void game_state::reenter(const boost::any&) {}
 
+void game_state::process_leave_pop() {
+	leave_pop();
+	for(auto& sys_state : system_states_) {
+		sys_state.second->leave_pop();
+	}
+}
+void game_state::process_leave_push() {
+	leave_push();
+	for(auto& sys_state : system_states_) {
+		sys_state.second->leave_push();
+	}
+}
+void game_state::process_reenter(const boost::any& parameter) {
+	process_reenter(parameter);
+	for(auto& sys_state : system_states_) {
+		sys_state.second->reenter(parameter);
+	}
+}
+
 } /* namespace core */
 } /* namespace mce */
