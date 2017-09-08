@@ -50,6 +50,26 @@ public:
 	~input_system();
 
 	void preprocess(const mce::core::frame_time& frame_time) override;
+
+	bool current_key_state(glfw::key k) const noexcept {
+		auto it = current_key_state_.find(k);
+		if(it != current_key_state_.end()) return it->second;
+		return false;
+	}
+
+	const mouse_state& current_mouse_state() const noexcept {
+		return current_mouse_state_;
+	}
+
+	bool last_key_state(glfw::key k) const noexcept {
+		auto it = last_key_state_.find(k);
+		if(it != last_key_state_.end()) return it->second;
+		return false;
+	}
+
+	const mouse_state& last_mouse_state() const noexcept {
+		return last_mouse_state_;
+	}
 };
 
 } /* namespace input */
