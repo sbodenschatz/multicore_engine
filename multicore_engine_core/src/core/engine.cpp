@@ -51,21 +51,10 @@ void engine::initialize_config() {
 
 void engine::run() {
 	tsi = std::make_unique<tbb::task_scheduler_init>(max_general_concurrency_);
-	using my_clock = std::conditional<std::chrono::high_resolution_clock::is_steady,
-									  std::chrono::high_resolution_clock, std::chrono::steady_clock>::type;
-	static_assert(std::ratio_less_equal<my_clock::period, std::micro>::value,
-				  "Standard library doesn't provide a steady clock with at least microsecond resolution.");
-	auto start_t = my_clock::now();
-	auto old_t = start_t;
+	core::clock clk;
 	running_ = true;
 	while(running()) {
-		auto new_t = my_clock::now();
-		std::chrono::microseconds t = std::chrono::duration_cast<std::chrono::microseconds>(new_t - start_t);
-		std::chrono::microseconds delta_t_microseconds =
-				std::chrono::duration_cast<std::chrono::microseconds>(new_t - old_t);
-		std::chrono::duration<float> delta_t = new_t - old_t;
-		old_t = new_t;
-		frame_time ft{delta_t.count(), delta_t_microseconds, t};
+		auto ft = clk.frame_tick();
 		process(ft);
 		render(ft);
 	}
