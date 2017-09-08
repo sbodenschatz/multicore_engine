@@ -48,7 +48,7 @@ stages:
     - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a ${BUILD_COMPILER_NAME}/libmce_parsers.a
     - cmake -E copy build/multicore_engine_base/libmce_base.a ${BUILD_COMPILER_NAME}/libmce_base.a
     - cmake -E copy build/multicore_engine_core/libmce_core.a ${BUILD_COMPILER_NAME}/libmce_core.a
-    - cmake -E copy build/multicore_engine_core/libmce_headed.a ${BUILD_COMPILER_NAME}/libmce_headed.a
+    - cmake -E copy build/multicore_engine_headed/libmce_headed.a ${BUILD_COMPILER_NAME}/libmce_headed.a
     - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a ${BUILD_COMPILER_NAME}/libmce_renderer.a
     - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test ${BUILD_COMPILER_NAME}/graphics_test
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
@@ -72,7 +72,7 @@ stages:
     - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a %BUILD_COMPILER_NAME%/libmce_parsers.a
     - cmake -E copy build/multicore_engine_base/libmce_base.a %BUILD_COMPILER_NAME%/libmce_base.a
     - cmake -E copy build/multicore_engine_core/libmce_core.a %BUILD_COMPILER_NAME%/libmce_core.a
-    - cmake -E copy build/multicore_engine_core/libmce_headed.a %BUILD_COMPILER_NAME%/libmce_headed.a
+    - cmake -E copy build/multicore_engine_headed/libmce_headed.a %BUILD_COMPILER_NAME%/libmce_headed.a
     - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a %BUILD_COMPILER_NAME%/libmce_renderer.a
     - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
@@ -97,7 +97,7 @@ stages:
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/mce_parsers.lib %BUILD_COMPILER_NAME%/mce_parsers.lib) ELSE (echo Skipping LTCG Lib)
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/mce_base.lib %BUILD_COMPILER_NAME%/mce_base.lib) ELSE (echo Skipping LTCG Lib)
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core.lib %BUILD_COMPILER_NAME%/mce_core.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_headed.lib %BUILD_COMPILER_NAME%/mce_headed.lib) ELSE (echo Skipping LTCG Lib)
+    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_headed/%BUILD_TYPE%/mce_headed.lib %BUILD_COMPILER_NAME%/mce_headed.lib) ELSE (echo Skipping LTCG Lib)
     - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_renderer/%BUILD_TYPE%/mce_renderer.lib %BUILD_COMPILER_NAME%/mce_renderer.lib) ELSE (echo Skipping LTCG Lib)
     - cmake -E copy build/multicore_engine_graphics_test/%BUILD_TYPE%/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
