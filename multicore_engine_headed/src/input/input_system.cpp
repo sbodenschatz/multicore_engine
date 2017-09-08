@@ -18,7 +18,9 @@ input_system::input_system(core::engine& eng, windowing::window_system& win_sys)
 input_system::~input_system() {}
 
 void input_system::preprocess(const mce::core::frame_time& ft) {
-	for(auto& k : key_state_) {
+	using std::swap;
+	swap(current_key_state_, last_key_state_);
+	for(auto& k : current_key_state_) {
 		k.second = win_sys.window().key(k.first);
 	}
 	last_mouse_state_ = current_mouse_state_;

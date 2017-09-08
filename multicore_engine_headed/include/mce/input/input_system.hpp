@@ -31,7 +31,8 @@ struct mouse_state {
 class input_system : public core::system {
 	core::engine& eng;
 	windowing::window_system& win_sys;
-	boost::container::flat_map<glfw::key, bool> key_state_;
+	boost::container::flat_map<glfw::key, bool> current_key_state_;
+	boost::container::flat_map<glfw::key, bool> last_key_state_;
 	mouse_state current_mouse_state_;
 	mouse_state last_mouse_state_;
 
