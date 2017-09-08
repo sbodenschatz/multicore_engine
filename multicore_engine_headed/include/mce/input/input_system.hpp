@@ -7,7 +7,10 @@
 #ifndef MCE_INPUT_INPUT_SYSTEM_HPP_
 #define MCE_INPUT_INPUT_SYSTEM_HPP_
 
+#include <boost/container/flat_map.hpp>
+#include <glm/vec2.hpp>
 #include <mce/core/system.hpp>
+#include <mce/glfw/glfw_defs.hpp>
 
 namespace mce {
 namespace core {
@@ -18,9 +21,19 @@ class window_system;
 } // namespace windowing
 namespace input {
 
+struct mouse_state {
+	glm::dvec2 position;
+	glm::dvec2 velocity;
+	glm::dvec2 acceleration;
+	bool buttons[size_t(glfw::mouse_button::last) + 1];
+};
+
 class input_system : public core::system {
 	core::engine& eng;
 	windowing::window_system& win_sys;
+	boost::container::flat_map<glfw::key, bool> key_state_;
+	mouse_state current_mouse_state_;
+	mouse_state last_mouse_state_;
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
@@ -34,6 +47,8 @@ public:
 
 	input_system(core::engine& eng, windowing::window_system& win_sys);
 	~input_system();
+
+	void preprocess(const mce::core::frame_time& frame_time) override;
 };
 
 } /* namespace input */
