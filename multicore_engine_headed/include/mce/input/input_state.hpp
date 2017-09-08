@@ -13,6 +13,9 @@
 #include <mce/input/first_person_flyer_component.hpp>
 
 namespace mce {
+namespace core {
+class game_state;
+} // namespace core
 namespace input {
 class input_system;
 
@@ -24,7 +27,7 @@ public:
 
 	ALIGNED_NEW_AND_DELETE(input_state)
 
-	explicit input_state(input_system* system);
+	explicit input_state(input_system* system, core::game_state*);
 	~input_state();
 
 	/// Creates a first_person_flyer_component for the given entity and using the given configuration.

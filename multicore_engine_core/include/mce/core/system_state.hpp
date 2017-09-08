@@ -18,7 +18,10 @@ struct frame_time;
 /**
  * Subclasses must define a typedef owner_system on the system to which the system_state belongs.
  * The constructor of subclasses must accept a non-const pointer to that system class as the first constructor
- * parameter and pass that pointer to the base class constructor.
+ * parameter and pass that pointer to the base class constructor. The second constructor parameter of
+ * subclasses must be a game_state pointer in which the owning game_state is supplied.
+ * Further constructor parameters can be defined be freely defined and must be supplied to add_system_state by
+ * the game_state subclass using the system_state.
  */
 class system_state {
 protected:

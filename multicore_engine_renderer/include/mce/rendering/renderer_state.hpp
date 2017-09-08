@@ -28,6 +28,9 @@
 #include <tbb/parallel_reduce.h>
 
 namespace mce {
+namespace core {
+class game_state;
+} // namespace core
 namespace entity {
 class entity_manager;
 } // namespace entity
@@ -87,7 +90,7 @@ public:
 	/**
 	 * Should be called by core::game_state::add_system_state.
 	 */
-	explicit renderer_state(renderer_system* sys);
+	explicit renderer_state(renderer_system* sys, core::game_state*);
 	/// Destroys the renderer_state and releases the used resources.
 	~renderer_state();
 

@@ -57,7 +57,7 @@ protected:
 	T* add_system_state(Args&&... args) {
 		auto sys = engine_->get_system<typename T::owner_system>();
 		system_states_.emplace_back(util::type_id<system_state>::id<T>(),
-									std::make_unique<T>(sys, std::forward<Args>(args)...));
+									std::make_unique<T>(sys, this, std::forward<Args>(args)...));
 		return static_cast<T*>(system_states_.back().second.get());
 	}
 
@@ -67,6 +67,11 @@ public:
 			   mce::core::game_state* parent_state);
 	/// Enables polymorphic destruction for game_state.
 	virtual ~game_state();
+
+	game_state(const game_state&) = delete;
+	game_state& operator=(const game_state&) = delete;
+	game_state(game_state&&) = delete;
+	game_state& operator=(game_state&&) = delete;
 
 	/// \brief Looks up a system_state object of the given type and returns a pointer to it or nullptr if no
 	/// such system_state exists.

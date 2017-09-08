@@ -13,7 +13,7 @@
 namespace mce {
 namespace input {
 
-input_state::input_state(input_system* system) : system_state(system) {
+input_state::input_state(input_system* system, core::game_state*) : system_state(system) {
 	system->win_sys.window().cursor_mode(glfw::cursor_mode::disabled);
 }
 
