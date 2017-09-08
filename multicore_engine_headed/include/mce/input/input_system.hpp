@@ -25,7 +25,7 @@ struct mouse_state {
 	glm::dvec2 position;
 	glm::dvec2 velocity;
 	glm::dvec2 acceleration;
-	bool buttons[size_t(glfw::mouse_button::last) + 1];
+	bool buttons[size_t(glfw::mouse_button::last) + 1] = {};
 };
 
 class input_system : public core::system {
