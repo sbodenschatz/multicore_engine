@@ -17,7 +17,7 @@
 namespace mce {
 namespace rendering {
 
-renderer_state::renderer_state(core::system* sys) : system_state(sys) {}
+renderer_state::renderer_state(renderer_system* sys) : system_state(sys) {}
 
 renderer_state::~renderer_state() {}
 

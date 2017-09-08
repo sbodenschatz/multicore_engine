@@ -15,6 +15,11 @@ class system;
 struct frame_time;
 
 /// Provides the base class for system_states holding game state specific data and functionality for a system.
+/**
+ * Subclasses must define a typedef owner_system on the system to which the system_state belongs.
+ * The constructor of subclasses must accept a non-const pointer to that system class as the first constructor
+ * parameter and pass that pointer to the base class constructor.
+ */
 class system_state {
 protected:
 	/// References the system for which data is held.

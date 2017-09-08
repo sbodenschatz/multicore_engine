@@ -13,8 +13,8 @@
 namespace mce {
 namespace input {
 
-input_state::input_state(mce::core::system* system) : system_state(system) {
-	static_cast<input_system*>(system_)->win_sys.window().cursor_mode(glfw::cursor_mode::disabled);
+input_state::input_state(input_system* system) : system_state(system) {
+	system->win_sys.window().cursor_mode(glfw::cursor_mode::disabled);
 }
 
 void input_state::reenter(const boost::any&) {

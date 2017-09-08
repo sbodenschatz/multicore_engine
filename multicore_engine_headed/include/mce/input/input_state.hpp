@@ -14,12 +14,17 @@
 
 namespace mce {
 namespace input {
+class input_system;
 
 class input_state : public core::system_state {
 	containers::smart_object_pool<first_person_flyer_component> first_person_flyer_comps;
 
 public:
-	explicit input_state(mce::core::system* system);
+	using owner_system = input_system;
+
+	ALIGNED_NEW_AND_DELETE(input_state)
+
+	explicit input_state(input_system* system);
 	~input_state();
 
 	/// Creates a first_person_flyer_component for the given entity and using the given configuration.

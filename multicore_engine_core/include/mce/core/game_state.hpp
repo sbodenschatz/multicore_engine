@@ -8,6 +8,7 @@
 #define CORE_GAME_STATE_HPP_
 
 #include <boost/any.hpp>
+#include <mce/core/engine.hpp>
 #include <mce/util/type_id.hpp>
 #include <memory>
 #include <utility>
@@ -19,7 +20,6 @@ namespace detail {
 template <typename State_Machine>
 struct game_state_machine_policy;
 } // namespace detail
-class engine;
 class game_state_machine;
 class system_state;
 struct frame_time;
@@ -55,8 +55,9 @@ protected:
 	 */
 	template <typename T, typename... Args>
 	T* add_system_state(Args&&... args) {
+		auto sys = engine_->get_system<typename T::owner_system>();
 		system_states_.emplace_back(util::type_id<system_state>::id<T>(),
-									std::make_unique<T>(std::forward<Args>(args)...));
+									std::make_unique<T>(sys, std::forward<Args>(args)...));
 		return static_cast<T*>(system_states_.back().second.get());
 	}
 
