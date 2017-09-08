@@ -139,6 +139,7 @@ static const boost::container::flat_map<key, std::string> key_to_name_mapping = 
 		 KEY_MAP_ENTRY(menu)}};
 static const boost::container::flat_map<std::string, key> name_to_key_mapping =
 		util::inverse_map(key_to_name_mapping);
+static const std::vector<key> all_keys_vec = util::map_keys<std::vector<key>>(key_to_name_mapping);
 static const std::string unknown_key_name = "unknown";
 
 #define MOUSE_BUTTON_MAP_ENTRY(MB)                                                                           \
@@ -174,6 +175,9 @@ boost::optional<mouse_button> mouse_button_from_string(const std::string& name) 
 	auto it = name_to_mouse_button_mapping.find(name);
 	if(it == name_to_mouse_button_mapping.end()) return {};
 	return it->second;
+}
+const std::vector<key>& all_keys() {
+	return all_keys_vec;
 }
 
 } /* namespace glfw */

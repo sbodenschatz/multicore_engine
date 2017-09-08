@@ -16,6 +16,7 @@ namespace glfw {
 
 const std::string& to_string(key k);
 key key_from_string(const std::string& name);
+const std::vector<key>& all_keys();
 
 const std::string& to_string(mouse_button b);
 boost::optional<mouse_button> mouse_button_from_string(const std::string& name);
