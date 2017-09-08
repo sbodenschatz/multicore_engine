@@ -22,6 +22,26 @@ boost::container::flat_map<Val, Key> inverse_map(const boost::container::flat_ma
 	return res;
 }
 
+template <typename Res, typename In>
+Res map_keys(const In& map) {
+	Res res;
+	res.reserve(map.size());
+	for(const auto& elem : map) {
+		res.push_back(elem.first);
+	}
+	return res;
+}
+
+template <typename Res, typename In>
+Res map_values(const In& map) {
+	Res res;
+	res.reserve(map.size());
+	for(const auto& elem : map) {
+		res.push_back(elem.second);
+	}
+	return res;
+}
+
 } // namespace util
 } // namespace mce
 
