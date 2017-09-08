@@ -80,7 +80,7 @@ public:
 	 * Arbitrary parameter data can be passed using an any object. What parameter types are expected /
 	 * accepted depends on the game_state that is below the current one on the stack.
 	 */
-	bool pop(const boost::any& parameters);
+	bool pop(const boost::any& parameters = {});
 };
 
 } /* namespace core */
