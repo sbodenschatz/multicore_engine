@@ -7,12 +7,16 @@
 #ifndef CORE_CORE_DEFS_HPP_
 #define CORE_CORE_DEFS_HPP_
 
+#include <chrono>
+
 namespace mce {
 namespace core {
 
 /// Represents timing information for a frame.
 struct frame_time {
 	float delta_t; ///< The time step (duration of a frame).
+	std::chrono::microseconds delta_t_microseconds;
+	std::chrono::microseconds t;
 };
 
 } // namespace core

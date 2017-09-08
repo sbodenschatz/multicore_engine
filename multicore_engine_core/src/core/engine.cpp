@@ -55,13 +55,17 @@ void engine::run() {
 									  std::chrono::high_resolution_clock, std::chrono::steady_clock>::type;
 	static_assert(std::ratio_less_equal<my_clock::period, std::micro>::value,
 				  "Standard library doesn't provide a steady clock with at least microsecond resolution.");
-	auto old_t = std::chrono::high_resolution_clock::now();
+	auto start_t = my_clock::now();
+	auto old_t = start_t;
 	running_ = true;
 	while(running()) {
 		auto new_t = my_clock::now();
+		std::chrono::microseconds t = std::chrono::duration_cast<std::chrono::microseconds>(new_t - start_t);
+		std::chrono::microseconds delta_t_microseconds =
+				std::chrono::duration_cast<std::chrono::microseconds>(new_t - old_t);
 		std::chrono::duration<float> delta_t = new_t - old_t;
 		old_t = new_t;
-		frame_time ft{delta_t.count()};
+		frame_time ft{delta_t.count(), delta_t_microseconds, t};
 		process(ft);
 		render(ft);
 	}
