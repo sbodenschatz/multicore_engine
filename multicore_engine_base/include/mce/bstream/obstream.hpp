@@ -73,6 +73,8 @@ public:
 		return invalid_;
 	}
 
+	/// Allows writing bool values to the stream.
+	obstream& operator<<(const bool& value);
 	/// Allows writing int8_t values to the stream.
 	obstream& operator<<(const int8_t& value);
 	/// Allows writing int16_t values to the stream.

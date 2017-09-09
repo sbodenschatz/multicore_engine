@@ -9,6 +9,12 @@
 namespace mce {
 namespace bstream {
 
+ibstream& ibstream::operator>>(bool& value) {
+	int8_t tmp;
+	(*this) >> tmp;
+	value = bool(tmp);
+	return *this;
+}
 ibstream& ibstream::operator>>(int8_t& value) {
 	size_t size = read_bytes(reinterpret_cast<char*>(&value), sizeof(value));
 	if(size < sizeof(value)) {
