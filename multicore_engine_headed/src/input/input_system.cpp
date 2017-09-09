@@ -19,6 +19,10 @@ input_system::input_system(core::engine& eng, windowing::window_system& win_sys)
 		current_key_state_[k] = false;
 		last_key_state_[k] = false;
 	}
+	current_mouse_state_.position = win_sys.window().cursor_position();
+	current_mouse_state_.velocity = {};
+	current_mouse_state_.acceleration = {};
+	last_mouse_state_ = current_mouse_state_;
 }
 
 input_system::~input_system() {}
