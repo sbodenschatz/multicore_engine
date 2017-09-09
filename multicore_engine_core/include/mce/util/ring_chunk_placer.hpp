@@ -26,20 +26,21 @@ class ring_chunk_placer {
 	size_t in_pos_ = 0;
 	size_t wrap_size_;
 
-	std::tuple<void*, bool> find_pos(size_t data_size);
+	std::tuple<void*, bool> find_pos(size_t data_size, size_t alignment);
 
 public:
 	/// Creates a rin_chunk_placer working on a buffer at the given address with the given size.
 	ring_chunk_placer(void* buffer_space, size_t buffer_space_size);
-	/// \brief Copies the given data into the ring buffer and returns the address of the copy or nullptr if
-	/// there was insufficient space.
-	void* place_chunk(const void* data, size_t data_size);
+	/// \brief Copies the given data into the ring buffer with the given alignment and returns the address of
+	/// the copy or nullptr if there was insufficient space.
+	void* place_chunk(const void* data, size_t data_size, size_t alignment = 1);
 	/// Frees all data between the last freed address (initially start of the buffer) and the given address.
 	void free_to(const void* end_of_space_to_free);
-	/// Checks if a block of the given size can currently fit into the buffer.
-	bool can_fit(size_t data_size);
-	/// Checks if a block of the given size can currently fit into the buffer without wrapping over the end.
-	bool can_fit_no_wrap(size_t data_size);
+	/// Checks if a block of the given size and alignment can currently fit into the buffer.
+	bool can_fit(size_t data_size, size_t alignment = 1);
+	/// \brief Checks if a block of the given size and alignment can currently fit into the buffer without
+	/// wrapping over the end.
+	bool can_fit_no_wrap(size_t data_size, size_t alignment = 1);
 
 	/// Returns the specified size of the buffer on which the ring_chunk_placer operates.
 	size_t buffer_space_size() const {
