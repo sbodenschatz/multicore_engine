@@ -167,26 +167,32 @@ public:
 		upward_key_ = upward_key;
 	}
 
+	/// Returns the movement speed factor.
 	float speed() const {
 		return speed_;
 	}
 
+	/// Sets the movement speed factor.
 	void speed(float speed) {
 		speed_ = speed;
 	}
 
+	/// Returns the inversion flag for the y axis movement.
 	bool inverted_y_axis() const {
 		return inverted_y_axis_;
 	}
 
+	/// Sets the inversion flag for the y axis movement.
 	void inverted_y_axis(bool inverted_y_axis) {
 		inverted_y_axis_ = inverted_y_axis;
 	}
 
+	/// Returns the rotation speed factor.
 	float rotation_speed() const {
 		return rotation_speed_;
 	}
 
+	/// Sets the rotation speed factor.
 	void rotation_speed(float rotation_speed) {
 		rotation_speed_ = rotation_speed;
 	}
