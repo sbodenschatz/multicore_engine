@@ -71,6 +71,7 @@ private:
 		size_t size = 0;
 		void* staging_buffer_ptr = nullptr;
 		vk::Image dst_img;
+		size_t alignment;
 		vk::ImageLayout final_layout;
 		vk::ImageAspectFlags aspects;
 		uint32_t mip_levels;
@@ -80,40 +81,42 @@ private:
 		util::callback_pool_function<void(vk::Image)> completion_callback;
 
 		image_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
-						   vk::Image dst_img, vk::ImageLayout final_layout, vk::ImageAspectFlags aspects,
-						   uint32_t mip_levels, uint32_t layers, vk::ImageLayout old_layout,
-						   decltype(regions) regions,
+						   vk::Image dst_img, size_t alignment, vk::ImageLayout final_layout,
+						   vk::ImageAspectFlags aspects, uint32_t mip_levels, uint32_t layers,
+						   vk::ImageLayout old_layout, decltype(regions) regions,
 						   util::callback_pool_function<void(vk::Image)> completion_callback)
 				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
-				  final_layout{final_layout}, aspects{aspects}, mip_levels{mip_levels}, layers{layers},
-				  old_layout{old_layout}, regions{std::move(regions)}, completion_callback{std::move(
-																			   completion_callback)} {}
+				  alignment{alignment}, final_layout{final_layout}, aspects{aspects},
+				  mip_levels{mip_levels}, layers{layers}, old_layout{old_layout}, regions{std::move(regions)},
+				  completion_callback{std::move(completion_callback)} {}
 		image_transfer_job(containers::pooled_byte_buffer_ptr src_data, size_t size, void* staging_buffer_ptr,
-						   vk::Image dst_img, vk::ImageLayout final_layout, vk::ImageAspectFlags aspects,
-						   uint32_t mip_levels, uint32_t layers, vk::ImageLayout old_layout,
-						   decltype(regions) regions,
+						   vk::Image dst_img, size_t alignment, vk::ImageLayout final_layout,
+						   vk::ImageAspectFlags aspects, uint32_t mip_levels, uint32_t layers,
+						   vk::ImageLayout old_layout, decltype(regions) regions,
 						   util::callback_pool_function<void(vk::Image)> completion_callback)
 				: src_data{src_data}, size{size}, staging_buffer_ptr{staging_buffer_ptr}, dst_img{dst_img},
-				  final_layout{final_layout}, aspects{aspects}, mip_levels{mip_levels}, layers{layers},
-				  old_layout{old_layout}, regions{std::move(regions)}, completion_callback{std::move(
-																			   completion_callback)} {}
-		image_transfer_job(size_t size, void* staging_buffer_ptr, vk::Image dst_img,
+				  alignment{alignment}, final_layout{final_layout}, aspects{aspects},
+				  mip_levels{mip_levels}, layers{layers}, old_layout{old_layout}, regions{std::move(regions)},
+				  completion_callback{std::move(completion_callback)} {}
+		image_transfer_job(size_t size, void* staging_buffer_ptr, vk::Image dst_img, size_t alignment,
 						   vk::ImageLayout final_layout, vk::ImageAspectFlags aspects, uint32_t mip_levels,
 						   uint32_t layers, vk::ImageLayout old_layout, decltype(regions) regions,
 						   util::callback_pool_function<void(vk::Image)> completion_callback)
 				: src_data{boost::blank{}}, size{size}, staging_buffer_ptr{staging_buffer_ptr},
-				  dst_img{dst_img}, final_layout{final_layout}, aspects{aspects},
+				  dst_img{dst_img}, alignment{alignment}, final_layout{final_layout}, aspects{aspects},
 				  mip_levels{mip_levels}, layers{layers}, old_layout{old_layout}, regions{std::move(regions)},
 				  completion_callback{std::move(completion_callback)} {}
 
 		image_transfer_job(image_transfer_job&& other) noexcept
 				: src_data{std::move(other.src_data)}, size{other.size},
 				  staging_buffer_ptr{std::move(other.staging_buffer_ptr)}, dst_img{other.dst_img},
-				  final_layout{other.final_layout}, aspects{other.aspects}, mip_levels{other.mip_levels},
-				  layers{other.layers}, old_layout{other.old_layout}, regions{std::move(other.regions)},
-				  completion_callback{std::move(other.completion_callback)} {
+				  alignment{other.alignment}, final_layout{other.final_layout}, aspects{other.aspects},
+				  mip_levels{other.mip_levels}, layers{other.layers}, old_layout{other.old_layout},
+				  regions{std::move(other.regions)}, completion_callback{
+															 std::move(other.completion_callback)} {
 			other.size = 0;
 			other.dst_img = vk::Image{};
+			other.alignment = 1;
 			other.final_layout = {};
 			other.aspects = {};
 			other.mip_levels = 0;
@@ -125,6 +128,7 @@ private:
 			size = other.size;
 			staging_buffer_ptr = std::move(other.staging_buffer_ptr);
 			dst_img = other.dst_img;
+			alignment = other.alignment;
 			final_layout = other.final_layout;
 			aspects = other.aspects;
 			mip_levels = other.mip_levels;
@@ -134,6 +138,7 @@ private:
 			completion_callback = std::move(other.completion_callback);
 			other.size = 0;
 			other.dst_img = vk::Image{};
+			other.alignment = 1;
 			other.final_layout = {};
 			other.aspects = {};
 			other.mip_levels = 0;
@@ -168,6 +173,8 @@ private:
 	containers::scratch_pad_pool<std::vector<transfer_job>> job_scratch_pad;
 	bool in_frame = false;
 	mutable std::mutex manager_mutex;
+
+	static size_t image_alignment(const base_image& img);
 
 	template <typename S, typename F>
 	util::callback_pool_function<S> take_callback(F&& f) {
@@ -217,10 +224,11 @@ private:
 		if(data_size > chunk_placer.buffer_space_size()) {
 			reallocate_buffer(data_size);
 		}
-		if(chunk_placer.can_fit_no_wrap(data_size) ||
-		   (chunk_placer.can_fit(data_size) &&
+		auto alignment = image_alignment(dst_img);
+		if(chunk_placer.can_fit_no_wrap(data_size, alignment) ||
+		   (chunk_placer.can_fit(data_size, alignment) &&
 			chunk_placer.available_space_no_wrap() < immediate_allocation_slack)) {
-			auto staging_ptr = chunk_placer.place_chunk(data, data_size);
+			auto staging_ptr = chunk_placer.place_chunk(data, data_size, alignment);
 			record_image_copy(staging_ptr, data_size, dst_img.native_image(), final_layout,
 							  dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(),
 							  dst_img.layout(), regions,
@@ -321,9 +329,9 @@ public:
 			auto byte_buff = byte_buff_pool.allocate_buffer(data_size);
 			memcpy(byte_buff, data, data_size);
 			waiting_jobs.push_back(image_transfer_job(
-					byte_buff, data_size, nullptr, dst_img.native_image(), final_layout,
-					dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(), dst_img.layout(),
-					decltype(image_transfer_job::regions)(regions.begin(), regions.end()),
+					byte_buff, data_size, nullptr, dst_img.native_image(), image_alignment(dst_img),
+					final_layout, dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(),
+					dst_img.layout(), decltype(image_transfer_job::regions)(regions.begin(), regions.end()),
 					take_callback<void(vk::Image)>(std::forward<F>(callback))));
 		}
 		dst_img.set_layout_external(final_layout);
@@ -342,7 +350,7 @@ public:
 		if(!try_immediate_alloc_image(data.get(), data_size, dst_img, final_layout, regions,
 									  std::forward<F>(callback))) {
 			waiting_jobs.push_back(image_transfer_job(
-					data, data_size, nullptr, dst_img.native_image(), final_layout,
+					data, data_size, nullptr, dst_img.native_image(), image_alignment(dst_img), final_layout,
 					dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(), dst_img.layout(),
 					decltype(image_transfer_job::regions)(regions.begin(), regions.end()),
 					take_callback<void(vk::Image)>(std::forward<F>(callback))));
@@ -361,9 +369,9 @@ public:
 		if(!try_immediate_alloc_image(data.data(), data_size, dst_img, final_layout, regions,
 									  std::forward<F>(callback))) {
 			waiting_jobs.push_back(image_transfer_job(
-					std::move(data), data_size, nullptr, dst_img.native_image(), final_layout,
-					dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(), dst_img.layout(),
-					decltype(image_transfer_job::regions)(regions.begin(), regions.end()),
+					std::move(data), data_size, nullptr, dst_img.native_image(), image_alignment(dst_img),
+					final_layout, dst_img.default_aspect_flags(), dst_img.mip_levels(), dst_img.layers(),
+					dst_img.layout(), decltype(image_transfer_job::regions)(regions.begin(), regions.end()),
 					take_callback<void(vk::Image)>(std::forward<F>(callback))));
 		}
 		dst_img.set_layout_external(final_layout);
