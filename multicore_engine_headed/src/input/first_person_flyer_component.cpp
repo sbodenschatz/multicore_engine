@@ -30,6 +30,7 @@ void first_person_flyer_component::fill_property_list(property_list& prop) {
 
 void first_person_flyer_component::process(const mce::core::frame_time& frame_time, const input_system& sys) {
 	process_mouse(frame_time, sys);
+	enforce_no_roll();
 	process_keyboard(frame_time, sys);
 }
 void first_person_flyer_component::process_keyboard(const mce::core::frame_time& frame_time,
@@ -73,6 +74,23 @@ void first_person_flyer_component::process_mouse(const mce::core::frame_time& fr
 	glm::quat orientation_derivative = 0.5f * (global_rot_quad * owner().orientation());
 	orientation_derivative += 0.5f * (owner().orientation() * local_rot_quad);
 	owner().orientation(glm::normalize(owner().orientation() + orientation_derivative * frame_time.delta_t));
+}
+void first_person_flyer_component::enforce_no_roll() {
+	glm::mat3 mat = glm::toMat3(owner().orientation());
+	glm::vec3 right = mat[0];
+	glm::vec3 back_orig = mat[2];
+	glm::vec3 up(0.0f, 1.0f, 0.0f);
+	glm::vec3 back = glm::cross(right, up);
+	right = glm::cross(up, back);
+	up = glm::cross(back_orig, right);
+	if(up.y < 0.0f) {
+		up.y = 0.0f;
+		back_orig = glm::cross(right, up);
+	}
+	mat[0] = glm::normalize(right);
+	mat[1] = glm::normalize(up);
+	mat[2] = glm::normalize(back_orig);
+	owner().orientation(glm::toQuat(mat));
 }
 
 } /* namespace input */

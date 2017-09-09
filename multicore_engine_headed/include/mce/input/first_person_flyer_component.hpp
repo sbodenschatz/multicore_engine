@@ -28,6 +28,7 @@ class first_person_flyer_component : public entity::component {
 
 	void process_keyboard(const mce::core::frame_time& frame_time, const input_system& sys);
 	void process_mouse(const mce::core::frame_time& frame_time, const input_system& sys);
+	void enforce_no_roll();
 
 public:
 	first_person_flyer_component(entity::entity& owner, const entity::component_configuration& configuration);
