@@ -30,6 +30,9 @@ std::tuple<void*, bool> ring_chunk_placer::find_pos(size_t data_size, size_t ali
 		wrap = true;
 	}
 
+	if(in_pos == out_pos_) {
+		return std::make_tuple(nullptr, wrap);
+	}
 	auto in_pos_aligned = in_pos;
 	auto space = out_pos_ - in_pos - 1;
 	if(memory::align_offset(alignment, data_size, in_pos_aligned, space)) {
