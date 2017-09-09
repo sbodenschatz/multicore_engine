@@ -56,6 +56,7 @@ void first_person_flyer_component::process_keyboard(const mce::core::frame_time&
 	if(dot(velocity, velocity) > 0.0) {
 		velocity = glm::normalize(velocity) * speed_;
 	}
+	velocity = glm::rotate(owner().orientation(), velocity);
 	owner().position(owner().position() + velocity * frame_time.delta_t);
 }
 void first_person_flyer_component::process_mouse(const mce::core::frame_time& frame_time,
