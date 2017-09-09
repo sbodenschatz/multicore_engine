@@ -23,7 +23,7 @@ class first_person_flyer_component : public entity::component {
 	glfw::key upward_key_ = glfw::key::k_r;
 	glfw::key downward_key_ = glfw::key::k_f;
 	float speed_ = 10.0f;
-	float rotation_speed = 10.0f;
+	float rotation_speed_ = 10.0f;
 	bool inverted_y_axis_ = false;
 
 	void process_keyboard(const mce::core::frame_time& frame_time, const input_system& sys);
@@ -136,8 +136,24 @@ public:
 		return speed_;
 	}
 
-	void speed(float speed = 10.0f) {
+	void speed(float speed) {
 		speed_ = speed;
+	}
+
+	bool inverted_y_axis() const {
+		return inverted_y_axis_;
+	}
+
+	void inverted_y_axis(bool inverted_y_axis) {
+		inverted_y_axis_ = inverted_y_axis;
+	}
+
+	float rotation_speed() const {
+		return rotation_speed_;
+	}
+
+	void rotation_speed(float rotation_speed) {
+		rotation_speed_ = rotation_speed;
 	}
 
 	/// Fills the given property_list with the properties available for this class.
