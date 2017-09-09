@@ -13,6 +13,7 @@
  */
 
 #include <cassert>
+#include <mce/core/core_defs.hpp>
 #include <mce/core/system.hpp>
 #include <mce/glfw/instance.hpp>
 #include <memory>
@@ -32,6 +33,9 @@ class window_system : public core::system {
 	std::string window_title_;
 	glfw::instance instance_;
 	std::unique_ptr<glfw::window> window_;
+
+	size_t render_frame_counter = 0;
+	core::clock render_frame_clock;
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
@@ -67,6 +71,8 @@ public:
 	 * Polls the inputs of the window and checks if the engine should stop.
 	 */
 	void preprocess(const mce::core::frame_time& frame_time) override;
+
+	void prerender(const mce::core::frame_time& frame_time) override;
 
 	/// Allows access to the glfw::instance object.
 	const glfw::instance& instance() const {
