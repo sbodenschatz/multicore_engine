@@ -4,8 +4,10 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/core/core_defs.hpp>
 #include <mce/entity/entity.hpp>
 #include <mce/input/first_person_flyer_component.hpp>
+#include <mce/input/input_system.hpp>
 
 namespace mce {
 namespace input {
@@ -26,8 +28,33 @@ void first_person_flyer_component::fill_property_list(property_list& prop) {
 }
 
 void first_person_flyer_component::process(const mce::core::frame_time& frame_time, const input_system& sys) {
-	static_cast<void>(frame_time);
-	static_cast<void>(sys);
+	process_keyboard(frame_time, sys);
+}
+void first_person_flyer_component::process_keyboard(const mce::core::frame_time& frame_time,
+													const input_system& sys) {
+	glm::vec4 velocity;
+	if(sys.current_key_state(forward_key_)) {
+		velocity.z = -1.0f;
+	}
+	if(sys.current_key_state(backward_key_)) {
+		velocity.z = 1.0f;
+	}
+	if(sys.current_key_state(left_key_)) {
+		velocity.x = -1.0f;
+	}
+	if(sys.current_key_state(right_key_)) {
+		velocity.x = 1.0f;
+	}
+	if(sys.current_key_state(upward_key_)) {
+		velocity.y = 1.0f;
+	}
+	if(sys.current_key_state(downward_key_)) {
+		velocity.y = -1.0f;
+	}
+	if(dot(velocity, velocity) > 0.0) {
+		velocity = glm::normalize(velocity);
+	}
+	owner().position(owner().position() + velocity * frame_time.delta_t);
 }
 
 } /* namespace input */

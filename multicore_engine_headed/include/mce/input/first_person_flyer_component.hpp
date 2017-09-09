@@ -23,6 +23,8 @@ class first_person_flyer_component : public entity::component {
 	glfw::key upward_key_ = glfw::key::k_r;
 	glfw::key downward_key_ = glfw::key::k_f;
 
+	void process_keyboard(const mce::core::frame_time& frame_time, const input_system& sys);
+
 public:
 	first_person_flyer_component(entity::entity& owner, const entity::component_configuration& configuration);
 	~first_person_flyer_component();
