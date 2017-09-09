@@ -23,8 +23,11 @@ class first_person_flyer_component : public entity::component {
 	glfw::key upward_key_ = glfw::key::k_r;
 	glfw::key downward_key_ = glfw::key::k_f;
 	float speed_ = 10.0f;
+	float rotation_speed = 10.0f;
+	bool inverted_y_axis_ = false;
 
 	void process_keyboard(const mce::core::frame_time& frame_time, const input_system& sys);
+	void process_mouse(const mce::core::frame_time& frame_time, const input_system& sys);
 
 public:
 	first_person_flyer_component(entity::entity& owner, const entity::component_configuration& configuration);

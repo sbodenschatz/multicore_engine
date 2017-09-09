@@ -29,6 +29,7 @@ void first_person_flyer_component::fill_property_list(property_list& prop) {
 }
 
 void first_person_flyer_component::process(const mce::core::frame_time& frame_time, const input_system& sys) {
+	process_mouse(frame_time, sys);
 	process_keyboard(frame_time, sys);
 }
 void first_person_flyer_component::process_keyboard(const mce::core::frame_time& frame_time,
@@ -56,6 +57,21 @@ void first_person_flyer_component::process_keyboard(const mce::core::frame_time&
 		velocity = glm::normalize(velocity) * speed_;
 	}
 	owner().position(owner().position() + velocity * frame_time.delta_t);
+}
+void first_person_flyer_component::process_mouse(const mce::core::frame_time& frame_time,
+												 const input_system& sys) {
+	glm::vec2 mouse_velocity = sys.current_mouse_state().velocity;
+	glm::vec2 velocity = glm::radians(-rotation_speed / 100.0f * mouse_velocity);
+	if(inverted_y_axis_) {
+		velocity.y *= -1.0f;
+	}
+	glm::vec3 global_angualar_velocity = {0.0f, velocity.x, 0.0f};
+	glm::vec3 local_angualar_velocity = {velocity.y, 0.0f, 0.0f};
+	glm::quat global_rot_quad = {0.0f, global_angualar_velocity};
+	glm::quat local_rot_quad = {0.0f, local_angualar_velocity};
+	glm::quat orientation_derivative = 0.5f * (global_rot_quad * owner().orientation());
+	orientation_derivative += 0.5f * (owner().orientation() * local_rot_quad);
+	owner().orientation(glm::normalize(owner().orientation() + orientation_derivative * frame_time.delta_t));
 }
 
 } /* namespace input */
