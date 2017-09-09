@@ -82,6 +82,7 @@ class renderer_state : public core::system_state {
 	void collect_scene_uniforms();
 
 public:
+	/// Defines the type of system that should be injected by add_system_state.
 	using owner_system = renderer_system;
 
 	ALIGNED_NEW_AND_DELETE(renderer_state)
