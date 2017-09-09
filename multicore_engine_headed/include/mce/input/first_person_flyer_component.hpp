@@ -22,6 +22,7 @@ class first_person_flyer_component : public entity::component {
 	glfw::key right_key_ = glfw::key::k_d;
 	glfw::key upward_key_ = glfw::key::k_r;
 	glfw::key downward_key_ = glfw::key::k_f;
+	float speed_ = 10.0f;
 
 	void process_keyboard(const mce::core::frame_time& frame_time, const input_system& sys);
 
@@ -125,6 +126,14 @@ public:
 
 	void upward_key(glfw::key upward_key) {
 		upward_key_ = upward_key;
+	}
+
+	float speed() const {
+		return speed_;
+	}
+
+	void speed(float speed = 10.0f) {
+		speed_ = speed;
 	}
 
 	/// Fills the given property_list with the properties available for this class.
