@@ -27,8 +27,7 @@ void first_person_flyer_component::fill_property_list(property_list& prop) {
 	REGISTER_COMPONENT_PROPERTY_NAME_PROXY(prop, first_person_flyer_component, std::string, downward_key);
 	REGISTER_COMPONENT_PROPERTY(prop, first_person_flyer_component, float, speed);
 	REGISTER_COMPONENT_PROPERTY(prop, first_person_flyer_component, float, rotation_speed);
-	// TODO Implement support for bool properties.
-	// REGISTER_COMPONENT_PROPERTY(prop, first_person_flyer_component, bool, inverted_y_axis);
+	REGISTER_COMPONENT_PROPERTY(prop, first_person_flyer_component, bool, inverted_y_axis);
 }
 
 void first_person_flyer_component::process(const mce::core::frame_time& frame_time, const input_system& sys) {
