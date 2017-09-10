@@ -1,11 +1,11 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/core/window_system.hpp
+ * File /multicore_engine_headed/include/mce/windowing/window_system.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef MCE_CORE_WINDOW_SYSTEM_HPP_
-#define MCE_CORE_WINDOW_SYSTEM_HPP_
+#ifndef MCE_WINDOWING_WINDOW_SYSTEM_HPP_
+#define MCE_WINDOWING_WINDOW_SYSTEM_HPP_
 
 /**
  * \file
@@ -13,6 +13,7 @@
  */
 
 #include <cassert>
+#include <mce/core/core_defs.hpp>
 #include <mce/core/system.hpp>
 #include <mce/glfw/instance.hpp>
 #include <memory>
@@ -23,13 +24,18 @@ class window;
 } // namespace glfw
 namespace core {
 class engine;
+} // namespace core
+namespace windowing {
 
 /// Provides window functionality for the engine by opening a window and processing input from it.
-class window_system : public system {
-	engine& eng;
+class window_system : public core::system {
+	core::engine& eng;
 	std::string window_title_;
 	glfw::instance instance_;
 	std::unique_ptr<glfw::window> window_;
+
+	size_t render_frame_counter = 0;
+	core::clock render_frame_clock;
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
@@ -56,7 +62,7 @@ public:
 	 * - "monitor" specifies the index of the monitor to use for (windowed_)fullscreen mode.
 	 * - "video_mode" specifies the index of the video mode of the used monitor to use in fullscreen mode.
 	 */
-	explicit window_system(engine& eng, const std::string& window_title);
+	explicit window_system(core::engine& eng, const std::string& window_title);
 	/// Destroys the window_system and releases the used resources.
 	virtual ~window_system();
 
@@ -65,6 +71,8 @@ public:
 	 * Polls the inputs of the window and checks if the engine should stop.
 	 */
 	void preprocess(const mce::core::frame_time& frame_time) override;
+
+	void prerender(const mce::core::frame_time& frame_time) override;
 
 	/// Allows access to the glfw::instance object.
 	const glfw::instance& instance() const {
@@ -94,7 +102,7 @@ public:
 	}
 };
 
-} /* namespace core */
+} /* namespace windowing */
 } /* namespace mce */
 
-#endif /* MCE_CORE_WINDOW_SYSTEM_HPP_ */
+#endif /* MCE_WINDOWING_WINDOW_SYSTEM_HPP_ */

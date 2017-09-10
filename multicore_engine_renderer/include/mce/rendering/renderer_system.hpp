@@ -107,11 +107,11 @@ class renderer_system : public core::system {
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
 	int pre_phase_ordering() const noexcept override {
-		return 0x1200;
+		return 0x2100;
 	}
 	/// Returns the phase ordering index for post hooks for this system.
 	int post_phase_ordering() const noexcept override {
-		return 0x1200;
+		return 0x2100;
 	}
 
 	/// Creates the renderer_system taking the graphics_system as a dependency.

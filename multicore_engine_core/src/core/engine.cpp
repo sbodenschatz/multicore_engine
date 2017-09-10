@@ -51,13 +51,10 @@ void engine::initialize_config() {
 
 void engine::run() {
 	tsi = std::make_unique<tbb::task_scheduler_init>(max_general_concurrency_);
-	auto old_t = std::chrono::high_resolution_clock::now();
+	core::clock clk;
 	running_ = true;
 	while(running()) {
-		auto new_t = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> delta_t = new_t - old_t;
-		old_t = new_t;
-		frame_time ft{delta_t.count()};
+		auto ft = clk.frame_tick();
 		process(ft);
 		render(ft);
 	}

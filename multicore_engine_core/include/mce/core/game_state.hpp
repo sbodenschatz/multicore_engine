@@ -8,6 +8,7 @@
 #define CORE_GAME_STATE_HPP_
 
 #include <boost/any.hpp>
+#include <mce/core/engine.hpp>
 #include <mce/util/type_id.hpp>
 #include <memory>
 #include <utility>
@@ -15,7 +16,10 @@
 
 namespace mce {
 namespace core {
-class engine;
+namespace detail {
+template <typename State_Machine>
+struct game_state_machine_policy;
+} // namespace detail
 class game_state_machine;
 class system_state;
 struct frame_time;
@@ -31,6 +35,13 @@ class game_state {
 	mce::core::game_state_machine* state_machine_;
 	mce::core::game_state* parent_state_;
 
+	void process_leave_pop();
+	void process_leave_push();
+	void process_reenter(const boost::any& parameter);
+
+	template <typename T>
+	friend struct detail::game_state_machine_policy;
+
 protected:
 	/// Adds the system_state implemented by the class supplied in T to the game_state.
 	/**
@@ -44,8 +55,9 @@ protected:
 	 */
 	template <typename T, typename... Args>
 	T* add_system_state(Args&&... args) {
+		auto sys = engine_->get_system<typename T::owner_system>();
 		system_states_.emplace_back(util::type_id<system_state>::id<T>(),
-									std::make_unique<T>(std::forward<Args>(args)...));
+									std::make_unique<T>(sys, this, std::forward<Args>(args)...));
 		return static_cast<T*>(system_states_.back().second.get());
 	}
 
@@ -55,6 +67,11 @@ public:
 			   mce::core::game_state* parent_state);
 	/// Enables polymorphic destruction for game_state.
 	virtual ~game_state();
+
+	game_state(const game_state&) = delete;
+	game_state& operator=(const game_state&) = delete;
+	game_state(game_state&&) = delete;
+	game_state& operator=(game_state&&) = delete;
 
 	/// \brief Looks up a system_state object of the given type and returns a pointer to it or nullptr if no
 	/// such system_state exists.

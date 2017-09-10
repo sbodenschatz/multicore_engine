@@ -48,6 +48,15 @@ T checked_numeric_conversion(long long val) {
 	}
 }
 
+/// Maps integers from the AST (represented by long long) to booleans.
+template <>
+struct ast_value_mapper<long long, bool, void> {
+	/// Converts ast_val to T and stores it in val.
+	static void convert(const long long& ast_val, bool& val, entity_manager&) {
+		val = bool(ast_val);
+	}
+};
+
 /// Maps integers from the AST (represented by long long) to any arithmetic type.
 template <typename T>
 struct ast_value_mapper<long long, T, std::enable_if_t<std::is_arithmetic<T>::value>> {

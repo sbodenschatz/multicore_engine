@@ -1,28 +1,28 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/core/window_system.cpp
+ * File /multicore_engine_headed/src/windowing/window_system.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
 #include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
-#include <mce/core/window_system.hpp>
 #include <mce/glfw/monitor.hpp>
 #include <mce/glfw/window.hpp>
 #include <mce/util/string_tools.hpp>
+#include <mce/windowing/window_system.hpp>
 
 namespace mce {
-namespace core {
+namespace windowing {
 
-window_system::window_system(engine& eng, const std::string& window_title)
-		: eng{eng}, instance_(), window_() {
+window_system::window_system(core::engine& eng, const std::string& window_title)
+		: eng{eng}, window_title_{std::move(window_title)}, instance_(), window_() {
 	auto mode = eng.config_store().resolve<std::string>("display_mode", "windowed");
 	auto mode_str = mode->value();
 	if(util::equal_ignore_case(mode_str, "windowed_fullscreen")) {
 		auto monitor = eng.config_store().resolve("monitor", 0);
 		auto monitors = glfw::monitor::monitors(instance_);
 		auto monitor_index = std::min<size_t>(monitor->value(), monitors.size() - 1);
-		window_ = std::make_unique<glfw::window>(window_title, monitors.at(monitor_index));
+		window_ = std::make_unique<glfw::window>(window_title_, monitors.at(monitor_index));
 	} else if(util::equal_ignore_case(mode_str, "fullscreen")) {
 		auto monitor = eng.config_store().resolve("monitor", 0);
 		auto monitors = glfw::monitor::monitors(instance_);
@@ -38,11 +38,11 @@ window_system::window_system(engine& eng, const std::string& window_title)
 		auto video_mode = eng.config_store().resolve<int>("video_mode", int(it - video_modes.begin()));
 		auto video_mode_index = size_t(video_mode->value());
 		if(video_mode_index >= video_modes.size()) video_mode_index = it - video_modes.begin();
-		window_ = std::make_unique<glfw::window>(window_title, selected_monitor,
+		window_ = std::make_unique<glfw::window>(window_title_, selected_monitor,
 												 video_modes.at(video_mode_index));
 	} else {
 		auto res = eng.config_store().resolve<glm::ivec2>("resolution", {800, 600});
-		window_ = std::make_unique<glfw::window>(window_title, res->value());
+		window_ = std::make_unique<glfw::window>(window_title_, res->value());
 	}
 }
 
@@ -55,5 +55,14 @@ void window_system::preprocess(const mce::core::frame_time&) {
 	}
 }
 
-} /* namespace core */
+void window_system::prerender(const mce::core::frame_time&) {
+	constexpr size_t fps_update_freq = 60;
+	if(++render_frame_counter > fps_update_freq) {
+		render_frame_counter = 0;
+		auto ft = render_frame_clock.frame_tick();
+		window_->title(window_title_ + " (" + std::to_string(fps_update_freq / ft.delta_t) + " fps)");
+	}
+}
+
+} /* namespace windowing */
 } /* namespace mce */

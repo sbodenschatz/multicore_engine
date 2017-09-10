@@ -153,10 +153,10 @@ struct property_type_parser_helper {
 
 template <typename T>
 struct property_type_parser_helper<T, std::false_type> {
-	static std::pair<T, bool> from_string(const std::string&) {
+	static std::pair<T, bool> from_string(const boost::string_view&) {
 		throw invalid_property_access_exception("Parsing unknown values from strings is not supported.");
 	}
-	static std::string to_string(T&) {
+	static std::string to_string(const T&) {
 		throw invalid_property_access_exception("Formating unknown values to strings is not supported.");
 	}
 };
@@ -206,6 +206,11 @@ public:
 	 * The value parameter type is T for primitive types and const T& for complex types (strings, vecN, etc.).
 	 */
 	virtual void set_value(Root_Type& object, accessor_value value) const = 0;
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4702)
+#endif
 	/// Parses a value from a string and assigns it to the property on the given object.
 	virtual bool from_string(Root_Type& object, const boost::string_view& str) const override {
 		using helper = detail::property_type_parser_helper<T, typename type_info<T>::known_type>;
@@ -213,6 +218,10 @@ public:
 		if(r.second) set_value(object, r.first);
 		return r.second;
 	}
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 	/// Retrieves the property value from the given object, formats it to a string and returns it.
 	virtual std::string to_string(const Root_Type& object) const override {
 		using helper = detail::property_type_parser_helper<T, typename type_info<T>::known_type>;

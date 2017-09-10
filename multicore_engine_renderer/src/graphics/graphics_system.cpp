@@ -5,14 +5,14 @@
  */
 
 #include <mce/core/engine.hpp>
-#include <mce/core/window_system.hpp>
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/sync_utils.hpp>
+#include <mce/windowing/window_system.hpp>
 
 namespace mce {
 namespace graphics {
 
-graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys,
+graphics_system::graphics_system(core::engine& eng, windowing::window_system& win_sys,
 								 const std::vector<std::string>& extensions, unsigned int validation_level)
 		: eng{eng},
 		  instance_(eng.engine_metadata(), eng.application_metadata(), extensions, validation_level),
@@ -55,7 +55,8 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 	for(uint32_t i = 0; i < window_.swapchain_images().size(); ++i) {
 		render_queue_start_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
 		render_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo({}, {}));
-		present_queue_end_frame_cmd_buffers_[i]->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eSimultaneousUse, {}));
+		present_queue_end_frame_cmd_buffers_[i]->begin(
+				vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eSimultaneousUse, {}));
 		// TODO Minimize barriers.
 		render_queue_start_frame_cmd_buffers_[i]->pipelineBarrier(
 				vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, {}, {}, {},
@@ -70,7 +71,8 @@ graphics_system::graphics_system(core::engine& eng, core::window_system& win_sys
 						window_.swapchain_images()[i], vk::ImageLayout::eColorAttachmentOptimal,
 						vk::ImageLayout::ePresentSrcKHR,
 						allowed_flags_for_layout(vk::ImageLayout::eColorAttachmentOptimal),
-						allowed_flags_for_layout(vk::ImageLayout::ePresentSrcKHR), vk::ImageAspectFlagBits::eColor)});
+						allowed_flags_for_layout(vk::ImageLayout::ePresentSrcKHR),
+						vk::ImageAspectFlagBits::eColor)});
 		if(device_.graphics_queue_index().first != device_.present_queue_index().first) {
 			image_queue_ownership_transfer(
 					window_.swapchain_images()[i], vk::ImageLayout::ePresentSrcKHR,

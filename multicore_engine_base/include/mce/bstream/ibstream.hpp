@@ -72,6 +72,8 @@ public:
 		return invalid_;
 	}
 
+	/// Allows reading bool values from the stream.
+	ibstream& operator>>(bool& value);
 	/// Allows reading int8_t values from the stream.
 	ibstream& operator>>(int8_t& value);
 	/// Allows reading int16_t values from the stream.

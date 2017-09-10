@@ -9,9 +9,17 @@
 #include <mce/graphics/sync_utils.hpp>
 #include <mce/graphics/transfer_manager.hpp>
 #include <utility>
+#include <vulkan/vk_format.h>
 
 namespace mce {
 namespace graphics {
+
+size_t transfer_manager::image_alignment(const base_image& img) {
+	VkFormatSize size;
+	VkFormat fmt = static_cast<VkFormat>(img.format());
+	vkGetFormatSize(fmt, &size);
+	return size.blockSizeInBits >> 3;
+}
 
 transfer_manager::transfer_manager(device& dev, device_memory_manager_interface& mm, uint32_t ring_slots)
 		: dev{dev}, mm{mm}, transfer_cmd_pool{dev, dev.transfer_queue_index().first, true, true},
@@ -73,7 +81,7 @@ void transfer_manager::record_image_copy(void* staging_ptr, size_t data_size, vk
 										 uint32_t mip_levels, uint32_t layers, vk::ImageLayout old_layout,
 										 vk::ArrayProxy<const vk::BufferImageCopy> regions,
 										 util::callback_pool_function<void(vk::Image)> callback) {
-	running_jobs[current_ring_index].push_back(image_transfer_job(data_size, staging_ptr, dst_img,
+	running_jobs[current_ring_index].push_back(image_transfer_job(data_size, staging_ptr, dst_img, 1,
 																  final_layout, aspects, mip_levels, layers,
 																  old_layout, {}, std::move(callback)));
 	boost::container::small_vector<vk::BufferImageCopy, 16> regions_transformed(regions.begin(),
@@ -212,10 +220,10 @@ void transfer_manager::process_waiting_jobs() {
 			return true;
 		}
 		bool operator()(image_transfer_job& job) const {
-			if(!mgr.chunk_placer.can_fit(job.size)) return false;
+			if(!mgr.chunk_placer.can_fit(job.size, job.alignment)) return false;
 			auto data = job.src_data.apply_visitor(pv);
 			assert(data);
-			auto staging_ptr = mgr.chunk_placer.place_chunk(data, job.size);
+			auto staging_ptr = mgr.chunk_placer.place_chunk(data, job.size, job.alignment);
 			mgr.record_image_copy(staging_ptr, job.size, job.dst_img, job.final_layout, job.aspects,
 								  job.mip_levels, job.layers, job.old_layout, job.regions,
 								  std::move(job.completion_callback));

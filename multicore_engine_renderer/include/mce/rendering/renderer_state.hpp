@@ -28,10 +28,14 @@
 #include <tbb/parallel_reduce.h>
 
 namespace mce {
+namespace core {
+class game_state;
+} // namespace core
 namespace entity {
 class entity_manager;
 } // namespace entity
 namespace rendering {
+class renderer_state;
 
 /// Provides the game_state specific data management for the renderer_system.
 /**
@@ -78,13 +82,16 @@ class renderer_state : public core::system_state {
 	void collect_scene_uniforms();
 
 public:
+	/// Defines the type of system that should be injected by add_system_state.
+	using owner_system = renderer_system;
+
 	ALIGNED_NEW_AND_DELETE(renderer_state)
 
-	/// Creates the renderer_state for the given system (must be a pointer to a renderer_system object).
+	/// Creates the renderer_state for the given renderer_system.
 	/**
 	 * Should be called by core::game_state::add_system_state.
 	 */
-	explicit renderer_state(core::system* sys);
+	explicit renderer_state(renderer_system* sys, core::game_state*);
 	/// Destroys the renderer_state and releases the used resources.
 	~renderer_state();
 
