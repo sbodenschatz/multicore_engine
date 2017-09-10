@@ -24,5 +24,9 @@ void game_state_machine::render(const mce::core::frame_time& frame_time) {
 	if(s) s->render(frame_time);
 }
 
+bool game_state_machine::pop(const boost::any& parameters) {
+	return state_machine.pop_state(parameters);
+}
+
 } /* namespace core */
 } /* namespace mce */

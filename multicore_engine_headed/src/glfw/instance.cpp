@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/glfw_wrapper/instance.cpp
+ * File /multicore_engine_headed/src/glfw_wrapper/instance.cpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 

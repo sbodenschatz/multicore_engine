@@ -9,6 +9,10 @@
 namespace mce {
 namespace bstream {
 
+obstream& obstream::operator<<(const bool& value) {
+	(*this) << int8_t(value ? 1 : 0);
+	return *this;
+}
 obstream& obstream::operator<<(const int8_t& value) {
 	if(!write_bytes(reinterpret_cast<const char*>(&value), sizeof(value))) raise_write_eof();
 	return *this;

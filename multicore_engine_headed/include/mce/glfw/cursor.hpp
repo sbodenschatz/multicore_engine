@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/glfw/cursor.hpp
+ * File /multicore_engine_headed/include/mce/glfw/cursor.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 

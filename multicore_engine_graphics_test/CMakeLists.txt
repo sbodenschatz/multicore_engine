@@ -9,6 +9,7 @@ target_include_directories(mce_graphics_test PUBLIC
 	)
 target_link_libraries(mce_graphics_test 
 		mce_core
+		mce_headed
 		mce_renderer
 		deps.Boost.ProgramOptions
 	)
