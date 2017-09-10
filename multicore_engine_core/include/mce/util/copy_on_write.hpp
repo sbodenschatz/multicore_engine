@@ -49,6 +49,7 @@ public:
 	// cppcheck-suppress noExplicitConstructor
 	copy_on_write(const std::shared_ptr<T>& object_to_manage) : ptr{object_to_manage} {}
 	/// Constructs a copy_on_write object that manages the object given by shared_ptr.
+	// cppcheck-suppress noExplicitConstructor
 	copy_on_write(std::shared_ptr<T>&& object_to_manage) : ptr{object_to_manage} {}
 	/// The copy_on_write object itself can neither be copied nor moved.
 	copy_on_write(const copy_on_write&) = delete;
