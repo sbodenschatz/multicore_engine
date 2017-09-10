@@ -105,6 +105,9 @@ public:
 		other.manager_ptr_ = nullptr;
 	}
 	/// Allows moving handles.
+	// For some reason cppcheck doesn't recognize the self check here, 
+	// but it also is not stricly required because this is a move operator.
+	// cppcheck-suppress operatorEqToSelf
 	device_memory_handle& operator=(device_memory_handle&& other) {
 		if(this == &other) return *this;
 		if(manager_ptr_) {
