@@ -90,6 +90,8 @@ public:
 		return empty_configuration_;
 	}
 
+	/// \brief Returns a bool indicating whether the component types supports additional property values in
+	/// the component_configurations beyond the values bound to the registered reflection properties.
 	bool takes_unbound_property_values() const {
 		return takes_unbound_property_values_;
 	}

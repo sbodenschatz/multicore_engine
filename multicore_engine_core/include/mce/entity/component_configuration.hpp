@@ -71,6 +71,11 @@ public:
 		return type_;
 	}
 
+	/// Allows access to property values that are not consumed by the bound reflection properties.
+	/**
+	 * This is only filled if the takes_unbound_property_values() static function of the component class
+	 * returns true. Otherwise additional properties given cause an exception.
+	 */
 	const boost::container::flat_map<std::string, ast::variable_value>& unbound_property_values() const {
 		return unbound_property_values_;
 	}
