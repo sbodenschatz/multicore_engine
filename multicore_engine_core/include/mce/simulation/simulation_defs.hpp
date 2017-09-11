@@ -7,6 +7,11 @@
 #ifndef MCE_SIMULATION_SIMULATION_DEFS_HPP_
 #define MCE_SIMULATION_SIMULATION_DEFS_HPP_
 
+/**
+ * \file
+ * Provides general definitions for the simulation subsystem.
+ */
+
 #include <mce/util/local_function.hpp>
 
 namespace mce {
@@ -18,6 +23,7 @@ class entity;
 } // namespace entity
 namespace simulation {
 
+/// The function wrapper type used for movement patterns in actuator_system.
 using movement_pattern_function =
 		util::local_function<256, void(const mce::core::frame_time&, entity::entity&)>;
 
