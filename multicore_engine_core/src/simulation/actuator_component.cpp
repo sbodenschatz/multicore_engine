@@ -29,8 +29,12 @@ void actuator_component::fill_property_list(property_list& prop) {
 }
 
 void actuator_component::movement_pattern_name(const std::string& name) {
-	movement_pattern_ = static_cast<const actuator_system*>(state_.system_)
-								->find_movement_pattern(movement_pattern_name_);
+	if(name.empty()) {
+		movement_pattern_ = {};
+	} else {
+		movement_pattern_ = static_cast<const actuator_system*>(state_.system_)
+									->find_movement_pattern(movement_pattern_name_);
+	}
 	movement_pattern_name_ = name;
 }
 
