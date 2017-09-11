@@ -13,5 +13,10 @@ actuator_state::actuator_state(core::system* system, core::game_state*) : system
 
 actuator_state::~actuator_state() {}
 
+void actuator_state::register_to_entity_manager(entity::entity_manager& em) {
+	// TODO Implement
+	static_cast<void>(em);
+}
+
 } /* namespace simulation */
 } /* namespace mce */

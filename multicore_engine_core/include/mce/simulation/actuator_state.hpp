@@ -8,12 +8,16 @@
 #define MCE_SIMULATION_ACTUATOR_STATE_HPP_
 
 #include <mce/core/system_state.hpp>
+#include <mce/simulation/actuator_system.hpp>
 
 namespace mce {
 namespace core {
 class system;
 class game_state;
 } // namespace core
+namespace entity {
+class entity_manager;
+} // namespace entity
 namespace simulation {
 class actuator_system;
 
@@ -24,6 +28,9 @@ public:
 
 	actuator_state(core::system* system, core::game_state*);
 	~actuator_state();
+
+	/// Registers the component types managed by input_state to the given entity_manager object.
+	void register_to_entity_manager(entity::entity_manager& em);
 };
 
 } /* namespace simulation */

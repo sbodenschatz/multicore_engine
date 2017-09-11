@@ -19,6 +19,15 @@ class actuator_system : public core::system {
 	core::engine& eng_;
 
 public:
+	/// Returns the phase ordering index for pre hooks for this system.
+	int pre_phase_ordering() const noexcept override {
+		return 0x1200;
+	}
+	/// Returns the phase ordering index for post hooks for this system.
+	int post_phase_ordering() const noexcept override {
+		return 0x1200;
+	}
+
 	actuator_system(core::engine& eng);
 	~actuator_system();
 };
