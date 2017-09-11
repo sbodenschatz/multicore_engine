@@ -28,7 +28,7 @@ public:
 		return 0x1200;
 	}
 
-	actuator_system(core::engine& eng);
+	explicit actuator_system(core::engine& eng);
 	~actuator_system();
 };
 
