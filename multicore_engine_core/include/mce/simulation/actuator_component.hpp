@@ -22,6 +22,8 @@ public:
 	actuator_component(entity::entity& owner, const entity::component_configuration& configuration,
 					   actuator_state& state);
 	~actuator_component();
+
+	void process(const mce::core::frame_time& ft);
 };
 
 } /* namespace simulation */
