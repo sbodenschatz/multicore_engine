@@ -17,7 +17,9 @@ actuator_component::actuator_component(entity::entity& owner,
 actuator_component::~actuator_component() {}
 
 void actuator_component::process(const mce::core::frame_time& frame_time) {
-	static_cast<void>(frame_time);
+	if(pattern_) {
+		pattern_(frame_time, owner());
+	}
 }
 
 } /* namespace simulation */
