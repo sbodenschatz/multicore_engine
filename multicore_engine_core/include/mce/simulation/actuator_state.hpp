@@ -26,6 +26,8 @@ class actuator_system;
 class actuator_state : public core::system_state {
 	containers::smart_object_pool<actuator_component> actuator_comps;
 
+	friend class actuator_component;
+
 public:
 	/// Defines the type of system that should be injected by add_system_state.
 	using owner_system = actuator_system;

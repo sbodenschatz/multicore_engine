@@ -16,7 +16,8 @@ class actuator_state;
 
 class actuator_component : public entity::component {
 	actuator_state& state_;
-	movement_pattern_function pattern_;
+	movement_pattern_function movement_pattern_;
+	std::string movement_pattern_name_;
 
 public:
 	actuator_component(entity::entity& owner, const entity::component_configuration& configuration,
@@ -24,6 +25,19 @@ public:
 	~actuator_component();
 
 	void process(const mce::core::frame_time& ft);
+
+	const movement_pattern_function& movement_pattern() const {
+		return movement_pattern_;
+	}
+
+	std::string movement_pattern_name() const {
+		return movement_pattern_name_;
+	}
+
+	void movement_pattern_name(const std::string& name);
+
+	/// Fills the given property_list with the properties available for this class.
+	static void fill_property_list(property_list& prop);
 };
 
 } /* namespace simulation */
