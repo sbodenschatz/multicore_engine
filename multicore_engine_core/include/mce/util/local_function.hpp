@@ -247,7 +247,7 @@ public:
 	}
 	/// Returns true if the wrapper contains a functor and false if it is empty.
 	operator bool() {
-		return function_obj;
+		return bool(function_obj);
 	}
 };
 
