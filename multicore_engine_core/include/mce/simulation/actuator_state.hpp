@@ -39,6 +39,8 @@ public:
 	/// Defines the type of system that should be injected by add_system_state.
 	using owner_system = actuator_system;
 
+	ALIGNED_NEW_AND_DELETE(actuator_state)
+
 	/// Creates a actuator_state for the given system and game_state.
 	/**
 	 * Should be called game_state::add_system_state that injects the parameters.
