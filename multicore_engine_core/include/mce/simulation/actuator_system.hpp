@@ -10,6 +10,7 @@
 #include <boost/container/flat_map.hpp>
 #include <mce/core/system.hpp>
 #include <mce/entity/ecs_types.hpp>
+#include <mce/simulation/simulation_defs.hpp>
 #include <mce/util/local_function.hpp>
 #include <mutex>
 
@@ -20,10 +21,6 @@ class engine;
 namespace simulation {
 
 class actuator_system : public core::system {
-public:
-	using movement_pattern_function = util::local_function<256, void(entity::entity&)>;
-
-private:
 	core::engine& eng_;
 	boost::container::flat_map<std::string, movement_pattern_function> movement_patterns_;
 	mutable std::mutex mtx;
