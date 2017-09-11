@@ -55,6 +55,13 @@ public:
 
 	/// Fills the given property_list with the properties available for this class.
 	static void fill_property_list(property_list& prop);
+
+	/// \brief Allows unbound properties for this component type to allow data-driven configuration of
+	/// movement_pattern_function objects by letting them obtain unbound properties from
+	/// component_configuration::unbound_property_values().
+	static bool takes_unbound_property_values() {
+		return true;
+	}
 };
 
 } /* namespace simulation */
