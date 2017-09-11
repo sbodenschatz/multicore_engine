@@ -12,6 +12,7 @@
  * Defines the component_configuration class.
  */
 
+#include <boost/container/flat_map.hpp>
 #include <mce/entity/component.hpp>
 #include <mce/entity/component_property_assignment.hpp>
 #include <mce/entity/ecs_types.hpp>
@@ -42,6 +43,7 @@ class component_configuration {
 	core::engine* engine;
 	const abstract_component_type& type_;
 	std::vector<std::unique_ptr<abstract_component_property_assignment<component>>> assignments;
+	boost::container::flat_map<std::string, ast::variable_value> unbound_property_values_;
 
 public:
 	/// \brief Creates a component_configuration for the given engine object and with the given
@@ -63,9 +65,14 @@ public:
 	/// entity_context for error messages.
 	void make_assignment(const std::string& property_name, const ast::variable_value& ast_value,
 						 const std::string& entity_context, entity_manager& entity_manager);
+
 	/// Returns the type of the component this configuration specifies.
 	const abstract_component_type& type() const {
 		return type_;
+	}
+
+	const boost::container::flat_map<std::string, ast::variable_value>& unbound_property_values() const {
+		return unbound_property_values_;
 	}
 };
 

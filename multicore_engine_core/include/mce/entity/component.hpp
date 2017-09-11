@@ -70,6 +70,10 @@ public:
 	/// Loads the state of the component (as stored by store_to_bstream) from the given bstream.
 	void load_from_bstream(bstream::ibstream& istr);
 
+	static bool takes_unbound_property_values() {
+		return false;
+	}
+
 protected:
 	/// \brief Allows derived classes to register a property specified by the given name, getter and setter to
 	/// the given list of properties.
