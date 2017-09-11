@@ -28,7 +28,7 @@ namespace simulation {
 /// Manages movement patterns that can be applied to entities using actuator_state and actuator_component.
 /**
  * The movement patterns are defined by function objects that are callable using the signature
- * <code>void(const mce::core::frame_time&, entity::entity&)</code>.
+ * <code>void(const mce::core::frame_time&, mce::entity::entity&)</code>.
  * These function objects are called once per frame and can manipulate the entity object given to them to
  * create the desired movement. The registered function objects are copied into the actuator_component objects
  * to provide each instance with a separate local state. The function objects on different actuator_component
