@@ -25,7 +25,8 @@ namespace detail {
 template <typename T>
 struct get_variable_value_ast_visitor : public boost::static_visitor<T> {
 	mce::entity::entity_manager& entity_manager_;
-	get_variable_value_ast_visitor(entity_manager& entity_manager) : entity_manager_(entity_manager) {}
+	explicit get_variable_value_ast_visitor(entity_manager& entity_manager)
+			: entity_manager_(entity_manager) {}
 	template <typename U, typename V = T, typename W = typename ast::ast_value_mapper<U, V>::error>
 	T operator()(const U&, W* = nullptr) {
 		throw value_type_exception("Invalid value for requested type.");
