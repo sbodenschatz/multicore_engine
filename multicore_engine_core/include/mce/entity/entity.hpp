@@ -142,9 +142,11 @@ public:
 		return transform;
 	}
 
+	/// Allows access to the entity_manager that contains the entity.
 	const mce::entity::entity_manager& entity_manager() const {
 		return entity_manager_;
 	}
+	/// Allows access to the entity_manager that contains the entity.
 	mce::entity::entity_manager& entity_manager() {
 		return entity_manager_;
 	}
