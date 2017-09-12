@@ -34,6 +34,7 @@ class entity_manager;
 /// the composition over inheritance technique.
 class entity {
 private:
+	mce::entity::entity_manager& entity_manager_;
 	entity_id_t id_;
 	entity_position_t position_;
 	entity_orientation_t orientation_;
@@ -44,9 +45,15 @@ private:
 			components_;
 	bool marker_for_despawn = false;
 
+	friend class entity_manager;
+
 public:
-	/// Constructs an entity with the given id.
-	explicit entity(entity_id_t id) noexcept : id_(id) {}
+	/// Constructs an entity with the given id in the given entity_manager.
+	/**
+	 * Should only be called in entity_manager but can't be private because it is internally used in an
+	 * emplace function.
+	 */
+	explicit entity(entity_id_t id, entity_manager& em) noexcept : entity_manager_{em}, id_{id} {}
 	/// Forbids copy-construction for entity.
 	entity(const entity&) = delete;
 	/// Forbids move-construction for entity.
@@ -101,7 +108,8 @@ public:
 	 * The given entity_manager is used to resolve component_types.
 	 * The given engine reference is forwarded to component constructors.
 	 */
-	void load_from_bstream(bstream::ibstream& istr, const entity_manager& ent_mgr, core::engine* engine);
+	void load_from_bstream(bstream::ibstream& istr, const mce::entity::entity_manager& ent_mgr,
+						   core::engine* engine);
 
 	/// Returns the id of the entity.
 	entity_id_t id() const {
@@ -132,6 +140,13 @@ public:
 		transform[3].y = position_.y;
 		transform[3].z = position_.z;
 		return transform;
+	}
+
+	const mce::entity::entity_manager& entity_manager() const {
+		return entity_manager_;
+	}
+	mce::entity::entity_manager& entity_manager() {
+		return entity_manager_;
 	}
 };
 
