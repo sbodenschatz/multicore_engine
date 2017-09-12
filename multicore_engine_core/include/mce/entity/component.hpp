@@ -70,6 +70,16 @@ public:
 	/// Loads the state of the component (as stored by store_to_bstream) from the given bstream.
 	void load_from_bstream(bstream::ibstream& istr);
 
+	/// Defines the default to not accept properties additionally to the bound reflection properties.
+	/**
+	 * This can be redefined in subclasses to allow additional properties that can be accessed through
+	 * component_configuration::unbound_property_values().
+	 * Those redefinitions should always return the same value for one run of the engine.
+	 */
+	static bool takes_unbound_property_values() {
+		return false;
+	}
+
 protected:
 	/// \brief Allows derived classes to register a property specified by the given name, getter and setter to
 	/// the given list of properties.

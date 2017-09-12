@@ -97,6 +97,15 @@ namespace vk_mock_interface {}
 /// Contains the rendering subsystem, drawing the 3D scene and implementing effects.
 namespace rendering {}
 
+/// Contains the simulation subsystem, controlling the movement of objects in the scene.
+namespace simulation {}
+
+/// Contains the input subsystem, processing user input to allow it to control objects in the scene.
+namespace input {}
+
+/// Contains the windowing subsystem, managing the window for the input and output from / to the user.
+namespace windowing {}
+
 } // namespace mce
 
 #endif /* NAMESPACE_DOC_HPP_ */
