@@ -41,6 +41,11 @@ private:
 			return std::tie(a.x, a.y, a.z) < std::tie(b.x, b.y, b.z);
 		}
 	};
+	struct pair_comparator {
+		bool operator()(const glm::ivec2& a, const glm::ivec2& b) const {
+			return std::tie(a.x, a.y) < std::tie(b.x, b.y);
+		}
+	};
 	class mesh_data {
 	public:
 		std::string object_name;
@@ -64,6 +69,8 @@ private:
 	std::vector<model::model_vertex> vertices;
 	std::vector<mesh_data> meshes;
 	boost::container::flat_map<glm::ivec3, model::model_index, tripple_comparator> vertex_indices;
+	boost::container::flat_map<glm::ivec2, glm::vec3, pair_comparator> tangents;
+	boost::container::flat_map<glm::ivec2, glm::vec3, pair_comparator> bitangents;
 	std::string current_object_name;
 	std::string current_group_name = "default";
 	std::string current_material_name;
@@ -83,6 +90,7 @@ private:
 
 	model::model_index get_or_create_vertex(const glm::ivec3& tripple);
 	void create_face(const std::array<glm::ivec3, 3>& vertex_tripples);
+	std::pair<glm::vec3, glm::vec3> calculate_tangents(const std::array<glm::ivec3, 3>& vertex_tripples);
 
 	bool check_prefix(boost::string_view str, boost::string_view prefix, boost::string_view& rest) const;
 
