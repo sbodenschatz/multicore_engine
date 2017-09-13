@@ -145,9 +145,9 @@ void obj_model_parser::parse_group(boost::string_view line) {
 	current_group_name.append(line.data(), line.size());
 }
 void obj_model_parser::parse_smoothing(boost::string_view line) {
-	if(line != "off") {
-		throw unimplemented_exception("Smoothing groups are currently not supported.");
-	}
+	// Smoothing groups are ignored because the model format requires vertex normals and vertex normals
+	// override smoothing groups.
+	UNUSED(line);
 }
 void obj_model_parser::parse_face(boost::string_view line) {
 	if(current_material_name.empty()) {
