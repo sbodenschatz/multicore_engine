@@ -206,7 +206,6 @@ model::model_index obj_model_parser::get_or_create_vertex(const glm::ivec3& trip
 }
 
 void obj_model_parser::create_face(const std::array<glm::ivec3, 3>& vertex_tripples) {
-	meshes.back().indices.reserve(vertex_tripples.size());
 	std::transform(vertex_tripples.begin(), vertex_tripples.end(), std::back_inserter(meshes.back().indices),
 				   [this](const glm::ivec3& tripple) {
 					   auto index = get_or_create_vertex(tripple);
