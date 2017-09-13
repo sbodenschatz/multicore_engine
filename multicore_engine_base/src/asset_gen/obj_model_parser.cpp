@@ -136,7 +136,8 @@ void obj_model_parser::parse_object(boost::string_view line) {
 	current_object_name.append(line.data(), line.size());
 }
 void obj_model_parser::parse_mtllib(boost::string_view line) {
-	// throw unimplemented_exception("Material libraries not supported yet");
+	// Material libraries are ignored because materials are defined in an engine specific json-based material
+	// definition library format.
 	UNUSED(line);
 }
 void obj_model_parser::parse_group(boost::string_view line) {
