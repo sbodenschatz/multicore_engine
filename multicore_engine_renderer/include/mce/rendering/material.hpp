@@ -159,7 +159,7 @@ public:
 		return material_map_;
 	}
 
-	/// Returns the texture map describing the surface normals of the material.
+	/// Returns the texture map describing the surface normals of the material using the DXT5nm compression.
 	/**
 	 * Requires the object to be ready for use. Calling this member function on a non-ready object results in
 	 * undefined behavior due to a race condition.
