@@ -28,6 +28,8 @@ namespace model {
 /// Defines the structure of a vertex in a model.
 struct model_vertex {
 	glm::vec3 position;   ///< The position in 3D model space.
+	glm::vec3 tangent;	///< The tangent vector of the vertex.
+	glm::vec3 bitangent;  ///< The bitangent vector of the vertex.
 	glm::vec3 normal;	 ///< The normal vector of the vertex.
 	glm::vec2 tex_coords; ///< The mapped texture coordinates of the vertex.
 };
@@ -70,7 +72,7 @@ struct static_model_meta_data {
 	constexpr static uint64_t magic_number_ = util::composite_magic_number<uint64_t>(
 			'm', 'c', 'e', 'm', 'd', 'l', 's' /*static*/, 'g' /*geometry*/);
 	/// The supported(current) version of the model file format.
-	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 3u);
+	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 4u);
 
 	uint64_t magic_number = magic_number_; ///< The deserialized magic number.
 	uint64_t version = version_;		   ///< The deserialized version tag.
