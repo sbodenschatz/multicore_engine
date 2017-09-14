@@ -28,10 +28,17 @@ graphics::pipeline_config::vertex_input_state_config model_vertex_input_config()
 					 graphics::format_from_type<decltype(model::model_vertex::position)>::default_format,
 					 offsetof(model::model_vertex, position)),
 			 vk::VertexInputAttributeDescription(
-					 1, 0, graphics::format_from_type<decltype(model::model_vertex::normal)>::default_format,
-					 offsetof(model::model_vertex, normal)),
+					 1, 0, graphics::format_from_type<decltype(model::model_vertex::tangent)>::default_format,
+					 offsetof(model::model_vertex, tangent)),
 			 vk::VertexInputAttributeDescription(
 					 2, 0,
+					 graphics::format_from_type<decltype(model::model_vertex::bitangent)>::default_format,
+					 offsetof(model::model_vertex, bitangent)),
+			 vk::VertexInputAttributeDescription(
+					 3, 0, graphics::format_from_type<decltype(model::model_vertex::normal)>::default_format,
+					 offsetof(model::model_vertex, normal)),
+			 vk::VertexInputAttributeDescription(
+					 4, 0,
 					 graphics::format_from_type<decltype(model::model_vertex::tex_coords)>::default_format,
 					 offsetof(model::model_vertex, tex_coords))});
 }
