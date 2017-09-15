@@ -19,6 +19,7 @@ const uint max_forward_lights = 64;
 layout(set = 0,binding = 0) uniform per_scene {
 	mat4 projection;
 	mat4 view;
+	vec3 cam_pos;
 	uint active_lights;
 	per_point_light_uniforms forward_lights[max_forward_lights];
 } scene;
@@ -37,6 +38,8 @@ void main() {
 	float ao = material_params.b;
 	vec3 normal = vec3(tex_normal,sqrt(1-tex_normal.x*tex_normal.x-tex_normal.y*tex_normal.y));
 	normal = normalize(var_tangent_space * normal);
+	vec3 view = normalize(scene.cam_pos-var_world_pos.xyz);
+	vec3 light_sum = vec3(0.0);
 	//output_color = texture(albedo_tex,uv);
 	output_color = vec4(abs(normal)*ao,1.0);
 	//output_color = vec4(ao,ao,ao,1.0);

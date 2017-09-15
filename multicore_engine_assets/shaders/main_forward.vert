@@ -13,6 +13,7 @@ const uint max_forward_lights = 64;
 layout(set = 0,binding = 0) uniform per_scene {
 	mat4 projection;
 	mat4 view;
+	vec3 cam_pos;
 	uint active_lights;
 	per_point_light_uniforms forward_lights[max_forward_lights];
 } scene;
