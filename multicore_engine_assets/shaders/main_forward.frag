@@ -40,7 +40,10 @@ void main() {
 	normal = normalize(var_tangent_space * normal);
 	vec3 view = normalize(scene.cam_pos-var_world_pos.xyz);
 	vec3 light_sum = vec3(0.0);
-	//output_color = texture(albedo_tex,uv);
-	output_color = vec4(abs(normal)*ao,1.0);
-	//output_color = vec4(ao,ao,ao,1.0);
+	for(uint i = 0; i<scene.active_lights; ++i){
+		vec3 light_dir = normalize(scene.forward_lights[i].position-var_world_pos.xyz);
+		vec3 half_way = normalize(view + light_dir);
+	}
+	//output_color = vec4(light_sum,1.0);
+	output_color = vec4(view,1.0);
 }
