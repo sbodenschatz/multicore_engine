@@ -5,6 +5,7 @@ layout(location = 0) out vec4 output_color;
 
 layout(location = 0) in vec2 var_uv;
 layout(location = 1) in mat3 var_tangent_space;
+layout(location = 4) in vec4 var_world_pos;
 
 struct per_point_light_uniforms {
 	vec3 position;

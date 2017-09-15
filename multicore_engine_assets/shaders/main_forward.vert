@@ -33,9 +33,11 @@ out gl_PerVertex {
 
 layout(location = 0) out vec2 var_uv;
 layout(location = 1) out mat3 var_tangent_space;
+layout(location = 4) out vec4 var_world_pos;
 
 void main() {
 	var_uv = in_uv;
 	var_tangent_space = mat3(obj_pc.model) * mat3(in_tangent,in_bitangent,in_normal);
-	gl_Position = scene.projection * scene.view * obj_pc.model * vec4(in_position,1.0);
+	var_world_pos = obj_pc.model * vec4(in_position,1.0);
+	gl_Position = scene.projection * scene.view * var_world_pos;
 }
