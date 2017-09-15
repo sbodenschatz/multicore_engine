@@ -43,7 +43,9 @@ void main() {
 	for(uint i = 0; i<scene.active_lights; ++i){
 		vec3 light_dir = normalize(scene.forward_lights[i].position-var_world_pos.xyz);
 		vec3 half_way = normalize(view + light_dir);
+		float cos_theta = max(dot(half_way, view), 0.0);
+		light_sum+=vec3(cos_theta);
 	}
-	//output_color = vec4(light_sum,1.0);
-	output_color = vec4(view,1.0);
+	output_color = vec4(light_sum,1.0);
+	//output_color = vec4(view,1.0);
 }
