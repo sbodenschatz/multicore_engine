@@ -6,6 +6,22 @@ layout(location = 0) out vec4 output_color;
 layout(location = 0) in vec2 var_uv;
 layout(location = 1) in mat3 var_tangent_space;
 
+struct per_point_light_uniforms {
+	vec3 position;
+	float radius;
+	vec3 color;
+	float brightness;
+};
+
+const uint max_forward_lights = 64;
+
+layout(set = 0,binding = 0) uniform per_scene {
+	mat4 projection;
+	mat4 view;
+	uint active_lights;
+	per_point_light_uniforms forward_lights[max_forward_lights];
+} scene;
+
 layout(set=1,binding = 0) uniform sampler2D albedo_tex;
 layout(set=1,binding = 1) uniform sampler2D normal_tex;
 layout(set=1,binding = 2) uniform sampler2D material_tex;
