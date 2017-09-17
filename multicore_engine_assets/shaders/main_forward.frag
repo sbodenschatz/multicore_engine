@@ -58,6 +58,15 @@ float geometry_schlick_GGX(float n_dot_v, float roughness) {
 	return nom / denom;
 }
 
+float geometry_smith(vec3 n, vec3 v, vec3 l, float roughness) {
+	float n_dot_v = max(dot(n, v), 0.0);
+	float n_dot_l = max(dot(n, l), 0.0);
+	float ggx2 = geometry_schlick_GGX(n_dot_v, roughness);
+	float ggx1 = geometry_schlick_GGX(n_dot_l, roughness);
+	
+	return ggx1 * ggx2;
+}
+
 void main() {
 	vec2 uv = vec2(var_uv.x,1.0-var_uv.y);
 	vec2 tex_normal = texture(normal_tex,uv).ag * 2.0 - 1.0;
@@ -81,7 +90,8 @@ void main() {
 		F0 = mix(F0, albedo, metallic);
 		vec3 F = fresnel_schlick(max(dot(half_way, view), 0.0), F0);
 		float NDF = distribution_GGX(normal, half_way, roughness);
-		light_sum += vec3(NDF);
+		float G = geometry_smith(normal, view, light_dir, roughness);
+		light_sum += vec3(G);
 		//light_sum += F;
 		//light_sum+=vec3(cos_theta*radiance);
 		//light_sum += radiance;
