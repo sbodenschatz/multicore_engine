@@ -49,6 +49,15 @@ float distribution_GGX(vec3 n, vec3 h, float roughness) {
 	return nom / denom;
 }
 
+float geometry_schlick_GGX(float n_dot_v, float roughness) {
+	float r = (roughness + 1.0);
+	float k = (r*r) / 8.0;
+
+	float nom   = n_dot_v;
+	float denom = n_dot_v * (1.0 - k) + k;
+	return nom / denom;
+}
+
 void main() {
 	vec2 uv = vec2(var_uv.x,1.0-var_uv.y);
 	vec2 tex_normal = texture(normal_tex,uv).ag * 2.0 - 1.0;
