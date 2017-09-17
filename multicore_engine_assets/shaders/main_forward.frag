@@ -29,8 +29,25 @@ layout(set=1,binding = 1) uniform sampler2D normal_tex;
 layout(set=1,binding = 2) uniform sampler2D material_tex;
 layout(set=1,binding = 3) uniform sampler2D emission_tex;
 
+const float PI = 3.14159265359;
+
 vec3 fresnel_schlick(float cos_theta, vec3 F0) {
 	return F0 + (1.0 - F0) * pow(1.0 - cos_theta, 5.0);
+}
+
+
+float distribution_GGX(vec3 n, vec3 h, float roughness)
+{
+    float a = roughness*roughness;
+    float a_sq = a*a;
+    float n_dot_h = max(dot(n, h), 0.0);
+    float n_dot_h_sq = n_dot_h * n_dot_h;
+	
+    float nom = a_sq;
+    float denom = (n_dot_h_sq * (a_sq - 1.0) + 1.0);
+    denom = PI * denom * denom;
+	
+    return nom / denom;
 }
 
 void main() {
@@ -55,7 +72,9 @@ void main() {
 		vec3 F0 = vec3(0.04);
 		F0 = mix(F0, albedo, metallic);
 		vec3 F = fresnel_schlick(max(dot(half_way, view), 0.0), F0);
-		light_sum += F;
+		float NDF = distribution_GGX(normal, half_way, roughness);
+		light_sum += vec3(NDF);
+		//light_sum += F;
 		//light_sum+=vec3(cos_theta*radiance);
 		//light_sum += radiance;
 	}
