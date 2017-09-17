@@ -36,18 +36,17 @@ vec3 fresnel_schlick(float cos_theta, vec3 F0) {
 }
 
 
-float distribution_GGX(vec3 n, vec3 h, float roughness)
-{
-    float a = roughness*roughness;
-    float a_sq = a*a;
-    float n_dot_h = max(dot(n, h), 0.0);
-    float n_dot_h_sq = n_dot_h * n_dot_h;
+float distribution_GGX(vec3 n, vec3 h, float roughness) {
+	float a = roughness*roughness;
+	float a_sq = a*a;
+	float n_dot_h = max(dot(n, h), 0.0);
+	float n_dot_h_sq = n_dot_h * n_dot_h;
 	
-    float nom = a_sq;
-    float denom = (n_dot_h_sq * (a_sq - 1.0) + 1.0);
-    denom = PI * denom * denom;
+	float nom = a_sq;
+	float denom = (n_dot_h_sq * (a_sq - 1.0) + 1.0);
+	denom = PI * denom * denom;
 	
-    return nom / denom;
+	return nom / denom;
 }
 
 void main() {
