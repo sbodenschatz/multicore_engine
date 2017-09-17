@@ -98,7 +98,10 @@ void main() {
 		vec3 F = fresnel_schlick(max(dot(half_way, view), 0.0), F0);
 		float NDF = distribution_GGX(normal, half_way, roughness);
 		float G = geometry_smith(normal, view, light_dir, roughness);
-		light_sum += vec3(G);
+		vec3 nominator = NDF * G * F;
+		float denominator = 4.0 * max(dot(normal, view), 0.0) * max(dot(normal, light_dir), 0.0) + 0.001; 
+		vec3 specular = nominator / denominator;
+		light_sum += vec3(specular);
 		//light_sum += F;
 		//light_sum+=vec3(cos_theta*radiance);
 		//light_sum += radiance;
