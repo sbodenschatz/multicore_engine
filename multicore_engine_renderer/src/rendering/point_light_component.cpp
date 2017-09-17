@@ -11,7 +11,7 @@ namespace rendering {
 
 point_light_component::point_light_component(entity::entity& owner,
 											 const entity::component_configuration& conf)
-		: component(owner, conf), color_(1.0f, 1.0f, 1.0f), radius_(1000.0f), brightness_(1.0f) {}
+		: component(owner, conf), color_(1.0f, 1.0f, 1.0f), radius_(1000.0f), brightness_(100.0f) {}
 
 point_light_component::~point_light_component() {}
 

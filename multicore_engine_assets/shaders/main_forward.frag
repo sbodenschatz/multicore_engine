@@ -41,10 +41,14 @@ void main() {
 	vec3 view = normalize(scene.cam_pos-var_world_pos.xyz);
 	vec3 light_sum = vec3(0.0);
 	for(uint i = 0; i<scene.active_lights; ++i){
-		vec3 light_dir = normalize(scene.forward_lights[i].position-var_world_pos.xyz);
+		vec3 light_dir = scene.forward_lights[i].position-var_world_pos.xyz;
+		float attenuation = 1.0 / dot(light_dir,light_dir);
+		light_dir = normalize(light_dir);
 		vec3 half_way = normalize(view + light_dir);
 		float cos_theta = max(dot(half_way, view), 0.0);
-		light_sum+=vec3(cos_theta);
+		vec3 radiance = scene.forward_lights[i].color * scene.forward_lights[i].brightness * attenuation;
+		light_sum+=vec3(cos_theta*radiance);
+		//light_sum += radiance;
 	}
 	output_color = vec4(light_sum,1.0);
 	//output_color = vec4(view,1.0);
