@@ -56,7 +56,9 @@ void material_library::complete_loading(const asset::asset_ptr& lib_asset) noexc
 			}
 		}
 	} catch(...) {
+		lock.unlock();
 		raise_error_flag(std::current_exception());
+		return;
 	}
 	auto this_shared = std::static_pointer_cast<const material_library>(this->shared_from_this());
 	current_state_ = state::ready;
@@ -75,5 +77,5 @@ void material_library::complete_loading(const asset::asset_ptr& lib_asset) noexc
 	error_handlers.shrink_to_fit();
 }
 
-} /* namespace rendering */
+} // namespace rendering
 } /* namespace mce */
