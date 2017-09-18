@@ -106,13 +106,8 @@ void main() {
 		k_d *= 1.0 - metallic;
 		float n_dot_l = max(dot(normal, light_dir), 0.0);
 		light_sum += (k_d * albedo / PI + specular) * radiance * n_dot_l;
-		//light_sum += vec3(n_dot_l);
-		//light_sum += F;
-		//light_sum+=vec3(cos_theta*radiance);
-		//light_sum += radiance;
 	}
 	light_sum = light_sum / (light_sum + vec3(1.0));
 	//light_sum = pow(light_sum, vec3(1.0/2.2));
 	output_color = vec4(light_sum,1.0);
-	//output_color = vec4(view,1.0);
 }
