@@ -112,6 +112,7 @@ void main() {
 		//light_sum += radiance;
 	}
 	light_sum = light_sum / (light_sum + vec3(1.0));
+	light_sum = pow(light_sum, vec3(1.0/2.2));
 	output_color = vec4(light_sum,1.0);
 	//output_color = vec4(view,1.0);
 }
