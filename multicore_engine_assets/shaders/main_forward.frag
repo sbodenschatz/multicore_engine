@@ -85,7 +85,7 @@ void main() {
 	vec3 normal = vec3(tex_normal,sqrt(1-tex_normal.x*tex_normal.x-tex_normal.y*tex_normal.y));
 	normal = normalize(var_tangent_space * normal);
 	vec3 view = normalize(scene.cam_pos-var_world_pos.xyz);
-	vec3 light_sum = vec3(0.0);
+	vec3 light_sum = vec3(0.03) * albedo * ao;
 	for(uint i = 0; i<scene.active_lights; ++i){
 		vec3 light_dir = scene.forward_lights[i].position-var_world_pos.xyz;
 		float attenuation = 1.0 / dot(light_dir,light_dir);
