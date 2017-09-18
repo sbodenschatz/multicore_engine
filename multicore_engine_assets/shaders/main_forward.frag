@@ -104,7 +104,9 @@ void main() {
 		vec3 k_s = F;
 		vec3 k_d = vec3(1.0) - k_s;
 		k_d *= 1.0 - metallic;
-		light_sum += vec3(k_d);
+		float n_dot_l = max(dot(normal, light_dir), 0.0);
+		light_sum += (k_d * albedo / PI + specular) * radiance * n_dot_l;
+		//light_sum += vec3(n_dot_l);
 		//light_sum += F;
 		//light_sum+=vec3(cos_theta*radiance);
 		//light_sum += radiance;
