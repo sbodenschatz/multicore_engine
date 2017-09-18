@@ -55,10 +55,10 @@ void window::configure_surface_format() {
 	surface_format_ = vk::Format::eB8G8R8A8Unorm;
 	assert(!surface_formats.empty());
 	if(surface_formats.size() != 1 || surface_formats[0].format != vk::Format::eUndefined) {
-		auto format_preferences = util::make_array(vk::Format::eB8G8R8A8Srgb
-												   // vk::Format::eB8G8R8A8Unorm
-												   // TODO Place other preferred formats here
-												   );
+		auto format_preferences = util::make_array( // vk::Format::eB8G8R8A8Srgb
+				vk::Format::eB8G8R8A8Unorm
+				// TODO Place other preferred formats here
+				);
 		util::preference_sort(surface_formats, format_preferences, [](const auto& v) { return v.format; });
 		color_space_ = surface_formats[0].colorSpace;
 		surface_format_ = surface_formats[0].format;
