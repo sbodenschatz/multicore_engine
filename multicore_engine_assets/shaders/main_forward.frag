@@ -101,7 +101,10 @@ void main() {
 		vec3 nominator = NDF * G * F;
 		float denominator = 4.0 * max(dot(normal, view), 0.0) * max(dot(normal, light_dir), 0.0) + 0.001; 
 		vec3 specular = nominator / denominator;
-		light_sum += vec3(specular);
+		vec3 k_s = F;
+		vec3 k_d = vec3(1.0) - k_s;
+		k_d *= 1.0 - metallic;
+		light_sum += vec3(k_d);
 		//light_sum += F;
 		//light_sum+=vec3(cos_theta*radiance);
 		//light_sum += radiance;
