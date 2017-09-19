@@ -65,6 +65,7 @@ void renderer_state::collect_scene_uniforms() {
 			glm::radians(cam->fov()), float(sys->gs_.window().swapchain_size().x),
 			float(sys->gs_.window().swapchain_size().y), cam->near_plane(), cam->far_plane());
 	// scene_uniforms.projection[1].y *= -1.0f;
+	scene_uniforms.cam_pos = cam->owner().position();
 	scene_uniforms.active_lights = 0;
 	for(const point_light_component& plc : point_light_comps) {
 		if(scene_uniforms.active_lights < max_forward_lights) {
