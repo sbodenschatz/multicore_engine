@@ -93,6 +93,8 @@ void renderer_system::create_samplers() {
 	auto aniso_val = anisotropy->value();
 	if(aniso_val > 0.0f) {
 		max_anisotropy = aniso_val;
+	} else if(aniso_val < 0.0f) {
+		max_anisotropy = gs_.device().physical_device_properties().limits.maxSamplerAnisotropy;
 	}
 	default_sampler_ = gs_.graphics_manager().create_sampler(
 			"default", vk::Filter::eLinear, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear,
