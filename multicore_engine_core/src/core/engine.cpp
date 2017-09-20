@@ -41,7 +41,7 @@ engine::~engine() {
 void engine::initialize_config() {
 	std::string user_cfg_name = "config.cfg";
 	std::ifstream user_cfg(user_cfg_name);
-	std::stringstream default_cfg("");
+	std::stringstream default_cfg("default.cfg");
 	config_store_ = std::make_unique<config::config_store>(
 			user_cfg, default_cfg, [user_cfg_name](config::config_store::config_storer& cs) {
 				std::ofstream user_cfg(user_cfg_name);
