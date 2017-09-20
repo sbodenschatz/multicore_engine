@@ -25,6 +25,7 @@ namespace mce {
 namespace graphics {
 
 window::window(instance& app_instance, glfw::window& win, device& dev, uint32_t desired_images,
+			   // cppcheck-suppress passedByValue
 			   std::vector<vk::PresentModeKHR> present_mode_preferences)
 		: present_mode_preferences_{std::move(present_mode_preferences)}, instance_{app_instance},
 		  window_{win}, device_{dev}, desired_images_{desired_images},
