@@ -88,6 +88,7 @@ public:
 		return dev;
 	}
 
+	/// Obtains a lock on the memory manager.
 	std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation&) const override;
 };
 

@@ -78,7 +78,8 @@ public:
 			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) = 0;
 	/// Interface function to allow access to the device associated with the device memory manager.
 	virtual device* associated_device() const = 0;
-
+	/// \brief Obtains a lock from the implementing object that protects at least the memory object of the
+	/// given allocation.
 	virtual std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation& allocation) const = 0;
 };
 
@@ -167,7 +168,10 @@ public:
 						   vk::DeviceSize size = VK_WHOLE_SIZE) {
 		allocation_.invalidate_mapped(dev, offset, size);
 	}
-
+	/// Obtains a lock from the memory manager that protects at least the memory object of this handle.
+	/**
+	 * Calling this member function on move-from handles results in undefined behavior.
+	 */
 	std::unique_lock<std::mutex> obtain_lock() const {
 		assert(manager_ptr_);
 		return manager_ptr_->obtain_lock(allocation_);
