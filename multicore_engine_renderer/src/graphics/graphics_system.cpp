@@ -167,7 +167,7 @@ vk::PhysicalDeviceType graphics_system::device_type_from_string(const std::strin
 std::vector<vk::PhysicalDeviceType> graphics_system::device_type_prefs_from_config() const {
 	std::vector<vk::PhysicalDeviceType> device_type_preferences;
 	using namespace std::literals;
-	std::vector<std::string> device_type_preferences_str = {{"discrete"s, "integrated"s}};
+	std::vector<std::string> device_type_preferences_str = {{{"discrete"s}, {"integrated"s}}};
 	auto var_device_type_preferences =
 			eng.config_store().resolve("device_type_preferences"s, device_type_preferences_str);
 	device_type_preferences_str = var_device_type_preferences->value();
