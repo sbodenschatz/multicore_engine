@@ -31,7 +31,10 @@ namespace graphics {
 const std::pair<uint32_t, uint32_t> device::no_queue_index{~0u, ~0u};
 const uint32_t device::no_queue_family_index{~0u};
 
-device::device(instance& app_inst) : instance_(app_inst) {
+device::device(instance& app_inst, std::vector<vk::PhysicalDeviceType> device_type_preferences,
+			   std::vector<std::string> device_preferences)
+		: device_type_preferences_{std::move(device_type_preferences)},
+		  device_preferences_{std::move(device_preferences)}, instance_{app_inst} {
 	find_physical_device();
 	find_queue_indexes();
 	create_device();
@@ -90,12 +93,9 @@ void device::find_physical_device() {
 		throw no_suitable_device_found_exception(
 				"No vulkan device with required presentation capabilities found.");
 	}
-	std::vector<vk::PhysicalDeviceType> device_type_preferences = {
-			{vk::PhysicalDeviceType::eDiscreteGpu, vk::PhysicalDeviceType::eIntegratedGpu}};
-	util::preference_sort(suitable_phy_devs, device_type_preferences,
+	util::preference_sort(suitable_phy_devs, device_type_preferences_,
 						  [](const vk::PhysicalDevice& pd) { return pd.getProperties().deviceType; });
-	std::vector<std::string> device_preferences;
-	util::preference_sort(suitable_phy_devs, device_preferences, [](const vk::PhysicalDevice& pd) {
+	util::preference_sort(suitable_phy_devs, device_preferences_, [](const vk::PhysicalDevice& pd) {
 		return std::string(pd.getProperties().deviceName);
 	});
 
