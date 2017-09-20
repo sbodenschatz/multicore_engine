@@ -42,7 +42,7 @@ public:
 		std::lock_guard<std::mutex> lock(mutex);
 		return nullptr;
 	}
-	virtual std::unique_lock<std::mutex> obtain_lock() const {
+	virtual std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation&) const {
 		return std::unique_lock<std::mutex>(mutex);
 	}
 };
