@@ -4,6 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <cctype>
+#include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/sync_utils.hpp>
@@ -16,7 +18,8 @@ graphics_system::graphics_system(core::engine& eng, windowing::window_system& wi
 								 const std::vector<std::string>& extensions, unsigned int validation_level)
 		: eng{eng},
 		  instance_(eng.engine_metadata(), eng.application_metadata(), extensions, validation_level),
-		  device_(instance_), window_(instance_, win_sys.window(), device_),
+		  device_(instance_, device_type_prefs_from_config(), device_prefs_from_config()),
+		  window_(instance_, win_sys.window(), device_),
 		  // TODO Parameterize
 		  memory_manager_(&device_, 1 << 27),
 		  destruction_queue_manager_(&device_, uint32_t(window_.swapchain_images().size())),
@@ -145,6 +148,42 @@ void graphics_system::postrender(const mce::core::frame_time&) {
 	device_.present_queue().presentKHR(
 			vk::PresentInfoKHR(1, &present_sema, 1, &swapchain_handle, &current_swapchain_image_));
 	transfer_manager_.end_frame();
+}
+
+static boost::container::flat_map<std::string, vk::PhysicalDeviceType> device_type_from_string_table = {
+		{{"other", vk::PhysicalDeviceType::eOther},
+		 {"integrated", vk::PhysicalDeviceType::eIntegratedGpu},
+		 {"discrete", vk::PhysicalDeviceType::eDiscreteGpu},
+		 {"virtual", vk::PhysicalDeviceType::eVirtualGpu},
+		 {"cpu", vk::PhysicalDeviceType::eCpu}}};
+
+vk::PhysicalDeviceType graphics_system::device_type_from_string(const std::string& type) {
+	auto it = device_type_from_string_table.find(type);
+	if(it != device_type_from_string_table.end()) {
+		return it->second;
+	}
+	throw mce::syntax_exception("Invalid device type '" + type + "'.");
+}
+std::vector<vk::PhysicalDeviceType> graphics_system::device_type_prefs_from_config() const {
+	std::vector<vk::PhysicalDeviceType> device_type_preferences;
+	using namespace std::literals;
+	std::vector<std::string> device_type_preferences_str = {{"discrete"s, "integrated"s}};
+	auto var_device_type_preferences =
+			eng.config_store().resolve("device_type_preferences"s, device_type_preferences_str);
+	device_type_preferences_str = var_device_type_preferences->value();
+	for(auto& dts : device_type_preferences_str) {
+		for(auto& c : dts) {
+			c = char(std::tolower(c));
+		}
+	}
+	std::transform(device_type_preferences_str.begin(), device_type_preferences_str.end(),
+				   std::back_inserter(device_type_preferences),
+				   [](const std::string& dts) { return device_type_from_string(dts); });
+	return device_type_preferences;
+}
+std::vector<std::string> graphics_system::device_prefs_from_config() const {
+	std::vector<std::string> device_preferences;
+	return eng.config_store().resolve("device_preferences", device_preferences)->value();
 }
 
 } /* namespace graphics */
