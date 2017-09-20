@@ -10,11 +10,14 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <boost/container/flat_map.hpp>
+#include <boost/range/irange.hpp>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/instance.hpp>
+#include <mce/util/algorithm.hpp>
 #include <mce/util/unused.hpp>
 #include <vector>
 
@@ -75,26 +78,28 @@ queue_index_t device::find_queue(const std::vector<vk::QueueFamilyProperties>& q
 
 void device::find_physical_device() {
 	std::vector<vk::PhysicalDevice> phy_devs = instance_->enumeratePhysicalDevices();
-	// TODO Find better device selection heuristic or make it configurable.
-	for(const auto& phy_dev : phy_devs) {
-		uint32_t queue_family_count = uint32_t(phy_dev.getQueueFamilyProperties().size());
-		for(uint32_t queue_family = 0; queue_family < queue_family_count; ++queue_family) {
-			if(glfwGetPhysicalDevicePresentationSupport(instance_.native_instance(), phy_dev, queue_family)) {
-				if(!physical_device_) {
-					// We have no useable device so far, accept any device that can present
-					physical_device_ = phy_dev;
-				} else if(phy_dev.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu) {
-					// We already have some device (which might be no discrete GPU), only accept
-					// discrete devices to prevent replacing a discrete device with an integrated (or similar)
-					// one.
-					physical_device_ = phy_dev;
-				}
-			}
-		}
-	}
-	if(!physical_device_)
+	std::vector<vk::PhysicalDevice> suitable_phy_devs;
+	std::copy_if(phy_devs.begin(), phy_devs.end(), std::back_inserter(suitable_phy_devs),
+				 [this](const vk::PhysicalDevice& pd) {
+					 auto qfs = boost::irange(0u, uint32_t(pd.getQueueFamilyProperties().size()));
+					 return std::any_of(qfs.begin(), qfs.end(), [this, &pd](uint32_t qf) {
+						 return glfwGetPhysicalDevicePresentationSupport(instance_.native_instance(), pd, qf);
+					 });
+				 });
+	if(suitable_phy_devs.empty()) {
 		throw no_suitable_device_found_exception(
 				"No vulkan device with required presentation capabilities found.");
+	}
+	std::vector<vk::PhysicalDeviceType> device_type_preferences = {
+			{vk::PhysicalDeviceType::eDiscreteGpu, vk::PhysicalDeviceType::eIntegratedGpu}};
+	util::preference_sort(suitable_phy_devs, device_type_preferences,
+						  [](const vk::PhysicalDevice& pd) { return pd.getProperties().deviceType; });
+	std::vector<std::string> device_preferences;
+	util::preference_sort(suitable_phy_devs, device_preferences, [](const vk::PhysicalDevice& pd) {
+		return std::string(pd.getProperties().deviceName);
+	});
+
+	physical_device_ = suitable_phy_devs.front();
 	physical_device_properties_ = physical_device_.getProperties();
 	std::cout << "Using render device \"" << physical_device_properties_.deviceName << "\"" << std::endl;
 }
