@@ -62,6 +62,7 @@ private:
 	std::vector<device_memory_block> separate_blocks_;
 	int32_t next_block_id = 1;			 // 0 is invalid
 	int32_t next_separate_block_id = -1; // 0 is invalid
+	mutable std::mutex mutex_;
 
 public:
 	/// Constructs a memory manager for the given device using the given block size.
@@ -86,6 +87,8 @@ public:
 	virtual device* associated_device() const override {
 		return dev;
 	}
+
+	std::unique_lock<std::mutex> obtain_lock() const override;
 };
 
 } /* namespace graphics */

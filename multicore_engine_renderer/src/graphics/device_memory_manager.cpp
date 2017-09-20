@@ -70,6 +70,7 @@ device_memory_manager::device_memory_block::try_allocate(const vk::MemoryRequire
 }
 
 void device_memory_manager::free(const device_memory_allocation& allocation) {
+	std::lock_guard<std::mutex> lock(mutex_);
 	if(allocation.block_id == 0)
 		return;						   // Invalid allocation
 	else if(allocation.block_id > 0) { // Normal block
@@ -101,6 +102,7 @@ bool device_memory_manager::device_memory_block::empty() const {
 }
 
 void device_memory_manager::cleanup(unsigned int keep_per_memory_type) {
+	std::lock_guard<std::mutex> lock(mutex_);
 	auto divider = std::stable_partition(blocks_.begin(), blocks_.end(),
 										 [](const device_memory_block& blk) { return !blk.empty(); });
 	size_t div_pos = std::distance(blocks_.begin(), divider);
@@ -119,6 +121,7 @@ void device_memory_manager::cleanup(unsigned int keep_per_memory_type) {
 
 device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequirements& memory_requirements,
 														 vk::MemoryPropertyFlags required_flags) {
+	std::lock_guard<std::mutex> lock(mutex_);
 	if(memory_requirements.size < block_size_) {
 		for(auto& block : blocks_) {
 			auto alloc = block.try_allocate(memory_requirements, required_flags);
@@ -209,9 +212,14 @@ device_memory_manager::device_memory_manager(device* dev, vk::DeviceSize block_s
 device_memory_manager::~device_memory_manager() {}
 
 vk::DeviceSize device_memory_manager::capacity() const {
+	std::lock_guard<std::mutex> lock(mutex_);
 	return block_size_ * blocks_.size() +
 		   std::accumulate(separate_blocks_.begin(), separate_blocks_.end(), vk::DeviceSize(0u),
 						   [](vk::DeviceSize sum, const device_memory_block& blk) { return sum + blk.size; });
+}
+
+std::unique_lock<std::mutex> device_memory_manager::obtain_lock() const {
+	return std::unique_lock<std::mutex>(mutex_);
 }
 
 } /* namespace graphics */

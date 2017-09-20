@@ -12,6 +12,8 @@
  * Defines types for handling allocated units of device memory.
  */
 
+#include <cassert>
+#include <mutex>
 #include <vulkan/vulkan.hpp>
 
 namespace mce {
@@ -76,6 +78,8 @@ public:
 			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) = 0;
 	/// Interface function to allow access to the device associated with the device memory manager.
 	virtual device* associated_device() const = 0;
+
+	virtual std::unique_lock<std::mutex> obtain_lock() const = 0;
 };
 
 /// Provides a RAII wrapper for managing the lifetime of a device_memory_allocation and the associated memory.
@@ -105,7 +109,7 @@ public:
 		other.manager_ptr_ = nullptr;
 	}
 	/// Allows moving handles.
-	// For some reason cppcheck doesn't recognize the self check here, 
+	// For some reason cppcheck doesn't recognize the self check here,
 	// but it also is not stricly required because this is a move operator.
 	// cppcheck-suppress operatorEqToSelf
 	device_memory_handle& operator=(device_memory_handle&& other) {
@@ -162,6 +166,11 @@ public:
 	void invalidate_mapped(const vk::Device& dev, vk::DeviceSize offset = 0,
 						   vk::DeviceSize size = VK_WHOLE_SIZE) {
 		allocation_.invalidate_mapped(dev, offset, size);
+	}
+
+	std::unique_lock<std::mutex> obtain_lock() const {
+		assert(manager_ptr_);
+		return manager_ptr_->obtain_lock();
 	}
 };
 

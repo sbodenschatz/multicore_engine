@@ -8,6 +8,7 @@
 #include <gtest.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
 #include <mce/graphics/device_memory_handle.hpp>
+#include <mutex>
 #include <vector>
 
 namespace mce {
@@ -17,24 +18,32 @@ namespace destruction_queue_manager_test {
 class test_memory_manager : public device_memory_manager_interface {
 	std::vector<int> destroyed_map;
 	int deletion_index = 0;
+	mutable std::mutex mutex;
 
 public:
 	void free(const device_memory_allocation& allocation) {
+		std::lock_guard<std::mutex> lock(mutex);
 		EXPECT_GT(destroyed_map.size(), allocation.block_id);
 		destroyed_map[allocation.block_id] = deletion_index++;
 	}
 	device_memory_allocation allocate(const vk::MemoryRequirements&,
 									  vk::MemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal) {
 		device_memory_allocation a;
+		std::lock_guard<std::mutex> lock(mutex);
 		a.block_id = int32_t(destroyed_map.size());
 		destroyed_map.push_back(-1);
 		return a;
 	}
 	const std::vector<int>& status() {
+		std::lock_guard<std::mutex> lock(mutex);
 		return destroyed_map;
 	}
 	virtual device* associated_device() const {
+		std::lock_guard<std::mutex> lock(mutex);
 		return nullptr;
+	}
+	virtual std::unique_lock<std::mutex> obtain_lock() const {
+		return std::unique_lock<std::mutex>(mutex);
 	}
 };
 
