@@ -20,8 +20,7 @@ graphics_system::graphics_system(core::engine& eng, windowing::window_system& wi
 		  instance_(eng.engine_metadata(), eng.application_metadata(), extensions, validation_level),
 		  device_(instance_, device_type_prefs_from_config(), device_prefs_from_config()),
 		  window_(instance_, win_sys.window(), device_),
-		  // TODO Parameterize
-		  memory_manager_(&device_, 1 << 27),
+		  memory_manager_(&device_, memory_block_size_from_config()),
 		  destruction_queue_manager_(&device_, uint32_t(window_.swapchain_images().size())),
 		  transfer_manager_(device_, memory_manager_, uint32_t(window_.swapchain_images().size())),
 		  texture_manager_(eng.asset_manager(), device_, memory_manager_, &destruction_queue_manager_,
@@ -184,6 +183,10 @@ std::vector<vk::PhysicalDeviceType> graphics_system::device_type_prefs_from_conf
 std::vector<std::string> graphics_system::device_prefs_from_config() const {
 	std::vector<std::string> device_preferences;
 	return eng.config_store().resolve("device_preferences", device_preferences)->value();
+}
+vk::DeviceSize graphics_system::memory_block_size_from_config() const {
+	auto var_memory_block_size_exp = eng.config_store().resolve("memory_block_size_exp", 27);
+	return uint64_t(1) << var_memory_block_size_exp->value();
 }
 
 } /* namespace graphics */
