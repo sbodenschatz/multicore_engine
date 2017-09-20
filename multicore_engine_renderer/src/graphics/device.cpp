@@ -82,13 +82,22 @@ queue_index_t device::find_queue(const std::vector<vk::QueueFamilyProperties>& q
 void device::find_physical_device() {
 	std::vector<vk::PhysicalDevice> phy_devs = instance_->enumeratePhysicalDevices();
 	std::vector<vk::PhysicalDevice> suitable_phy_devs;
-	std::copy_if(phy_devs.begin(), phy_devs.end(), std::back_inserter(suitable_phy_devs),
-				 [this](const vk::PhysicalDevice& pd) {
-					 auto qfs = boost::irange(0u, uint32_t(pd.getQueueFamilyProperties().size()));
-					 return std::any_of(qfs.begin(), qfs.end(), [this, &pd](uint32_t qf) {
-						 return glfwGetPhysicalDevicePresentationSupport(instance_.native_instance(), pd, qf);
-					 });
-				 });
+	std::copy_if(
+			phy_devs.begin(), phy_devs.end(), std::back_inserter(suitable_phy_devs),
+			[this](const vk::PhysicalDevice& pd) {
+				auto qfs = boost::irange(0u, uint32_t(pd.getQueueFamilyProperties().size()));
+				bool presentation_supported = std::any_of(qfs.begin(), qfs.end(), [this, &pd](uint32_t qf) {
+					return glfwGetPhysicalDevicePresentationSupport(instance_.native_instance(), pd, qf);
+				});
+				auto rfs = required_device_features();
+				auto avail_features = pd.getFeatures();
+				bool required_features_supported =
+						std::all_of(rfs.begin(), rfs.end(),
+									[&avail_features](vk::Bool32 vk::PhysicalDeviceFeatures::*rf) {
+										return avail_features.*rf;
+									});
+				return presentation_supported && required_features_supported;
+			});
 	if(suitable_phy_devs.empty()) {
 		throw no_suitable_device_found_exception(
 				"No vulkan device with required presentation capabilities found.");
@@ -200,7 +209,6 @@ void device::create_device() {
 	for(auto& rf : req_features) {
 		dev_features.*rf = true;
 	}
-	// TODO: Check availability in device selection.
 	vk::DeviceCreateInfo dev_ci;
 	const char* swapchain_extension_name = "VK_KHR_swapchain";
 	dev_ci.ppEnabledExtensionNames = &swapchain_extension_name;
