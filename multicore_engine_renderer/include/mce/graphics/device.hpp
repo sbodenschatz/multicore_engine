@@ -57,6 +57,8 @@ private:
 	void find_queue_indexes();
 	void create_device();
 
+	const std::vector<vk::Bool32 vk::PhysicalDeviceFeatures::*>& required_device_features() const;
+
 public:
 	/// Defines the type of use for a format is checked in a supported format query
 	enum class format_support_query_type {

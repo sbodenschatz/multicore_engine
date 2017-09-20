@@ -195,10 +195,11 @@ void device::create_device() {
 		}
 	}
 
+	auto req_features = required_device_features();
 	vk::PhysicalDeviceFeatures dev_features;
-	dev_features.textureCompressionBC = true;
-	dev_features.samplerAnisotropy = true;
-	// TODO: Set bools for needed features
+	for(auto& rf : req_features) {
+		dev_features.*rf = true;
+	}
 	// TODO: Check availability in device selection.
 	vk::DeviceCreateInfo dev_ci;
 	const char* swapchain_extension_name = "VK_KHR_swapchain";
@@ -281,6 +282,13 @@ vk::Format device::best_supported_format(vk::ArrayProxy<const vk::Format> candid
 		throw mce::graphics_exception(
 				"No supported format with the required flags found in the given candidates.");
 	}
+}
+
+static std::vector<vk::Bool32 vk::PhysicalDeviceFeatures::*> required_device_features_table = {
+		{&vk::PhysicalDeviceFeatures::textureCompressionBC, &vk::PhysicalDeviceFeatures::samplerAnisotropy}};
+
+const std::vector<vk::Bool32 vk::PhysicalDeviceFeatures::*>& device::required_device_features() const {
+	return required_device_features_table;
 }
 
 } /* namespace graphics */
