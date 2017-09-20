@@ -26,10 +26,11 @@ void config_store::read_config_file_data(std::istream& input, bool user_config) 
 	std::string line_buffer;
 	while(std::getline(input, line_buffer)) {
 		boost::string_view line = line_buffer;
+		if(util::starts_with(line, "#")) continue;
 		auto eq_pos = line.find("=");
 		if(eq_pos != line.npos) {
-			auto name = line.substr(0, eq_pos);
-			auto value = line.substr(eq_pos + 1);
+			auto name = util::trim(line.substr(0, eq_pos));
+			auto value = util::trim_left(line.substr(eq_pos + 1));
 			config_file_data_.insert_or_assign(name.to_string(), value.to_string());
 			if(user_config) {
 				key_order.emplace_back(name);
