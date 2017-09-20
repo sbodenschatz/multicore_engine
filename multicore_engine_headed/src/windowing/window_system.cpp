@@ -16,15 +16,15 @@ namespace windowing {
 
 window_system::window_system(core::engine& eng, const std::string& window_title)
 		: eng{eng}, window_title_{std::move(window_title)}, instance_(), window_() {
-	auto mode = eng.config_store().resolve<std::string>("display_mode", "windowed");
+	auto mode = eng.config_store().resolve<std::string>("window.display_mode", "windowed");
 	auto mode_str = mode->value();
 	if(util::equal_ignore_case(mode_str, "windowed_fullscreen")) {
-		auto monitor = eng.config_store().resolve("monitor", 0);
+		auto monitor = eng.config_store().resolve("window.monitor", 0);
 		auto monitors = glfw::monitor::monitors(instance_);
 		auto monitor_index = std::min<size_t>(monitor->value(), monitors.size() - 1);
 		window_ = std::make_unique<glfw::window>(window_title_, monitors.at(monitor_index));
 	} else if(util::equal_ignore_case(mode_str, "fullscreen")) {
-		auto monitor = eng.config_store().resolve("monitor", 0);
+		auto monitor = eng.config_store().resolve("window.monitor", 0);
 		auto monitors = glfw::monitor::monitors(instance_);
 		auto monitor_index = std::min<size_t>(monitor->value(), monitors.size() - 1);
 		auto& selected_monitor = monitors.at(monitor_index);
@@ -35,13 +35,13 @@ window_system::window_system(core::engine& eng, const std::string& window_title)
 				   std::tie(cv.width, cv.height, cv.red_bits, cv.green_bits, cv.blue_bits, cv.refresh_rate);
 		});
 		if(it == video_modes.end()) it = video_modes.end() - 1;
-		auto video_mode = eng.config_store().resolve<int>("video_mode", int(it - video_modes.begin()));
+		auto video_mode = eng.config_store().resolve<int>("window.video_mode", int(it - video_modes.begin()));
 		auto video_mode_index = size_t(video_mode->value());
 		if(video_mode_index >= video_modes.size()) video_mode_index = it - video_modes.begin();
 		window_ = std::make_unique<glfw::window>(window_title_, selected_monitor,
 												 video_modes.at(video_mode_index));
 	} else {
-		auto res = eng.config_store().resolve<glm::ivec2>("resolution", {800, 600});
+		auto res = eng.config_store().resolve<glm::ivec2>("window.resolution", {800, 600});
 		window_ = std::make_unique<glfw::window>(window_title_, res->value());
 	}
 }

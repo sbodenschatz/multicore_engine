@@ -26,9 +26,11 @@ class framebuffer_config;
 /// Implements the window handling for the graphics subsystem.
 class window {
 private:
+	std::vector<vk::PresentModeKHR> present_mode_preferences_;
 	instance& instance_;
 	glfw::window& window_;
 	device& device_;
+	uint32_t desired_images_;
 	vk::UniqueSurfaceKHR surface_;
 	vk::UniqueSwapchainKHR swapchain_;
 	vk::ColorSpaceKHR color_space_;
@@ -46,7 +48,10 @@ private:
 public:
 	/// \brief Initializes a graphics window from the given graphics instance in the given glfw::window using
 	/// the given device.
-	window(instance& app_instance, glfw::window& win, device& dev);
+	window(instance& app_instance, glfw::window& win, device& dev, uint32_t desired_images = 3u,
+		   std::vector<vk::PresentModeKHR> present_mode_preferences = {
+				   vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eFifoRelaxed, vk::PresentModeKHR::eFifo,
+				   vk::PresentModeKHR::eImmediate});
 	/// Releases the graphics window resources.
 	~window();
 

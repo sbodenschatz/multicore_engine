@@ -10,11 +10,14 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <boost/container/flat_map.hpp>
+#include <boost/range/irange.hpp>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
 #include <mce/graphics/instance.hpp>
+#include <mce/util/algorithm.hpp>
 #include <mce/util/unused.hpp>
 #include <vector>
 
@@ -28,7 +31,10 @@ namespace graphics {
 const std::pair<uint32_t, uint32_t> device::no_queue_index{~0u, ~0u};
 const uint32_t device::no_queue_family_index{~0u};
 
-device::device(instance& app_inst) : instance_(app_inst) {
+device::device(instance& app_inst, std::vector<vk::PhysicalDeviceType> device_type_preferences,
+			   std::vector<std::string> device_preferences)
+		: device_type_preferences_{std::move(device_type_preferences)},
+		  device_preferences_{std::move(device_preferences)}, instance_{app_inst} {
 	find_physical_device();
 	find_queue_indexes();
 	create_device();
@@ -75,26 +81,40 @@ queue_index_t device::find_queue(const std::vector<vk::QueueFamilyProperties>& q
 
 void device::find_physical_device() {
 	std::vector<vk::PhysicalDevice> phy_devs = instance_->enumeratePhysicalDevices();
-	// TODO Find better device selection heuristic or make it configurable.
-	for(const auto& phy_dev : phy_devs) {
-		uint32_t queue_family_count = uint32_t(phy_dev.getQueueFamilyProperties().size());
-		for(uint32_t queue_family = 0; queue_family < queue_family_count; ++queue_family) {
-			if(glfwGetPhysicalDevicePresentationSupport(instance_.native_instance(), phy_dev, queue_family)) {
-				if(!physical_device_) {
-					// We have no useable device so far, accept any device that can present
-					physical_device_ = phy_dev;
-				} else if(phy_dev.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu) {
-					// We already have some device (which might be no discrete GPU), only accept
-					// discrete devices to prevent replacing a discrete device with an integrated (or similar)
-					// one.
-					physical_device_ = phy_dev;
-				}
-			}
-		}
-	}
-	if(!physical_device_)
+	std::vector<vk::PhysicalDevice> suitable_phy_devs;
+	std::copy_if(
+			phy_devs.begin(), phy_devs.end(), std::back_inserter(suitable_phy_devs),
+			[this](const vk::PhysicalDevice& pd) {
+				auto qfs = boost::irange(0u, uint32_t(pd.getQueueFamilyProperties().size()));
+				bool presentation_supported = std::any_of(qfs.begin(), qfs.end(), [this, &pd](uint32_t qf) {
+					return glfwGetPhysicalDevicePresentationSupport(instance_.native_instance(), pd, qf);
+				});
+				auto rfs = required_device_features();
+				auto avail_features = pd.getFeatures();
+				bool required_features_supported =
+						std::all_of(rfs.begin(), rfs.end(),
+									[&avail_features](vk::Bool32 vk::PhysicalDeviceFeatures::*rf) {
+										return avail_features.*rf;
+									});
+				auto queue_families = pd.getQueueFamilyProperties();
+				bool graphics_supported =
+						std::any_of(queue_families.begin(), queue_families.end(),
+									[](const vk::QueueFamilyProperties& qfp) {
+										return bool(qfp.queueFlags & vk::QueueFlagBits::eGraphics);
+									});
+				return presentation_supported && required_features_supported && graphics_supported;
+			});
+	if(suitable_phy_devs.empty()) {
 		throw no_suitable_device_found_exception(
 				"No vulkan device with required presentation capabilities found.");
+	}
+	util::preference_sort(suitable_phy_devs, device_type_preferences_,
+						  [](const vk::PhysicalDevice& pd) { return pd.getProperties().deviceType; });
+	util::preference_sort(suitable_phy_devs, device_preferences_, [](const vk::PhysicalDevice& pd) {
+		return std::string(pd.getProperties().deviceName);
+	});
+
+	physical_device_ = suitable_phy_devs.front();
 	physical_device_properties_ = physical_device_.getProperties();
 	std::cout << "Using render device \"" << physical_device_properties_.deviceName << "\"" << std::endl;
 }
@@ -190,11 +210,11 @@ void device::create_device() {
 		}
 	}
 
+	auto req_features = required_device_features();
 	vk::PhysicalDeviceFeatures dev_features;
-	dev_features.textureCompressionBC = true;
-	dev_features.samplerAnisotropy = true;
-	// TODO: Set bools for needed features
-	// TODO: Check availability in device selection.
+	for(auto& rf : req_features) {
+		dev_features.*rf = true;
+	}
 	vk::DeviceCreateInfo dev_ci;
 	const char* swapchain_extension_name = "VK_KHR_swapchain";
 	dev_ci.ppEnabledExtensionNames = &swapchain_extension_name;
@@ -276,6 +296,13 @@ vk::Format device::best_supported_format(vk::ArrayProxy<const vk::Format> candid
 		throw mce::graphics_exception(
 				"No supported format with the required flags found in the given candidates.");
 	}
+}
+
+static std::vector<vk::Bool32 vk::PhysicalDeviceFeatures::*> required_device_features_table = {
+		{&vk::PhysicalDeviceFeatures::textureCompressionBC, &vk::PhysicalDeviceFeatures::samplerAnisotropy}};
+
+const std::vector<vk::Bool32 vk::PhysicalDeviceFeatures::*>& device::required_device_features() const {
+	return required_device_features_table;
 }
 
 } /* namespace graphics */

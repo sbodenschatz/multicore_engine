@@ -24,8 +24,11 @@
 namespace mce {
 namespace graphics {
 
-window::window(instance& app_instance, glfw::window& win, device& dev)
-		: instance_{app_instance}, window_{win}, device_{dev},
+window::window(instance& app_instance, glfw::window& win, device& dev, uint32_t desired_images,
+			   // cppcheck-suppress passedByValue
+			   std::vector<vk::PresentModeKHR> present_mode_preferences)
+		: present_mode_preferences_{std::move(present_mode_preferences)}, instance_{app_instance},
+		  window_{win}, device_{dev}, desired_images_{desired_images},
 		  color_space_{vk::ColorSpaceKHR::eSrgbNonlinear}, surface_format_{vk::Format::eUndefined},
 		  present_mode_{vk::PresentModeKHR::eFifo} {
 	create_surface();
@@ -71,21 +74,18 @@ void window::select_present_mode() {
 	std::vector<vk::PresentModeKHR> present_modes =
 			device_.physical_device().getSurfacePresentModesKHR(surface_.get());
 	assert(!present_modes.empty());
-	auto preference_list = util::make_array(vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eFifoRelaxed,
-											vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eImmediate);
-	util::preference_sort(present_modes, preference_list);
+	util::preference_sort(present_modes, present_mode_preferences_);
 	for(const auto& pm : present_modes) std::cout << vk::to_string(pm) << std::endl;
 	present_mode_ = present_modes.front();
 }
 
 void window::create_swapchain() {
-
 	vk::SurfaceCapabilitiesKHR surface_caps =
 			device_.physical_device().getSurfaceCapabilitiesKHR(surface_.get());
 
 	vk::SwapchainCreateInfoKHR swapchain_ci;
 	swapchain_ci.surface = surface_.get();
-	uint32_t image_count = std::max(surface_caps.minImageCount, 3u);
+	uint32_t image_count = std::max(surface_caps.minImageCount, desired_images_);
 
 	if(surface_caps.maxImageCount > 0 && image_count > surface_caps.maxImageCount)
 		image_count = surface_caps.maxImageCount;
