@@ -96,7 +96,13 @@ void device::find_physical_device() {
 									[&avail_features](vk::Bool32 vk::PhysicalDeviceFeatures::*rf) {
 										return avail_features.*rf;
 									});
-				return presentation_supported && required_features_supported;
+				auto queue_families = pd.getQueueFamilyProperties();
+				bool graphics_supported =
+						std::any_of(queue_families.begin(), queue_families.end(),
+									[](const vk::QueueFamilyProperties& qfp) {
+										return bool(qfp.queueFlags & vk::QueueFlagBits::eGraphics);
+									});
+				return presentation_supported && required_features_supported && graphics_supported;
 			});
 	if(suitable_phy_devs.empty()) {
 		throw no_suitable_device_found_exception(
