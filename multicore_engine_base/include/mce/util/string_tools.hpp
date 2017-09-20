@@ -44,6 +44,10 @@ void split_iterate(boost::string_view str, boost::string_view delim, F f) {
 	f(str.substr(pos));
 }
 
+boost::string_view trim_left(boost::string_view str);
+boost::string_view trim_right(boost::string_view str);
+boost::string_view trim(boost::string_view str);
+
 } /* namespace util */
 } /* namespace mce */
 
