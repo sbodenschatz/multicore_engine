@@ -23,12 +23,12 @@ class input_system;
 /// \brief Provides input logic for flying around in the scene using a first person camera to the entity it is
 /// attached to.
 class first_person_flyer_component : public entity::component {
-	glfw::key forward_key_ = glfw::key::k_w;
-	glfw::key backward_key_ = glfw::key::k_s;
-	glfw::key left_key_ = glfw::key::k_a;
-	glfw::key right_key_ = glfw::key::k_d;
-	glfw::key upward_key_ = glfw::key::k_r;
-	glfw::key downward_key_ = glfw::key::k_f;
+	std::string forward_key_ = "%forward%w";
+	std::string backward_key_ = "%backward%s";
+	std::string left_key_ = "%left%a";
+	std::string right_key_ = "%right%d";
+	std::string upward_key_ = "%upward%r";
+	std::string downward_key_ = "%downward%f";
 	float speed_ = 10.0f;
 	float rotation_speed_ = 10.0f;
 	bool inverted_y_axis_ = false;
@@ -48,123 +48,135 @@ public:
 	~first_person_flyer_component();
 
 	/// Returns the name of the key used for moving backwards.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
 	std::string backward_key_name() const {
-		return glfw::to_string(backward_key_);
-	}
-
-	/// Sets the key used for moving backwards by name.
-	void backward_key_name(const std::string& backward_key_name) {
-		backward_key_ = glfw::key_from_string(backward_key_name);
-	}
-
-	/// Returns the name of the key used for moving downwards.
-	std::string downward_key_name() const {
-		return glfw::to_string(downward_key_);
-	}
-
-	/// Sets the key used for moving downwards by name.
-	void downward_key_name(const std::string& downward_key_name) {
-		downward_key_ = glfw::key_from_string(downward_key_name);
-	}
-
-	/// Returns the name of the key used for moving forwards.
-	std::string forward_key_name() const {
-		return glfw::to_string(forward_key_);
-	}
-
-	/// Sets the key used for moving forwards by name.
-	void forward_key_name(const std::string& forward_key_name) {
-		forward_key_ = glfw::key_from_string(forward_key_name);
-	}
-
-	/// Returns the name of the key used for moving left.
-	std::string left_key_name() const {
-		return glfw::to_string(left_key_);
-	}
-
-	/// Sets the key used for moving left by name.
-	void left_key_name(const std::string& left_key_name) {
-		left_key_ = glfw::key_from_string(left_key_name);
-	}
-
-	/// Returns the name of the key used for moving right.
-	std::string right_key_name() const {
-		return glfw::to_string(right_key_);
-	}
-
-	/// Sets the key used for moving right by name.
-	void right_key_name(const std::string& right_key_name) {
-		right_key_ = glfw::key_from_string(right_key_name);
-	}
-
-	/// Returns the name of the key used for moving upwards.
-	std::string upward_key_name() const {
-		return glfw::to_string(upward_key_);
-	}
-
-	/// Sets the key used for moving upwards by name.
-	void upward_key_name(const std::string& upward_key_name) {
-		upward_key_ = glfw::key_from_string(upward_key_name);
-	}
-
-	/// Returns the key used for moving backwards.
-	glfw::key backward_key() const {
 		return backward_key_;
 	}
 
-	/// Sets the key used for moving backwards.
-	void backward_key(glfw::key backward_key) {
-		backward_key_ = backward_key;
+	/// Sets the key used for moving backwards by name.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	void backward_key_name(const std::string& backward_key_name) {
+		backward_key_ = backward_key_name;
 	}
 
-	/// Returns the key used for moving downwards.
-	glfw::key downward_key() const {
+	/// Returns the name of the key used for moving downwards.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	std::string downward_key_name() const {
 		return downward_key_;
 	}
 
-	/// Sets the key used for moving downwards.
-	void downward_key(glfw::key downward_key) {
-		downward_key_ = downward_key;
+	/// Sets the key used for moving downwards by name.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	void downward_key_name(const std::string& downward_key_name) {
+		downward_key_ = downward_key_name;
 	}
 
-	/// Returns the key used for moving forwards.
-	glfw::key forward_key() const {
+	/// Returns the name of the key used for moving forwards.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	std::string forward_key_name() const {
 		return forward_key_;
 	}
 
-	/// Sets the key used for moving forwards.
-	void forward_key(glfw::key forward_key) {
-		forward_key_ = forward_key;
+	/// Sets the key used for moving forwards by name.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	void forward_key_name(const std::string& forward_key_name) {
+		forward_key_ = forward_key_name;
 	}
 
-	/// Returns the key used for moving left.
-	glfw::key left_key() const {
+	/// Returns the name of the key used for moving left.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	std::string left_key_name() const {
 		return left_key_;
 	}
 
-	/// Sets the key used for moving left.
-	void left_key(glfw::key left_key) {
-		left_key_ = left_key;
+	/// Sets the key used for moving left by name.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	void left_key_name(const std::string& left_key_name) {
+		left_key_ = left_key_name;
 	}
 
-	/// Returns the key used for moving right.
-	glfw::key right_key() const {
+	/// Returns the name of the key used for moving right.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	std::string right_key_name() const {
 		return right_key_;
 	}
 
-	/// Sets the key used for moving right.
-	void right_key(glfw::key right_key) {
-		right_key_ = right_key;
+	/// Sets the key used for moving right by name.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	void right_key_name(const std::string& right_key_name) {
+		right_key_ = right_key_name;
 	}
 
-	/// Returns the key used for moving upwards.
-	glfw::key upward_key() const {
+	/// Returns the name of the key used for moving upwards.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	std::string upward_key_name() const {
 		return upward_key_;
 	}
 
-	/// Sets the key used for moving upwards.
-	void upward_key(glfw::key upward_key) {
-		upward_key_ = upward_key;
+	/// Sets the key used for moving upwards by name.
+	/**
+	 * A % character prefix indicates that the key mapping is resolved through the config system, e.g.
+	 * the name "%name" means that the value of the config variable "input.key.name" will be used to get the
+	 * key name.
+	 * A default value can be given after a second % character.
+	 */
+	void upward_key_name(const std::string& upward_key_name) {
+		upward_key_ = upward_key_name;
 	}
 
 	/// Returns the movement speed factor.

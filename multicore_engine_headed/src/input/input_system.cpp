@@ -4,10 +4,13 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <mce/config/config_store.hpp>
 #include <mce/core/core_defs.hpp>
+#include <mce/core/engine.hpp>
 #include <mce/glfw/name_mapping.hpp>
 #include <mce/glfw/window.hpp>
 #include <mce/input/input_system.hpp>
+#include <mce/util/string_tools.hpp>
 #include <mce/windowing/window_system.hpp>
 
 namespace mce {
@@ -43,6 +46,41 @@ void input_system::preprocess(const mce::core::frame_time& ft) {
 					glfw::mouse_button::button_4, glfw::mouse_button::button_5, glfw::mouse_button::button_6,
 					glfw::mouse_button::button_7, glfw::mouse_button::button_8}) {
 		current_mouse_state_.buttons[size_t(mb)] = win_sys.window().mouse_button(mb);
+	}
+}
+glfw::key input_system::key_from_name_or_config(const std::string& name) const {
+	{
+		std::shared_lock<std::shared_timed_mutex> rlock(mtx);
+		auto it = key_name_cache.find(name);
+		if(it != key_name_cache.end()) {
+			return it->second;
+		}
+	}
+	using namespace std::literals;
+	{
+		std::unique_lock<std::shared_timed_mutex> rwlock(mtx);
+		auto it = key_name_cache.find(name);
+		if(it != key_name_cache.end()) {
+			return it->second;
+		} else if(util::starts_with(name, "%"s)) {
+			auto pos = name.find('%', 1);
+			if(pos == name.npos) {
+				auto var = eng.config_store().resolve("input.key."s + name.substr(1), "unknown"s);
+				auto key = glfw::key_from_string(var->value());
+				key_name_cache.emplace(name, key);
+				return key;
+			} else {
+				auto var = eng.config_store().resolve("input.key."s + name.substr(1, pos - 1),
+													  name.substr(pos + 1));
+				auto key = glfw::key_from_string(var->value());
+				key_name_cache.emplace(name, key);
+				return key;
+			}
+		} else {
+			auto key = glfw::key_from_string(name);
+			key_name_cache.emplace(name, key);
+			return key;
+		}
 	}
 }
 
