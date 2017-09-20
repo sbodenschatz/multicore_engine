@@ -7,11 +7,19 @@
 #ifndef MCE_CONTAINERS_SIMPLE_SMART_OBJECT_POOL_HPP_
 #define MCE_CONTAINERS_SIMPLE_SMART_OBJECT_POOL_HPP_
 
+#include <algorithm>
+#include <memory>
+#include <shared_mutex>
+#include <vector>
+
 namespace mce {
 namespace containers {
 
 template <typename T>
 class simple_smart_object_pool {
+	std::vector<std::shared_ptr<T>> objects_;
+	std::vector<std::shared_ptr<T>> pending_objects_;
+	mutable std::shared_timed_mutex pending_objects_mtx_;
 
 public:
 	/// Creates an empty pool.
