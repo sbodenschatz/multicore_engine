@@ -168,7 +168,7 @@ std::vector<vk::PhysicalDeviceType> graphics_system::device_type_prefs_from_conf
 	using namespace std::literals;
 	std::vector<std::string> device_type_preferences_str = {{{"discrete"s}, {"integrated"s}}};
 	auto var_device_type_preferences =
-			eng.config_store().resolve("device_type_preferences"s, device_type_preferences_str);
+			eng.config_store().resolve("graphics.device_type_preferences"s, device_type_preferences_str);
 	device_type_preferences_str = var_device_type_preferences->value();
 	for(auto& dts : device_type_preferences_str) {
 		for(auto& c : dts) {
@@ -182,10 +182,10 @@ std::vector<vk::PhysicalDeviceType> graphics_system::device_type_prefs_from_conf
 }
 std::vector<std::string> graphics_system::device_prefs_from_config() const {
 	std::vector<std::string> device_preferences;
-	return eng.config_store().resolve("device_preferences", device_preferences)->value();
+	return eng.config_store().resolve("graphics.device_preferences", device_preferences)->value();
 }
 vk::DeviceSize graphics_system::memory_block_size_from_config() const {
-	auto var_memory_block_size_exp = eng.config_store().resolve("memory_block_size_exp", 27);
+	auto var_memory_block_size_exp = eng.config_store().resolve("graphics.memory_block_size_exp", 27);
 	return uint64_t(1) << var_memory_block_size_exp->value();
 }
 
