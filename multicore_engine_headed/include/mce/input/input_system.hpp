@@ -14,6 +14,7 @@
 
 #include <boost/container/flat_map.hpp>
 #include <glm/vec2.hpp>
+#include <mce/config/variable.hpp>
 #include <mce/core/system.hpp>
 #include <mce/glfw/glfw_defs.hpp>
 #include <shared_mutex>
@@ -29,9 +30,12 @@ namespace input {
 
 /// Encapsulates the state data related to the mouse.
 struct mouse_state {
-	glm::dvec2 position;	 ///< The position of the mouse in this state.
-	glm::dvec2 velocity;	 ///< The velocity of the mouse in this state.
-	glm::dvec2 acceleration; ///< The acceleration of the mouse in this state.
+	glm::dvec2 position; ///< The position of the mouse in this state.
+	glm::dvec2 velocity; ///< The velocity of the mouse in this state modified by mouse velocity config.
+	/// The acceleration of the mouse in this state modified by mouse velocity config.
+	glm::dvec2 acceleration;
+	glm::dvec2 raw_velocity;	 ///< The raw velocity of the mouse in this state.
+	glm::dvec2 raw_acceleration; ///< The raw acceleration of the mouse in this state.
 	/// Indicates for each glfw::mouse_button whether it is pressed in this state.
 	bool buttons[size_t(glfw::mouse_button::last) + 1] = {};
 };
@@ -45,6 +49,7 @@ class input_system : public core::system {
 	boost::container::flat_map<glfw::key, bool> last_key_state_;
 	mouse_state current_mouse_state_;
 	mouse_state last_mouse_state_;
+	std::shared_ptr<config::variable<float>> var_mouse_sensitivity_percent;
 	mutable std::shared_timed_mutex mtx;
 	mutable boost::container::flat_map<std::string, glfw::key> key_name_cache;
 
