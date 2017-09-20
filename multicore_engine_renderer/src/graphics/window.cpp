@@ -79,7 +79,6 @@ void window::select_present_mode() {
 }
 
 void window::create_swapchain() {
-
 	vk::SurfaceCapabilitiesKHR surface_caps =
 			device_.physical_device().getSurfaceCapabilitiesKHR(surface_.get());
 

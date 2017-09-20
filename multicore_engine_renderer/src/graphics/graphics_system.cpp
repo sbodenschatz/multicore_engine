@@ -19,7 +19,7 @@ graphics_system::graphics_system(core::engine& eng, windowing::window_system& wi
 		: eng{eng},
 		  instance_(eng.engine_metadata(), eng.application_metadata(), extensions, validation_level),
 		  device_(instance_, device_type_prefs_from_config(), device_prefs_from_config()),
-		  window_(instance_, win_sys.window(), device_),
+		  window_(instance_, win_sys.window(), device_, desired_swapchain_images_from_config()),
 		  memory_manager_(&device_, memory_block_size_from_config()),
 		  destruction_queue_manager_(&device_, uint32_t(window_.swapchain_images().size())),
 		  transfer_manager_(device_, memory_manager_, uint32_t(window_.swapchain_images().size())),
@@ -187,6 +187,10 @@ std::vector<std::string> graphics_system::device_prefs_from_config() const {
 vk::DeviceSize graphics_system::memory_block_size_from_config() const {
 	auto var_memory_block_size_exp = eng.config_store().resolve("graphics.memory_block_size_exp", 27);
 	return uint64_t(1) << var_memory_block_size_exp->value();
+}
+uint32_t graphics_system::desired_swapchain_images_from_config() const {
+	auto var_desired_swapchain_images = eng.config_store().resolve("graphics.desired_swapchain_images", 3);
+	return var_desired_swapchain_images->value();
 }
 
 } /* namespace graphics */

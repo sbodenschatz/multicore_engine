@@ -77,6 +77,7 @@ class graphics_system : public core::system {
 	std::vector<vk::PhysicalDeviceType> device_type_prefs_from_config() const;
 	std::vector<std::string> device_prefs_from_config() const;
 	vk::DeviceSize memory_block_size_from_config() const;
+	uint32_t desired_swapchain_images_from_config() const;
 
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
