@@ -19,7 +19,7 @@ graphics_system::graphics_system(core::engine& eng, windowing::window_system& wi
 		: eng{eng},
 		  instance_(eng.engine_metadata(), eng.application_metadata(), extensions, validation_level),
 		  device_(instance_, device_type_prefs_from_config(), device_prefs_from_config()),
-		  window_(instance_, win_sys.window(), device_, desired_swapchain_images_from_config()),
+		  window_(instance_, win_sys.window(), device_, desired_swapchain_images_from_config(),present_mode_prefs_from_config()),
 		  memory_manager_(&device_, memory_block_size_from_config()),
 		  destruction_queue_manager_(&device_, uint32_t(window_.swapchain_images().size())),
 		  transfer_manager_(device_, memory_manager_, uint32_t(window_.swapchain_images().size())),
@@ -191,6 +191,37 @@ vk::DeviceSize graphics_system::memory_block_size_from_config() const {
 uint32_t graphics_system::desired_swapchain_images_from_config() const {
 	auto var_desired_swapchain_images = eng.config_store().resolve("graphics.desired_swapchain_images", 3);
 	return var_desired_swapchain_images->value();
+}
+static boost::container::flat_map<std::string, vk::PresentModeKHR> present_mode_from_string_table = {
+		{{"fifo", vk::PresentModeKHR::eFifo},
+		 {"fifo_relaxed", vk::PresentModeKHR::eFifoRelaxed},
+		 {"fiforelaxed", vk::PresentModeKHR::eFifoRelaxed},
+		 {"immediate", vk::PresentModeKHR::eImmediate},
+		 {"mailbox", vk::PresentModeKHR::eMailbox}}};
+vk::PresentModeKHR graphics_system::present_mode_from_string(const std::string& mode) {
+	auto it = present_mode_from_string_table.find(mode);
+	if(it != present_mode_from_string_table.end()) {
+		return it->second;
+	}
+	throw mce::syntax_exception("Invalid present mode '" + mode + "'.");
+}
+std::vector<vk::PresentModeKHR> graphics_system::present_mode_prefs_from_config() const {
+	std::vector<vk::PresentModeKHR> present_mode_preferences;
+	using namespace std::literals;
+	std::vector<std::string> present_mode_preferences_str = {
+			{{"mailbox"s}, {"fifo_relaxed"s}, {"fifo"s}, {"immediate"s}}};
+	auto var_present_mode_preferences =
+			eng.config_store().resolve("graphics.present_mode_preferences"s, present_mode_preferences_str);
+	present_mode_preferences_str = var_present_mode_preferences->value();
+	for(auto& dts : present_mode_preferences_str) {
+		for(auto& c : dts) {
+			c = char(std::tolower(c));
+		}
+	}
+	std::transform(present_mode_preferences_str.begin(), present_mode_preferences_str.end(),
+				   std::back_inserter(present_mode_preferences),
+				   [](const std::string& dts) { return present_mode_from_string(dts); });
+	return present_mode_preferences;
 }
 
 } /* namespace graphics */
