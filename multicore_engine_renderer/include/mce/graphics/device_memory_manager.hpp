@@ -88,7 +88,7 @@ public:
 		return dev;
 	}
 
-	std::unique_lock<std::mutex> obtain_lock() const override;
+	std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation&) const override;
 };
 
 } /* namespace graphics */

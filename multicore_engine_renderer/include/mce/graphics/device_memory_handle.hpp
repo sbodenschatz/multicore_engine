@@ -79,7 +79,7 @@ public:
 	/// Interface function to allow access to the device associated with the device memory manager.
 	virtual device* associated_device() const = 0;
 
-	virtual std::unique_lock<std::mutex> obtain_lock() const = 0;
+	virtual std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation& allocation) const = 0;
 };
 
 /// Provides a RAII wrapper for managing the lifetime of a device_memory_allocation and the associated memory.
@@ -170,7 +170,7 @@ public:
 
 	std::unique_lock<std::mutex> obtain_lock() const {
 		assert(manager_ptr_);
-		return manager_ptr_->obtain_lock();
+		return manager_ptr_->obtain_lock(allocation_);
 	}
 };
 

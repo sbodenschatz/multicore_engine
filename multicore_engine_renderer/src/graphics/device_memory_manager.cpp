@@ -218,7 +218,7 @@ vk::DeviceSize device_memory_manager::capacity() const {
 						   [](vk::DeviceSize sum, const device_memory_block& blk) { return sum + blk.size; });
 }
 
-std::unique_lock<std::mutex> device_memory_manager::obtain_lock() const {
+std::unique_lock<std::mutex> device_memory_manager::obtain_lock(const device_memory_allocation&) const {
 	return std::unique_lock<std::mutex>(mutex_);
 }
 
