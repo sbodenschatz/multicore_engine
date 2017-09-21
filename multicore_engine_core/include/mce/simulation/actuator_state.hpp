@@ -14,6 +14,7 @@
 
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/core/system_state.hpp>
+#include <mce/entity/ecs_types.hpp>
 #include <mce/simulation/actuator_component.hpp>
 #include <mce/simulation/actuator_system.hpp>
 
@@ -31,7 +32,7 @@ class actuator_system;
 /// \brief Adds actuator logic to a game_state allowing to control the movement of entities with
 /// actuator_component objects attached by movement patterns defined in actuator_system.
 class actuator_state : public core::system_state {
-	containers::smart_object_pool<actuator_component> actuator_comps;
+	entity::component_pool<actuator_component> actuator_comps;
 
 	friend class actuator_component;
 
@@ -50,7 +51,7 @@ public:
 	~actuator_state();
 
 	/// Creates an actuator_component for the given entity and using the given configuration.
-	containers::smart_pool_ptr<actuator_component>
+	entity::component_impl_pool_ptr<actuator_component>
 	create_actuator_component(entity::entity& owner, const entity::component_configuration& configuration) {
 		return actuator_comps.emplace(owner, configuration, *this);
 	}

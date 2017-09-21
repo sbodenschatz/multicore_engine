@@ -14,6 +14,7 @@
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/core/system_state.hpp>
+#include <mce/entity/ecs_types.hpp>
 #include <mce/input/first_person_flyer_component.hpp>
 
 namespace mce {
@@ -25,7 +26,7 @@ class input_system;
 
 /// Adds input logic to control entities to a game_state.
 class input_state : public core::system_state {
-	containers::smart_object_pool<first_person_flyer_component, 4> first_person_flyer_comps;
+	entity::component_pool<first_person_flyer_component, 4> first_person_flyer_comps;
 
 public:
 	/// Defines the type of system that should be injected by add_system_state.
@@ -43,7 +44,7 @@ public:
 	~input_state();
 
 	/// Creates a first_person_flyer_component for the given entity and using the given configuration.
-	containers::smart_pool_ptr<first_person_flyer_component>
+	entity::component_impl_pool_ptr<first_person_flyer_component>
 	create_first_person_flyer_component(entity::entity& owner,
 										const entity::component_configuration& configuration) {
 		return first_person_flyer_comps.emplace(owner, configuration);

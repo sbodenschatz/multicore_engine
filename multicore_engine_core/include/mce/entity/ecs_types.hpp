@@ -33,6 +33,13 @@ typedef glm::vec4 entity_position_t;
 typedef glm::quat entity_orientation_t;
 /// Specifies the smart pointer type used to manage the lifetime of component objects.
 typedef mce::containers::smart_pool_ptr<mce::entity::component> component_pool_ptr;
+/// brief Specifies the smart pointer template used to manage the lifetime of component objects referring to
+/// the implementation type.
+template <typename T>
+using component_impl_pool_ptr = mce::containers::smart_pool_ptr<T>;
+/// Specifies the template for systems and system states to use to store component objects.
+template <typename T, size_t block_size = 0x10000u>
+using component_pool = mce::containers::smart_object_pool<T, block_size>;
 
 } // namespace entity
 } // namespace mce
