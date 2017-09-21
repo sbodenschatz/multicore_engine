@@ -8,6 +8,7 @@
 #define MCE_CONTAINERS_SIMPLE_SMART_OBJECT_POOL_HPP_
 
 #include <algorithm>
+#include <boost/operators.hpp>
 #include <memory>
 #include <shared_mutex>
 #include <vector>
@@ -35,13 +36,68 @@ public:
 	/// Forbids moving the pool.
 	simple_smart_object_pool& operator=(simple_smart_object_pool&&) noexcept = delete;
 
-	template <typename Obj>
-	class iterator_ {};
+	template <typename Obj, typename It>
+	class iterator_
+			: public boost::additive<
+					  iterator_<Obj, It>, std::ptrdiff_t,
+					  boost::unit_steppable<iterator_<Obj, It>, boost::totally_ordered<iterator_<Obj, It>>>> {
+		It it;
 
-	/// ForwardIterator
-	typedef iterator_<T> iterator;
-	/// Constant ForwardIterator
-	typedef iterator_<const T> const_iterator;
+		friend class simple_smart_object_pool<T>;
+
+		explicit iterator_(It it) : it{it} {}
+
+	public:
+		using difference_type = std::ptrdiff_t;
+		using value_type = T;
+		using pointer = T*;
+		using reference = T&;
+		using iterator_category = std::random_access_iterator_tag;
+
+		reference operator*() const {
+			return **it;
+		}
+		pointer operator->() const {
+			return it->get();
+		}
+		reference operator[](std::ptrdiff_t n) const {
+			return *(it[n]);
+		}
+		std::ptrdiff_t operator-(const iterator_<Obj, It>& other) const {
+			return it - other.it;
+		}
+		iterator_<Obj, It>& operator++() {
+			++it;
+			return *this;
+		}
+		iterator_<Obj, It>& operator--() {
+			--it;
+			return *this;
+		}
+		iterator_<Obj, It>& operator+=(std::ptrdiff_t n) {
+			it += n;
+			return *this;
+		}
+		iterator_<Obj, It>& operator-=(std::ptrdiff_t n) {
+			it -= n;
+			return *this;
+		}
+		bool operator==(const iterator_<Obj, It>& other) const {
+			return it == other.it;
+		}
+		bool operator<(const iterator_<Obj, It>& other) const {
+			return it < other.it;
+		}
+
+		operator iterator_<const T, typename decltype(objects_)::const_iterator>() const {
+			return iterator_<const T, typename decltype(objects_)::const_iterator>(it);
+		}
+	};
+
+	/// RandomAccessIterator
+	typedef iterator_<T, typename decltype(objects_)::iterator> iterator;
+	/// Constant RandomAccessIterator
+	typedef iterator_<const T, typename decltype(objects_)::const_iterator> const_iterator;
 
 	///  \brief Creates an object in the the pool and returns a smart pointer as the initial owner that
 	///  manages the lifetime of the object.
@@ -66,19 +122,31 @@ public:
 	}
 	/// \brief Returns an iterator referring to the first object in the pool or a past-end-iterator if the
 	/// pool is empty.
-	iterator begin();
+	iterator begin() {
+		return iterator(objects_.begin());
+	}
 	/// \brief Returns an const_iterator referring to the first object in the pool or a past-end-iterator
 	/// if the pool is empty.
-	const_iterator begin() const;
+	const_iterator begin() const {
+		return const_iterator(objects_.begin());
+	}
 	/// \brief Returns an const_iterator referring to the first object in the pool or a past-end-iterator
 	/// if the pool is empty.
-	const_iterator cbegin() const;
+	const_iterator cbegin() const {
+		return const_iterator(objects_.cbegin());
+	}
 	/// Returns a past-end-iterator for this pool.
-	iterator end();
+	iterator end() {
+		return iterator(objects_.end());
+	}
 	/// Returns a constant past-end-iterator for this pool.
-	const_iterator end() const;
+	const_iterator end() const {
+		return const_iterator(objects_.end());
+	}
 	/// Returns a constant past-end-iterator for this pool.
-	const_iterator cend() const;
+	const_iterator cend() const {
+		return const_iterator(objects_.cend());
+	}
 
 	void process_pending() {
 		// Obtain lock although this needs to be externally synchronized to acquire visibility of writes
