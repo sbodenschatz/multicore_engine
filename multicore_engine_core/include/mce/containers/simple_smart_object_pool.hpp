@@ -7,6 +7,11 @@
 #ifndef MCE_CONTAINERS_SIMPLE_SMART_OBJECT_POOL_HPP_
 #define MCE_CONTAINERS_SIMPLE_SMART_OBJECT_POOL_HPP_
 
+/**
+ * \file
+ * Defines a simple smart-pointer-managed pool for objects with fixed memory locations.
+ */
+
 #include <algorithm>
 #include <boost/operators.hpp>
 #include <memory>
@@ -16,6 +21,20 @@
 namespace mce {
 namespace containers {
 
+/// \brief Provides a container for objects that are managed by smart pointers and should be iteratable
+/// through the pool.
+/**
+ * The pool is thread-safe regarding the set objects for most member functions (exceptions are noted on the
+ * members).
+ * Access to the objects must be either externally synchronized by using code or must be internally
+ * synchronized by the objects.
+ * The thread-safety concept works phase-base by making the set of objects read-only during normal use.
+ * Object additions or removals can be performed concurrently to iterating over the pool but are not visible
+ * in this phase.
+ * These changes are made available for future readers by calling process_pending. This operation must be
+ * externally synchronized by the caller and must not run concurrently with any other member function of the
+ * pool or with iterating over the pool.
+ */
 template <typename T>
 class simple_smart_object_pool {
 	std::vector<std::shared_ptr<T>> objects_;
@@ -101,6 +120,10 @@ public:
 
 	///  \brief Creates an object in the the pool and returns a smart pointer as the initial owner that
 	///  manages the lifetime of the object.
+	/**
+	 * The added object becomes available to readers (through iterators) after process_pending() has been
+	 * called.
+	 */
 	template <typename... Args>
 	std::shared_ptr<T> emplace(Args&&... args) {
 		auto o = std::make_shared<T>(std::forward<Args>(args)...);
@@ -148,6 +171,11 @@ public:
 		return const_iterator(objects_.cend());
 	}
 
+	/// \brief Makes changes to the object set available to future readers by removing orphaned objects and
+	/// adding created ones.
+	/**
+	 * \warning Must be externally synchronized against all other operations on the pool.
+	 */
 	void process_pending() {
 		// Obtain lock although this needs to be externally synchronized to acquire visibility of writes
 		// performed under lock.
@@ -160,6 +188,10 @@ public:
 					   objects_.end());
 	}
 
+	/// Reserves space for at least the given number of objects.
+	/**
+	 * \warning Must be externally synchronized against all other operations on the pool.
+	 */
 	void reserve(size_t size) {
 		objects_.reserve(size);
 	}
