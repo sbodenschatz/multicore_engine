@@ -73,6 +73,18 @@ public:
 	const_iterator end() const;
 	/// Returns a constant past-end-iterator for this pool.
 	const_iterator cend() const;
+
+	void process_pending() {
+		// Obtain lock although this needs to be externally synchronized to acquire visibility of writes
+		// performed under lock.
+		std::lock_guard<decltype(pending_objects_mtx_)> lock(pending_objects_mtx_);
+		objects_.reserve(objects_.size() + pending_objects_.size());
+		std::move(pending_objects_.begin(), pending_objects_.end(), std::back_inserter(objects_));
+		pending_objects_.clear();
+		objects_.erase(std::remove_if(objects_.begin(), objects_.end(),
+									  [](const std::shared_ptr<T>& ptr) { return ptr.use_count() == 1; }),
+					   objects_.end());
+	}
 };
 
 } // namespace containers
