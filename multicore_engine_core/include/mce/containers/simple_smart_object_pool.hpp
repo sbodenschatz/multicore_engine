@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <boost/operators.hpp>
 #include <memory>
-#include <shared_mutex>
+#include <mutex>
 #include <vector>
 
 namespace mce {
@@ -39,7 +39,7 @@ template <typename T>
 class simple_smart_object_pool {
 	std::vector<std::shared_ptr<T>> objects_;
 	std::vector<std::shared_ptr<T>> pending_objects_;
-	mutable std::shared_timed_mutex pending_objects_mtx_;
+	mutable std::mutex pending_objects_mtx_;
 
 public:
 	/// Creates an empty pool.
