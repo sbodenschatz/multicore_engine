@@ -91,6 +91,10 @@ public:
 									  [](const std::shared_ptr<T>& ptr) { return ptr.use_count() == 1; }),
 					   objects_.end());
 	}
+
+	void reserve(size_t size) {
+		objects_.reserve(size);
+	}
 };
 
 } // namespace containers
