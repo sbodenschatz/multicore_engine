@@ -891,6 +891,8 @@ public:
 	const_iterator cend() const {
 		return const_iterator();
 	}
+
+	void process_pending() const noexcept {}
 };
 
 template <typename T, size_t block_size>
