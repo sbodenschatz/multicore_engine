@@ -892,6 +892,7 @@ public:
 		return const_iterator();
 	}
 
+	/// Does nothing and is only provided for interface compatibility with simple_smart_object_pool.
 	void process_pending() const noexcept {}
 };
 
