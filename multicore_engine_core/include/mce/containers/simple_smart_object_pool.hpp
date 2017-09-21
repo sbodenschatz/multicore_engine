@@ -71,11 +71,11 @@ public:
 		/// The type used to count the object slots for differences between iterators.
 		using difference_type = std::ptrdiff_t;
 		/// The type of the values referenced by the iterator.
-		using value_type = T;
+		using value_type = Obj;
 		/// The type of a pointer to a referenced value.
-		using pointer = T*;
+		using pointer = Obj*;
 		/// The type of a reference to a referenced value.
-		using reference = T&;
+		using reference = Obj&;
 		/// A tag type indicating that this iterator implements the RandomAccessIterator concept.
 		using iterator_category = std::random_access_iterator_tag;
 
