@@ -39,5 +39,21 @@ bool equal_ignore_case(boost::string_view str_a, boost::string_view str_b) {
 					  [](auto a, auto b) { return std::tolower(a) == std::tolower(b); });
 }
 
+boost::string_view trim_left(boost::string_view str) {
+	auto pos = str.find_first_not_of(" \t\r\n");
+	if(pos == str.npos) return {};
+	str.remove_prefix(pos);
+	return str;
+}
+boost::string_view trim_right(boost::string_view str) {
+	auto pos = str.find_last_not_of(" \t\r\n");
+	if(pos == str.npos) return {};
+	str.remove_suffix(str.size() - (pos + 1));
+	return str;
+}
+boost::string_view trim(boost::string_view str) {
+	return trim_left(trim_right(str));
+}
+
 } /* namespace util */
 } /* namespace mce */

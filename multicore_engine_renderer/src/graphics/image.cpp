@@ -31,6 +31,7 @@ base_image::base_image(image_dimension img_dim, bool layered, image_aspect_mode 
 			make_device_memory_handle(
 					mem_mgr, mem_mgr.allocate(dev->getImageMemoryRequirements(*img_), required_flags)),
 			destruction_manager);
+	auto lock = mem_handle_->obtain_lock();
 	dev->bindImageMemory(*img_, mem_handle_->memory(), mem_handle_->offset());
 }
 

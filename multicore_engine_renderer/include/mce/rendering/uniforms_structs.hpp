@@ -29,6 +29,7 @@ constexpr size_t max_forward_lights = 64;
 struct per_scene_uniforms {
 	glm::mat4 projection;										 ///< The projection matrix of the camera.
 	glm::mat4 view;												 ///< The view matrix of the camera.
+	glm::vec3 cam_pos;											 ///< The world position of the camera.
 	uint32_t active_lights = 0;									 ///< The number of lights actually present.
 	per_point_light_uniforms forward_lights[max_forward_lights]; ///< Lights supplied for forward rendering.
 };

@@ -71,10 +71,10 @@ void first_person_flyer_component::process_mouse(const mce::core::frame_time& fr
 	}
 	glm::vec3 global_angualar_velocity = {0.0f, velocity.x, 0.0f};
 	glm::vec3 local_angualar_velocity = {velocity.y, 0.0f, 0.0f};
-	glm::quat global_rot_quad = {0.0f, global_angualar_velocity};
-	glm::quat local_rot_quad = {0.0f, local_angualar_velocity};
-	glm::quat orientation_derivative = 0.5f * (global_rot_quad * owner().orientation());
-	orientation_derivative += 0.5f * (owner().orientation() * local_rot_quad);
+	glm::quat global_rot_quat = {0.0f, global_angualar_velocity};
+	glm::quat local_rot_quat = {0.0f, local_angualar_velocity};
+	glm::quat orientation_derivative = 0.5f * (global_rot_quat * owner().orientation());
+	orientation_derivative += 0.5f * (owner().orientation() * local_rot_quat);
 	owner().orientation(glm::normalize(owner().orientation() + orientation_derivative * frame_time.delta_t));
 }
 void first_person_flyer_component::enforce_no_roll() {

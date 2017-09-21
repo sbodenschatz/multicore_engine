@@ -171,29 +171,52 @@ public:
 
 	/// Allows copying.
 	local_function(const local_function& other) {
-		function_obj = other.function_obj->copy_to(storage, Max_Size);
+		if(other.function_obj) {
+			function_obj = other.function_obj->copy_to(storage, Max_Size);
+		} else {
+			function_obj = {};
+		}
 	}
 	/// Allows moving.
 	local_function(local_function&& other) {
-		function_obj = other.function_obj->move_to(storage, Max_Size);
+		if(other.function_obj) {
+			function_obj = other.function_obj->move_to(storage, Max_Size);
+			other.function_obj = {};
+		} else {
+			function_obj = {};
+		}
 	}
 	/// Allows copying of smaller function wrappers.
 	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function(const local_function<Max_Size_2, R(Args...)>& other) {
-		function_obj = other.function_obj->copy_to(storage, Max_Size);
+		if(other.function_obj) {
+			function_obj = other.function_obj->copy_to(storage, Max_Size);
+		} else {
+			function_obj = {};
+		}
 	}
 	/// Allows moving of smaller function wrappers.
 	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function(local_function<Max_Size_2, R(Args...)>&& other) {
-		function_obj = other.function_obj->move_to(storage, Max_Size);
+		if(other.function_obj) {
+			function_obj = other.function_obj->move_to(storage, Max_Size);
+			other.function_obj = {};
+		} else {
+			function_obj = {};
+		}
 	}
+
 	/// Allows copying of smaller function wrappers.
 	template <size_t Max_Size_2, typename Dummy = std::enable_if_t<Max_Size >= Max_Size_2>>
 	local_function& operator=(const local_function<Max_Size_2, R(Args...)>& other) {
 		// No self-destruction check because the objects are of different type and aliasing them would be
 		// undefined behavior anyway
-		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->copy_to(storage, Max_Size);
+		if(other.function_obj) {
+			function_obj.reset(); // Destroy current value first because storage is needed for new value
+			function_obj = other.function_obj->copy_to(storage, Max_Size);
+		} else {
+			function_obj = {};
+		}
 		return *this;
 	}
 	/// Allows moving of smaller function wrappers.
@@ -201,22 +224,36 @@ public:
 	local_function& operator=(local_function<Max_Size_2, R(Args...)>&& other) {
 		// No self-destruction check because the objects are of different type and aliasing them would be
 		// undefined behavior anyway
-		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->move_to(storage, Max_Size);
+		if(other.function_obj) {
+			function_obj.reset(); // Destroy current value first because storage is needed for new value
+			function_obj = other.function_obj->move_to(storage, Max_Size);
+			other.function_obj = {};
+		} else {
+			function_obj = {};
+		}
 		return *this;
 	}
 	/// Allows copying.
 	local_function& operator=(const local_function& other) {
 		if(&other == this) return *this;
-		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->copy_to(storage, Max_Size);
+		if(other.function_obj) {
+			function_obj.reset(); // Destroy current value first because storage is needed for new value
+			function_obj = other.function_obj->copy_to(storage, Max_Size);
+		} else {
+			function_obj = {};
+		}
 		return *this;
 	}
 	/// Allows moving.
 	local_function& operator=(local_function&& other) {
 		assert(&other != this);
-		function_obj.reset(); // Destroy current value first because storage is needed for new value
-		function_obj = other.function_obj->move_to(storage, Max_Size);
+		if(other.function_obj) {
+			function_obj.reset(); // Destroy current value first because storage is needed for new value
+			function_obj = other.function_obj->move_to(storage, Max_Size);
+			other.function_obj = {};
+		} else {
+			function_obj = {};
+		}
 		return *this;
 	}
 	/// Assigns a new functor to the function wrapper object (see local_function(F&&) for requirements).
@@ -247,7 +284,7 @@ public:
 	}
 	/// Returns true if the wrapper contains a functor and false if it is empty.
 	operator bool() {
-		return function_obj;
+		return bool(function_obj);
 	}
 };
 

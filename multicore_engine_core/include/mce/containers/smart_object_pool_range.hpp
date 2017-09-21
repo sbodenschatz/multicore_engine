@@ -14,8 +14,10 @@
 
 #include <cassert>
 #include <cstdint>
+#include <mce/containers/simple_smart_object_pool.hpp>
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/exceptions.hpp>
+#include <tbb/blocked_range.h>
 #include <tbb/tbb_stddef.h>
 
 namespace mce {
@@ -100,6 +102,28 @@ smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterato
 make_pool_const_range(smart_object_pool<T, block_size>& pool) {
 	return smart_object_pool_range<typename smart_object_pool<T, block_size>::const_iterator>(pool.cbegin(),
 																							  pool.cend());
+}
+
+/// Makes a tbb::blocked_range for the given simple_smart_object_pool.
+template <typename T>
+tbb::blocked_range<typename simple_smart_object_pool<T>::iterator>
+make_pool_range(simple_smart_object_pool<T>& pool) {
+	return tbb::blocked_range<typename simple_smart_object_pool<T>::iterator>(pool.begin(), pool.end());
+}
+
+/// Makes a constant tbb::blocked_range for the given simple_smart_object_pool.
+template <typename T>
+tbb::blocked_range<typename simple_smart_object_pool<T>::const_iterator>
+make_pool_range(const simple_smart_object_pool<T>& pool) {
+	return tbb::blocked_range<typename simple_smart_object_pool<T>::const_iterator>(pool.begin(), pool.end());
+}
+
+/// Makes a constant tbb::blocked_range for the given simple_smart_object_pool.
+template <typename T>
+tbb::blocked_range<typename simple_smart_object_pool<T>::const_iterator>
+make_pool_const_range(simple_smart_object_pool<T>& pool) {
+	return tbb::blocked_range<typename simple_smart_object_pool<T>::const_iterator>(pool.cbegin(),
+																					pool.cend());
 }
 
 } // namespace containers

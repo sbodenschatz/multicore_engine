@@ -18,6 +18,7 @@
 #include <mce/containers/smart_object_pool_range.hpp>
 #include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/core/system_state.hpp>
+#include <mce/entity/ecs_types.hpp>
 #include <mce/memory/aligned_new.hpp>
 #include <mce/rendering/camera_component.hpp>
 #include <mce/rendering/point_light_component.hpp>
@@ -43,9 +44,11 @@ class renderer_state;
  * renderer_state is bound.
  */
 class renderer_state : public core::system_state {
-	containers::smart_object_pool<camera_component, 4> camera_comps;
-	containers::smart_object_pool<point_light_component> point_light_comps;
-	containers::smart_object_pool<static_model_component> static_model_comps;
+	entity::component_pool<camera_component, 4> camera_comps;
+	entity::component_pool<point_light_component> point_light_comps;
+	entity::component_pool<static_model_component> static_model_comps;
+
+	using static_model_comp_range_t = decltype(containers::make_pool_const_range(static_model_comps));
 
 	per_scene_uniforms scene_uniforms;
 
@@ -66,8 +69,7 @@ class renderer_state : public core::system_state {
 		explicit task_reducer(renderer_state& rs) : rs{rs}, buffer{rs.render_task_buffer_pool.get()} {}
 		task_reducer(const task_reducer& other, tbb::split)
 				: rs{other.rs}, buffer{rs.render_task_buffer_pool.get()} {}
-		void operator()(const containers::smart_object_pool_range<
-						containers::smart_object_pool<static_model_component>::const_iterator>& range);
+		void operator()(const static_model_comp_range_t& range);
 		void join(const task_reducer& other);
 	};
 
@@ -96,18 +98,18 @@ public:
 	~renderer_state();
 
 	/// Creates a camera_component for the given entity and using the given configuration.
-	containers::smart_pool_ptr<camera_component>
+	entity::component_impl_pool_ptr<camera_component>
 	create_camera_component(entity::entity& owner, const entity::component_configuration& configuration) {
 		return camera_comps.emplace(owner, configuration);
 	}
 	/// Creates a point_light_component for the given entity and using the given configuration.
-	containers::smart_pool_ptr<point_light_component>
+	entity::component_impl_pool_ptr<point_light_component>
 	create_point_light_component(entity::entity& owner,
 								 const entity::component_configuration& configuration) {
 		return point_light_comps.emplace(owner, configuration);
 	}
 	/// Creates a static_model_component for the given entity and using the given configuration.
-	containers::smart_pool_ptr<static_model_component>
+	entity::component_impl_pool_ptr<static_model_component>
 	create_static_model_component(renderer_state& sys, entity::entity& owner,
 								  const entity::component_configuration& configuration) {
 		return static_model_comps.emplace(sys, owner, configuration);

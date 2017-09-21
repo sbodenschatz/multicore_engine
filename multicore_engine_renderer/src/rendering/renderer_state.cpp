@@ -65,6 +65,7 @@ void renderer_state::collect_scene_uniforms() {
 			glm::radians(cam->fov()), float(sys->gs_.window().swapchain_size().x),
 			float(sys->gs_.window().swapchain_size().y), cam->near_plane(), cam->far_plane());
 	// scene_uniforms.projection[1].y *= -1.0f;
+	scene_uniforms.cam_pos = cam->owner().position();
 	scene_uniforms.active_lights = 0;
 	for(const point_light_component& plc : point_light_comps) {
 		if(scene_uniforms.active_lights < max_forward_lights) {
@@ -78,6 +79,9 @@ void renderer_state::collect_scene_uniforms() {
 	}
 }
 void renderer_state::render(const mce::core::frame_time&) {
+	camera_comps.process_pending();
+	point_light_comps.process_pending();
+	static_model_comps.process_pending();
 	auto sys = static_cast<renderer_system*>(system_);
 	auto& frame_data = sys->per_frame_data();
 	if(camera_comps.empty()) return;
@@ -119,9 +123,7 @@ void renderer_state::render(const mce::core::frame_time&) {
 						[](const render_task&) {}));
 	});
 }
-void renderer_state::task_reducer::
-operator()(const containers::smart_object_pool_range<
-		   containers::smart_object_pool<static_model_component>::const_iterator>& range) {
+void renderer_state::task_reducer::operator()(const static_model_comp_range_t& range) {
 	for(const static_model_component& c : range) {
 		if(c.ready()) {
 			assert(c.model());

@@ -73,6 +73,14 @@ class graphics_system : public core::system {
 	containers::dynamic_array<vk::UniqueCommandBuffer> render_queue_end_frame_cmd_buffers_;
 	containers::dynamic_array<vk::UniqueCommandBuffer> present_queue_end_frame_cmd_buffers_;
 
+	static vk::PhysicalDeviceType device_type_from_string(const std::string& type);
+	std::vector<vk::PhysicalDeviceType> device_type_prefs_from_config() const;
+	std::vector<std::string> device_prefs_from_config() const;
+	vk::DeviceSize memory_block_size_from_config() const;
+	uint32_t desired_swapchain_images_from_config() const;
+	static vk::PresentModeKHR present_mode_from_string(const std::string& mode);
+	std::vector<vk::PresentModeKHR> present_mode_prefs_from_config() const;
+
 public:
 	/// Returns the phase ordering index for pre hooks for this system.
 	int pre_phase_ordering() const noexcept override {

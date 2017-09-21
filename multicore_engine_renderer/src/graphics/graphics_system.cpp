@@ -4,6 +4,8 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <cctype>
+#include <mce/config/config_store.hpp>
 #include <mce/core/engine.hpp>
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/sync_utils.hpp>
@@ -16,9 +18,9 @@ graphics_system::graphics_system(core::engine& eng, windowing::window_system& wi
 								 const std::vector<std::string>& extensions, unsigned int validation_level)
 		: eng{eng},
 		  instance_(eng.engine_metadata(), eng.application_metadata(), extensions, validation_level),
-		  device_(instance_), window_(instance_, win_sys.window(), device_),
-		  // TODO Parameterize
-		  memory_manager_(&device_, 1 << 27),
+		  device_(instance_, device_type_prefs_from_config(), device_prefs_from_config()),
+		  window_(instance_, win_sys.window(), device_, desired_swapchain_images_from_config(),present_mode_prefs_from_config()),
+		  memory_manager_(&device_, memory_block_size_from_config()),
 		  destruction_queue_manager_(&device_, uint32_t(window_.swapchain_images().size())),
 		  transfer_manager_(device_, memory_manager_, uint32_t(window_.swapchain_images().size())),
 		  texture_manager_(eng.asset_manager(), device_, memory_manager_, &destruction_queue_manager_,
@@ -145,6 +147,81 @@ void graphics_system::postrender(const mce::core::frame_time&) {
 	device_.present_queue().presentKHR(
 			vk::PresentInfoKHR(1, &present_sema, 1, &swapchain_handle, &current_swapchain_image_));
 	transfer_manager_.end_frame();
+}
+
+static boost::container::flat_map<std::string, vk::PhysicalDeviceType> device_type_from_string_table = {
+		{{"other", vk::PhysicalDeviceType::eOther},
+		 {"integrated", vk::PhysicalDeviceType::eIntegratedGpu},
+		 {"discrete", vk::PhysicalDeviceType::eDiscreteGpu},
+		 {"virtual", vk::PhysicalDeviceType::eVirtualGpu},
+		 {"cpu", vk::PhysicalDeviceType::eCpu}}};
+
+vk::PhysicalDeviceType graphics_system::device_type_from_string(const std::string& type) {
+	auto it = device_type_from_string_table.find(type);
+	if(it != device_type_from_string_table.end()) {
+		return it->second;
+	}
+	throw mce::syntax_exception("Invalid device type '" + type + "'.");
+}
+std::vector<vk::PhysicalDeviceType> graphics_system::device_type_prefs_from_config() const {
+	std::vector<vk::PhysicalDeviceType> device_type_preferences;
+	using namespace std::literals;
+	std::vector<std::string> device_type_preferences_str = {{{"discrete"s}, {"integrated"s}}};
+	auto var_device_type_preferences =
+			eng.config_store().resolve("graphics.device_type_preferences"s, device_type_preferences_str);
+	device_type_preferences_str = var_device_type_preferences->value();
+	for(auto& dts : device_type_preferences_str) {
+		for(auto& c : dts) {
+			c = char(std::tolower(c));
+		}
+	}
+	std::transform(device_type_preferences_str.begin(), device_type_preferences_str.end(),
+				   std::back_inserter(device_type_preferences),
+				   [](const std::string& dts) { return device_type_from_string(dts); });
+	return device_type_preferences;
+}
+std::vector<std::string> graphics_system::device_prefs_from_config() const {
+	std::vector<std::string> device_preferences;
+	return eng.config_store().resolve("graphics.device_preferences", device_preferences)->value();
+}
+vk::DeviceSize graphics_system::memory_block_size_from_config() const {
+	auto var_memory_block_size_exp = eng.config_store().resolve("graphics.memory_block_size_exp", 27);
+	return uint64_t(1) << var_memory_block_size_exp->value();
+}
+uint32_t graphics_system::desired_swapchain_images_from_config() const {
+	auto var_desired_swapchain_images = eng.config_store().resolve("graphics.desired_swapchain_images", 3);
+	return var_desired_swapchain_images->value();
+}
+static boost::container::flat_map<std::string, vk::PresentModeKHR> present_mode_from_string_table = {
+		{{"fifo", vk::PresentModeKHR::eFifo},
+		 {"fifo_relaxed", vk::PresentModeKHR::eFifoRelaxed},
+		 {"fiforelaxed", vk::PresentModeKHR::eFifoRelaxed},
+		 {"immediate", vk::PresentModeKHR::eImmediate},
+		 {"mailbox", vk::PresentModeKHR::eMailbox}}};
+vk::PresentModeKHR graphics_system::present_mode_from_string(const std::string& mode) {
+	auto it = present_mode_from_string_table.find(mode);
+	if(it != present_mode_from_string_table.end()) {
+		return it->second;
+	}
+	throw mce::syntax_exception("Invalid present mode '" + mode + "'.");
+}
+std::vector<vk::PresentModeKHR> graphics_system::present_mode_prefs_from_config() const {
+	std::vector<vk::PresentModeKHR> present_mode_preferences;
+	using namespace std::literals;
+	std::vector<std::string> present_mode_preferences_str = {
+			{{"mailbox"s}, {"fifo_relaxed"s}, {"fifo"s}, {"immediate"s}}};
+	auto var_present_mode_preferences =
+			eng.config_store().resolve("graphics.present_mode_preferences"s, present_mode_preferences_str);
+	present_mode_preferences_str = var_present_mode_preferences->value();
+	for(auto& dts : present_mode_preferences_str) {
+		for(auto& c : dts) {
+			c = char(std::tolower(c));
+		}
+	}
+	std::transform(present_mode_preferences_str.begin(), present_mode_preferences_str.end(),
+				   std::back_inserter(present_mode_preferences),
+				   [](const std::string& dts) { return present_mode_from_string(dts); });
+	return present_mode_preferences;
 }
 
 } /* namespace graphics */

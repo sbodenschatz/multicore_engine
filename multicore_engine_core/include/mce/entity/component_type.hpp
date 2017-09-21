@@ -45,14 +45,18 @@ private:
 	component_type_id_t id_;
 	std::string name_;
 	component_configuration empty_configuration_;
+	bool takes_unbound_property_values_;
 
 protected:
 	/// Stores the list of properties registered for the component type.
 	property_list properties_;
 	/// Allows implementing classes to construct the base class with the given type id and name.
 	// cppcheck-suppress passedByValue
-	abstract_component_type(core::engine* engine, component_type_id_t id, std::string name)
-			: id_(id), name_(std::move(name)), empty_configuration_(engine, *this) {}
+	abstract_component_type(core::engine* engine, component_type_id_t id, std::string name,
+							bool takes_unbound_property_values)
+			: id_(id), name_(std::move(name)),
+			  empty_configuration_(engine, *this), takes_unbound_property_values_{
+														   takes_unbound_property_values} {}
 
 public:
 	/// Forbids copy-construction of abstract_component_type.
@@ -85,6 +89,12 @@ public:
 	const component_configuration& empty_configuration() const noexcept {
 		return empty_configuration_;
 	}
+
+	/// \brief Returns a bool indicating whether the component types supports additional property values in
+	/// the component_configurations beyond the values bound to the registered reflection properties.
+	bool takes_unbound_property_values() const {
+		return takes_unbound_property_values_;
+	}
 };
 
 /// \brief Represents a concrete description of a component type with a specific type T of the component and
@@ -97,7 +107,8 @@ public:
 	/// \brief Constructs a component_type description for T with the given name and component object factory
 	/// function.
 	component_type(core::engine* engine, const std::string& name, const F& factory_function)
-			: abstract_component_type(engine, component_type_id_manager::id<T>(), name),
+			: abstract_component_type(engine, component_type_id_manager::id<T>(), name,
+									  T::takes_unbound_property_values()),
 			  factory_function_(factory_function) {
 		T::fill_property_list(properties_);
 	}

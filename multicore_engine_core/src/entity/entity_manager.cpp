@@ -44,7 +44,7 @@ void entity_manager::load_entities_from_text_file(const asset::asset_ptr& text_f
 entity* entity_manager::create_entity(const entity_configuration* config) {
 	assert(!read_only_mode);
 	auto id = next_id++;
-	auto it = entities.emplace(id);
+	auto it = entities.emplace(id, *this);
 	if(config) config->create_components(*it);
 	std::lock_guard<std::mutex> lock(id_map_mutex);
 	entity_id_map.insert(std::make_pair(id, it));

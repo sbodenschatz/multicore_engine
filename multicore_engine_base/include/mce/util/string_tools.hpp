@@ -44,6 +44,14 @@ void split_iterate(boost::string_view str, boost::string_view delim, F f) {
 	f(str.substr(pos));
 }
 
+/// Removes white-space chars (space, tab, line break) before the first non-whitespace char.
+boost::string_view trim_left(boost::string_view str);
+/// Removes white-space chars (space, tab, line break) after the last non-whitespace char.
+boost::string_view trim_right(boost::string_view str);
+/// \brief Removes white-space chars (space, tab, line break) from both ends of the string so the result
+/// starts and ends with non-whitespace chars.
+boost::string_view trim(boost::string_view str);
+
 } /* namespace util */
 } /* namespace mce */
 

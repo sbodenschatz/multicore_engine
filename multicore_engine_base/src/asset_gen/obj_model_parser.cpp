@@ -9,6 +9,7 @@
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/utility/string_view.hpp>
+#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <glm/glm.hpp>
@@ -135,7 +136,8 @@ void obj_model_parser::parse_object(boost::string_view line) {
 	current_object_name.append(line.data(), line.size());
 }
 void obj_model_parser::parse_mtllib(boost::string_view line) {
-	// throw unimplemented_exception("Material libraries not supported yet");
+	// Material libraries are ignored because materials are defined in an engine specific json-based material
+	// definition library format.
 	UNUSED(line);
 }
 void obj_model_parser::parse_group(boost::string_view line) {
@@ -143,9 +145,9 @@ void obj_model_parser::parse_group(boost::string_view line) {
 	current_group_name.append(line.data(), line.size());
 }
 void obj_model_parser::parse_smoothing(boost::string_view line) {
-	if(line != "off") {
-		throw unimplemented_exception("Smoothing groups are currently not supported.");
-	}
+	// Smoothing groups are ignored because the model format requires vertex normals and vertex normals
+	// override smoothing groups.
+	UNUSED(line);
 }
 void obj_model_parser::parse_face(boost::string_view line) {
 	if(current_material_name.empty()) {
@@ -206,15 +208,41 @@ model::model_index obj_model_parser::get_or_create_vertex(const glm::ivec3& trip
 }
 
 void obj_model_parser::create_face(const std::array<glm::ivec3, 3>& vertex_tripples) {
-	meshes.back().indices.reserve(vertex_tripples.size());
+	auto tans = calculate_tangents(vertex_tripples);
 	std::transform(vertex_tripples.begin(), vertex_tripples.end(), std::back_inserter(meshes.back().indices),
-				   [this](const glm::ivec3& tripple) {
+				   [this, &tans](const glm::ivec3& tripple) {
 					   auto index = get_or_create_vertex(tripple);
+					   tangents[glm::ivec2(tripple.x, tripple.z)] += tans.first;
+					   bitangents[glm::ivec2(tripple.x, tripple.z)] += tans.second;
 					   return index;
 				   });
 }
 
+std::pair<glm::vec3, glm::vec3>
+obj_model_parser::calculate_tangents(const std::array<glm::ivec3, 3>& vertex_tripples) {
+	std::array<glm::vec3, 3> p = {{positions.at(vertex_tripples[0].x), positions.at(vertex_tripples[1].x),
+								   positions.at(vertex_tripples[2].x)}};
+	std::array<glm::vec2, 3> uv = {{tex_coords.at(vertex_tripples[0].y), tex_coords.at(vertex_tripples[1].y),
+									tex_coords.at(vertex_tripples[2].y)}};
+	std::array<glm::vec3, 2> q = {{p[1] - p[0], p[2] - p[0]}};
+	std::array<glm::vec2, 2> duv = {{uv[1] - uv[0], uv[2] - uv[0]}};
+	glm::mat2 m_duv_inv = (1.0f / (duv[0].s * duv[1].t - duv[1].s * duv[0].t)) *
+						  glm::mat2(duv[1].t, -duv[1].s, -duv[0].t, duv[0].s);
+	glm::mat3x2 m_q = glm::mat3x2(q[0].x, q[1].x, q[0].y, q[1].y, q[0].z, q[1].z);
+	glm::mat2x3 m_t = transpose(m_duv_inv * m_q);
+	return {m_t[0], m_t[1]};
+}
+
 std::tuple<static_model, model::static_model_collision_data> obj_model_parser::finalize_model() {
+	for(const auto& vert_idx : vertex_indices) {
+		auto& vert = vertices[vert_idx.second];
+		auto it_tan = tangents.find(glm::ivec2(vert_idx.first.x, vert_idx.first.z));
+		assert(it_tan != tangents.end());
+		auto it_bitan = bitangents.find(glm::ivec2(vert_idx.first.x, vert_idx.first.z));
+		assert(it_bitan != bitangents.end());
+		vert.tangent = glm::normalize(it_tan->second);
+		vert.bitangent = glm::normalize(it_bitan->second);
+	}
 	for(auto& mesh : meshes) {
 		mesh.collision_data.sphere.center =
 				std::accumulate(mesh.collision_vertices.begin(), mesh.collision_vertices.end(),

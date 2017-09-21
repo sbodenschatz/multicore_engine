@@ -48,9 +48,15 @@ void component_configuration::make_assignment(const std::string& property_name,
 	if(it == assignments.end()) {
 		auto it2 = std::find_if(type_.properties().begin(), type_.properties().end(),
 								[&](const auto& elem) { return elem->name() == property_name; });
-		if(it2 == type_.properties().end())
-			throw invalid_property_exception("Unknown property '" + property_name + "' of component type '" +
-											 type_.name() + "'.");
+		if(it2 == type_.properties().end()) {
+			if(type_.takes_unbound_property_values()) {
+				unbound_property_values_[property_name] = ast_value;
+				return;
+			} else {
+				throw invalid_property_exception("Unknown property '" + property_name +
+												 "' of component type '" + type_.name() + "'.");
+			}
+		}
 		it = assignments.emplace(assignments.end(), it2->get()->make_assignment(engine));
 	}
 	it->get()->parse(ast_value, entity_context, type_.name(), entity_manager);

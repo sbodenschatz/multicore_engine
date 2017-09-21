@@ -26,6 +26,8 @@ class instance;
 /// Manages the vulkan device including associated queues.
 class device {
 private:
+	std::vector<vk::PhysicalDeviceType> device_type_preferences_;
+	std::vector<std::string> device_preferences_;
 	static const queue_index_t no_queue_index;
 	static const queue_family_index_t no_queue_family_index;
 	instance& instance_;
@@ -55,6 +57,8 @@ private:
 	void find_queue_indexes();
 	void create_device();
 
+	const std::vector<vk::Bool32 vk::PhysicalDeviceFeatures::*>& required_device_features() const;
+
 public:
 	/// Defines the type of use for a format is checked in a supported format query
 	enum class format_support_query_type {
@@ -67,7 +71,10 @@ public:
 	};
 
 	/// Creates a device object from the given instance.
-	explicit device(instance& app_inst);
+	explicit device(instance& app_inst,
+					std::vector<vk::PhysicalDeviceType> device_type_preferences =
+							{{vk::PhysicalDeviceType::eDiscreteGpu, vk::PhysicalDeviceType::eIntegratedGpu}},
+					std::vector<std::string> device_preferences = {});
 	/// Releases the resources associated with the device object.
 	~device();
 

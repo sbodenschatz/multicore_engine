@@ -668,7 +668,8 @@ public:
 					target.entry <= it.target.entry) ||
 				   (it.is_limiter && target.containing_block && it.target.containing_block &&
 					it.target.containing_block->block_index <= target.containing_block->block_index &&
-					it.target.entry <= target.entry);
+					it.target.entry <= target.entry) ||
+				   (is_limiter && !(it.target.entry)) || (it.is_limiter && !(target.entry));
 		}
 
 		/// Compares *this with it and returns true if they are considered not equal.
@@ -890,6 +891,9 @@ public:
 	const_iterator cend() const {
 		return const_iterator();
 	}
+
+	/// Does nothing and is only provided for interface compatibility with simple_smart_object_pool.
+	void process_pending() const noexcept {}
 };
 
 template <typename T, size_t block_size>

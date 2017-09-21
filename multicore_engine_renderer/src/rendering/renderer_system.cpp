@@ -88,11 +88,13 @@ void renderer_system::postrender(const mce::core::frame_time&) {
 }
 
 void renderer_system::create_samplers() {
-	auto anisotropy = eng_.config_store().resolve("anisotropy", -1.0f);
+	auto anisotropy = eng_.config_store().resolve("renderer.anisotropy", -1.0f);
 	boost::optional<float> max_anisotropy;
 	auto aniso_val = anisotropy->value();
 	if(aniso_val > 0.0f) {
 		max_anisotropy = aniso_val;
+	} else if(aniso_val < 0.0f) {
+		max_anisotropy = gs_.device().physical_device_properties().limits.maxSamplerAnisotropy;
 	}
 	default_sampler_ = gs_.graphics_manager().create_sampler(
 			"default", vk::Filter::eLinear, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear,
