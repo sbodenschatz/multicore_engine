@@ -21,6 +21,12 @@ namespace graphics {
 class device;
 
 /// Provides the functionality of vulkan command pools.
+/**
+ * \warning This class is not inherently thread-safe and access to it must be externally synchronized.
+ *
+ * \warning The release of allocated command buffers must also be externally synchronized against other uses
+ * of the command_pool.
+ */
 class command_pool {
 private:
 	device& owner_device_;
