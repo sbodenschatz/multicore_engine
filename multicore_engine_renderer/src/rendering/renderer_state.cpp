@@ -79,6 +79,9 @@ void renderer_state::collect_scene_uniforms() {
 	}
 }
 void renderer_state::render(const mce::core::frame_time&) {
+	camera_comps.process_pending();
+	point_light_comps.process_pending();
+	static_model_comps.process_pending();
 	auto sys = static_cast<renderer_system*>(system_);
 	auto& frame_data = sys->per_frame_data();
 	if(camera_comps.empty()) return;

@@ -32,6 +32,7 @@ void input_state::register_to_entity_manager(entity::entity_manager& em) {
 }
 
 void input_state::process(const mce::core::frame_time& frame_time) {
+	first_person_flyer_comps.process_pending();
 	if(frame_time.delta_t > 0.0f) {
 		const input_system& sys = *static_cast<input_system*>(system_);
 		tbb::parallel_for(containers::make_pool_range(first_person_flyer_comps),

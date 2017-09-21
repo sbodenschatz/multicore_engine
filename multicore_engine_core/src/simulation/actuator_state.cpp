@@ -21,6 +21,7 @@ void actuator_state::register_to_entity_manager(entity::entity_manager& em) {
 }
 
 void actuator_state::process(const mce::core::frame_time& frame_time) {
+	actuator_comps.process_pending();
 	tbb::parallel_for(
 			containers::make_pool_range(actuator_comps),
 			[&frame_time](containers::smart_object_pool_range<decltype(actuator_comps)::iterator>& range) {
