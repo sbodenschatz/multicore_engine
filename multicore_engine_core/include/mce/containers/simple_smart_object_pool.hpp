@@ -89,15 +89,15 @@ public:
 			return it < other.it;
 		}
 
-		operator iterator_<const T, typename decltype(objects_)::const_iterator>() const {
-			return iterator_<const T, typename decltype(objects_)::const_iterator>(it);
+		operator iterator_<const T, typename std::vector<std::shared_ptr<T>>::const_iterator>() const {
+			return iterator_<const T, typename std::vector<std::shared_ptr<T>>::const_iterator>(it);
 		}
 	};
 
 	/// RandomAccessIterator
-	typedef iterator_<T, typename decltype(objects_)::iterator> iterator;
+	typedef iterator_<T, typename std::vector<std::shared_ptr<T>>::iterator> iterator;
 	/// Constant RandomAccessIterator
-	typedef iterator_<const T, typename decltype(objects_)::const_iterator> const_iterator;
+	typedef iterator_<const T, typename std::vector<std::shared_ptr<T>>::const_iterator> const_iterator;
 
 	///  \brief Creates an object in the the pool and returns a smart pointer as the initial owner that
 	///  manages the lifetime of the object.
