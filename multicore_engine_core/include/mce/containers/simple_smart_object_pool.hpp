@@ -55,6 +55,7 @@ public:
 	/// Forbids moving the pool.
 	simple_smart_object_pool& operator=(simple_smart_object_pool&&) noexcept = delete;
 
+	/// Implements RandomAccessIterator for const and non-const iterators over the pool.
 	template <typename Obj, typename It>
 	class iterator_
 			: public boost::additive<
@@ -67,47 +68,82 @@ public:
 		explicit iterator_(It it) : it{it} {}
 
 	public:
+		/// The type used to count the object slots for differences between iterators.
 		using difference_type = std::ptrdiff_t;
+		/// The type of the values referenced by the iterator.
 		using value_type = T;
+		/// The type of a pointer to a referenced value.
 		using pointer = T*;
+		/// The type of a reference to a referenced value.
 		using reference = T&;
+		/// A tag type indicating that this iterator implements the RandomAccessIterator concept.
 		using iterator_category = std::random_access_iterator_tag;
 
+		/// Dereferences the iterator to get a reference to the object it points to.
 		reference operator*() const {
 			return **it;
 		}
+		/// Dereferences the iterator to members of the object it points to.
 		pointer operator->() const {
 			return it->get();
 		}
+		/// \brief Dereferences the iterator using an offset to access the object n slots after the pointed-to
+		/// object.
 		reference operator[](std::ptrdiff_t n) const {
 			return *(it[n]);
 		}
+		/// Returns the difference in object slots between this and other.
 		std::ptrdiff_t operator-(const iterator_<Obj, It>& other) const {
 			return it - other.it;
 		}
+		/// Advances the iterator by one slot.
+		/**
+		 * Post-increment is provided based on this by boost.operators.
+		 */
 		iterator_<Obj, It>& operator++() {
 			++it;
 			return *this;
 		}
+		/// Advances the iterator backwards by one slot.
+		/**
+		 * Post-decrement is provided based on this by boost.operators.
+		 */
 		iterator_<Obj, It>& operator--() {
 			--it;
 			return *this;
 		}
+		/// Advances the iterator by n slots.
+		/**
+		 * Symmetric operator+ overloads are provided based on this by boost.operators.
+		 */
 		iterator_<Obj, It>& operator+=(std::ptrdiff_t n) {
 			it += n;
 			return *this;
 		}
+		/// Advances the iterator backwards by n slots.
+		/**
+		 * The operator-(iterator_,std::ptrdiff_t) is provided based on this by boost.operators.
+		 */
 		iterator_<Obj, It>& operator-=(std::ptrdiff_t n) {
 			it -= n;
 			return *this;
 		}
+		/// Compares this and other for equality.
+		/**
+		 * The operator != is provided based on this by boost.operators.
+		 */
 		bool operator==(const iterator_<Obj, It>& other) const {
 			return it == other.it;
 		}
+		/// Returns true if this refers to an object slot before other.
+		/**
+		 * The other comparison operators are provided based on this by boost.operators.
+		 */
 		bool operator<(const iterator_<Obj, It>& other) const {
 			return it < other.it;
 		}
 
+		/// Allows converting a non-const iterator to a const iterator.
 		operator iterator_<const T, typename std::vector<std::shared_ptr<T>>::const_iterator>() const {
 			return iterator_<const T, typename std::vector<std::shared_ptr<T>>::const_iterator>(it);
 		}
