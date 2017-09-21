@@ -77,7 +77,7 @@ void entity::load_from_bstream(bstream::ibstream& istr, const mce::entity::entit
 	component_container<component_type_id_t> current_component_ids;
 	component_container<component_type_id_t> created_component_ids;
 	component_container<component_type_id_t> removed_component_ids;
-	using comp_elem_t = std::pair<component_type_id_t, containers::smart_pool_ptr<mce::entity::component>>;
+	using comp_elem_t = std::pair<component_type_id_t, component_pool_ptr>;
 	std::transform(components_.begin(), components_.end(), std::back_inserter(current_component_ids),
 				   [](const comp_elem_t& e) { return e.first; });
 	std::set_difference(loaded_component_ids.begin(), loaded_component_ids.end(),

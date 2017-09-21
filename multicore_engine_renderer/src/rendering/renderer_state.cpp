@@ -123,9 +123,7 @@ void renderer_state::render(const mce::core::frame_time&) {
 						[](const render_task&) {}));
 	});
 }
-void renderer_state::task_reducer::
-operator()(const containers::smart_object_pool_range<
-		   containers::smart_object_pool<static_model_component>::const_iterator>& range) {
+void renderer_state::task_reducer::operator()(const static_model_comp_range_t& range) {
 	for(const static_model_component& c : range) {
 		if(c.ready()) {
 			assert(c.model());

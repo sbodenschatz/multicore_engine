@@ -12,6 +12,7 @@
  * Defines the actuator_state class.
  */
 
+#include <mce/containers/simple_smart_object_pool.hpp>
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/core/system_state.hpp>
 #include <mce/entity/ecs_types.hpp>

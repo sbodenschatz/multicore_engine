@@ -48,6 +48,8 @@ class renderer_state : public core::system_state {
 	entity::component_pool<point_light_component> point_light_comps;
 	entity::component_pool<static_model_component> static_model_comps;
 
+	using static_model_comp_range_t = decltype(containers::make_pool_const_range(static_model_comps));
+
 	per_scene_uniforms scene_uniforms;
 
 	struct render_task {
@@ -67,8 +69,7 @@ class renderer_state : public core::system_state {
 		explicit task_reducer(renderer_state& rs) : rs{rs}, buffer{rs.render_task_buffer_pool.get()} {}
 		task_reducer(const task_reducer& other, tbb::split)
 				: rs{other.rs}, buffer{rs.render_task_buffer_pool.get()} {}
-		void operator()(const containers::smart_object_pool_range<
-						containers::smart_object_pool<static_model_component>::const_iterator>& range);
+		void operator()(const static_model_comp_range_t& range);
 		void join(const task_reducer& other);
 	};
 

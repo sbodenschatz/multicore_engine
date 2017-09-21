@@ -35,13 +35,13 @@ void input_state::process(const mce::core::frame_time& frame_time) {
 	first_person_flyer_comps.process_pending();
 	if(frame_time.delta_t > 0.0f) {
 		const input_system& sys = *static_cast<input_system*>(system_);
-		tbb::parallel_for(containers::make_pool_range(first_person_flyer_comps),
-						  [&frame_time, &sys](const containers::smart_object_pool_range<decltype(
-													  first_person_flyer_comps)::iterator>& range) {
-							  for(auto& comp : range) {
-								  comp.process(frame_time, sys);
-							  }
-						  });
+		auto range = containers::make_pool_range(first_person_flyer_comps);
+		using range_t = decltype(range);
+		tbb::parallel_for(range, [&frame_time, &sys](const range_t& range) {
+			for(auto& comp : range) {
+				comp.process(frame_time, sys);
+			}
+		});
 	}
 }
 

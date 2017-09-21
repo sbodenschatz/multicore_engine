@@ -40,9 +40,7 @@ private:
 	entity_orientation_t orientation_;
 	template <typename T>
 	using component_container = boost::container::small_vector<T, 16>;
-	containers::generic_flat_map<component_container, component_type_id_t,
-								 containers::smart_pool_ptr<mce::entity::component>>
-			components_;
+	containers::generic_flat_map<component_container, component_type_id_t, component_pool_ptr> components_;
 	bool marker_for_despawn = false;
 
 	friend class entity_manager;

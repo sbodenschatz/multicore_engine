@@ -11,6 +11,7 @@
  * Defines the system_state class for the input system.
  */
 
+#include <mce/containers/simple_smart_object_pool.hpp>
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/containers/smart_pool_ptr.hpp>
 #include <mce/core/system_state.hpp>
