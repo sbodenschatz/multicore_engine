@@ -53,11 +53,17 @@ public:
 		return o;
 	}
 	/// Returns true if and only if the pool has no objects in it.
-	bool empty() const;
+	bool empty() const {
+		return objects_.empty();
+	}
 	/// Returns the number objects in the pool.
-	size_t size() const;
+	size_t size() const {
+		return objects_.size();
+	}
 	/// Returns the number of objects, the pool can currently hold without a larger handle container.
-	size_t capacity() const;
+	size_t capacity() const {
+		return objects_.capacity();
+	}
 	/// \brief Returns an iterator referring to the first object in the pool or a past-end-iterator if the
 	/// pool is empty.
 	iterator begin();
