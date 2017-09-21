@@ -46,7 +46,12 @@ public:
 	///  \brief Creates an object in the the pool and returns a smart pointer as the initial owner that
 	///  manages the lifetime of the object.
 	template <typename... Args>
-	std::shared_ptr<T> emplace(Args&&... args);
+	std::shared_ptr<T> emplace(Args&&... args) {
+		auto o = std::make_shared<T>(std::forward<Args>(args)...);
+		std::lock_guard<decltype(pending_objects_mtx_)> lock(pending_objects_mtx_);
+		pending_objects_.push_back(o);
+		return o;
+	}
 	/// Returns true if and only if the pool has no objects in it.
 	bool empty() const;
 	/// Returns the number objects in the pool.
