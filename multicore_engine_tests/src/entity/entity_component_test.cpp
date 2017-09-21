@@ -7,6 +7,7 @@
 #include <gtest.hpp>
 #include <mce/asset/dummy_asset.hpp>
 #include <mce/bstream/vector_iobstream.hpp>
+#include <mce/containers/simple_smart_object_pool.hpp>
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/entity/component.hpp>
 #include <mce/entity/entity_manager.hpp>
@@ -46,10 +47,10 @@ public:
 };
 
 class test_a_system {
-	containers::smart_object_pool<test_a_1_component, 256> components1;
+	component_pool<test_a_1_component, 256> components1;
 
 public:
-	containers::smart_pool_ptr<test_a_1_component>
+	component_impl_pool_ptr<test_a_1_component>
 	create_component_1(entity& owner, const component_configuration& configuration) {
 		return components1.emplace(owner, configuration);
 	}
@@ -288,30 +289,30 @@ public:
 };
 
 class test_b_system {
-	containers::smart_object_pool<test_b_entref_component, 256> entref_components;
-	containers::smart_object_pool<test_b_quat_component, 256> quat_components;
-	containers::smart_object_pool<test_b_float_component, 256> float_components;
-	containers::smart_object_pool<test_b_int_component, 256> int_components;
-	containers::smart_object_pool<test_b_direct_prop_component, 256> direct_prop_components;
+	component_pool<test_b_entref_component, 256> entref_components;
+	component_pool<test_b_quat_component, 256> quat_components;
+	component_pool<test_b_float_component, 256> float_components;
+	component_pool<test_b_int_component, 256> int_components;
+	component_pool<test_b_direct_prop_component, 256> direct_prop_components;
 
 public:
-	containers::smart_pool_ptr<test_b_entref_component>
+	component_impl_pool_ptr<test_b_entref_component>
 	create_entref_component(entity& owner, const component_configuration& configuration) {
 		return entref_components.emplace(owner, configuration);
 	}
-	containers::smart_pool_ptr<test_b_quat_component>
+	component_impl_pool_ptr<test_b_quat_component>
 	create_quat_component(entity& owner, const component_configuration& configuration) {
 		return quat_components.emplace(owner, configuration);
 	}
-	containers::smart_pool_ptr<test_b_float_component>
+	component_impl_pool_ptr<test_b_float_component>
 	create_float_component(entity& owner, const component_configuration& configuration) {
 		return float_components.emplace(owner, configuration);
 	}
-	containers::smart_pool_ptr<test_b_int_component>
+	component_impl_pool_ptr<test_b_int_component>
 	create_int_component(entity& owner, const component_configuration& configuration) {
 		return int_components.emplace(owner, configuration);
 	}
-	containers::smart_pool_ptr<test_b_direct_prop_component>
+	component_impl_pool_ptr<test_b_direct_prop_component>
 	create_direct_prop_component(entity& owner, const component_configuration& configuration) {
 		return direct_prop_components.emplace(owner, configuration);
 	}
