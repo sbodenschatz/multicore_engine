@@ -891,6 +891,9 @@ public:
 	const_iterator cend() const {
 		return const_iterator();
 	}
+
+	/// Does nothing and is only provided for interface compatibility with simple_smart_object_pool.
+	void process_pending() const noexcept {}
 };
 
 template <typename T, size_t block_size>
