@@ -9,12 +9,10 @@
 #include <mce/asset/pack_file_meta_data.hpp>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
+#include <mce/exceptions.hpp>
 
 namespace mce {
 namespace asset {
-
-constexpr uint64_t pack_file_meta_data::magic_number;
-constexpr uint8_t pack_file_meta_data::current_version[3];
 
 bstream::ibstream& operator>>(bstream::ibstream& ibs, pack_file_element_meta_data& value) {
 	ibs >> value.offset;
@@ -32,25 +30,21 @@ bstream::obstream& operator<<(bstream::obstream& obs, const pack_file_element_me
 }
 
 bstream::ibstream& operator>>(bstream::ibstream& ibs, pack_file_meta_data& value) {
-	uint64_t magic_num = 0;
-	ibs >> magic_num;
-	if(magic_num != pack_file_meta_data::magic_number) {
+	ibs >> value.magic_number;
+	if(value.magic_number != pack_file_meta_data::magic_number_) {
 		ibs.raise_read_invalid();
-	} else {
-		ibs >> value.version;
-
-		if(!std::equal(std::begin(value.version), std::end(value.version),
-					   std::begin(pack_file_meta_data::current_version),
-					   std::end(pack_file_meta_data::current_version))) {
-			ibs.raise_read_invalid();
-		} else {
-			ibs >> value.elements;
-		}
+		throw invalid_magic_number_exception("Invalid magic number.");
 	}
+	ibs >> value.version;
+	if(value.version != pack_file_meta_data::version_) {
+		ibs.raise_read_invalid();
+		throw invalid_version_exception("Can't load different load unit version.");
+	}
+	ibs >> value.elements;
 	return ibs;
 }
 bstream::obstream& operator<<(bstream::obstream& obs, const pack_file_meta_data& value) {
-	obs << pack_file_meta_data::magic_number;
+	obs << value.magic_number;
 	obs << value.version;
 	obs << value.elements;
 	return obs;

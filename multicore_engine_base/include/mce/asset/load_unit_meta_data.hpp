@@ -13,6 +13,7 @@
  */
 
 #include <cstdint>
+#include <mce/util/composite_magic_number.hpp>
 #include <string>
 #include <vector>
 
@@ -37,11 +38,16 @@ struct asset_meta_data {
 
 /// Defines the structure of the meta data for a load unit.
 struct load_unit_meta_data {
-	// std::string name;
-	std::vector<asset_meta_data> assets; ///< The meta data for the assets in the load unit.
-
 	/// Magic number for load unit meta data files.
-	static const uint64_t magic_number = 0x4d43454c53422015ULL; /*MCELSB2015*/
+	constexpr static uint64_t magic_number_ =
+			util::composite_magic_number<uint64_t>('m', 'c', 'e', 'l', 'd', 'u', 'n', 't');
+	/// The supported (current) version of the load unit file format.
+	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 1u);
+
+	uint64_t magic_number = magic_number_; ///< The deserialized magic number.
+	uint64_t version = version_;		   ///< The deserialized version tag.
+
+	std::vector<asset_meta_data> assets; ///< The meta data for the assets in the load unit.
 
 	/// Deserializes the load unit meta data from the bstream.
 	friend bstream::ibstream& operator>>(bstream::ibstream& ibs, load_unit_meta_data& value);
