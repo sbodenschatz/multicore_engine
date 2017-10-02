@@ -102,18 +102,18 @@ struct static_model_meta_data {
 	/// Deserializes the model meta data.
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_meta_data& value) {
 		stream >> value.magic_number;
-		stream >> value.version;
-		stream >> value.content_range;
-		stream >> value.meshes;
-		stream >> value.vertex_data_in_content;
 		if(value.magic_number != magic_number_) {
 			stream.raise_read_invalid();
 			throw invalid_magic_number_exception("Invalid magic number.");
 		}
+		stream >> value.version;
 		if(value.version != version_) {
 			stream.raise_read_invalid();
 			throw invalid_version_exception("Can't load different model version.");
 		}
+		stream >> value.content_range;
+		stream >> value.meshes;
+		stream >> value.vertex_data_in_content;
 		return stream;
 	}
 };
@@ -220,16 +220,16 @@ struct static_model_collision_data {
 	/// Deserializes the static model collision data.
 	friend bstream::ibstream& operator>>(bstream::ibstream& stream, static_model_collision_data& value) {
 		stream >> value.magic_number;
-		stream >> value.version;
-		stream >> value.meshes;
 		if(value.magic_number != magic_number_) {
 			stream.raise_read_invalid();
 			throw invalid_magic_number_exception("Invalid magic number.");
 		}
+		stream >> value.version;
 		if(value.version != version_) {
 			stream.raise_read_invalid();
 			throw invalid_version_exception("Can't load different model version.");
 		}
+		stream >> value.meshes;
 		return stream;
 	}
 };
