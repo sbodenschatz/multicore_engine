@@ -13,6 +13,7 @@
  */
 
 #include <cstdint>
+#include <mce/util/composite_magic_number.hpp>
 #include <string>
 #include <vector>
 
@@ -39,13 +40,16 @@ struct pack_file_element_meta_data {
 /// Represents the meta data for a pack file.
 struct pack_file_meta_data {
 	/// The supported (current) version of the pack file meta data format.
-	static constexpr uint8_t current_version[3] = {0, 2, 0};
+	constexpr static uint64_t version_ = util::composite_magic_number<uint64_t>(0u, 3u);
 
 	/// Magic number for pack file meta data files.
-	static constexpr uint64_t magic_number = 0x4d43455053422015ULL; /*MCEPSB2015*/
-	std::vector<pack_file_element_meta_data> elements;				///< The elements of the pack file.
-	/// Version flag for the pack file meta data format.
-	uint8_t version[3] = {current_version[0], current_version[1], current_version[2]};
+	static constexpr uint64_t magic_number_ =
+			util::composite_magic_number<uint64_t>('m', 'c', 'e', 'p', 'c', 'k', 'f', 'l');
+
+	uint64_t magic_number = magic_number_; ///< The deserialized magic number.
+	uint64_t version = version_;		   ///< The deserialized version tag.
+
+	std::vector<pack_file_element_meta_data> elements; ///< The elements of the pack file.
 
 	/// Deserializes the pack file meta data from the bstream.
 	friend bstream::ibstream& operator>>(bstream::ibstream& ibs, pack_file_meta_data& value);
