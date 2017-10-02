@@ -7,11 +7,10 @@
 #include <mce/asset/load_unit_meta_data.hpp>
 #include <mce/bstream/ibstream.hpp>
 #include <mce/bstream/obstream.hpp>
+#include <mce/exceptions.hpp>
 
 namespace mce {
 namespace asset {
-
-const uint64_t load_unit_meta_data::magic_number;
 
 bstream::ibstream& operator>>(bstream::ibstream& ibs, asset_meta_data& value) {
 	ibs >> value.offset;
@@ -27,16 +26,22 @@ bstream::obstream& operator<<(bstream::obstream& obs, const asset_meta_data& val
 }
 
 bstream::ibstream& operator>>(bstream::ibstream& ibs, load_unit_meta_data& value) {
-	uint64_t magic_num = 0;
-	ibs >> magic_num;
-	if(magic_num != load_unit_meta_data::magic_number)
+	ibs >> value.magic_number;
+	if(value.magic_number != load_unit_meta_data::magic_number_) {
 		ibs.raise_read_invalid();
-	else
-		ibs >> value.assets;
+		throw invalid_magic_number_exception("Invalid magic number.");
+	}
+	ibs >> value.version;
+	if(value.version != load_unit_meta_data::version_) {
+		ibs.raise_read_invalid();
+		throw invalid_version_exception("Can't load different load unit version.");
+	}
+	ibs >> value.assets;
 	return ibs;
 }
 bstream::obstream& operator<<(bstream::obstream& obs, const load_unit_meta_data& value) {
-	obs << load_unit_meta_data::magic_number;
+	obs << value.magic_number;
+	obs << value.version;
 	obs << value.assets;
 	return obs;
 }
