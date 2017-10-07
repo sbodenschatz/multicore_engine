@@ -54,6 +54,7 @@ class entity_manager {
 	boost::container::flat_map<std::string, std::unique_ptr<abstract_component_type>> component_types;
 	boost::container::flat_map<component_type_id_t, abstract_component_type*> component_types_by_id;
 
+	// TODO remove?
 	void register_builtin_components();
 
 public:
