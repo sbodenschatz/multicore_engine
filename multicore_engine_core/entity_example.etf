@@ -1,17 +1,24 @@
 include "other_file.etf";
 
-Entity_Config_Name : Super_Entity {
-	Component_Name{
-		variable_1=42;
+entity_config_name : super_entity {
+	component_name{
+		variable_1=42.24;
 		var_2=(123,456,789);
 	}
-	Inherited_Component1{
+	inherited_component_1{
 		changed_variable="Test";	
 	}
-	replace Inherited_Component2{
+	replace inherited_component_2{
+	}
+}
+follower{
+	follow_component{
+		start_point = marker "Start";
+		target = entity name_of_entity;
 	}
 }
 
 //This file format allows C++-Style comments but not C-Style comments
-Entity_Config_Name (1,2,3),(x:45,y:30); //Unnamed entity
-Entity_Config_Name name_of_entity (1,2,3),(x:45,y:30);
+entity_config_name (1,2,3),(x:45,y:30); //Unnamed entity
+entity_config_name name_of_entity (1,2,3),(x:45,y:30);
+follower f (0,0,0),();
