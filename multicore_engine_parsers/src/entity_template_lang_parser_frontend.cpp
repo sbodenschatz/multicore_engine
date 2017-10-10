@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/entity/parser/entity_text_file_parser.cpp
+ * File /multicore_engine_parsers/src/entity/parser/entity_template_lang_parser.cpp
  * Copyright 2015 by Stefan Bodenschatz
  */
 
@@ -26,9 +26,9 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
-#include <mce/entity/parser/entity_text_file_ast_fusion.hpp>
-#include <mce/entity/parser/entity_text_file_parser_frontend.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast_fusion.hpp>
+#include <mce/entity/parser/entity_template_lang_parser_frontend.hpp>
 #include <mce/util/error_helper.hpp>
 
 namespace spirit = boost::spirit;
@@ -39,9 +39,9 @@ namespace mce {
 namespace entity {
 namespace parser {
 
-struct entity_text_file_skipper : qi::grammar<const char*> {
+struct entity_template_lang_skipper : qi::grammar<const char*> {
 	qi::rule<const char*> skip;
-	entity_text_file_skipper() : entity_text_file_skipper::base_type(skip, "Skipper") {
+	entity_template_lang_skipper() : entity_template_lang_skipper::base_type(skip, "Skipper") {
 		using qi::lit;
 		using qi::char_;
 		using qi::eol;
@@ -50,9 +50,10 @@ struct entity_text_file_skipper : qi::grammar<const char*> {
 	}
 };
 
-struct entity_text_file_grammar : qi::grammar<const char*, entity_text_file_skipper, ast::ast_root()> {
+struct entity_template_lang_grammar
+		: qi::grammar<const char*, entity_template_lang_skipper, ast::ast_root()> {
 	template <typename Signature>
-	using rule = qi::rule<const char*, entity_text_file_skipper, Signature>;
+	using rule = qi::rule<const char*, entity_template_lang_skipper, Signature>;
 
 	rule<ast::ast_root()> start;
 	rule<std::string()> identifier;
@@ -76,7 +77,7 @@ struct entity_text_file_grammar : qi::grammar<const char*, entity_text_file_skip
 	rule<ast::entity_instance_param()> entity_instance_param;
 	rule<ast::float_node> float_literal;
 
-	entity_text_file_grammar() : entity_text_file_grammar::base_type(start) {
+	entity_template_lang_grammar() : entity_template_lang_grammar::base_type(start) {
 		using qi::_1;
 		using spirit::_val;
 		using phoenix::at_c;
@@ -146,13 +147,13 @@ struct entity_text_file_grammar : qi::grammar<const char*, entity_text_file_skip
 	}
 };
 
-entity_text_file_parser_frontend::entity_text_file_parser_frontend()
-		: grammar(std::make_unique<entity_text_file_grammar>()),
-		  skipper(std::make_unique<entity_text_file_skipper>()) {}
-entity_text_file_parser_frontend::~entity_text_file_parser_frontend() {}
+entity_template_lang_parser_frontend::entity_template_lang_parser_frontend()
+		: grammar(std::make_unique<entity_template_lang_grammar>()),
+		  skipper(std::make_unique<entity_template_lang_skipper>()) {}
+entity_template_lang_parser_frontend::~entity_template_lang_parser_frontend() {}
 
-ast::ast_root entity_text_file_parser_frontend::parse(const std::string& filename, const char*& first,
-													  const char* last) {
+ast::ast_root entity_template_lang_parser_frontend::parse(const std::string& filename, const char*& first,
+														  const char* last) {
 	ast::ast_root ast_root;
 	const char* buffer_start = first;
 	try {

@@ -1,21 +1,21 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/entity/parser/entity_text_file_ast_fusion.hpp
+ * File /multicore_engine_core/include/mce/entity/parser/entity_template_lang_ast_fusion.hpp
  * Copyright 2015 by Stefan Bodenschatz
  */
 
-#ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_FUSION_HPP_
-#define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_FUSION_HPP_
+#ifndef ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_FUSION_HPP_
+#define ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_FUSION_HPP_
 
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/mpl/sequence_tag.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
 #include <string>
 #include <vector>
 
 /**
  * \file
- * Adaptation of entity text file AST nodes for boost.fusion.
+ * Adaptation of entity template language AST nodes for boost.fusion.
  */
 
 BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::float_node, (float, value))
@@ -52,4 +52,4 @@ BOOST_FUSION_ADAPT_STRUCT(mce::entity::ast::entity_instance,								//
 						  (mce::entity::ast::entity_instance_param, position_parameter)		//
 						  (mce::entity::ast::entity_instance_param, orientation_parameter)) //
 
-#endif /* ENTITY_PARSER_ENTITY_TEXT_FILE_AST_FUSION_HPP_ */
+#endif /* ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_FUSION_HPP_ */

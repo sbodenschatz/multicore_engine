@@ -11,7 +11,7 @@
 #include <mce/bstream/obstream.hpp>
 #include <mce/entity/entity_configuration.hpp>
 #include <mce/entity/entity_manager.hpp>
-#include <mce/entity/parser/entity_text_file_parser.hpp>
+#include <mce/entity/parser/entity_template_lang_parser.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/util/finally.hpp>
 #include <tuple>
@@ -37,9 +37,9 @@ void entity_manager::clear_entities_and_entity_configurations() {
 	clear_entities();
 	entity_configurations.clear();
 }
-void entity_manager::load_entities_from_text_file(const asset::asset_ptr& text_file_asset) {
-	parser::entity_text_file_parser_backend parser_backend(*this);
-	parser_backend.load_and_process_file(text_file_asset);
+void entity_manager::load_entities_from_template_lang_file(const asset::asset_ptr& template_lang_file_asset) {
+	parser::entity_template_lang_parser_backend parser_backend(*this);
+	parser_backend.load_and_process_file(template_lang_file_asset);
 }
 entity* entity_manager::create_entity(const entity_configuration* config) {
 	assert(!read_only_mode);

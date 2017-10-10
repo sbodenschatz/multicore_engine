@@ -1,14 +1,14 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_tests/src/entity/entity_text_file_parser_frontend_test.cpp
+ * File /multicore_engine_tests/src/entity/entity_template_lang_parser_frontend_test.cpp
  * Copyright 2015 by Stefan Bodenschatz
  */
 
 #include <boost/variant/get.hpp>
 #include <gtest.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
-#include <mce/entity/parser/entity_text_file_ast_compare.hpp>
-#include <mce/entity/parser/entity_text_file_parser.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast_compare.hpp>
+#include <mce/entity/parser/entity_template_lang_parser.hpp>
 #include <mce/exceptions.hpp>
 #include <string>
 
@@ -16,8 +16,8 @@ namespace mce {
 namespace entity {
 namespace parser {
 
-TEST(entity_entity_text_file_parser_frontend_test, empty_file_valid) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, empty_file_valid) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -25,8 +25,8 @@ TEST(entity_entity_text_file_parser_frontend_test, empty_file_valid) {
 	ASSERT_TRUE(first == last);
 	ASSERT_TRUE(root.size() == 0);
 }
-TEST(entity_entity_text_file_parser_frontend_test, only_comment_valid) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, only_comment_valid) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "//Comment\n";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -35,8 +35,8 @@ TEST(entity_entity_text_file_parser_frontend_test, only_comment_valid) {
 	ASSERT_TRUE(root.size() == 0);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_instance_unnamed_intlist_rotlist) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_instance_unnamed_intlist_rotlist) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "Test (1,2,3),(x:45,y:30);";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -52,8 +52,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_instance_unnamed_intli
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_instance_named_floatlist_floatlist) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_instance_named_floatlist_floatlist) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "Test test(1,2,3.0),(1.0,2.0,3.0,4.0);";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -69,22 +69,22 @@ TEST(entity_entity_text_file_parser_frontend_test, single_instance_named_floatli
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_include) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";";
+TEST(entity_entity_template_lang_parser_frontend_test, single_include) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
 	auto root = parser.parse("[unittest]", first, last);
 	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::include_instruction ii;
-	ii.filename = "testfile.etf";
+	ii.filename = "testfile.etl";
 	root_expected.emplace_back(ii);
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_empty) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_empty) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -97,8 +97,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_emp
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_empty) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_empty) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -114,8 +114,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_intvar) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_intvar) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=42;}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -135,8 +135,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_floatvar) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_floatvar) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=42.0;}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -156,8 +156,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_stringvar) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_stringvar) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=\"Hello World!!\";}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -177,8 +177,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_intlist) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_intlist) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=(1,2,3);test2=();}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -206,8 +206,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_floatlist) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_floatlist) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=(1,2,3.0);}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -227,8 +227,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_stringlist) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_stringlist) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=(\"Hello\",\"World\");}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -248,8 +248,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_entityref) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_entityref) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=entity testent;}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -269,8 +269,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_comp_marker) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_nosuper_comp_marker) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt{TestComp{test=marker \"testmarker\";}}";
 	const char* first = testdata.data();
 	const char* last = testdata.data() + testdata.size();
@@ -290,8 +290,8 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_nosuper_com
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, single_definition_super_compreplace_comp) {
-	entity_text_file_parser_frontend parser;
+TEST(entity_entity_template_lang_parser_frontend_test, single_definition_super_compreplace_comp) {
+	entity_template_lang_parser_frontend parser;
 	std::string testdata = "TestEnt:SuperEnt{"
 						   "replace TestComp{test=(\"Hello\",\"World\");}"
 						   "TestComp2{test=42;}"
@@ -327,9 +327,9 @@ TEST(entity_entity_text_file_parser_frontend_test, single_definition_super_compr
 	ASSERT_TRUE(root == root_expected);
 }
 
-TEST(entity_entity_text_file_parser_frontend_test, combined) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, combined) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -347,7 +347,7 @@ TEST(entity_entity_text_file_parser_frontend_test, combined) {
 	ASSERT_TRUE(first == last);
 	ast::ast_root root_expected;
 	ast::include_instruction ii;
-	ii.filename = "testfile.etf";
+	ii.filename = "testfile.etl";
 	root_expected.emplace_back(ii);
 	ast::entity_definition ed;
 	ed.name = "TestEnt";
@@ -390,9 +390,9 @@ TEST(entity_entity_text_file_parser_frontend_test, combined) {
 	}
 	ASSERT_TRUE(root == root_expected);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_include_non_string) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include testfile.etf;\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_include_non_string) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include testfile.etl;\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -409,9 +409,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_include_non_stri
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_super) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_missing_super) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:{\n"
 						   "	replace TestComp{\n"
@@ -428,9 +428,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_super) {
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_template_name) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_missing_template_name) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   ":SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -447,9 +447,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_template
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_invalid_modifier) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_invalid_modifier) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	repl TestComp{\n"
@@ -466,9 +466,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_invalid_modifier
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_comp_name) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_missing_comp_name) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -485,9 +485,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_comp_nam
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_var_name) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_missing_var_name) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -504,9 +504,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_var_name
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_delimiter) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_missing_delimiter) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -523,9 +523,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_delimite
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_value) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_missing_value) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -542,9 +542,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_value) {
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_semicolon) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_missing_semicolon) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -561,9 +561,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_missing_semicolo
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_instance_missing_delimiter) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_instance_missing_delimiter) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -580,9 +580,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_instance_missing
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_instance_missing_internal_delimiter) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_instance_missing_internal_delimiter) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"
@@ -599,9 +599,9 @@ TEST(entity_entity_text_file_parser_frontend_test, syntax_error_instance_missing
 	ast::ast_root root;
 	ASSERT_THROW(root = parser.parse("[unit test]", first, last), syntax_exception);
 }
-TEST(entity_entity_text_file_parser_frontend_test, syntax_error_instance_missing_semicolon) {
-	entity_text_file_parser_frontend parser;
-	std::string testdata = "include \"testfile.etf\";\n"
+TEST(entity_entity_template_lang_parser_frontend_test, syntax_error_instance_missing_semicolon) {
+	entity_template_lang_parser_frontend parser;
+	std::string testdata = "include \"testfile.etl\";\n"
 						   "//Comment\n"
 						   "TestEnt:SuperEnt{\n"
 						   "	replace TestComp{\n"

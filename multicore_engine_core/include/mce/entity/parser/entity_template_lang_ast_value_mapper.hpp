@@ -1,15 +1,15 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/entity/parser/entity_text_file_ast_value_map.hpp
+ * File /multicore_engine_core/include/mce/entity/parser/entity_template_lang_ast_value_map.hpp
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
-#ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
-#define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
+#ifndef ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_VALUE_MAPPER_HPP_
+#define ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_VALUE_MAPPER_HPP_
 
 /**
  * \file
- * Maps value AST node types to component property type they can be used with.
+ * Maps value entity template language AST node types to component property type they can be used with.
  */
 
 #include <cstdint>
@@ -17,7 +17,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <limits>
 #include <mce/entity/entity_reference.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
 #include <mce/exceptions.hpp>
 #include <string>
 #include <type_traits>
@@ -261,4 +261,4 @@ struct ast_value_mapper<ast::rotation_list, glm::tquat<T, p>> {
 } // namespace entity
 } // namespace mce
 
-#endif /* ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_ */
+#endif /* ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_VALUE_MAPPER_HPP_ */

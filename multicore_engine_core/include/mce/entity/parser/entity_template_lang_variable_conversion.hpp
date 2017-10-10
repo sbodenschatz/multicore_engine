@@ -1,19 +1,19 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/entity/parser/entity_text_file_variable_conversion.hpp
+ * File /multicore_engine_core/include/mce/entity/parser/entity_template_lang_variable_conversion.hpp
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#ifndef MCE_ENTITY_PARSER_ENTITY_TEXT_FILE_VARIABLE_CONVERSION_HPP_
-#define MCE_ENTITY_PARSER_ENTITY_TEXT_FILE_VARIABLE_CONVERSION_HPP_
+#ifndef MCE_ENTITY_PARSER_ENTITY_TEMPLATE_LANG_VARIABLE_CONVERSION_HPP_
+#define MCE_ENTITY_PARSER_ENTITY_TEMPLATE_LANG_VARIABLE_CONVERSION_HPP_
 
 /**
  * \file
- * Provides helper conversion functions to work with entity text file AST variables.
+ * Provides helper conversion functions to work with entity template language AST variables.
  */
 
-#include <mce/entity/parser/entity_text_file_ast.hpp>
-#include <mce/entity/parser/entity_text_file_ast_value_mapper.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast_value_mapper.hpp>
 
 namespace mce {
 namespace entity {
@@ -62,4 +62,4 @@ T get_variable_value(const variable_value& var, entity_manager& em) {
 } // namespace entity
 } // namespace mce
 
-#endif /* MCE_ENTITY_PARSER_ENTITY_TEXT_FILE_VARIABLE_CONVERSION_HPP_ */
+#endif /* MCE_ENTITY_PARSER_ENTITY_TEMPLATE_LANG_VARIABLE_CONVERSION_HPP_ */

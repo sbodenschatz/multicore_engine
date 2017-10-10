@@ -74,7 +74,7 @@ TEST(entity_entity_component_test, load_entity_with_simple_component) {
 	test_a_system tasys;
 	entity_manager em(nullptr);
 	tasys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 						"Test_Ent_Conf test_ent (0,0,0),();"));
 	simple_ecs_test_verfiy(em);
@@ -85,7 +85,7 @@ TEST(entity_entity_component_test, entity_serialize_and_deserialize) {
 	{
 		entity_manager em(nullptr);
 		tasys.register_with_manager(em);
-		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+		em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 				"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 							"Test_Ent_Conf test_ent (0,0,0),();"));
 		em.store_entities_to_bstream(stream);
@@ -101,7 +101,7 @@ TEST(entity_entity_component_test, entity_despawn) {
 	test_a_system tasys;
 	entity_manager em(nullptr);
 	tasys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 						"Test_Ent_Conf test_ent_1 (0,0,0),();"
 						"Test_Ent_Conf test_ent_2 (0,0,0),();"));
@@ -344,7 +344,7 @@ TEST(entity_entity_component_test, entity_component_property_entity_reference) {
 	entity_manager em(nullptr);
 	tasys.register_with_manager(em);
 	tbsys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 						"Test2_Ent_Conf{test_b_entref{ent_ref=entity test_ent1;}}"
 						"Test_Ent_Conf test_ent1 (0,0,0),();"
@@ -360,7 +360,7 @@ TEST(entity_entity_component_test, entity_component_property_entity_reference_se
 		entity_manager em(nullptr);
 		tasys.register_with_manager(em);
 		tbsys.register_with_manager(em);
-		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+		em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 				"test.etf", "Test_Ent_Conf{test_a_1{name=\"TestComp\";values=(\"Hello\",\"World\");}}"
 							"Test2_Ent_Conf{test_b_entref{ent_ref=entity test_ent1;}}"
 							"Test_Ent_Conf test_ent1 (0,0,0),();"
@@ -401,7 +401,7 @@ TEST(entity_entity_component_test, entity_component_property_quaternion) {
 	test_b_system tbsys;
 	entity_manager em(nullptr);
 	tbsys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf_1{test_b_quat{orientation=(x:90,y:0,z:0);}}"
 						"Test_Ent_Conf_2{test_b_quat{orientation=(90,1,0,0);}}"
 						"Test_Ent_Conf_1 test_ent1 (0,0,0),(x:90,y:0,z:0);"
@@ -415,7 +415,7 @@ TEST(entity_entity_component_test, entity_component_property_quaternion_serializ
 	{
 		entity_manager em(nullptr);
 		tbsys.register_with_manager(em);
-		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+		em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 				"test.etf", "Test_Ent_Conf_1{test_b_quat{orientation=(x:90,y:0,z:0);}}"
 							"Test_Ent_Conf_2{test_b_quat{orientation=(90,1,0,0);}}"
 							"Test_Ent_Conf_1 test_ent1 (0,0,0),(x:90,y:0,z:0);"
@@ -459,7 +459,7 @@ TEST(entity_entity_component_test, entity_component_property_float) {
 	test_b_system tbsys;
 	entity_manager em(nullptr);
 	tbsys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_b_float{"
 						"scalar=1.2;"
 						"vec2=(3.4,5.6);"
@@ -476,7 +476,7 @@ TEST(entity_entity_component_test, entity_component_property_float_serialize_des
 	{
 		entity_manager em(nullptr);
 		tbsys.register_with_manager(em);
-		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+		em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 				"test.etf", "Test_Ent_Conf{test_b_float{"
 							"scalar=1.2;"
 							"vec2=(3.4,5.6);"
@@ -498,7 +498,7 @@ TEST(entity_entity_component_test, entity_component_property_float_scalar_as_1d_
 	test_b_system tbsys;
 	entity_manager em(nullptr);
 	tbsys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_b_float{"
 						"scalar=(1.2);"
 						"vec2=(3.4,5.6);"
@@ -538,7 +538,7 @@ TEST(entity_entity_component_test, entity_component_property_int) {
 	test_b_system tbsys;
 	entity_manager em(nullptr);
 	tbsys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_b_int{"
 						"scalar=123;"
 						"vec2=(456, 789);"
@@ -555,7 +555,7 @@ TEST(entity_entity_component_test, entity_component_property_int_serialize_deser
 	{
 		entity_manager em(nullptr);
 		tbsys.register_with_manager(em);
-		em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+		em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 				"test.etf", "Test_Ent_Conf{test_b_int{"
 							"scalar=123;"
 							"vec2=(456, 789);"
@@ -577,7 +577,7 @@ TEST(entity_entity_component_test, entity_component_property_int_scalar_as_1d_ve
 	test_b_system tbsys;
 	entity_manager em(nullptr);
 	tbsys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_b_int{"
 						"scalar=(123);"
 						"vec2=(456, 789);"
@@ -602,7 +602,7 @@ TEST(entity_entity_component_test, entity_component_property_direct_prop) {
 	test_b_system tbsys;
 	entity_manager em(nullptr);
 	tbsys.register_with_manager(em);
-	em.load_entities_from_text_file(asset::dummy_asset::create_dummy_asset(
+	em.load_entities_from_template_lang_file(asset::dummy_asset::create_dummy_asset(
 			"test.etf", "Test_Ent_Conf{test_b_direct_prop{"
 						"int_val=12345;"
 						"string_val=\"Hello World\";"

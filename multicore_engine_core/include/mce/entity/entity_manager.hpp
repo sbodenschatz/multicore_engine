@@ -32,7 +32,7 @@ class engine;
 } // namespace core
 namespace entity {
 namespace parser {
-class entity_text_file_parser_backend;
+class entity_template_lang_parser_backend;
 } // namespace parser
 class entity_configuration;
 class abstract_component_type;
@@ -58,7 +58,7 @@ class entity_manager {
 	void register_builtin_components();
 
 public:
-	friend class mce::entity::parser::entity_text_file_parser_backend;
+	friend class mce::entity::parser::entity_template_lang_parser_backend;
 	/// Constructs an entity_manager for the given engine object.
 	explicit entity_manager(core::engine* engine);
 	/// Forbids copy-construction for entity_manager.
@@ -77,7 +77,7 @@ public:
 	/// Deletes all entity objects and entity_configuration objects from the manager.
 	void clear_entities_and_entity_configurations();
 	/// Loads entities and entity configurations from the entity text file represented by the given asset.
-	void load_entities_from_text_file(const asset::asset_ptr& text_file_asset);
+	void load_entities_from_template_lang_file(const asset::asset_ptr& template_lang_file_asset);
 	/// Adds an entity_configuration to the manager.
 	void add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config);
 	/// Creates an entity from the referenced entity_configuration.

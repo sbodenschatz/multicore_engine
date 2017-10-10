@@ -1,21 +1,21 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/entity/parser/entity_text_file_ast_compare.hpp
+ * File /multicore_engine_core/include/mce/entity/parser/entity_template_lang_ast_compare.hpp
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
-#ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_COMPARE_HPP_
-#define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_COMPARE_HPP_
+#ifndef ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_COMPARE_HPP_
+#define ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_COMPARE_HPP_
 
 /**
  * \file
- * Enables comparison for AST node types for entity text files.
+ * Enables comparison for AST node types for the entity template language.
  */
 
 #include <boost/variant/variant.hpp>
 #include <cmath>
 #include <limits>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
 #include <string>
 #include <vector>
 
@@ -110,4 +110,4 @@ inline bool operator!=(const entity_instance& o1, const entity_instance& o2) {
 } // namespace entity
 } // namespace mce
 
-#endif /* ENTITY_PARSER_ENTITY_TEXT_FILE_AST_COMPARE_HPP_ */
+#endif /* ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_COMPARE_HPP_ */

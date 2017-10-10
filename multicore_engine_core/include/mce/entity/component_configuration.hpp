@@ -16,7 +16,7 @@
 #include <mce/entity/component.hpp>
 #include <mce/entity/component_property_assignment.hpp>
 #include <mce/entity/ecs_types.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
 #include <memory>
 #include <string>
 #include <vector>
