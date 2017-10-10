@@ -57,7 +57,7 @@ struct ast_value_mapper<long long, bool, void> {
 	}
 };
 
-/// Maps integers from the AST (represented by long long) to any arithmetic type.
+/// Maps integers from the AST (represented by long long) to any arithmetic type (except bool).
 template <typename T>
 struct ast_value_mapper<long long, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to T and stores it in val.
@@ -141,7 +141,7 @@ struct ast_value_mapper<float_list, glm::vec4> {
 	}
 };
 
-/// Maps integer lists from the AST to any arithmetic type.
+/// Maps integer lists from the AST to any arithmetic type (except bool).
 template <typename T>
 struct ast_value_mapper<int_list, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to int and stores it in val.
@@ -149,6 +149,18 @@ struct ast_value_mapper<int_list, T, std::enable_if_t<std::is_arithmetic<T>::val
 		val = 0;
 		if(ast_val.size()) {
 			val = checked_numeric_conversion<T>(ast_val[0]);
+		}
+	}
+};
+
+/// Maps integer lists from the AST to bool.
+template <>
+struct ast_value_mapper<int_list, bool> {
+	/// Converts ast_val to int and stores it in val.
+	static void convert(const int_list& ast_val, bool& val, entity_manager&) {
+		val = 0;
+		if(ast_val.size()) {
+			val = bool(ast_val[0]);
 		}
 	}
 };
