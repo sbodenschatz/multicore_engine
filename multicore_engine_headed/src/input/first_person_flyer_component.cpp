@@ -37,7 +37,7 @@ void first_person_flyer_component::process(const mce::core::frame_time& frame_ti
 }
 void first_person_flyer_component::process_keyboard(const mce::core::frame_time& frame_time,
 													const input_system& sys) {
-	glm::vec4 velocity;
+	glm::vec3 velocity;
 	if(sys.current_key_state(forward_key_)) {
 		velocity.z = -1.0f;
 	}
@@ -59,7 +59,7 @@ void first_person_flyer_component::process_keyboard(const mce::core::frame_time&
 	if(dot(velocity, velocity) > 0.0) {
 		velocity = glm::normalize(velocity) * speed_;
 	}
-	velocity = glm::rotate(owner().orientation(), velocity);
+	velocity = glm::vec3(glm::rotate(owner().orientation(), glm::vec4(velocity, 0.0f)));
 	owner().position(owner().position() + velocity * frame_time.delta_t);
 }
 void first_person_flyer_component::process_mouse(const mce::core::frame_time& frame_time,

@@ -32,7 +32,7 @@ typedef uint64_t entity_id_t;
 /// Specifies the type used for component type ids.
 typedef uint32_t component_type_id_t;
 /// Specifies the type used to store the position of an entity.
-typedef glm::vec4 entity_position_t;
+typedef glm::vec3 entity_position_t;
 /// Specifies the type used to store the orientation of an entity.
 typedef glm::quat entity_orientation_t;
 
