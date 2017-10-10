@@ -141,14 +141,14 @@ struct ast_value_mapper<float_list, glm::vec4> {
 	}
 };
 
-/// Maps integer lists from the AST to int.
-template <>
-struct ast_value_mapper<int_list, int> {
+/// Maps integer lists from the AST to any arithmetic type.
+template <typename T>
+struct ast_value_mapper<int_list, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to int and stores it in val.
-	static void convert(const int_list& ast_val, int& val, entity_manager&) {
+	static void convert(const int_list& ast_val, T& val, entity_manager&) {
 		val = 0;
 		if(ast_val.size()) {
-			val = checked_numeric_conversion<int>(ast_val[0]);
+			val = checked_numeric_conversion<T>(ast_val[0]);
 		}
 	}
 };
