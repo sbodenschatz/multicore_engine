@@ -66,7 +66,7 @@ public:
 	game_state(mce::core::engine* engine, mce::core::game_state_machine* state_machine,
 			   mce::core::game_state* parent_state);
 	/// Enables polymorphic destruction for game_state.
-	virtual ~game_state();
+	virtual ~game_state() = 0;
 
 	game_state(const game_state&) = delete;
 	game_state& operator=(const game_state&) = delete;
