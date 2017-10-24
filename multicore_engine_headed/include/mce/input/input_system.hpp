@@ -40,8 +40,8 @@ struct mouse_state {
 	bool buttons[size_t(glfw::mouse_button::last) + 1] = {};
 };
 
-/// \brief Implements a system that handles the logic for input processing (in combination with input_state
-/// and associated component classes).
+/// \brief Implements a system that handles the logic for input processing (in combination with
+/// first_person_input_state and associated component classes).
 class input_system : public core::system {
 	core::engine& eng;
 	windowing::window_system& win_sys;
@@ -53,7 +53,7 @@ class input_system : public core::system {
 	mutable std::shared_timed_mutex mtx;
 	mutable boost::container::flat_map<std::string, glfw::key> key_name_cache;
 
-	friend class input_state;
+	friend class first_person_input_state;
 
 	glfw::key key_from_name_or_config(const std::string& name) const;
 
