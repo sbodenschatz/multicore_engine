@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <atomic>
 #include <limits>
+#include <mce/containers/dynamic_array.hpp>
+#include <vector>
 
 namespace mce {
 namespace util {
@@ -71,6 +73,78 @@ public:
 	result<Avg> evaluate() const noexcept {
 		auto s = state_.load();
 		return result<Avg>(s);
+	}
+};
+
+namespace detail {
+
+template <typename T>
+size_t histogram_bucket_index(const T& value, const T& lower, const T& upper, size_t bucket_count) noexcept {
+	return size_t((bucket_count * (value - lower)) / (upper - lower));
+}
+
+template <typename T>
+T histogram_bucket_lower_bound(size_t index, const T& lower, const T& upper, size_t bucket_count) noexcept {
+	return T((index * (upper - lower)) / bucket_count + lower);
+}
+
+} // namespace detail
+
+template <typename T>
+struct histogram_result {
+	size_t under_samples;
+	size_t over_samples;
+	struct bucket {
+		T lower_bound;
+		T upper_bound;
+		size_t samples;
+		bucket(T lower_bound, T upper_bound, size_t samples)
+				: lower_bound{lower_bound}, upper_bound{upper_bound}, samples{samples} {}
+	};
+	std::vector<bucket> buckets;
+};
+
+template <typename T>
+class histogram_statistic {
+	T lower_;
+	T upper_;
+	size_t bucket_count_;
+	std::atomic<size_t> under_samples_ = 0;
+	std::atomic<size_t> over_samples_ = 0;
+	containers::dynamic_array<std::atomic<size_t>> hist_data_;
+
+public:
+	histogram_statistic(T lower, T upper, size_t bucket_count)
+			: lower_{lower}, upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
+
+	void record(const T& value) noexcept {
+		if(value < lower_) {
+			++under_samples_;
+		} else if(value >= upper_) {
+			++over_samples_;
+		} else {
+			auto index = detail::histogram_bucket_index(value, lower_, upper_, bucket_count_);
+			++hist_data_[index];
+		}
+	}
+
+	void clear() noexcept {
+		under_samples_.store(0);
+		over_samples_.store(0);
+		for(auto& h : hist_data_) {
+			h.store(0);
+		}
+	}
+
+	histogram_result<T> evaluate() const {
+		histogram_result<T> res{under_samples_.load(), over_samples_.load(), {}};
+		for(size_t i = 0; i < hist_data_.size(); ++i) {
+			auto next = i + 1;
+			auto lower = detail::histogram_bucket_lower_bound(i, lower_, upper_, bucket_count_);
+			auto upper = detail::histogram_bucket_lower_bound(next, lower_, upper_, bucket_count_);
+			res.buckets.emplace_back(lower, upper, hist_data_[i].load());
+		}
+		return res;
 	}
 };
 
