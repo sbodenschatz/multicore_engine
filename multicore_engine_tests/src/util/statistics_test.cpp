@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <cmath>
 #include <gtest.hpp>
 #include <mce/util/statistics.hpp>
 
@@ -40,6 +41,68 @@ TEST(util_statistics_test, aggregate_int) {
 	ASSERT_EQ(r.minimum, 1);
 	ASSERT_EQ(r.maximum, 12);
 	ASSERT_EQ(r.count, 6);
+}
+
+TEST(util_statistics_test, histogram_bucket_bounds_int) {
+	auto lower = 10;
+	auto upper = 110;
+	auto bucket_count = size_t(64);
+	for(size_t i = 0; i <= bucket_count; ++i) {
+		auto idx = detail::histogram_bucket_index(
+				detail::histogram_bucket_lower_bound(i, lower, upper, bucket_count), lower, upper,
+				bucket_count);
+		ASSERT_TRUE(i == idx || i == idx + 1);
+	}
+}
+
+TEST(util_statistics_test, histogram_bucket_mapping_float) {
+	auto lower = 7.0f;
+	auto upper = 263.0f;
+	auto bucket_count = size_t(137);
+	for(size_t i = 0; i <= bucket_count; ++i) {
+		auto idx = detail::histogram_bucket_index(
+				detail::histogram_bucket_lower_bound(i, lower, upper, bucket_count), lower, upper,
+				bucket_count);
+		ASSERT_TRUE(i == idx || i == idx + 1);
+	}
+}
+
+TEST(util_statistics_test, histogram_int) {
+	auto upper = 4096;
+	auto count = 1024;
+	histogram_statistic<int> s(0, upper, count);
+	for(int i = 0; i < upper; ++i) {
+		for(int j = 0; j < i; ++j) {
+			s.record(i);
+		}
+	}
+	auto r = s.evaluate();
+	ASSERT_EQ(0, r.under_samples);
+	ASSERT_EQ(0, r.over_samples);
+	for(int i = 0; i < count; ++i) {
+		ASSERT_EQ(i * upper / count, r.buckets.at(i).lower_bound);
+		ASSERT_EQ((i + 1) * upper / count, r.buckets.at(i).upper_bound);
+		ASSERT_EQ(4 * 4 * i + 1 + 2 + 3, r.buckets.at(i).samples);
+	}
+}
+
+TEST(util_statistics_test, histogram_float) {
+	auto upper = 4096.0f;
+	auto count = 1024;
+	histogram_statistic<float> s(0.0f, upper, count);
+	for(float i = 0; i < upper; i += 1.0f) {
+		for(int j = 0; j < i; ++j) {
+			s.record(i);
+		}
+	}
+	auto r = s.evaluate();
+	ASSERT_EQ(0, r.under_samples);
+	ASSERT_EQ(0, r.over_samples);
+	for(int i = 0; i < count; ++i) {
+		ASSERT_EQ(i * upper / count, r.buckets.at(i).lower_bound);
+		ASSERT_EQ((i + 1) * upper / count, r.buckets.at(i).upper_bound);
+		ASSERT_EQ(4 * 4 * i + 1 + 2 + 3, r.buckets.at(i).samples);
+	}
 }
 
 } // namespace util
