@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <limits>
 
 namespace mce {
 namespace util {
@@ -23,8 +24,8 @@ template <typename T>
 class aggregate_statistic {
 	struct state {
 		T sum = T();
-		T min = T();
-		T max = T();
+		T min = std::numeric_limits<T>::max();
+		T max = std::numeric_limits<T>::lowest();
 		size_t count = 0;
 
 		state() noexcept {}
@@ -32,7 +33,7 @@ class aggregate_statistic {
 				: sum{prev.sum + val}, min{std::min(prev.min, val)}, max{std::max(prev.max, val)},
 				  count{prev.count + 1} {}
 	};
-	std::atomic<state> state_;
+	std::atomic<state> state_ = state();
 
 public:
 	/// Records a sample for the variable.
