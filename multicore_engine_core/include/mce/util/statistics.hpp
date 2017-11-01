@@ -36,7 +36,7 @@ class aggregate_statistic {
 				: sum{prev.sum + val}, min{std::min(prev.min, val)}, max{std::max(prev.max, val)},
 				  count{prev.count + 1} {}
 	};
-	std::atomic<state> state_ = state();
+	std::atomic<state> state_ = {state()};
 
 public:
 	/// Records a sample for the variable.
@@ -137,8 +137,8 @@ public:
 
 	/// Encapsulates a statistics evaluation result.
 	struct result {
-		size_t under_samples = 0; ///< The number of samples smaller than the lower bound.
-		size_t over_samples = 0;  ///< The number of samples larger or equal to the upper bound.
+		size_t under_samples = {0}; ///< The number of samples smaller than the lower bound.
+		size_t over_samples = {0};  ///< The number of samples larger or equal to the upper bound.
 		/// Represents a histogram bucket in a result.
 		struct bucket {
 			T lower_bound;  ///< The lower bound of the bucket (approximated to T's precision).
