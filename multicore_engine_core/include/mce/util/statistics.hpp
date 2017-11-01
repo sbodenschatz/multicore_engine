@@ -103,6 +103,7 @@ public:
 	histogram_statistic(T lower, T upper, size_t bucket_count)
 			: lower_{lower}, upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
 
+	/// Records a sample for the variable.
 	void record(const T& value) noexcept {
 		if(value < lower_) {
 			++under_samples_;
@@ -114,6 +115,10 @@ public:
 		}
 	}
 
+	/// Clears the statistics data for the variable.
+	/**
+	 * \warning Clearing is not performed atomically but in a thread-safe manner.
+	 */
 	void clear() noexcept {
 		under_samples_.store(0);
 		over_samples_.store(0);
@@ -122,21 +127,28 @@ public:
 		}
 	}
 
-	struct histogram_result {
-		size_t under_samples;
-		size_t over_samples;
+	/// Encapsulates a statistics evaluation result.
+	struct result {
+		size_t under_samples; ///< The number of samples smaller than the lower bound.
+		size_t over_samples;  ///< The number of samples larger or equal to the upper bound.
+		/// Represents a histogram bucket in a result.
 		struct bucket {
-			T lower_bound;
-			T upper_bound;
-			size_t samples;
+			T lower_bound;  ///< The lower bound of the bucket (approximated to T's precision).
+			T upper_bound;  ///< The upper bound of the bucket (approximated to T's precision).
+			size_t samples; ///< The number of samples in the bucket.
+			/// Creates a bucket description.
 			bucket(T lower_bound, T upper_bound, size_t samples)
 					: lower_bound{lower_bound}, upper_bound{upper_bound}, samples{samples} {}
 		};
-		std::vector<bucket> buckets;
+		std::vector<bucket> buckets; ///< Represents the buckets in the result.
 	};
 
-	histogram_result evaluate() const {
-		histogram_result res{under_samples_.load(), over_samples_.load(), {}};
+	/// Evaluates the statistic of the samples recorded so far.
+	/**
+	 * \warning The evaluation is not performed atomically but in a thread-safe manner.
+	 */
+	result evaluate() const {
+		result res{under_samples_.load(), over_samples_.load(), {}};
 		for(size_t i = 0; i < hist_data_.size(); ++i) {
 			auto next = i + 1;
 			auto lower = detail::histogram_bucket_lower_bound(i, lower_, upper_, bucket_count_);
