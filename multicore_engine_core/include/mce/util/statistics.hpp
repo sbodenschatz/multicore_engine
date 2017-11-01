@@ -91,20 +91,6 @@ T histogram_bucket_lower_bound(size_t index, const T& lower, const T& upper, siz
 } // namespace detail
 
 template <typename T>
-struct histogram_result {
-	size_t under_samples;
-	size_t over_samples;
-	struct bucket {
-		T lower_bound;
-		T upper_bound;
-		size_t samples;
-		bucket(T lower_bound, T upper_bound, size_t samples)
-				: lower_bound{lower_bound}, upper_bound{upper_bound}, samples{samples} {}
-	};
-	std::vector<bucket> buckets;
-};
-
-template <typename T>
 class histogram_statistic {
 	T lower_;
 	T upper_;
@@ -136,8 +122,21 @@ public:
 		}
 	}
 
-	histogram_result<T> evaluate() const {
-		histogram_result<T> res{under_samples_.load(), over_samples_.load(), {}};
+	struct histogram_result {
+		size_t under_samples;
+		size_t over_samples;
+		struct bucket {
+			T lower_bound;
+			T upper_bound;
+			size_t samples;
+			bucket(T lower_bound, T upper_bound, size_t samples)
+					: lower_bound{lower_bound}, upper_bound{upper_bound}, samples{samples} {}
+		};
+		std::vector<bucket> buckets;
+	};
+
+	histogram_result evaluate() const {
+		histogram_result res{under_samples_.load(), over_samples_.load(), {}};
 		for(size_t i = 0; i < hist_data_.size(); ++i) {
 			auto next = i + 1;
 			auto lower = detail::histogram_bucket_lower_bound(i, lower_, upper_, bucket_count_);
