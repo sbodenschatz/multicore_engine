@@ -7,12 +7,18 @@
 #ifndef MCE_UTIL_STATISTICS_HPP_
 #define MCE_UTIL_STATISTICS_HPP_
 
+/**
+ * \file
+ * Defines utilities to gather statistics in the engine or applications.
+ */
+
 #include <algorithm>
 #include <atomic>
 
 namespace mce {
 namespace util {
 
+/// Collects thread-safe aggregate statistics for a single variable of type T.
 template <typename T>
 class aggregate_statistic {
 	struct state {
@@ -29,28 +35,37 @@ class aggregate_statistic {
 	std::atomic<state> state_;
 
 public:
+	/// Records a sample for the variable.
 	void record(const T& value) noexcept {
 		auto s = state_.load();
 		while(!state_.compare_exchange_weak(s, state(s, value)))
 			;
 	}
 
+	/// Clears the statistics data for the variable.
 	void clear() noexcept {
 		state_.store(state());
 	}
 
+	/// Encapsulates a statistics evaluation result.
 	template <typename Avg>
 	struct result {
-		Avg average;
-		T sum;
-		T minimum;
-		T maximum;
-		size_t count;
+		Avg average;  ///< The arithmetic average of the samples.
+		T sum;		  ///< The sum of all recorded samples.
+		T minimum;	///< The minimal sample recorded.
+		T maximum;	///< The maximal sample recorder.
+		size_t count; ///< The number of recorder samples.
 
+		/// Creates a result object for the given internal state.
 		explicit result(const state& s) noexcept
 				: average{Avg(s.sum) / s.count}, sum{s.sum}, minimum{s.min}, maximum{s.max}, count{s.count} {}
 	};
 
+	/// Evaluates the statistic of the samples recorded so far.
+	/**
+	 * Optionally uses the Avg type for the average value.
+	 * This allows using a floating point value for the average of integer samples.
+	 */
 	template <typename Avg = T>
 	result<Avg> evaluate() const noexcept {
 		auto s = state_.load();
