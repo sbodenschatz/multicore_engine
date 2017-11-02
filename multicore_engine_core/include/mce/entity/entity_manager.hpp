@@ -87,6 +87,11 @@ public:
 	/// Destroys the referenced entity.
 	void destroy_entity(entity* entity);
 
+	/// Returns the current number of entities.
+	size_t entity_count() const noexcept {
+		return entities.size();
+	}
+
 	/// Returns a pointer to the entity with the given id or nullptr if no such entity exists.
 	entity* find_entity(long long id) const;
 	/// Returns a pointer to the entity with the given name or nullptr if no such entity exists.
