@@ -226,11 +226,18 @@ struct statistics_container : statistics_container_base {
 
 } // namespace detail
 
+/// Provides a name-based directory for statistics objects with functionality to centrally save or clear them.
 class statistics_manager {
 	mutable std::shared_timed_mutex mtx;
 	boost::container::flat_map<std::string, std::shared_ptr<detail::statistics_container_base>> stats_;
 
 public:
+	/// \brief Creates, registers and returns (by shared_ptr) a statistics object of type Stat with the given
+	/// name and constructor parameters.
+	/**
+	 * If an object with the name already exists and is of he request type, this object is returned instead.
+	 * If an object with the given name but a different type exists an exception is thrown.
+	 */
 	template <typename Stat, typename... Args>
 	std::shared_ptr<Stat> create(const std::string& name, Args&&... args) {
 		std::unique_lock<std::shared_timed_mutex> lock(mtx);
@@ -249,6 +256,8 @@ public:
 		}
 	}
 
+	/// \brief Obtains a shared_ptr to the statistics object with the given name if it exists and is of the
+	/// requested type or returns an empty pointer if it doesn't exist or is of a different type.
 	template <typename Stat>
 	std::shared_ptr<Stat> get(const std::string& name) const {
 		std::shared_lock<std::shared_timed_mutex> lock(mtx);
@@ -263,8 +272,11 @@ public:
 		}
 	}
 
+	/// Saves all registered objects to CSV files with the name of each object.
 	void save() const;
+	/// Clears the values of all registered statistics objects.
 	void clear_values();
+	/// Removes all registered statistics objects.
 	void clear();
 };
 
