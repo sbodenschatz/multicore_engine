@@ -13,11 +13,13 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <boost/container/flat_map.hpp>
 #include <limits>
 #include <mce/containers/dynamic_array.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/locked.hpp>
 #include <mce/util/type_id.hpp>
 #include <memory>
 #include <mutex>
@@ -29,9 +31,76 @@
 namespace mce {
 namespace util {
 
+template <size_t fields>
+class statistic_base {
+public:
+	struct label_set {
+		std::array<std::string, fields + 2> header;
+		std::string prefix;
+		std::string suffix;
+		std::array<std::string, fields + 2> footer;
+
+		label_set(std::array<std::string, fields + 2> header) : header(std::move(header)) {}
+
+		void output_header(std::ostream& ostr, const char* separator = ';') const {
+			output_hf(header, ostr, separator);
+		}
+		void output_footer(std::ostream& ostr, const char* separator = ';') const {
+			output_hf(footer, ostr, separator);
+		}
+		void output_prefix(std::ostream& ostr, const char* separator = ';') const {
+			bool has_prefix = (!prefix.empty()) || (!header[0].empty()) || (!footer[0].empty());
+			if(has_prefix) {
+				ostr << prefix << separator;
+			}
+		}
+		void output_suffix(std::ostream& ostr, const char* separator = ';') const {
+			bool has_suffix =
+					(!suffix.empty()) || (!header[fields + 1].empty()) || (!footer[fields + 1].empty());
+			if(has_suffix) {
+				ostr << separator << suffix;
+			}
+		}
+
+	private:
+		void output_hf(const std::array<std::string, fields + 2>& hf, std::ostream& ostr,
+					   const char* separator = ";") const {
+			bool has_hf = std::any_of(hf.begin(), hf.end(), [](const auto& field) { return !field.empty(); });
+			if(!has_hf) return;
+			bool has_prefix = (!prefix.empty()) || (!header[0].empty()) || (!footer[0].empty());
+			bool has_suffix =
+					(!suffix.empty()) || (!header[fields + 1].empty()) || (!footer[fields + 1].empty());
+			auto begin = has_prefix ? hf.begin() : (hf.begin() + 1);
+			auto end = has_suffix ? hf.end() : (hf.end() - 1);
+			for(auto it = begin; it != end; ++it) {
+				ostr << *it;
+				if(it + 1 != end) {
+					ostr << separator;
+				}
+			}
+			ostr << "\n";
+		}
+	};
+
+protected:
+	statistic_base(std::array<std::string, fields + 2> header) : labels_{std::move(header)} {}
+	~statistic_base() noexcept = default;
+
+private:
+	locked<label_set> labels_;
+
+public:
+	auto labels() const noexcept {
+		return labels_.start_transaction();
+	}
+	auto labels() noexcept {
+		return labels_.start_transaction();
+	}
+};
+
 /// Collects thread-safe aggregate statistics for a single variable of type T.
 template <typename T>
-class aggregate_statistic {
+class aggregate_statistic : public statistic_base<5> {
 	struct state {
 		T sum = T();
 		T min = std::numeric_limits<T>::max();
@@ -46,6 +115,8 @@ class aggregate_statistic {
 	std::atomic<state> state_ = {state()};
 
 public:
+	aggregate_statistic() : statistic_base({"", "avg", "sum", "min", "max", "count", ""}) {}
+
 	/// Records a sample for the variable.
 	void record(const T& value) noexcept {
 		auto s = state_.load();
@@ -66,16 +137,22 @@ public:
 		T minimum;	///< The minimal sample recorded.
 		T maximum;	///< The maximal sample recorder.
 		size_t count; ///< The number of recorder samples.
+		label_set labels;
 
 		/// Creates a result object for the given internal state.
-		explicit result(const state& s) noexcept
+		explicit result(const state& s, const label_set& lbl) noexcept
 				: average{Avg(Avg(s.sum) / s.count)}, sum{s.sum}, minimum{s.min}, maximum{s.max},
-				  count{s.count} {}
+				  count{s.count}, labels{lbl} {}
 
 		/// Allows outputting the result data to an ostream.
 		friend std::ostream& operator<<(std::ostream& ostr, const result& res) {
+			res.labels.output_header(ostr, ";");
+			res.labels.output_prefix(ostr, ";");
 			ostr << res.average << ";" << res.sum << ";" << res.minimum << ";" << res.maximum << ";"
-				 << res.count << "\n";
+				 << res.count;
+			res.labels.output_suffix(ostr, ";");
+			ostr << "\n";
+			res.labels.output_footer(ostr, ";");
 			return ostr;
 		}
 	};
@@ -88,7 +165,7 @@ public:
 	template <typename Avg = T>
 	result<Avg> evaluate() const noexcept {
 		auto s = state_.load();
-		return result<Avg>(s);
+		return result<Avg>(s, *labels());
 	}
 };
 

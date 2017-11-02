@@ -59,6 +59,10 @@ public:
 		U* operator->() const noexcept {
 			return value_ptr;
 		}
+
+		U& operator*() const noexcept {
+			return *value_ptr;
+		}
 	};
 
 private:
