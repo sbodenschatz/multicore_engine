@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <mce/util/statistics.hpp>
 
@@ -11,9 +12,14 @@ namespace mce {
 namespace util {
 
 void statistics_manager::save() const {
+	boost::filesystem::path sp("stats");
+	if(!boost::filesystem::exists(sp)) {
+		boost::filesystem::create_directory(sp);
+	}
 	std::shared_lock<std::shared_timed_mutex> lock(mtx);
 	for(const auto& stat : stats_) {
-		std::ofstream fstr(stat.first + ".csv", std::ios_base::out | std::ios_base::trunc);
+		std::ofstream fstr((sp / (stat.first + ".csv")).generic_string(),
+						   std::ios_base::out | std::ios_base::trunc);
 		stat.second->write_result_to(fstr);
 	}
 }

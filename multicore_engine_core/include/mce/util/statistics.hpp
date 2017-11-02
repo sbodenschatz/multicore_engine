@@ -272,7 +272,7 @@ public:
 		}
 	}
 
-	/// Saves all registered objects to CSV files with the name of each object.
+	/// Saves all registered objects to CSV files with the name of each object in the "stats/" directory.
 	void save() const;
 	/// Clears the values of all registered statistics objects.
 	void clear_values();
