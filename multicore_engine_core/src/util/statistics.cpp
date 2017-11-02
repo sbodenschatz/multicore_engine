@@ -18,5 +18,16 @@ void statistics_manager::save() const {
 	}
 }
 
+void statistics_manager::clear_values() {
+	std::unique_lock<std::shared_timed_mutex> lock(mtx);
+	for(auto& stat : stats_) {
+		stat.second->clear();
+	}
+}
+void statistics_manager::clear() {
+	std::unique_lock<std::shared_timed_mutex> lock(mtx);
+	stats_.clear();
+}
+
 } // namespace util
 } // namespace mce

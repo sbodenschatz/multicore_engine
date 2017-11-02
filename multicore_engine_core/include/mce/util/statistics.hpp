@@ -205,6 +205,7 @@ struct statistics_container_base {
 	statistics_container_base(type_id_t type) : type_{type} {}
 	virtual ~statistics_container_base() noexcept = default;
 	virtual void write_result_to(std::ostream& ostr) noexcept = 0;
+	virtual void clear() noexcept = 0;
 };
 
 template <typename Stat>
@@ -217,6 +218,9 @@ struct statistics_container : statistics_container_base {
 	virtual void write_result_to(std::ostream& ostr) noexcept override {
 		auto r = stat.evaluate();
 		ostr << r;
+	}
+	virtual void clear() noexcept override {
+		stat.clear();
 	}
 };
 
@@ -260,6 +264,8 @@ public:
 	}
 
 	void save() const;
+	void clear_values();
+	void clear();
 };
 
 } // namespace util
