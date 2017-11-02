@@ -176,7 +176,7 @@ public:
 				} else {
 					ostr << ";";
 				}
-				ostr << ";" << res.under_samples << "\n";
+				ostr << ";" << res.over_samples << "\n";
 			}
 			return ostr;
 		}
