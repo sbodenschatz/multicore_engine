@@ -202,7 +202,7 @@ namespace detail {
 
 struct statistics_container_base {
 	type_id_t type_;
-	statistics_container_base(type_id_t type) : type_{type} {}
+	explicit statistics_container_base(type_id_t type) : type_{type} {}
 	virtual ~statistics_container_base() noexcept = default;
 	virtual void write_result_to(std::ostream& ostr) noexcept = 0;
 	virtual void clear() noexcept = 0;
@@ -212,7 +212,7 @@ template <typename Stat>
 struct statistics_container : statistics_container_base {
 	Stat stat;
 	template <typename... Args>
-	statistics_container(Args&&... args)
+	explicit statistics_container(Args&&... args)
 			: statistics_container_base(type_id<statistics_container_base>::id<Stat>()),
 			  stat(std::forward<Args>(args)...) {}
 	virtual void write_result_to(std::ostream& ostr) noexcept override {
