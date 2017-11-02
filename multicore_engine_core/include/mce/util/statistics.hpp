@@ -106,6 +106,7 @@ T histogram_bucket_lower_bound(size_t index, const T& lower, const T& upper, siz
 
 } // namespace detail
 
+/// Collects thread-safe histogram statistics for a single variable of type T.
 template <typename T>
 class histogram_statistic {
 	T lower_;
@@ -116,6 +117,8 @@ class histogram_statistic {
 	containers::dynamic_array<std::atomic<size_t>> hist_data_;
 
 public:
+	/// \brief Creates a histogram_statistic with the given lower (inclusive) and upper bounds (exclusive) for
+	/// sampled values and the given bucket granularity into which the range is divided.
 	histogram_statistic(T lower, T upper, size_t bucket_count)
 			: lower_{lower}, upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
 
