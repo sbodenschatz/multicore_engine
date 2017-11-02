@@ -109,8 +109,8 @@ class histogram_statistic {
 	T lower_;
 	T upper_;
 	size_t bucket_count_;
-	std::atomic<size_t> under_samples_ = 0;
-	std::atomic<size_t> over_samples_ = 0;
+	std::atomic<size_t> under_samples_ = {0};
+	std::atomic<size_t> over_samples_ = {0};
 	containers::dynamic_array<std::atomic<size_t>> hist_data_;
 
 public:
@@ -143,8 +143,8 @@ public:
 
 	/// Encapsulates a statistics evaluation result.
 	struct result {
-		size_t under_samples = {0}; ///< The number of samples smaller than the lower bound.
-		size_t over_samples = {0};  ///< The number of samples larger or equal to the upper bound.
+		size_t under_samples = 0; ///< The number of samples smaller than the lower bound.
+		size_t over_samples = 0;  ///< The number of samples larger or equal to the upper bound.
 		/// Represents a histogram bucket in a result.
 		struct bucket {
 			T lower_bound;  ///< The lower bound of the bucket (approximated to T's precision).
