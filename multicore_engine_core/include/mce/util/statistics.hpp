@@ -68,7 +68,8 @@ public:
 
 		/// Creates a result object for the given internal state.
 		explicit result(const state& s) noexcept
-				: average{Avg(s.sum) / s.count}, sum{s.sum}, minimum{s.min}, maximum{s.max}, count{s.count} {}
+				: average{Avg(Avg(s.sum) / s.count)}, sum{s.sum}, minimum{s.min}, maximum{s.max},
+				  count{s.count} {}
 
 		/// Allows outputting the result data to an ostream.
 		friend std::ostream& operator<<(std::ostream& ostr, const result& res) {
@@ -212,7 +213,7 @@ struct statistics_container : statistics_container_base {
 	template <typename... Args>
 	statistics_container(Args&&... args)
 			: statistics_container_base(type_id<statistics_container_base>::id<Stat>()),
-			  stat{std::forward<Args>(args)...} {}
+			  stat(std::forward<Args>(args)...) {}
 	virtual void write_result_to(std::ostream& ostr) noexcept override {
 		auto r = stat.evaluate();
 		ostr << r;
