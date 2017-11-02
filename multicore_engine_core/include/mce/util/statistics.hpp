@@ -14,9 +14,15 @@
 
 #include <algorithm>
 #include <atomic>
+#include <boost/container/flat_map.hpp>
 #include <limits>
 #include <mce/containers/dynamic_array.hpp>
+#include <mce/exceptions.hpp>
+#include <mce/util/type_id.hpp>
+#include <memory>
+#include <mutex>
 #include <ostream>
+#include <shared_mutex>
 #include <vector>
 
 namespace mce {
@@ -189,6 +195,70 @@ public:
 		}
 		return res;
 	}
+};
+
+namespace detail {
+
+struct statistics_container_base {
+	type_id_t type_;
+	statistics_container_base(type_id_t type) : type_{type} {}
+	virtual ~statistics_container_base() noexcept = default;
+	virtual void write_result_to(std::ostream& ostr) noexcept = 0;
+};
+
+template <typename Stat>
+struct statistics_container : statistics_container_base {
+	Stat stat;
+	template <typename... Args>
+	statistics_container(Args&&... args)
+			: statistics_container_base(type_id<statistics_container_base>::id<Stat>()),
+			  stat{std::forward<Args>(args)...} {}
+	virtual void write_result_to(std::ostream& ostr) noexcept override {
+		auto r = stat.evaluate();
+		ostr << r;
+	}
+};
+
+} // namespace detail
+
+class statistics_manager {
+	mutable std::shared_timed_mutex mtx;
+	boost::container::flat_map<std::string, std::shared_ptr<detail::statistics_container_base>> stats_;
+
+public:
+	template <typename Stat, typename... Args>
+	std::shared_ptr<Stat> create(const std::string& name, Args&&... args) {
+		std::unique_lock<std::shared_timed_mutex> lock(mtx);
+		auto it = stats_.find(name);
+		if(it == stats_.end()) {
+			auto sptr = std::make_shared<detail::statistics_container<Stat>>(std::forward<Args>(args)...);
+			stats_.emplace(name, sptr);
+			auto ptr = static_cast<detail::statistics_container<Stat>*>(sptr.get());
+			return std::shared_ptr<Stat>(sptr, &(ptr->stat));
+		} else if(it->second->type_ == type_id<detail::statistics_container_base>::id<Stat>()) {
+			auto ptr = static_cast<detail::statistics_container<Stat>*>(it->second.get());
+			return std::shared_ptr<Stat>(it->second, &(ptr->stat));
+		} else {
+			throw mce::key_already_used_exception(
+					"The given name is already in use for a statistic of a different type.");
+		}
+	}
+
+	template <typename Stat>
+	std::shared_ptr<Stat> get(const std::string& name) const {
+		std::shared_lock<std::shared_timed_mutex> lock(mtx);
+		auto it = stats_.find(name);
+		if(it == stats_.end()) {
+			return std::shared_ptr<Stat>();
+		} else if(it->second->type_ == type_id<detail::statistics_container_base>::id<Stat>()) {
+			auto ptr = static_cast<detail::statistics_container<Stat>*>(it->second.get());
+			return std::shared_ptr<Stat>(it->second, &(ptr->stat));
+		} else {
+			return std::shared_ptr<Stat>();
+		}
+	}
+
+	void save() const;
 };
 
 } // namespace util
