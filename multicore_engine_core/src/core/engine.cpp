@@ -42,16 +42,7 @@ engine::engine()
 	initialize_config();
 	stats_pimpl_ = std::make_unique<detail::engine_core_stats_pimpl>();
 	stats_pimpl_->enable_frame_time_stat = config_store_->resolve("stats.core.frametime", 0);
-	if(stats_pimpl_->enable_frame_time_stat->value()) {
-		stats_pimpl_->frame_time_aggregate =
-				statistics_manager_->create<util::aggregate_statistic<std::chrono::microseconds::rep>>(
-						"core.frametime.aggregate");
-		auto frametime_buckets = config_store_->resolve("stats.core.frametime.buckets", 1000);
-		auto frametime_max = config_store_->resolve("stats.core.frametime.max", 20000);
-		stats_pimpl_->frame_time_histogram =
-				statistics_manager_->create<util::histogram_statistic<std::chrono::microseconds::rep>>(
-						"core.frametime.histogram", 0, frametime_max->value(), frametime_buckets->value());
-	}
+	initialize_stats();
 	game_state_machine_ = std::make_unique<mce::core::game_state_machine>(this);
 }
 
@@ -71,6 +62,19 @@ void engine::initialize_config() {
 				std::ofstream user_cfg(user_cfg_name);
 				cs.store(user_cfg);
 			});
+}
+
+void engine::initialize_stats() {
+	if(stats_pimpl_->enable_frame_time_stat->value()) {
+		stats_pimpl_->frame_time_aggregate =
+				statistics_manager_->create<util::aggregate_statistic<std::chrono::microseconds::rep>>(
+						"core.frametime.aggregate");
+		auto frametime_buckets = config_store_->resolve("stats.core.frametime.buckets", 1000);
+		auto frametime_max = config_store_->resolve("stats.core.frametime.max", 20000);
+		stats_pimpl_->frame_time_histogram =
+				statistics_manager_->create<util::histogram_statistic<std::chrono::microseconds::rep>>(
+						"core.frametime.histogram", 0, frametime_max->value(), frametime_buckets->value());
+	}
 }
 
 void engine::run() {
