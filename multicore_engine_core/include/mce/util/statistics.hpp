@@ -170,7 +170,8 @@ public:
 				} else {
 					ostr << ";";
 				}
-				ostr << ";" << res.under_samples << "\n";
+				ostr << ";" << res.under_samples << ";"
+					 << double(res.under_samples) / double(res.total_samples) << "\n";
 			}
 			for(const auto& b : res.buckets) {
 				ostr << b.lower_bound << ";" << b.upper_bound << ";" << b.samples << ";"
@@ -182,7 +183,8 @@ public:
 				} else {
 					ostr << ";";
 				}
-				ostr << ";" << res.over_samples << "\n";
+				ostr << ";" << res.over_samples << ";" << double(res.over_samples) / double(res.total_samples)
+					 << "\n";
 			}
 			return ostr;
 		}
