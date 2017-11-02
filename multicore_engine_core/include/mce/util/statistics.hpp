@@ -115,7 +115,7 @@ class aggregate_statistic : public statistic_base<5> {
 	std::atomic<state> state_ = {state()};
 
 public:
-	aggregate_statistic() : statistic_base({"", "avg", "sum", "min", "max", "count", ""}) {}
+	aggregate_statistic() : statistic_base{{"", "avg", "sum", "min", "max", "count", ""}} {}
 
 	/// Records a sample for the variable.
 	void record(const T& value) noexcept {
@@ -185,7 +185,7 @@ T histogram_bucket_lower_bound(size_t index, const T& lower, const T& upper, siz
 
 /// Collects thread-safe histogram statistics for a single variable of type T.
 template <typename T>
-class histogram_statistic {
+class histogram_statistic : public statistic_base<4> {
 	T lower_;
 	T upper_;
 	size_t bucket_count_;
@@ -197,7 +197,8 @@ public:
 	/// \brief Creates a histogram_statistic with the given lower (inclusive) and upper bounds (exclusive) for
 	/// sampled values and the given bucket granularity into which the range is divided.
 	histogram_statistic(T lower, T upper, size_t bucket_count)
-			: lower_{lower}, upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
+			: statistic_base{{"", "lower", "upper", "samples_abs", "samples_rel", ""}}, lower_{lower},
+			  upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
 
 	/// Records a sample for the variable.
 	void record(const T& value) noexcept {
@@ -238,31 +239,43 @@ public:
 					: lower_bound{lower_bound}, upper_bound{upper_bound}, samples{samples} {}
 		};
 		std::vector<bucket> buckets; ///< Represents the buckets in the result.
+		label_set labels;
 
 		/// Allows outputting the result data to an ostream.
 		friend std::ostream& operator<<(std::ostream& ostr, const result& res) {
+			res.labels.output_header(ostr, ";");
 			if(res.under_samples) {
+				res.labels.output_prefix(ostr, ";");
 				if(!res.buckets.empty()) {
 					ostr << std::numeric_limits<T>::lowest() << ";" << res.buckets.front().lower_bound;
 				} else {
 					ostr << ";";
 				}
 				ostr << ";" << res.under_samples << ";"
-					 << double(res.under_samples) / double(res.total_samples) << "\n";
+					 << double(res.under_samples) / double(res.total_samples);
+				res.labels.output_suffix(ostr, ";");
+				ostr << "\n";
 			}
 			for(const auto& b : res.buckets) {
+				res.labels.output_prefix(ostr, ";");
 				ostr << b.lower_bound << ";" << b.upper_bound << ";" << b.samples << ";"
-					 << double(b.samples) / double(res.total_samples) << "\n";
+					 << double(b.samples) / double(res.total_samples);
+				res.labels.output_suffix(ostr, ";");
+				ostr << "\n";
 			}
 			if(res.over_samples) {
+				res.labels.output_prefix(ostr, ";");
 				if(!res.buckets.empty()) {
 					ostr << res.buckets.back().upper_bound << ";" << std::numeric_limits<T>::max();
 				} else {
 					ostr << ";";
 				}
-				ostr << ";" << res.over_samples << ";" << double(res.over_samples) / double(res.total_samples)
-					 << "\n";
+				ostr << ";" << res.over_samples << ";"
+					 << double(res.over_samples) / double(res.total_samples);
+				res.labels.output_suffix(ostr, ";");
+				ostr << "\n";
 			}
+			res.labels.output_footer(ostr, ";");
 			return ostr;
 		}
 	};
@@ -283,7 +296,7 @@ public:
 		auto over = over_samples_.load();
 		auto total = std::accumulate(buckets.begin(), buckets.end(), under + over,
 									 [](size_t s, const auto& b) { return s + b.samples; });
-		return {under, over, total, buckets};
+		return {under, over, total, buckets, *labels()};
 	}
 };
 
