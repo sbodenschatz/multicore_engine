@@ -144,15 +144,19 @@ public:
 				: average{Avg(Avg(s.sum) / s.count)}, sum{s.sum}, minimum{s.min}, maximum{s.max},
 				  count{s.count}, labels{lbl} {}
 
+		void output_to(std::ostream& ostr, const char* separator = ";") const {
+			labels.output_header(ostr, separator);
+			labels.output_prefix(ostr, separator);
+			ostr << average << separator << sum << separator << minimum << separator << maximum << separator
+				 << count;
+			labels.output_suffix(ostr, separator);
+			ostr << "\n";
+			labels.output_footer(ostr, separator);
+		}
+
 		/// Allows outputting the result data to an ostream.
 		friend std::ostream& operator<<(std::ostream& ostr, const result& res) {
-			res.labels.output_header(ostr, ";");
-			res.labels.output_prefix(ostr, ";");
-			ostr << res.average << ";" << res.sum << ";" << res.minimum << ";" << res.maximum << ";"
-				 << res.count;
-			res.labels.output_suffix(ostr, ";");
-			ostr << "\n";
-			res.labels.output_footer(ostr, ";");
+			res.output_to(ostr);
 			return ostr;
 		}
 	};
@@ -241,41 +245,45 @@ public:
 		std::vector<bucket> buckets; ///< Represents the buckets in the result.
 		label_set labels;
 
+		void output_to(std::ostream& ostr, const char* separator = ";") const {
+			labels.output_header(ostr, separator);
+			if(under_samples) {
+				labels.output_prefix(ostr, separator);
+				if(!buckets.empty()) {
+					ostr << std::numeric_limits<T>::lowest() << separator << buckets.front().lower_bound;
+				} else {
+					ostr << separator;
+				}
+				ostr << separator << under_samples << separator
+					 << double(under_samples) / double(total_samples);
+				labels.output_suffix(ostr, separator);
+				ostr << "\n";
+			}
+			for(const auto& b : buckets) {
+				labels.output_prefix(ostr, separator);
+				ostr << b.lower_bound << separator << b.upper_bound << separator << b.samples << separator
+					 << double(b.samples) / double(total_samples);
+				labels.output_suffix(ostr, separator);
+				ostr << "\n";
+			}
+			if(over_samples) {
+				labels.output_prefix(ostr, separator);
+				if(!buckets.empty()) {
+					ostr << buckets.back().upper_bound << separator << std::numeric_limits<T>::max();
+				} else {
+					ostr << separator;
+				}
+				ostr << separator << over_samples << separator
+					 << double(over_samples) / double(total_samples);
+				labels.output_suffix(ostr, separator);
+				ostr << "\n";
+			}
+			labels.output_footer(ostr, separator);
+		}
+
 		/// Allows outputting the result data to an ostream.
 		friend std::ostream& operator<<(std::ostream& ostr, const result& res) {
-			res.labels.output_header(ostr, ";");
-			if(res.under_samples) {
-				res.labels.output_prefix(ostr, ";");
-				if(!res.buckets.empty()) {
-					ostr << std::numeric_limits<T>::lowest() << ";" << res.buckets.front().lower_bound;
-				} else {
-					ostr << ";";
-				}
-				ostr << ";" << res.under_samples << ";"
-					 << double(res.under_samples) / double(res.total_samples);
-				res.labels.output_suffix(ostr, ";");
-				ostr << "\n";
-			}
-			for(const auto& b : res.buckets) {
-				res.labels.output_prefix(ostr, ";");
-				ostr << b.lower_bound << ";" << b.upper_bound << ";" << b.samples << ";"
-					 << double(b.samples) / double(res.total_samples);
-				res.labels.output_suffix(ostr, ";");
-				ostr << "\n";
-			}
-			if(res.over_samples) {
-				res.labels.output_prefix(ostr, ";");
-				if(!res.buckets.empty()) {
-					ostr << res.buckets.back().upper_bound << ";" << std::numeric_limits<T>::max();
-				} else {
-					ostr << ";";
-				}
-				ostr << ";" << res.over_samples << ";"
-					 << double(res.over_samples) / double(res.total_samples);
-				res.labels.output_suffix(ostr, ";");
-				ostr << "\n";
-			}
-			res.labels.output_footer(ostr, ";");
+			res.output_to(ostr);
 			return ostr;
 		}
 	};
@@ -306,7 +314,7 @@ struct statistics_container_base {
 	type_id_t type_;
 	explicit statistics_container_base(type_id_t type) : type_{type} {}
 	virtual ~statistics_container_base() noexcept = default;
-	virtual void write_result_to(std::ostream& ostr) noexcept = 0;
+	virtual void write_result_to(std::ostream& ostr, const char* separator) noexcept = 0;
 	virtual void clear() noexcept = 0;
 };
 
@@ -317,9 +325,9 @@ struct statistics_container : statistics_container_base {
 	explicit statistics_container(Args&&... args)
 			: statistics_container_base(type_id<statistics_container_base>::id<Stat>()),
 			  stat(std::forward<Args>(args)...) {}
-	virtual void write_result_to(std::ostream& ostr) noexcept override {
+	virtual void write_result_to(std::ostream& ostr, const char* separator) noexcept override {
 		auto r = stat.evaluate();
-		ostr << r;
+		r.output_to(ostr, separator);
 	}
 	virtual void clear() noexcept override {
 		stat.clear();
@@ -375,7 +383,7 @@ public:
 	}
 
 	/// Saves all registered objects to CSV files with the name of each object in the "stats/" directory.
-	void save() const;
+	void save(const char* separator = ";") const;
 	/// Clears the values of all registered statistics objects.
 	void clear_values();
 	/// Removes all registered statistics objects.

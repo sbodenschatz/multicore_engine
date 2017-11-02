@@ -11,7 +11,7 @@
 namespace mce {
 namespace util {
 
-void statistics_manager::save() const {
+void statistics_manager::save(const char* separator) const {
 	boost::filesystem::path sp("stats");
 	if(!boost::filesystem::exists(sp)) {
 		boost::filesystem::create_directory(sp);
@@ -20,7 +20,7 @@ void statistics_manager::save() const {
 	for(const auto& stat : stats_) {
 		std::ofstream fstr((sp / (stat.first + ".csv")).generic_string(),
 						   std::ios_base::out | std::ios_base::trunc);
-		stat.second->write_result_to(fstr);
+		stat.second->write_result_to(fstr, separator);
 	}
 }
 
