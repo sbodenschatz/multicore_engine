@@ -71,14 +71,17 @@ TEST(util_statistics_test, histogram_int) {
 	auto upper = 4096;
 	auto count = 1024;
 	histogram_statistic<int> s(0, upper, count);
+	size_t total = 0;
 	for(int i = 0; i < upper; ++i) {
 		for(int j = 0; j < i; ++j) {
 			s.record(i);
+			++total;
 		}
 	}
 	auto r = s.evaluate();
 	ASSERT_EQ(0, r.under_samples);
 	ASSERT_EQ(0, r.over_samples);
+	ASSERT_EQ(total, r.total_samples);
 	for(int i = 0; i < count; ++i) {
 		ASSERT_EQ(i * upper / count, r.buckets.at(i).lower_bound);
 		ASSERT_EQ((i + 1) * upper / count, r.buckets.at(i).upper_bound);
@@ -90,14 +93,17 @@ TEST(util_statistics_test, histogram_float) {
 	auto upper = 4096.0f;
 	auto count = 1024;
 	histogram_statistic<float> s(0.0f, upper, count);
+	size_t total = 0;
 	for(float i = 0; i < upper; i += 1.0f) {
 		for(int j = 0; j < i; ++j) {
 			s.record(i);
+			++total;
 		}
 	}
 	auto r = s.evaluate();
 	ASSERT_EQ(0, r.under_samples);
 	ASSERT_EQ(0, r.over_samples);
+	ASSERT_EQ(total, r.total_samples);
 	for(int i = 0; i < count; ++i) {
 		ASSERT_EQ(i * upper / count, r.buckets.at(i).lower_bound);
 		ASSERT_EQ((i + 1) * upper / count, r.buckets.at(i).upper_bound);

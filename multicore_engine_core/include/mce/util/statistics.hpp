@@ -21,6 +21,7 @@
 #include <mce/util/type_id.hpp>
 #include <memory>
 #include <mutex>
+#include <numeric>
 #include <ostream>
 #include <shared_mutex>
 #include <vector>
@@ -146,6 +147,7 @@ public:
 	struct result {
 		size_t under_samples = 0; ///< The number of samples smaller than the lower bound.
 		size_t over_samples = 0;  ///< The number of samples larger or equal to the upper bound.
+		size_t total_samples = 0; ///< The total number of samples.
 		/// Represents a histogram bucket in a result.
 		struct bucket {
 			T lower_bound;  ///< The lower bound of the bucket (approximated to T's precision).
@@ -168,7 +170,8 @@ public:
 				ostr << ";" << res.under_samples << "\n";
 			}
 			for(const auto& b : res.buckets) {
-				ostr << b.lower_bound << ";" << b.upper_bound << ";" << b.samples << "\n";
+				ostr << b.lower_bound << ";" << b.upper_bound << ";" << b.samples << ";"
+					 << double(b.samples) / double(res.total_samples) << "\n";
 			}
 			if(res.over_samples) {
 				if(!res.buckets.empty()) {
@@ -187,14 +190,18 @@ public:
 	 * \warning The evaluation is not performed atomically but in a thread-safe manner.
 	 */
 	result evaluate() const {
-		result res{under_samples_.load(), over_samples_.load(), {}};
+		std::vector<typename result::bucket> buckets;
 		for(size_t i = 0; i < hist_data_.size(); ++i) {
 			auto next = i + 1;
 			auto lower = detail::histogram_bucket_lower_bound(i, lower_, upper_, bucket_count_);
 			auto upper = detail::histogram_bucket_lower_bound(next, lower_, upper_, bucket_count_);
-			res.buckets.emplace_back(lower, upper, hist_data_[i].load());
+			buckets.emplace_back(lower, upper, hist_data_[i].load());
 		}
-		return res;
+		auto under = under_samples_.load();
+		auto over = over_samples_.load();
+		auto total = std::accumulate(buckets.begin(), buckets.end(), under + over,
+									 [](size_t s, const auto& b) { return s + b.samples; });
+		return {under, over, total, buckets};
 	}
 };
 
