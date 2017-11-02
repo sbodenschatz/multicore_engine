@@ -15,19 +15,41 @@
 #include <mce/core/system.hpp>
 #include <mce/core/version.hpp>
 #include <mce/model/model_data_manager.hpp>
+#include <mce/util/statistics.hpp>
 #include <sstream>
 #include <tbb/task_scheduler_init.h>
 
 namespace mce {
 namespace core {
 
+namespace detail {
+
+struct engine_core_stats_pimpl {
+	std::shared_ptr<config::variable<int>> enable_frame_time_stat;
+	std::shared_ptr<util::aggregate_statistic<std::chrono::microseconds::rep>> frame_time_aggregate;
+	std::shared_ptr<util::histogram_statistic<std::chrono::microseconds::rep>> frame_time_histogram;
+};
+
+} // namespace detail
+
 engine::engine()
 		: max_general_concurrency_{std::thread::hardware_concurrency()}, running_{false},
 		  engine_metadata_{"mce", get_build_version_number()},
 		  application_metadata_{"mce-app", get_build_version_number()},
+		  statistics_manager_{std::make_unique<util::statistics_manager>()},
 		  asset_manager_{std::make_unique<asset::asset_manager>()},
 		  model_data_manager_{std::make_unique<model::model_data_manager>(asset_manager())} {
 	initialize_config();
+	stats_pimpl_ = std::make_unique<detail::engine_core_stats_pimpl>();
+	stats_pimpl_->enable_frame_time_stat = config_store_->resolve("stats.core.frametime", 0);
+	if(stats_pimpl_->enable_frame_time_stat->value()) {
+		stats_pimpl_->frame_time_aggregate =
+				statistics_manager_->create<util::aggregate_statistic<std::chrono::microseconds::rep>>(
+						"core.frametime.aggregate");
+		stats_pimpl_->frame_time_histogram =
+				statistics_manager_->create<util::histogram_statistic<std::chrono::microseconds::rep>>(
+						"core.frametime.histogram", 0, 20000, 1000);
+	}
 	game_state_machine_ = std::make_unique<mce::core::game_state_machine>(this);
 }
 
@@ -55,6 +77,10 @@ void engine::run() {
 	running_ = true;
 	while(running()) {
 		auto ft = clk.frame_tick();
+		if(stats_pimpl_->enable_frame_time_stat->value()) {
+			stats_pimpl_->frame_time_aggregate->record(ft.delta_t_microseconds.count());
+			stats_pimpl_->frame_time_histogram->record(ft.delta_t_microseconds.count());
+		}
 		process(ft);
 		render(ft);
 	}
