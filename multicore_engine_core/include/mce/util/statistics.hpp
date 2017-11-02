@@ -31,29 +31,48 @@
 namespace mce {
 namespace util {
 
+/// The base class for statistics for providing labeling functionality.
 template <size_t fields>
 class statistic_base {
 public:
+	/// Encapsulates the labels for a statistics result on output.
 	struct label_set {
+		/// The headers for the fields, printed at the start of the file.
+		/**
+		 * First and last entries are reserved for the prefix and suffix headers.
+		 */
 		std::array<std::string, fields + 2> header;
+		/// A prefix field that is printed before each line.
 		std::string prefix;
+		/// A suffix field that is printed after each line.
 		std::string suffix;
+		/// The footers for the fields, printed at the end of the file.
+		/**
+		 * First and last entries are reserved for the prefix and suffix footers.
+		 */
 		std::array<std::string, fields + 2> footer;
 
+		/// Creates an empty label_set.
+		label_set() {}
+		/// Creates label_set with the given headers.
 		label_set(std::array<std::string, fields + 2> header) : header(std::move(header)) {}
 
+		/// Outputs the header to the given stream.
 		void output_header(std::ostream& ostr, const char* separator = ';') const {
 			output_hf(header, ostr, separator);
 		}
+		/// Outputs the footer to the given stream.
 		void output_footer(std::ostream& ostr, const char* separator = ';') const {
 			output_hf(footer, ostr, separator);
 		}
+		/// Outputs the prefix to the given stream.
 		void output_prefix(std::ostream& ostr, const char* separator = ';') const {
 			bool has_prefix = (!prefix.empty()) || (!header[0].empty()) || (!footer[0].empty());
 			if(has_prefix) {
 				ostr << prefix << separator;
 			}
 		}
+		/// Outputs the suffix to the given stream.
 		void output_suffix(std::ostream& ostr, const char* separator = ';') const {
 			bool has_suffix =
 					(!suffix.empty()) || (!header[fields + 1].empty()) || (!footer[fields + 1].empty());
@@ -83,16 +102,20 @@ public:
 	};
 
 protected:
+	/// Allows the derived classes to construct the base using the given headers.
 	statistic_base(std::array<std::string, fields + 2> header) : labels_{std::move(header)} {}
+	/// Protected destructor to prevent independent instantiation.
 	~statistic_base() noexcept = default;
 
 private:
 	locked<label_set> labels_;
 
 public:
+	/// Returns a reading transaction on the labels.
 	auto labels() const noexcept {
 		return labels_.start_transaction();
 	}
+	/// Returns a read-write transaction on the labels.
 	auto labels() noexcept {
 		return labels_.start_transaction();
 	}
@@ -115,6 +138,7 @@ class aggregate_statistic : public statistic_base<5> {
 	std::atomic<state> state_ = {state()};
 
 public:
+	/// Creates an aggregate_statistic.
 	aggregate_statistic() : statistic_base{{{"", "avg", "sum", "min", "max", "count", ""}}} {}
 
 	/// Records a sample for the variable.
@@ -132,18 +156,19 @@ public:
 	/// Encapsulates a statistics evaluation result.
 	template <typename Avg>
 	struct result {
-		Avg average;  ///< The arithmetic average of the samples.
-		T sum;		  ///< The sum of all recorded samples.
-		T minimum;	///< The minimal sample recorded.
-		T maximum;	///< The maximal sample recorder.
-		size_t count; ///< The number of recorder samples.
-		label_set labels;
+		Avg average;	  ///< The arithmetic average of the samples.
+		T sum;			  ///< The sum of all recorded samples.
+		T minimum;		  ///< The minimal sample recorded.
+		T maximum;		  ///< The maximal sample recorder.
+		size_t count;	 ///< The number of recorder samples.
+		label_set labels; ///< The labels used on output.
 
 		/// Creates a result object for the given internal state.
 		explicit result(const state& s, const label_set& lbl) noexcept
 				: average{Avg(Avg(s.sum) / s.count)}, sum{s.sum}, minimum{s.min}, maximum{s.max},
 				  count{s.count}, labels{lbl} {}
 
+		/// Outputs the formated result to the given stream using the given separator.
 		void output_to(std::ostream& ostr, const char* separator = ";") const {
 			labels.output_header(ostr, separator);
 			labels.output_prefix(ostr, separator);
@@ -243,8 +268,9 @@ public:
 					: lower_bound{lower_bound}, upper_bound{upper_bound}, samples{samples} {}
 		};
 		std::vector<bucket> buckets; ///< Represents the buckets in the result.
-		label_set labels;
+		label_set labels;			 ///< The labels used on output.
 
+		/// Outputs the formated result to the given stream using the given separator.
 		void output_to(std::ostream& ostr, const char* separator = ";") const {
 			labels.output_header(ostr, separator);
 			if(under_samples) {

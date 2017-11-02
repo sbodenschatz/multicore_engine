@@ -59,7 +59,7 @@ public:
 		U* operator->() const noexcept {
 			return value_ptr;
 		}
-
+		/// Allows value access to the object for copying or similar operations.
 		U& operator*() const noexcept {
 			return *value_ptr;
 		}
