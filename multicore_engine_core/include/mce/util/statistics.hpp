@@ -115,7 +115,7 @@ class aggregate_statistic : public statistic_base<5> {
 	std::atomic<state> state_ = {state()};
 
 public:
-	aggregate_statistic() : statistic_base{{"", "avg", "sum", "min", "max", "count", ""}} {}
+	aggregate_statistic() : statistic_base{{{"", "avg", "sum", "min", "max", "count", ""}}} {}
 
 	/// Records a sample for the variable.
 	void record(const T& value) noexcept {
@@ -197,7 +197,7 @@ public:
 	/// \brief Creates a histogram_statistic with the given lower (inclusive) and upper bounds (exclusive) for
 	/// sampled values and the given bucket granularity into which the range is divided.
 	histogram_statistic(T lower, T upper, size_t bucket_count)
-			: statistic_base{{"", "lower", "upper", "samples_abs", "samples_rel", ""}}, lower_{lower},
+			: statistic_base{{{"", "lower", "upper", "samples_abs", "samples_rel", ""}}}, lower_{lower},
 			  upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
 
 	/// Records a sample for the variable.
