@@ -58,22 +58,22 @@ public:
 		label_set(std::array<std::string, fields + 2> header) : header(std::move(header)) {}
 
 		/// Outputs the header to the given stream.
-		void output_header(std::ostream& ostr, const char* separator = ';') const {
+		void output_header(std::ostream& ostr, const char* separator = ";") const {
 			output_hf(header, ostr, separator);
 		}
 		/// Outputs the footer to the given stream.
-		void output_footer(std::ostream& ostr, const char* separator = ';') const {
+		void output_footer(std::ostream& ostr, const char* separator = ";") const {
 			output_hf(footer, ostr, separator);
 		}
 		/// Outputs the prefix to the given stream.
-		void output_prefix(std::ostream& ostr, const char* separator = ';') const {
+		void output_prefix(std::ostream& ostr, const char* separator = ";") const {
 			bool has_prefix = (!prefix.empty()) || (!header[0].empty()) || (!footer[0].empty());
 			if(has_prefix) {
 				ostr << prefix << separator;
 			}
 		}
 		/// Outputs the suffix to the given stream.
-		void output_suffix(std::ostream& ostr, const char* separator = ';') const {
+		void output_suffix(std::ostream& ostr, const char* separator = ";") const {
 			bool has_suffix =
 					(!suffix.empty()) || (!header[fields + 1].empty()) || (!footer[fields + 1].empty());
 			if(has_suffix) {
