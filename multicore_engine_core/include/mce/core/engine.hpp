@@ -227,10 +227,12 @@ public:
 		max_general_concurrency_ = max_general_concurrency;
 	}
 
+	/// Allows access to the engine-wide statistics_manager.
 	const util::statistics_manager& statistics_manager() const {
 		assert(statistics_manager_);
 		return *statistics_manager_;
 	}
+	/// Allows access to the engine-wide statistics_manager.
 	util::statistics_manager& statistics_manager() {
 		assert(statistics_manager_);
 		return *statistics_manager_;

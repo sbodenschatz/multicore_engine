@@ -21,6 +21,7 @@
 #include <mce/util/type_id.hpp>
 #include <memory>
 #include <mutex>
+#include <numeric>
 #include <ostream>
 #include <shared_mutex>
 #include <vector>
@@ -105,6 +106,7 @@ T histogram_bucket_lower_bound(size_t index, const T& lower, const T& upper, siz
 
 } // namespace detail
 
+/// Collects thread-safe histogram statistics for a single variable of type T.
 template <typename T>
 class histogram_statistic {
 	T lower_;
@@ -115,6 +117,8 @@ class histogram_statistic {
 	containers::dynamic_array<std::atomic<size_t>> hist_data_;
 
 public:
+	/// \brief Creates a histogram_statistic with the given lower (inclusive) and upper bounds (exclusive) for
+	/// sampled values and the given bucket granularity into which the range is divided.
 	histogram_statistic(T lower, T upper, size_t bucket_count)
 			: lower_{lower}, upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
 
@@ -146,6 +150,7 @@ public:
 	struct result {
 		size_t under_samples = 0; ///< The number of samples smaller than the lower bound.
 		size_t over_samples = 0;  ///< The number of samples larger or equal to the upper bound.
+		size_t total_samples = 0; ///< The total number of samples.
 		/// Represents a histogram bucket in a result.
 		struct bucket {
 			T lower_bound;  ///< The lower bound of the bucket (approximated to T's precision).
@@ -165,10 +170,12 @@ public:
 				} else {
 					ostr << ";";
 				}
-				ostr << ";" << res.under_samples << "\n";
+				ostr << ";" << res.under_samples << ";"
+					 << double(res.under_samples) / double(res.total_samples) << "\n";
 			}
 			for(const auto& b : res.buckets) {
-				ostr << b.lower_bound << ";" << b.upper_bound << ";" << b.samples << "\n";
+				ostr << b.lower_bound << ";" << b.upper_bound << ";" << b.samples << ";"
+					 << double(b.samples) / double(res.total_samples) << "\n";
 			}
 			if(res.over_samples) {
 				if(!res.buckets.empty()) {
@@ -176,7 +183,8 @@ public:
 				} else {
 					ostr << ";";
 				}
-				ostr << ";" << res.under_samples << "\n";
+				ostr << ";" << res.over_samples << ";" << double(res.over_samples) / double(res.total_samples)
+					 << "\n";
 			}
 			return ostr;
 		}
@@ -187,14 +195,18 @@ public:
 	 * \warning The evaluation is not performed atomically but in a thread-safe manner.
 	 */
 	result evaluate() const {
-		result res{under_samples_.load(), over_samples_.load(), {}};
+		std::vector<typename result::bucket> buckets;
 		for(size_t i = 0; i < hist_data_.size(); ++i) {
 			auto next = i + 1;
 			auto lower = detail::histogram_bucket_lower_bound(i, lower_, upper_, bucket_count_);
 			auto upper = detail::histogram_bucket_lower_bound(next, lower_, upper_, bucket_count_);
-			res.buckets.emplace_back(lower, upper, hist_data_[i].load());
+			buckets.emplace_back(lower, upper, hist_data_[i].load());
 		}
-		return res;
+		auto under = under_samples_.load();
+		auto over = over_samples_.load();
+		auto total = std::accumulate(buckets.begin(), buckets.end(), under + over,
+									 [](size_t s, const auto& b) { return s + b.samples; });
+		return {under, over, total, buckets};
 	}
 };
 
