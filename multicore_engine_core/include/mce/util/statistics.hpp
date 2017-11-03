@@ -13,11 +13,13 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <boost/container/flat_map.hpp>
 #include <limits>
 #include <mce/containers/dynamic_array.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/locked.hpp>
 #include <mce/util/type_id.hpp>
 #include <memory>
 #include <mutex>
@@ -29,9 +31,99 @@
 namespace mce {
 namespace util {
 
+/// The base class for statistics for providing labeling functionality.
+template <size_t fields>
+class statistic_base {
+public:
+	/// Encapsulates the labels for a statistics result on output.
+	struct label_set {
+		/// The headers for the fields, printed at the start of the file.
+		/**
+		 * First and last entries are reserved for the prefix and suffix headers.
+		 */
+		std::array<std::string, fields + 2> header;
+		/// A prefix field that is printed before each line.
+		std::string prefix;
+		/// A suffix field that is printed after each line.
+		std::string suffix;
+		/// The footers for the fields, printed at the end of the file.
+		/**
+		 * First and last entries are reserved for the prefix and suffix footers.
+		 */
+		std::array<std::string, fields + 2> footer;
+
+		/// Creates an empty label_set.
+		label_set() {}
+		/// Creates label_set with the given headers.
+		explicit label_set(std::array<std::string, fields + 2> header) : header(std::move(header)) {}
+
+		/// Outputs the header to the given stream.
+		void output_header(std::ostream& ostr, const char* separator = ";") const {
+			output_hf(header, ostr, separator);
+		}
+		/// Outputs the footer to the given stream.
+		void output_footer(std::ostream& ostr, const char* separator = ";") const {
+			output_hf(footer, ostr, separator);
+		}
+		/// Outputs the prefix to the given stream.
+		void output_prefix(std::ostream& ostr, const char* separator = ";") const {
+			bool has_prefix = (!prefix.empty()) || (!header[0].empty()) || (!footer[0].empty());
+			if(has_prefix) {
+				ostr << prefix << separator;
+			}
+		}
+		/// Outputs the suffix to the given stream.
+		void output_suffix(std::ostream& ostr, const char* separator = ";") const {
+			bool has_suffix =
+					(!suffix.empty()) || (!header[fields + 1].empty()) || (!footer[fields + 1].empty());
+			if(has_suffix) {
+				ostr << separator << suffix;
+			}
+		}
+
+	private:
+		void output_hf(const std::array<std::string, fields + 2>& hf, std::ostream& ostr,
+					   const char* separator = ";") const {
+			bool has_hf = std::any_of(hf.begin(), hf.end(), [](const auto& field) { return !field.empty(); });
+			if(!has_hf) return;
+			bool has_prefix = (!prefix.empty()) || (!header[0].empty()) || (!footer[0].empty());
+			bool has_suffix =
+					(!suffix.empty()) || (!header[fields + 1].empty()) || (!footer[fields + 1].empty());
+			auto begin = has_prefix ? hf.begin() : (hf.begin() + 1);
+			auto end = has_suffix ? hf.end() : (hf.end() - 1);
+			for(auto it = begin; it != end; ++it) {
+				ostr << *it;
+				if(it + 1 != end) {
+					ostr << separator;
+				}
+			}
+			ostr << "\n";
+		}
+	};
+
+protected:
+	/// Allows the derived classes to construct the base using the given headers.
+	explicit statistic_base(std::array<std::string, fields + 2> header) : labels_{std::move(header)} {}
+	/// Protected destructor to prevent independent instantiation.
+	~statistic_base() noexcept = default;
+
+private:
+	locked<label_set> labels_;
+
+public:
+	/// Returns a reading transaction on the labels.
+	auto labels() const noexcept {
+		return labels_.start_transaction();
+	}
+	/// Returns a read-write transaction on the labels.
+	auto labels() noexcept {
+		return labels_.start_transaction();
+	}
+};
+
 /// Collects thread-safe aggregate statistics for a single variable of type T.
 template <typename T>
-class aggregate_statistic {
+class aggregate_statistic : public statistic_base<5> {
 	struct state {
 		T sum = T();
 		T min = std::numeric_limits<T>::max();
@@ -46,6 +138,9 @@ class aggregate_statistic {
 	std::atomic<state> state_ = {state()};
 
 public:
+	/// Creates an aggregate_statistic.
+	aggregate_statistic() : statistic_base{{{"", "avg", "sum", "min", "max", "count", ""}}} {}
+
 	/// Records a sample for the variable.
 	void record(const T& value) noexcept {
 		auto s = state_.load();
@@ -61,21 +156,32 @@ public:
 	/// Encapsulates a statistics evaluation result.
 	template <typename Avg>
 	struct result {
-		Avg average;  ///< The arithmetic average of the samples.
-		T sum;		  ///< The sum of all recorded samples.
-		T minimum;	///< The minimal sample recorded.
-		T maximum;	///< The maximal sample recorder.
-		size_t count; ///< The number of recorder samples.
+		Avg average;	  ///< The arithmetic average of the samples.
+		T sum;			  ///< The sum of all recorded samples.
+		T minimum;		  ///< The minimal sample recorded.
+		T maximum;		  ///< The maximal sample recorder.
+		size_t count;	 ///< The number of recorder samples.
+		label_set labels; ///< The labels used on output.
 
 		/// Creates a result object for the given internal state.
-		explicit result(const state& s) noexcept
+		explicit result(const state& s, const label_set& lbl) noexcept
 				: average{Avg(Avg(s.sum) / s.count)}, sum{s.sum}, minimum{s.min}, maximum{s.max},
-				  count{s.count} {}
+				  count{s.count}, labels{lbl} {}
+
+		/// Outputs the formated result to the given stream using the given separator.
+		void output_to(std::ostream& ostr, const char* separator = ";") const {
+			labels.output_header(ostr, separator);
+			labels.output_prefix(ostr, separator);
+			ostr << average << separator << sum << separator << minimum << separator << maximum << separator
+				 << count;
+			labels.output_suffix(ostr, separator);
+			ostr << "\n";
+			labels.output_footer(ostr, separator);
+		}
 
 		/// Allows outputting the result data to an ostream.
 		friend std::ostream& operator<<(std::ostream& ostr, const result& res) {
-			ostr << res.average << ";" << res.sum << ";" << res.minimum << ";" << res.maximum << ";"
-				 << res.count << "\n";
+			res.output_to(ostr);
 			return ostr;
 		}
 	};
@@ -88,7 +194,7 @@ public:
 	template <typename Avg = T>
 	result<Avg> evaluate() const noexcept {
 		auto s = state_.load();
-		return result<Avg>(s);
+		return result<Avg>(s, *labels());
 	}
 };
 
@@ -108,7 +214,7 @@ T histogram_bucket_lower_bound(size_t index, const T& lower, const T& upper, siz
 
 /// Collects thread-safe histogram statistics for a single variable of type T.
 template <typename T>
-class histogram_statistic {
+class histogram_statistic : public statistic_base<4> {
 	T lower_;
 	T upper_;
 	size_t bucket_count_;
@@ -120,7 +226,8 @@ public:
 	/// \brief Creates a histogram_statistic with the given lower (inclusive) and upper bounds (exclusive) for
 	/// sampled values and the given bucket granularity into which the range is divided.
 	histogram_statistic(T lower, T upper, size_t bucket_count)
-			: lower_{lower}, upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
+			: statistic_base{{{"", "lower", "upper", "samples_abs", "samples_rel", ""}}}, lower_{lower},
+			  upper_{upper}, bucket_count_{bucket_count}, hist_data_(bucket_count, 0) {}
 
 	/// Records a sample for the variable.
 	void record(const T& value) noexcept {
@@ -161,31 +268,48 @@ public:
 					: lower_bound{lower_bound}, upper_bound{upper_bound}, samples{samples} {}
 		};
 		std::vector<bucket> buckets; ///< Represents the buckets in the result.
+		label_set labels;			 ///< The labels used on output.
+
+		/// Outputs the formated result to the given stream using the given separator.
+		void output_to(std::ostream& ostr, const char* separator = ";") const {
+			labels.output_header(ostr, separator);
+			if(under_samples) {
+				labels.output_prefix(ostr, separator);
+				if(!buckets.empty()) {
+					ostr << std::numeric_limits<T>::lowest() << separator << buckets.front().lower_bound;
+				} else {
+					ostr << separator;
+				}
+				ostr << separator << under_samples << separator
+					 << double(under_samples) / double(total_samples);
+				labels.output_suffix(ostr, separator);
+				ostr << "\n";
+			}
+			for(const auto& b : buckets) {
+				labels.output_prefix(ostr, separator);
+				ostr << b.lower_bound << separator << b.upper_bound << separator << b.samples << separator
+					 << double(b.samples) / double(total_samples);
+				labels.output_suffix(ostr, separator);
+				ostr << "\n";
+			}
+			if(over_samples) {
+				labels.output_prefix(ostr, separator);
+				if(!buckets.empty()) {
+					ostr << buckets.back().upper_bound << separator << std::numeric_limits<T>::max();
+				} else {
+					ostr << separator;
+				}
+				ostr << separator << over_samples << separator
+					 << double(over_samples) / double(total_samples);
+				labels.output_suffix(ostr, separator);
+				ostr << "\n";
+			}
+			labels.output_footer(ostr, separator);
+		}
 
 		/// Allows outputting the result data to an ostream.
 		friend std::ostream& operator<<(std::ostream& ostr, const result& res) {
-			if(res.under_samples) {
-				if(!res.buckets.empty()) {
-					ostr << std::numeric_limits<T>::lowest() << ";" << res.buckets.front().lower_bound;
-				} else {
-					ostr << ";";
-				}
-				ostr << ";" << res.under_samples << ";"
-					 << double(res.under_samples) / double(res.total_samples) << "\n";
-			}
-			for(const auto& b : res.buckets) {
-				ostr << b.lower_bound << ";" << b.upper_bound << ";" << b.samples << ";"
-					 << double(b.samples) / double(res.total_samples) << "\n";
-			}
-			if(res.over_samples) {
-				if(!res.buckets.empty()) {
-					ostr << res.buckets.back().upper_bound << ";" << std::numeric_limits<T>::max();
-				} else {
-					ostr << ";";
-				}
-				ostr << ";" << res.over_samples << ";" << double(res.over_samples) / double(res.total_samples)
-					 << "\n";
-			}
+			res.output_to(ostr);
 			return ostr;
 		}
 	};
@@ -206,7 +330,7 @@ public:
 		auto over = over_samples_.load();
 		auto total = std::accumulate(buckets.begin(), buckets.end(), under + over,
 									 [](size_t s, const auto& b) { return s + b.samples; });
-		return {under, over, total, buckets};
+		return {under, over, total, buckets, *labels()};
 	}
 };
 
@@ -216,7 +340,7 @@ struct statistics_container_base {
 	type_id_t type_;
 	explicit statistics_container_base(type_id_t type) : type_{type} {}
 	virtual ~statistics_container_base() noexcept = default;
-	virtual void write_result_to(std::ostream& ostr) noexcept = 0;
+	virtual void write_result_to(std::ostream& ostr, const char* separator) noexcept = 0;
 	virtual void clear() noexcept = 0;
 };
 
@@ -227,9 +351,9 @@ struct statistics_container : statistics_container_base {
 	explicit statistics_container(Args&&... args)
 			: statistics_container_base(type_id<statistics_container_base>::id<Stat>()),
 			  stat(std::forward<Args>(args)...) {}
-	virtual void write_result_to(std::ostream& ostr) noexcept override {
+	virtual void write_result_to(std::ostream& ostr, const char* separator) noexcept override {
 		auto r = stat.evaluate();
-		ostr << r;
+		r.output_to(ostr, separator);
 	}
 	virtual void clear() noexcept override {
 		stat.clear();
@@ -285,7 +409,7 @@ public:
 	}
 
 	/// Saves all registered objects to CSV files with the name of each object in the "stats/" directory.
-	void save() const;
+	void save(const char* separator = ";") const;
 	/// Clears the values of all registered statistics objects.
 	void clear_values();
 	/// Removes all registered statistics objects.

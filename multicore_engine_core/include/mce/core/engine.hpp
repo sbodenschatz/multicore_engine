@@ -70,6 +70,7 @@ class engine {
 
 	void refresh_system_ordering();
 	void initialize_config();
+	void initialize_stats();
 
 public:
 	/// Constructs the engine.
