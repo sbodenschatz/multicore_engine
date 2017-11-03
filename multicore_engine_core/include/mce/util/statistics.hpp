@@ -55,7 +55,7 @@ public:
 		/// Creates an empty label_set.
 		label_set() {}
 		/// Creates label_set with the given headers.
-		label_set(std::array<std::string, fields + 2> header) : header(std::move(header)) {}
+		explicit label_set(std::array<std::string, fields + 2> header) : header(std::move(header)) {}
 
 		/// Outputs the header to the given stream.
 		void output_header(std::ostream& ostr, const char* separator = ";") const {
@@ -103,7 +103,7 @@ public:
 
 protected:
 	/// Allows the derived classes to construct the base using the given headers.
-	statistic_base(std::array<std::string, fields + 2> header) : labels_{std::move(header)} {}
+	explicit statistic_base(std::array<std::string, fields + 2> header) : labels_{std::move(header)} {}
 	/// Protected destructor to prevent independent instantiation.
 	~statistic_base() noexcept = default;
 
