@@ -18,9 +18,13 @@ void statistics_manager::save(const char* separator) const {
 	}
 	std::shared_lock<std::shared_timed_mutex> lock(mtx);
 	for(const auto& stat : stats_) {
-		std::ofstream fstr((sp / (stat.first + ".csv")).generic_string(),
-						   std::ios_base::out | std::ios_base::trunc);
-		stat.second->write_result_to(fstr, separator);
+		auto append = stat.second->append_output();
+		boost::filesystem::path p = (sp / (stat.first + ".csv"));
+		auto old_file = boost::filesystem::exists(p);
+		std::ofstream fstr(p.generic_string(),
+						   std::ios_base::out | (append ? std::ios_base::app : std::ios_base::trunc));
+		stat.second->write_result_to(fstr, separator, stat.second->append_output() && old_file,
+									 stat.second->append_output());
 	}
 }
 
