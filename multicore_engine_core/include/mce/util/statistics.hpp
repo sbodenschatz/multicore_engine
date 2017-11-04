@@ -31,7 +31,7 @@
 namespace mce {
 namespace util {
 
-/// The base class for statistics for providing labeling functionality.
+/// The base class for statistics for providing labeling functionality and other output settings.
 template <size_t fields>
 class statistic_base {
 public:
@@ -109,6 +109,7 @@ protected:
 
 private:
 	locked<label_set> labels_;
+	std::atomic<bool> append_output_ = {true};
 
 public:
 	/// Returns a reading transaction on the labels.
@@ -118,6 +119,26 @@ public:
 	/// Returns a read-write transaction on the labels.
 	auto labels() noexcept {
 		return labels_.start_transaction();
+	}
+
+	/// Returns a bool indicating whether the output should be appended to an existing file.
+	/**
+	 * Defaults to false, which indicates, that existing files are replaced.
+	 * Setting the flag to true additionally suppresses the footer and if the file exists the footer is also
+	 * suppressed.
+	 */
+	bool append_output() const {
+		return append_output_;
+	}
+
+	/// Sets flag indicating whether the output should be appended to an existing file.
+	/**
+	 * Defaults to false, which indicates, that existing files are replaced.
+	 * Setting the flag to true additionally suppresses the footer and if the file exists the footer is also
+	 * suppressed.
+	 */
+	void append_output(bool append_output) {
+		append_output_ = append_output;
 	}
 };
 
@@ -169,14 +190,15 @@ public:
 				  count{s.count}, labels{lbl} {}
 
 		/// Outputs the formated result to the given stream using the given separator.
-		void output_to(std::ostream& ostr, const char* separator = ";") const {
-			labels.output_header(ostr, separator);
+		void output_to(std::ostream& ostr, const char* separator = ";", bool suppress_header = false,
+					   bool suppress_footer = false) const {
+			if(!suppress_header) labels.output_header(ostr, separator);
 			labels.output_prefix(ostr, separator);
 			ostr << average << separator << sum << separator << minimum << separator << maximum << separator
 				 << count;
 			labels.output_suffix(ostr, separator);
 			ostr << "\n";
-			labels.output_footer(ostr, separator);
+			if(!suppress_footer) labels.output_footer(ostr, separator);
 		}
 
 		/// Allows outputting the result data to an ostream.
@@ -271,8 +293,9 @@ public:
 		label_set labels;			 ///< The labels used on output.
 
 		/// Outputs the formated result to the given stream using the given separator.
-		void output_to(std::ostream& ostr, const char* separator = ";") const {
-			labels.output_header(ostr, separator);
+		void output_to(std::ostream& ostr, const char* separator = ";", bool suppress_header = false,
+					   bool suppress_footer = false) const {
+			if(!suppress_header) labels.output_header(ostr, separator);
 			if(under_samples) {
 				labels.output_prefix(ostr, separator);
 				if(!buckets.empty()) {
@@ -304,7 +327,7 @@ public:
 				labels.output_suffix(ostr, separator);
 				ostr << "\n";
 			}
-			labels.output_footer(ostr, separator);
+			if(!suppress_footer) labels.output_footer(ostr, separator);
 		}
 
 		/// Allows outputting the result data to an ostream.
@@ -340,8 +363,10 @@ struct statistics_container_base {
 	type_id_t type_;
 	explicit statistics_container_base(type_id_t type) : type_{type} {}
 	virtual ~statistics_container_base() noexcept = default;
-	virtual void write_result_to(std::ostream& ostr, const char* separator) noexcept = 0;
+	virtual void write_result_to(std::ostream& ostr, const char* separator, bool suppress_header = false,
+								 bool suppress_footer = false) noexcept = 0;
 	virtual void clear() noexcept = 0;
+	virtual bool append_output() const noexcept = 0;
 };
 
 template <typename Stat>
@@ -351,12 +376,16 @@ struct statistics_container : statistics_container_base {
 	explicit statistics_container(Args&&... args)
 			: statistics_container_base(type_id<statistics_container_base>::id<Stat>()),
 			  stat(std::forward<Args>(args)...) {}
-	virtual void write_result_to(std::ostream& ostr, const char* separator) noexcept override {
+	virtual void write_result_to(std::ostream& ostr, const char* separator, bool suppress_header = false,
+								 bool suppress_footer = false) noexcept override {
 		auto r = stat.evaluate();
-		r.output_to(ostr, separator);
+		r.output_to(ostr, separator, suppress_header, suppress_footer);
 	}
 	virtual void clear() noexcept override {
 		stat.clear();
+	}
+	virtual bool append_output() const noexcept override {
+		return stat.append_output();
 	}
 };
 
