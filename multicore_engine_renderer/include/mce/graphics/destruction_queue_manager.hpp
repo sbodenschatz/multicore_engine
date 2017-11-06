@@ -148,7 +148,7 @@ public:
 	/// \brief Inserts the resource managed by the given handle to be destroyed when the current ring index is
 	/// cleared.
 	template <typename T>
-	void enqueue(T&& handle) { // TODO make noexcept because it is used in destructors.
+	void enqueue(T&& handle) { // TODO make noexcept if possible because it is used in destructors.
 		std::lock_guard<std::mutex> lock(queue_mutex);
 		queues[current_ring_index].emplace_back(std::forward<T>(handle));
 	}

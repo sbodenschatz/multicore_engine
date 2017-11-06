@@ -77,7 +77,6 @@ public:
 	abstract_property() noexcept = 0;
 	/// Returns a unique_ptr-managed copy of this assignment object.
 	virtual std::unique_ptr<abstract_component_property_assignment<Root_Type>> make_copy() const = 0;
-	// TODO: Implement interface for binary serialization of object configurations
 
 	/// Returns a bool indicating if this assignment is valid.
 	bool valid() const {

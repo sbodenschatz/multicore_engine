@@ -121,7 +121,6 @@ public:
 	template <typename F, typename E>
 	void run_when_loaded(F handler, E error_handler) {
 		if(current_state_ == state::data_ready) {
-			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
 			handler(this->shared_from_this());
 			return;
 		} else if(current_state_ == state::error) {
@@ -154,7 +153,6 @@ public:
 	template <typename F, typename E>
 	void run_when_loaded_simple(F handler, E error_handler) {
 		if(current_state_ == state::data_ready) {
-			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
 			handler();
 			return;
 		} else if(current_state_ == state::error) {
@@ -227,8 +225,6 @@ private:
 		simple_completion_handlers.shrink_to_fit();
 	}
 
-	// TODO Prevent a dead-lock where all workers are waiting (sync) for completions of assets whose load
-	// tasks are further back in the thread pools queue (async).
 	void internal_wait_for_data_complete() const {
 		if(ready()) return;
 		check_error_flag();
@@ -240,8 +236,6 @@ private:
 		check_error_flag();
 	}
 
-	// TODO Prevent a dead-lock where all workers are waiting (sync) for completions of assets whose load
-	// tasks are further back in the thread pools queue (async).
 	void internal_wait_for_meta_complete() const {
 		if(meta_data_ready()) return;
 		check_error_flag();

@@ -21,6 +21,7 @@
 #include <mce/entity/parser/entity_template_lang_ast.hpp>
 #include <mce/entity/parser/entity_template_lang_parser.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/unused.hpp>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -116,7 +117,7 @@ operator()(const ast::rotation_list&) {
 }
 entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::marker_evaluation& node) {
-	(void)node; // TODO Resolve marker and set position, when marker system is implemented.
+	UNUSED(node);
 	throw unimplemented_exception("not implemented");
 }
 entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
@@ -158,7 +159,7 @@ operator()(const ast::rotation_list& node) {
 }
 entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::marker_evaluation& node) {
-	(void)node; // TODO Resolve marker and set position, when marker system is implemented.
+	UNUSED(node);
 	throw unimplemented_exception("not implemented");
 }
 entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::

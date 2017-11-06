@@ -384,8 +384,7 @@ template <>
 struct type_parser<entity::entity_reference> {
 	/// Parses s into t.
 	static bool from_string(const boost::string_view&, entity::entity_reference&) {
-		/// TODO: Check if this operation can be supported in the future (an entity_manager would be required
-		/// here, reducing generality of the property).
+		// Currently not supported.
 		return false;
 	}
 	/// Formats t into a string.

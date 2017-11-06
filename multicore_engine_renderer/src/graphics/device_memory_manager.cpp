@@ -86,7 +86,6 @@ void device_memory_manager::free(const device_memory_allocation& allocation) {
 }
 
 void device_memory_manager::device_memory_block::free(const device_memory_allocation& allocation) {
-	// TODO Optimize by making use of the assumption that freelist is already sorted.
 	freelist.emplace_back(allocation.internal_offset, allocation.internal_size);
 	std::sort(freelist.begin(), freelist.end(),
 			  [](freelist_entry& a, freelist_entry& b) { return a.offset < b.offset; });

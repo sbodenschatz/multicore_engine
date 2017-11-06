@@ -106,7 +106,6 @@ int main(int argc, char* argv[]) {
 						if(entry_path.is_relative()) {
 							internal_path = entry.external_path;
 						} else {
-							// TODO: make entry path relative to desc file ?
 							internal_path = entry_path.filename().string();
 						}
 					}

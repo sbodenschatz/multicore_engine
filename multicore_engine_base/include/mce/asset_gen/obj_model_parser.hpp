@@ -94,7 +94,6 @@ private:
 
 	bool check_prefix(boost::string_view str, boost::string_view prefix, boost::string_view& rest) const;
 
-	// TODO: Try to implement these functions without copying to a temporary buffer
 	float stof(boost::string_view str, std::size_t* pos = nullptr);
 	long long stoll(boost::string_view str, std::size_t* pos = nullptr);
 

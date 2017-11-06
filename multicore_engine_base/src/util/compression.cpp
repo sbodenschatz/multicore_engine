@@ -9,8 +9,7 @@
 #include <cstring>
 #include <mce/util/compression.hpp>
 
-// TODO Cite in sources
-// Based on http://www.zlib.net/zlib_how.html
+// The implementation of the compress and decompress functions is based on http://www.zlib.net/zlib_how.html
 
 namespace mce {
 namespace util {
