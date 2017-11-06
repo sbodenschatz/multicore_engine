@@ -9,8 +9,9 @@
 namespace mce {
 namespace graphics {
 
-// TODO Cite in sources:
+// The required and optional flags are modeled after the checks performed by the validation layer, see
 // https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/blob/57f0da98098689f3624c5503cfe1a4b5fede885a/layers/buffer_validation.cpp#L2691
+// At the time of writing they are explicitly listed in the spec.
 
 vk::AccessFlags required_flags_for_layout(vk::ImageLayout layout) {
 	switch(layout) {

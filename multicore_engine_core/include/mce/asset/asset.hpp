@@ -81,7 +81,6 @@ public:
 	template <typename F, typename E>
 	void run_when_loaded(F handler, E error_handler) {
 		if(current_state_ == state::ready) {
-			// TODO: Maybe also run this asynchronously (post it into the thread pool of the asset manager)
 			handler(std::static_pointer_cast<const asset>(this->shared_from_this()));
 			return;
 		} else if(current_state_ == state::error) {
@@ -168,8 +167,6 @@ private:
 		completion_handlers.shrink_to_fit();
 	}
 
-	// TODO Prevent a dead-lock where all workers are waiting (sync) for completions of assets whose load
-	// tasks are further back in the thread pools queue (async).
 	void internal_wait_for_complete() const {
 		if(current_state_ == state::ready) return;
 		check_error_flag();

@@ -1,15 +1,15 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/entity/parser/entity_text_file_ast.hpp
+ * File /multicore_engine_core/include/mce/entity/parser/entity_template_lang_ast.hpp
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
-#ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_HPP_
-#define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_HPP_
+#ifndef ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_HPP_
+#define ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_HPP_
 
 /**
  * \file
- * Defines AST node types for entity text files.
+ * Defines AST node types for the entity template language.
  */
 
 #include <algorithm>
@@ -134,7 +134,7 @@ struct entity_definition {
 
 struct ast_wrapper;
 
-/// Represents an include instruction in an entity text file.
+/// Represents an include instruction in an entity template language file.
 struct include_instruction {
 	/// The name of the included file.
 	std::string filename;
@@ -158,13 +158,13 @@ struct entity_instance {
 	entity_instance_param orientation_parameter;
 };
 
-/// Represents an element of the root of the entity text file AST.
+/// Represents an element of the root of the entity template language AST.
 typedef boost::variant<entity_definition, include_instruction, entity_instance> root_element;
 
-/// Represents the root node of the entity text file AST.
+/// Represents the root node of the entity template language AST.
 typedef std::vector<root_element> ast_root;
 
-/// Wraps another AST from an included entity text file.
+/// Wraps another AST from an included entity template language file.
 struct ast_wrapper {
 	/// The root node of the included file's AST.
 	ast_root root;
@@ -177,4 +177,4 @@ struct ast_wrapper {
 } // namespace entity
 } // namespace mce
 
-#endif /* ENTITY_PARSER_ENTITY_TEXT_FILE_AST_HPP_ */
+#endif /* ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_HPP_ */

@@ -32,7 +32,7 @@ class engine;
 } // namespace core
 namespace entity {
 namespace parser {
-class entity_text_file_parser_backend;
+class entity_template_lang_parser_backend;
 } // namespace parser
 class entity_configuration;
 class abstract_component_type;
@@ -54,10 +54,8 @@ class entity_manager {
 	boost::container::flat_map<std::string, std::unique_ptr<abstract_component_type>> component_types;
 	boost::container::flat_map<component_type_id_t, abstract_component_type*> component_types_by_id;
 
-	void register_builtin_components();
-
 public:
-	friend class mce::entity::parser::entity_text_file_parser_backend;
+	friend class mce::entity::parser::entity_template_lang_parser_backend;
 	/// Constructs an entity_manager for the given engine object.
 	explicit entity_manager(core::engine* engine);
 	/// Forbids copy-construction for entity_manager.
@@ -76,7 +74,7 @@ public:
 	/// Deletes all entity objects and entity_configuration objects from the manager.
 	void clear_entities_and_entity_configurations();
 	/// Loads entities and entity configurations from the entity text file represented by the given asset.
-	void load_entities_from_text_file(const asset::asset_ptr& text_file_asset);
+	void load_entities_from_template_lang_file(const asset::asset_ptr& template_lang_file_asset);
 	/// Adds an entity_configuration to the manager.
 	void add_entity_configuration(std::unique_ptr<entity_configuration>&& entity_config);
 	/// Creates an entity from the referenced entity_configuration.
@@ -85,6 +83,11 @@ public:
 	void destroy_entity(entity_id_t id);
 	/// Destroys the referenced entity.
 	void destroy_entity(entity* entity);
+
+	/// Returns the current number of entities.
+	size_t entity_count() const noexcept {
+		return entities.size();
+	}
 
 	/// Returns a pointer to the entity with the given id or nullptr if no such entity exists.
 	entity* find_entity(long long id) const;

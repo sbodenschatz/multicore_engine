@@ -39,7 +39,7 @@ class first_person_flyer_component : public entity::component {
 
 	void process(const mce::core::frame_time& frame_time, const input_system& sys);
 
-	friend class input_state;
+	friend class first_person_input_state;
 
 public:
 	/// Creates a first_person_flyer_component for the given entity and using the given configuration.

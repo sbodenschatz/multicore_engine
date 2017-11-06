@@ -14,8 +14,8 @@
 
 #include <boost/variant/static_visitor.hpp>
 #include <mce/core/engine.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
-#include <mce/entity/parser/entity_text_file_ast_value_mapper.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast_value_mapper.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/reflection/property.hpp>
 #include <memory>
@@ -77,7 +77,6 @@ public:
 	abstract_property() noexcept = 0;
 	/// Returns a unique_ptr-managed copy of this assignment object.
 	virtual std::unique_ptr<abstract_component_property_assignment<Root_Type>> make_copy() const = 0;
-	// TODO: Implement interface for binary serialization of object configurations
 
 	/// Returns a bool indicating if this assignment is valid.
 	bool valid() const {

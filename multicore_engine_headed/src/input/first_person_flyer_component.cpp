@@ -37,7 +37,7 @@ void first_person_flyer_component::process(const mce::core::frame_time& frame_ti
 }
 void first_person_flyer_component::process_keyboard(const mce::core::frame_time& frame_time,
 													const input_system& sys) {
-	glm::vec4 velocity;
+	glm::vec3 velocity;
 	if(sys.current_key_state(forward_key_)) {
 		velocity.z = -1.0f;
 	}
@@ -59,7 +59,7 @@ void first_person_flyer_component::process_keyboard(const mce::core::frame_time&
 	if(dot(velocity, velocity) > 0.0) {
 		velocity = glm::normalize(velocity) * speed_;
 	}
-	velocity = glm::rotate(owner().orientation(), velocity);
+	velocity = glm::vec3(glm::rotate(owner().orientation(), glm::vec4(velocity, 0.0f)));
 	owner().position(owner().position() + velocity * frame_time.delta_t);
 }
 void first_person_flyer_component::process_mouse(const mce::core::frame_time& frame_time,
@@ -71,6 +71,7 @@ void first_person_flyer_component::process_mouse(const mce::core::frame_time& fr
 	}
 	glm::vec3 global_angualar_velocity = {0.0f, velocity.x, 0.0f};
 	glm::vec3 local_angualar_velocity = {velocity.y, 0.0f, 0.0f};
+	// See https://public.hochschule-trier.de/~luerig/Phys/4/ for formula for the following:
 	glm::quat global_rot_quat = {0.0f, global_angualar_velocity};
 	glm::quat local_rot_quat = {0.0f, local_angualar_velocity};
 	glm::quat orientation_derivative = 0.5f * (global_rot_quat * owner().orientation());

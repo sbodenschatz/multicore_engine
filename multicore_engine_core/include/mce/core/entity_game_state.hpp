@@ -46,7 +46,7 @@ public:
 	entity_game_state(mce::core::engine* engine, mce::core::game_state_machine* state_machine,
 					  mce::core::game_state* parent_state);
 	/// Destroys the entity_game_state.
-	virtual ~entity_game_state();
+	virtual ~entity_game_state() = 0;
 
 	/// Allows access to the contained entity_manager.
 	const entity::entity_manager& entity_manager() const {

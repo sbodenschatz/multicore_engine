@@ -1,6 +1,6 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/src/entity/parser/entity_text_file_parser_frontend.cpp
+ * File /multicore_engine_core/src/entity/parser/entity_template_lang_parser_frontend.cpp
  * Copyright 2015-2016 by Stefan Bodenschatz
  */
 
@@ -18,9 +18,10 @@
 #include <mce/entity/entity.hpp>
 #include <mce/entity/entity_configuration.hpp>
 #include <mce/entity/entity_manager.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
-#include <mce/entity/parser/entity_text_file_parser.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_parser.hpp>
 #include <mce/exceptions.hpp>
+#include <mce/util/unused.hpp>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -30,7 +31,8 @@ namespace mce {
 namespace entity {
 namespace parser {
 
-void entity_text_file_parser_backend::ast_definition_visitor::operator()(const ast::entity_definition& node) {
+void entity_template_lang_parser_backend::ast_definition_visitor::
+operator()(const ast::entity_definition& node) {
 	std::unique_ptr<entity_configuration> config;
 	if(!node.super_name.empty()) {
 		auto super_config = backend.em.find_entity_configuration(node.super_name);
@@ -66,7 +68,7 @@ void entity_text_file_parser_backend::ast_definition_visitor::operator()(const a
 	}
 	backend.em.add_entity_configuration(std::move(config));
 }
-void entity_text_file_parser_backend::ast_definition_visitor::operator()(ast::include_instruction& node) {
+void entity_template_lang_parser_backend::ast_definition_visitor::operator()(ast::include_instruction& node) {
 	if(!backend.em.engine)
 		throw invalid_operation_exception("Can't include files because a null-engine is given and therefore "
 										  "no asset_loader is available");
@@ -75,13 +77,13 @@ void entity_text_file_parser_backend::ast_definition_visitor::operator()(ast::in
 	node.included_ast = std::make_shared<ast::ast_wrapper>(backend.load_file(included));
 	backend.process_entity_definitions(node.included_ast->root);
 }
-void entity_text_file_parser_backend::ast_definition_visitor::operator()(const ast::entity_instance&) {}
+void entity_template_lang_parser_backend::ast_definition_visitor::operator()(const ast::entity_instance&) {}
 
-void entity_text_file_parser_backend::ast_instance_visitor::operator()(const ast::entity_definition&) {}
-void entity_text_file_parser_backend::ast_instance_visitor::operator()(ast::include_instruction& node) {
+void entity_template_lang_parser_backend::ast_instance_visitor::operator()(const ast::entity_definition&) {}
+void entity_template_lang_parser_backend::ast_instance_visitor::operator()(ast::include_instruction& node) {
 	backend.process_entity_instances(node.included_ast->root);
 }
-void entity_text_file_parser_backend::ast_instance_visitor::operator()(const ast::entity_instance& node) {
+void entity_template_lang_parser_backend::ast_instance_visitor::operator()(const ast::entity_instance& node) {
 	// Create entity and give it the specified position and orientation
 	auto entity_conf = backend.em.find_entity_configuration(node.type_name);
 	if(!entity_conf)
@@ -93,7 +95,7 @@ void entity_text_file_parser_backend::ast_instance_visitor::operator()(const ast
 	entity->orientation(node.orientation_parameter.apply_visitor(orientation_visitor));
 	if(!node.instance_name.empty()) backend.em.assign_entity_name(node.instance_name, entity->id());
 }
-entity_position_t entity_text_file_parser_backend::ast_position_visitor::
+entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::int_list& node) {
 	entity_position_t pos;
 	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) {
@@ -101,7 +103,7 @@ operator()(const ast::int_list& node) {
 	}
 	return pos;
 }
-entity_position_t entity_text_file_parser_backend::ast_position_visitor::
+entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::float_list& node) {
 	entity_position_t pos;
 	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) {
@@ -109,16 +111,16 @@ operator()(const ast::float_list& node) {
 	}
 	return pos;
 }
-entity_position_t entity_text_file_parser_backend::ast_position_visitor::
+entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::rotation_list&) {
 	throw value_type_exception("Rotation list given as position.");
 }
-entity_position_t entity_text_file_parser_backend::ast_position_visitor::
+entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::marker_evaluation& node) {
-	(void)node; // TODO Resolve marker and set position, when marker system is implemented.
+	UNUSED(node);
 	throw unimplemented_exception("not implemented");
 }
-entity_position_t entity_text_file_parser_backend::ast_position_visitor::
+entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::entity_reference& node) {
 	auto ent = backend.em.find_entity(node.referred_name);
 	if(ent) {
@@ -127,20 +129,20 @@ operator()(const ast::entity_reference& node) {
 		throw missing_entity_exception("Named entity not found.");
 	}
 }
-entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
+entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::int_list& node) {
 	if(node.empty()) return entity_orientation_t();
 	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
 	return glm::angleAxis(glm::radians(float(node[0])),
 						  glm::vec3(float(node[1]), float(node[2]), float(node[3])));
 }
-entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
+entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::float_list& node) {
 	if(node.empty()) return entity_orientation_t();
 	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
 	return glm::angleAxis(glm::radians(float(node[0])), glm::vec3(node[1], node[2], node[3]));
 }
-entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
+entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::rotation_list& node) {
 	entity_orientation_t orientation;
 	for(auto&& entry : node) {
@@ -155,12 +157,12 @@ operator()(const ast::rotation_list& node) {
 	}
 	return orientation;
 }
-entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
+entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::marker_evaluation& node) {
-	(void)node; // TODO Resolve marker and set position, when marker system is implemented.
+	UNUSED(node);
 	throw unimplemented_exception("not implemented");
 }
-entity_orientation_t entity_text_file_parser_backend::ast_orientation_visitor::
+entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::entity_reference& node) {
 	auto ent = backend.em.find_entity(node.referred_name);
 	if(ent) {
@@ -170,24 +172,26 @@ operator()(const ast::entity_reference& node) {
 	}
 }
 
-void entity_text_file_parser_backend::process_entity_definitions(ast::ast_root& root_node) {
+void entity_template_lang_parser_backend::process_entity_definitions(ast::ast_root& root_node) {
 	ast_definition_visitor visitor{*this};
 	for(auto&& element : root_node) element.apply_visitor(visitor);
 }
-void entity_text_file_parser_backend::process_entity_instances(ast::ast_root& root_node) {
+void entity_template_lang_parser_backend::process_entity_instances(ast::ast_root& root_node) {
 	ast_instance_visitor visitor{*this};
 	for(auto&& element : root_node) element.apply_visitor(visitor);
 }
-ast::ast_root entity_text_file_parser_backend::load_file(const asset::asset_ptr& text_file_asset) {
-	const char* start = text_file_asset->data();
-	const char* end = text_file_asset->data() + text_file_asset->size();
-	parser::entity_text_file_parser_frontend fe;
-	auto root = fe.parse(text_file_asset->name(), start, end);
-	if(start != end) throw syntax_exception("Partial parse of '" + text_file_asset->name() + "'.");
+ast::ast_root
+entity_template_lang_parser_backend::load_file(const asset::asset_ptr& template_lang_file_asset) {
+	const char* start = template_lang_file_asset->data();
+	const char* end = template_lang_file_asset->data() + template_lang_file_asset->size();
+	parser::entity_template_lang_parser_frontend fe;
+	auto root = fe.parse(template_lang_file_asset->name(), start, end);
+	if(start != end) throw syntax_exception("Partial parse of '" + template_lang_file_asset->name() + "'.");
 	return root;
 }
-void entity_text_file_parser_backend::load_and_process_file(const asset::asset_ptr& text_file_asset) {
-	ast::ast_root root = load_file(text_file_asset);
+void entity_template_lang_parser_backend::load_and_process_file(
+		const asset::asset_ptr& template_lang_file_asset) {
+	ast::ast_root root = load_file(template_lang_file_asset);
 	process_entity_definitions(root);
 	process_entity_instances(root);
 }

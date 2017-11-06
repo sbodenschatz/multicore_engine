@@ -29,7 +29,7 @@ class buffer_ibstream : public ibstream {
 public:
 	/// Constructs a binary stream interface for a buffer in memory without taking ownership.
 	buffer_ibstream(const char* buffer, size_t size) : buffer_{buffer}, size_{size} {};
-	/// Constructs a binary stream interface for a buffer manager by a shared_ptr.
+	/// Constructs a binary stream interface for a buffer managed by a shared_ptr.
 	buffer_ibstream(const std::shared_ptr<const char>& owned_buffer, size_t size)
 			: buffer_{owned_buffer.get()}, size_{size}, owned_buffer{owned_buffer} {};
 	/// Reads bytes from the buffer at the current read position.

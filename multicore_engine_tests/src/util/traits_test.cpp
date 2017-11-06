@@ -26,7 +26,7 @@ TEST(util_traits_test, swappable_positive) {
 }
 
 /*
-// TODO Fix on msvc
+// The trait is currently broken on MSVC and can therefore not be tested before the MS STL conforms to C++17.
 TEST(util_traits_test,swappable_negative) {
 	struct A {
 		A() {}

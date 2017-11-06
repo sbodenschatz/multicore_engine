@@ -34,10 +34,7 @@ int main(int argc, char* argv[]) {
 			("version,v", "Display version info.")												 //
 			("description-file,d", po::value(&description_file), "The description file to use.") //
 			("output,o", po::value(&output_file), "The output file name.")						 //
-			("deps", po::bool_switch(&deps), "Only generate list of dependencies.")
-			/*TODO:
-			 * ("deps", po::value(&deps_file),														 //
-			 "Generate makefile-style dependency rules into given file")*/; //
+			("deps", po::bool_switch(&deps), "Only generate list of dependencies.");			 //
 	po::variables_map vars;
 	try {
 		po::store(po::parse_command_line(argc, argv, desc), vars);
@@ -97,7 +94,6 @@ int main(int argc, char* argv[]) {
 						if(entry_path.is_relative()) {
 							internal_path = entry.external_path;
 						} else {
-							// TODO: make entry path relative to desc file ?
 							internal_path = entry_path.filename().string();
 						}
 					}

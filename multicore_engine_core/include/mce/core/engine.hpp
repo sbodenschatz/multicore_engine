@@ -38,10 +38,18 @@ namespace config {
 class config_store;
 } // namespace config
 
+namespace util {
+class statistics_manager;
+} // namespace util
+
 namespace core {
 class system;
 class game_state_machine;
 struct frame_time;
+
+namespace detail {
+struct engine_core_stats_pimpl;
+} // namespace detail
 
 /// Represents the central management class for the subsystems of the engine.
 class engine {
@@ -50,6 +58,7 @@ class engine {
 	std::atomic<bool> running_;
 	software_metadata engine_metadata_;
 	software_metadata application_metadata_;
+	std::unique_ptr<util::statistics_manager> statistics_manager_;
 	std::unique_ptr<asset::asset_manager> asset_manager_;
 	std::unique_ptr<config::config_store> config_store_;
 	std::unique_ptr<model::model_data_manager> model_data_manager_;
@@ -57,9 +66,11 @@ class engine {
 	std::vector<std::pair<int, mce::core::system*>> systems_pre_phase_ordered;
 	std::vector<std::pair<int, mce::core::system*>> systems_post_phase_ordered;
 	std::unique_ptr<mce::core::game_state_machine> game_state_machine_;
+	std::unique_ptr<detail::engine_core_stats_pimpl> stats_pimpl_;
 
 	void refresh_system_ordering();
 	void initialize_config();
+	void initialize_stats();
 
 public:
 	/// Constructs the engine.
@@ -215,6 +226,17 @@ public:
 	 */
 	void max_general_concurrency(uint32_t max_general_concurrency) {
 		max_general_concurrency_ = max_general_concurrency;
+	}
+
+	/// Allows access to the engine-wide statistics_manager.
+	const util::statistics_manager& statistics_manager() const {
+		assert(statistics_manager_);
+		return *statistics_manager_;
+	}
+	/// Allows access to the engine-wide statistics_manager.
+	util::statistics_manager& statistics_manager() {
+		assert(statistics_manager_);
+		return *statistics_manager_;
 	}
 };
 

@@ -129,7 +129,6 @@ public:
 	 * The smart_pool_ptr\<A\> is pointer-assignment-compatible with (i.e. can be constructed from)
 	 * smart_pool_ptr\<B\> if B* is implicitly convertible to A*.
 	 */
-	// TODO Check, if this signature is correct or should be const L-ref.
 	template <typename U, typename Dummy = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 	explicit smart_pool_ptr(weak_pool_ptr<U>&& other)
 			: object(other.object), managed_object{other.managed_object}, block{other.block} {

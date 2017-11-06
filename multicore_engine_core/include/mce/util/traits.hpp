@@ -109,8 +109,6 @@ struct is_callable {
 	static constexpr bool value = detail::callable_trait_impl<T, Args...>::value;
 };
 
-// TODO cite in sources: http://en.cppreference.com/w/cpp/types/conjunction
-
 /// Implements C++17 std::conjunction because not all compilers provide it yet.
 /**
  * The implementation was taken from: http://en.cppreference.com/w/cpp/types/conjunction

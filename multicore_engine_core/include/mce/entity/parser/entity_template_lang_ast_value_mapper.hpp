@@ -1,15 +1,15 @@
 /*
  * Multi-Core Engine project
- * File /multicore_engine_core/include/mce/entity/parser/entity_text_file_ast_value_map.hpp
+ * File /multicore_engine_core/include/mce/entity/parser/entity_template_lang_ast_value_map.hpp
  * Copyright 2015-2017 by Stefan Bodenschatz
  */
 
-#ifndef ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
-#define ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_
+#ifndef ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_VALUE_MAPPER_HPP_
+#define ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_VALUE_MAPPER_HPP_
 
 /**
  * \file
- * Maps value AST node types to component property type they can be used with.
+ * Maps value entity template language AST node types to component property type they can be used with.
  */
 
 #include <cstdint>
@@ -17,7 +17,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <limits>
 #include <mce/entity/entity_reference.hpp>
-#include <mce/entity/parser/entity_text_file_ast.hpp>
+#include <mce/entity/parser/entity_template_lang_ast.hpp>
 #include <mce/exceptions.hpp>
 #include <string>
 #include <type_traits>
@@ -57,7 +57,7 @@ struct ast_value_mapper<long long, bool, void> {
 	}
 };
 
-/// Maps integers from the AST (represented by long long) to any arithmetic type.
+/// Maps integers from the AST (represented by long long) to any arithmetic type (except bool).
 template <typename T>
 struct ast_value_mapper<long long, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to T and stores it in val.
@@ -141,14 +141,26 @@ struct ast_value_mapper<float_list, glm::vec4> {
 	}
 };
 
-/// Maps integer lists from the AST to int.
-template <>
-struct ast_value_mapper<int_list, int> {
+/// Maps integer lists from the AST to any arithmetic type (except bool).
+template <typename T>
+struct ast_value_mapper<int_list, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to int and stores it in val.
-	static void convert(const int_list& ast_val, int& val, entity_manager&) {
+	static void convert(const int_list& ast_val, T& val, entity_manager&) {
 		val = 0;
 		if(ast_val.size()) {
-			val = checked_numeric_conversion<int>(ast_val[0]);
+			val = checked_numeric_conversion<T>(ast_val[0]);
+		}
+	}
+};
+
+/// Maps integer lists from the AST to bool.
+template <>
+struct ast_value_mapper<int_list, bool> {
+	/// Converts ast_val to int and stores it in val.
+	static void convert(const int_list& ast_val, bool& val, entity_manager&) {
+		val = 0;
+		if(ast_val.size()) {
+			val = bool(ast_val[0]);
 		}
 	}
 };
@@ -249,4 +261,4 @@ struct ast_value_mapper<ast::rotation_list, glm::tquat<T, p>> {
 } // namespace entity
 } // namespace mce
 
-#endif /* ENTITY_PARSER_ENTITY_TEXT_FILE_AST_VALUE_MAPPER_HPP_ */
+#endif /* ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_VALUE_MAPPER_HPP_ */

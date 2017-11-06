@@ -28,7 +28,6 @@ std::pair<file_content_ptr, file_size> native_file_reader::read_file(const std::
 		decltype(size_tmp) size_check = size;
 		if(size_check != size_tmp) throw buffer_size_exception("Asset too big to fit in address space.");
 		stream.seekg(0, std::ios::beg);
-		// TODO Maybe use 64-bit aligned storage for content
 		std::shared_ptr<char> content =
 				std::shared_ptr<char>(new char[size], [](char* ptr) { delete[] ptr; });
 		stream.read(content.get(), size);

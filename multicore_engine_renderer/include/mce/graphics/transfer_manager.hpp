@@ -77,7 +77,7 @@ private:
 		uint32_t mip_levels;
 		uint32_t layers;
 		vk::ImageLayout old_layout;
-		std::vector<vk::BufferImageCopy> regions; // TODO: Find nothrow but heap-avoiding solution.
+		std::vector<vk::BufferImageCopy> regions;
 		util::callback_pool_function<void(vk::Image)> completion_callback;
 
 		image_transfer_job(std::shared_ptr<const char> src_data, size_t size, void* staging_buffer_ptr,
