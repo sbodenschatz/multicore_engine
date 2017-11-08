@@ -57,8 +57,12 @@ void renderer_state::record_render_task(const render_task& task,
 }
 void renderer_state::collect_scene_uniforms() {
 	auto sys = static_cast<renderer_system*>(system_);
-	// TODO: Implement camera selection.
-	auto cam = camera_comps.begin();
+	std::vector<std::pair<std::string, const camera_component*>> cameras;
+	std::transform(camera_comps.begin(), camera_comps.end(), std::back_inserter(cameras),
+				   [](const auto& comp) { return std::make_pair(comp.name(), &comp); });
+	util::preference_sort(cameras, *(camera_preferences_.start_transaction()),
+						  [](const auto& cam) -> const std::string& { return cam.first; });
+	auto cam = cameras.front().second;
 	scene_uniforms.view = glm::inverse(
 			glm::rotate(cam->owner().calculate_transform(), glm::radians(180.0f), {1.0f, 0.0f, 0.0f}));
 	scene_uniforms.projection = glm::perspectiveFovLH(
