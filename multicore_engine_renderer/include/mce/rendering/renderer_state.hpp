@@ -26,6 +26,7 @@
 #include <mce/rendering/static_model.hpp>
 #include <mce/rendering/static_model_component.hpp>
 #include <mce/rendering/uniforms_structs.hpp>
+#include <mce/util/locked.hpp>
 #include <tbb/parallel_reduce.h>
 
 namespace mce {
@@ -47,7 +48,7 @@ class renderer_state : public core::system_state {
 	entity::component_pool<camera_component, 4> camera_comps;
 	entity::component_pool<point_light_component> point_light_comps;
 	entity::component_pool<static_model_component> static_model_comps;
-	std::vector<std::string> camera_preferences_;
+	util::locked<std::vector<std::string>> camera_preferences_;
 
 	using static_model_comp_range_t = decltype(containers::make_pool_const_range(static_model_comps));
 
@@ -121,6 +122,18 @@ public:
 
 	/// Hook function in the main loop that performs the actual rendering.
 	void render(const mce::core::frame_time& frame_time) override;
+
+	/// \brief Allows thread-safe read access to the preference list controlling the camera selection using
+	/// their names.
+	auto camera_preferences() const {
+		return camera_preferences_.start_transaction();
+	}
+
+	/// \brief Allows thread-safe read-write access to the preference list controlling the camera selection
+	/// using their names.
+	auto camera_preferences() {
+		return camera_preferences_.start_transaction();
+	}
 };
 
 } /* namespace rendering */

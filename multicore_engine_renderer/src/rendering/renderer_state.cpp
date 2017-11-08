@@ -60,7 +60,7 @@ void renderer_state::collect_scene_uniforms() {
 	std::vector<std::pair<std::string, const camera_component*>> cameras;
 	std::transform(camera_comps.begin(), camera_comps.end(), std::back_inserter(cameras),
 				   [](const auto& comp) { return std::make_pair(comp.name(), &comp); });
-	util::preference_sort(cameras, camera_preferences_,
+	util::preference_sort(cameras, *(camera_preferences_.start_transaction()),
 						  [](const auto& cam) -> const std::string& { return cam.first; });
 	auto cam = cameras.front().second;
 	scene_uniforms.view = glm::inverse(
