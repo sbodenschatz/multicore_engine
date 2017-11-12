@@ -49,6 +49,7 @@ class renderer_state : public core::system_state {
 	entity::component_pool<point_light_component> point_light_comps;
 	entity::component_pool<static_model_component> static_model_comps;
 	util::locked<std::vector<std::string>> camera_preferences_;
+	std::vector<std::pair<std::string, const camera_component*>> cameras_tmp;
 
 	using static_model_comp_range_t = decltype(containers::make_pool_const_range(static_model_comps));
 
