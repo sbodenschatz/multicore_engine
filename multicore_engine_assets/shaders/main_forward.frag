@@ -106,6 +106,7 @@ void main() {
 		float n_dot_l = max(dot(normal, light_dir), 0.0);
 		light_sum += (k_d * albedo / PI + specular) * radiance * n_dot_l;
 	}
+	light_sum += texture(emission_tex,uv).rgb;
 	light_sum = light_sum / (light_sum + vec3(1.0));
 	light_sum = pow(light_sum, vec3(1.0/2.2));
 	output_color = vec4(light_sum,1.0);
