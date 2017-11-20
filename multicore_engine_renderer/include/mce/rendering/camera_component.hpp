@@ -27,6 +27,7 @@ class camera_component : public entity::component {
 	float fov_;
 	float near_plane_;
 	float far_plane_;
+	std::string name_;
 
 public:
 	/// \brief Creates a camera_component for the given entity to attach to and the given
@@ -67,6 +68,16 @@ public:
 
 	/// Fills the given property_list with the properties available for this class.
 	static void fill_property_list(property_list& prop);
+
+	/// Returns the name identifying the camera.
+	std::string name() const {
+		return name_;
+	}
+
+	/// Sets the name identifying the camera.
+	void name(const std::string& name) {
+		name_ = name;
+	}
 };
 
 } /* namespace rendering */

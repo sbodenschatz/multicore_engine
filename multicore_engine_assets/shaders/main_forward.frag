@@ -42,7 +42,6 @@ vec3 fresnel_schlick(float cos_theta, vec3 F0) {
 	return F0 + (1.0 - F0) * pow(1.0 - cos_theta, 5.0);
 }
 
-
 float distribution_GGX(vec3 n, vec3 h, float roughness) {
 	float a = roughness*roughness;
 	float a_sq = a*a;
@@ -107,6 +106,7 @@ void main() {
 		float n_dot_l = max(dot(normal, light_dir), 0.0);
 		light_sum += (k_d * albedo / PI + specular) * radiance * n_dot_l;
 	}
+	light_sum += texture(emission_tex,uv).rgb;
 	light_sum = light_sum / (light_sum + vec3(1.0));
 	light_sum = pow(light_sum, vec3(1.0/2.2));
 	output_color = vec4(light_sum,1.0);

@@ -18,6 +18,7 @@ void camera_component::fill_property_list(property_list& prop) {
 	REGISTER_COMPONENT_PROPERTY(prop, camera_component, float, fov);
 	REGISTER_COMPONENT_PROPERTY(prop, camera_component, float, near_plane);
 	REGISTER_COMPONENT_PROPERTY(prop, camera_component, float, far_plane);
+	REGISTER_COMPONENT_PROPERTY(prop, camera_component, std::string, name);
 }
 
 } /* namespace rendering */
