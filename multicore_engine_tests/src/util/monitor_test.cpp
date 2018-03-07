@@ -180,7 +180,7 @@ TEST(util_monitor_test, thread_safety_copy_compare_exchange_spin_lock) {
 	std::atomic<bool> ok{true};
 
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&, i]() {
+		threads.emplace_back([&]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				monitor_test_object val_old;
 				monitor_test_object val_new(val_old.data[0] + 1);
@@ -209,7 +209,7 @@ TEST(util_monitor_test, thread_safety_move_compare_exchange_spin_lock) {
 	std::atomic<bool> ok{true};
 
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&, i]() {
+		threads.emplace_back([&]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				monitor_test_object val_old;
 				monitor_test_object val_new(val_old.data[0] + 1);
@@ -237,7 +237,7 @@ TEST(util_monitor_test, thread_safety_do_atomically_spin_lock) {
 	std::atomic<bool> ok{true};
 
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&, i]() {
+		threads.emplace_back([&]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				monitor.do_atomically([&ok](monitor_test_object& value) {
 					for(int i = 0; i < 64; ++i) {
@@ -404,7 +404,7 @@ TEST(util_monitor_test, thread_safety_copy_compare_exchange_mutex) {
 	std::atomic<bool> ok{true};
 
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&, i]() {
+		threads.emplace_back([&]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				monitor_test_object val_old;
 				monitor_test_object val_new(val_old.data[0] + 1);
@@ -433,7 +433,7 @@ TEST(util_monitor_test, thread_safety_move_compare_exchange_mutex) {
 	std::atomic<bool> ok{true};
 
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&, i]() {
+		threads.emplace_back([&]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				monitor_test_object val_old;
 				monitor_test_object val_new(val_old.data[0] + 1);
@@ -461,7 +461,7 @@ TEST(util_monitor_test, thread_safety_do_atomically_mutex) {
 	std::atomic<bool> ok{true};
 
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&, i]() {
+		threads.emplace_back([&]() {
 			for(int j = 0; j < elements_per_thread; ++j) {
 				monitor.do_atomically([&ok](monitor_test_object& value) {
 					for(int i = 0; i < 64; ++i) {

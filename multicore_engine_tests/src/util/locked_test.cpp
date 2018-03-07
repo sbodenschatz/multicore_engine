@@ -35,7 +35,7 @@ TEST(util_locked_test, thread_safety_stress_test) {
 	std::atomic<bool> ok{true};
 
 	for(int i = 0; i < thread_count; i++) {
-		threads.emplace_back([&, i]() {
+		threads.emplace_back([&]() {
 			for(int j = 0; j < iterations_per_thread; ++j) {
 				if(!locked_test_object->do_test()) ok = false;
 			}
