@@ -160,7 +160,7 @@ clang-debug-build:
         BUILD_COMPILER_NAME: "clang"
         BUILD_SANITIZE: "YES"
         ASAN_OPTIONS: "detect_leaks=0"
-    image: $CI_REGISTRY/ci-util/cpp/clang/debug:ubuntu
+    image: $CI_REGISTRY/ci-util/cpp/clang/debug:local-gli
     <<: *linux-build-task
 
 clang-release-build:
@@ -170,7 +170,7 @@ clang-release-build:
         BUILD_TYPE: "Release"
         BUILD_COMPILER_NAME: "clang"
         BUILD_SANITIZE: "NO"
-    image: $CI_REGISTRY/ci-util/cpp/clang/debug:ubuntu
+    image: $CI_REGISTRY/ci-util/cpp/clang/release:local-gli
     <<: *linux-build-task
     <<: *artifact-spec-build-linux
 
