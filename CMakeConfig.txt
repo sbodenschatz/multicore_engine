@@ -187,6 +187,7 @@ target_compile_definitions(deps.glm INTERFACE
 		GLM_FORCE_RADIANS 
 		GLM_FORCE_SIZE_T_LENGTH
 		GLM_FORCE_DEPTH_ZERO_TO_ONE
+		GLM_ENABLE_EXPERIMENTAL
 	)
 target_include_directories(deps.glm SYSTEM INTERFACE
 		${GLM_INCLUDE}

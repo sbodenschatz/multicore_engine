@@ -166,7 +166,7 @@ struct ast_value_mapper<int_list, bool> {
 };
 
 /// Maps integer lists from the AST to tvec2.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<int_list, glm::tvec2<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to tvec2<T,p> and stores it in val.
 	static void convert(const int_list& ast_val, glm::tvec2<T, p>& val, entity_manager&) {
@@ -178,7 +178,7 @@ struct ast_value_mapper<int_list, glm::tvec2<T, p>, std::enable_if_t<std::is_ari
 };
 
 /// Maps integer lists from the AST to tvec3.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<int_list, glm::tvec3<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to tvec3<T,p> and stores it in val.
 	static void convert(const int_list& ast_val, glm::tvec3<T, p>& val, entity_manager&) {
@@ -190,7 +190,7 @@ struct ast_value_mapper<int_list, glm::tvec3<T, p>, std::enable_if_t<std::is_ari
 };
 
 /// Maps integer lists from the AST to tvec4.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<int_list, glm::tvec4<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to tvec4<T,p> and stores it in val.
 	static void convert(const int_list& ast_val, glm::tvec4<T, p>& val, entity_manager&) {
@@ -212,7 +212,7 @@ struct ast_value_mapper<ast::entity_reference, mce::entity::entity_reference> {
 };
 
 /// Maps float lists from the AST to tquat.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<ast::float_list, glm::tquat<T, p>> {
 	/// Converts ast_val to tquat<T,p> and stores it in val.
 	static void convert(const ast::float_list& ast_val, glm::tquat<T, p>& val, entity_manager&) {
@@ -224,7 +224,7 @@ struct ast_value_mapper<ast::float_list, glm::tquat<T, p>> {
 };
 
 /// Maps int lists from the AST to tquat.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<ast::int_list, glm::tquat<T, p>> {
 	/// Converts ast_val to tquat<T,p> and stores it in val.
 	static void convert(const ast::int_list& ast_val, glm::tquat<T, p>& val, entity_manager&) {
@@ -238,7 +238,7 @@ struct ast_value_mapper<ast::int_list, glm::tquat<T, p>> {
 };
 
 /// Maps rotation lists from the AST to tquat.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<ast::rotation_list, glm::tquat<T, p>> {
 	/// Converts ast_val to tquat<T,p> and stores it in val.
 	static void convert(const ast::rotation_list& ast_val, glm::tquat<T, p>& val, entity_manager&) {

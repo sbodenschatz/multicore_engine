@@ -125,20 +125,20 @@ public:
 		return *this;
 	}
 	/// Allows reading of 1D glm vectors from the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	ibstream& operator>>(glm::tvec1<T, P>& value) {
 		*this >> value.x;
 		return *this;
 	}
 	/// Allows reading of 2D glm vectors from the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	ibstream& operator>>(glm::tvec2<T, P>& value) {
 		*this >> value.x;
 		*this >> value.y;
 		return *this;
 	}
 	/// Allows reading of 3D glm vectors from the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	ibstream& operator>>(glm::tvec3<T, P>& value) {
 		*this >> value.x;
 		*this >> value.y;
@@ -146,7 +146,7 @@ public:
 		return *this;
 	}
 	/// Allows reading of 4D glm vectors from the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	ibstream& operator>>(glm::tvec4<T, P>& value) {
 		*this >> value.x;
 		*this >> value.y;
@@ -155,7 +155,7 @@ public:
 		return *this;
 	}
 	/// Allows reading of glm quaternions from the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	ibstream& operator>>(glm::tquat<T, P>& value) {
 		*this >> value.x;
 		*this >> value.y;

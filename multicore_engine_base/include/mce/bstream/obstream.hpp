@@ -118,20 +118,20 @@ public:
 		return *this;
 	}
 	/// Allows writing of 1D glm vectors to the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	obstream& operator<<(const glm::tvec1<T, P>& value) {
 		*this << value.x;
 		return *this;
 	}
 	/// Allows writing of 2D glm vectors to the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	obstream& operator<<(const glm::tvec2<T, P>& value) {
 		*this << value.x;
 		*this << value.y;
 		return *this;
 	}
 	/// Allows writing of 3D glm vectors to the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	obstream& operator<<(const glm::tvec3<T, P>& value) {
 		*this << value.x;
 		*this << value.y;
@@ -139,7 +139,7 @@ public:
 		return *this;
 	}
 	/// Allows writing of 4D glm vectors to the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	obstream& operator<<(const glm::tvec4<T, P>& value) {
 		*this << value.x;
 		*this << value.y;
@@ -148,7 +148,7 @@ public:
 		return *this;
 	}
 	/// Allows writing of glm quaternions to the stream.
-	template <typename T, glm::precision P>
+	template <typename T, glm::qualifier P>
 	obstream& operator<<(const glm::tquat<T, P>& value) {
 		*this << value.x;
 		*this << value.y;
