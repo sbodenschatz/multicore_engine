@@ -252,7 +252,7 @@ target_link_libraries(deps.glfw INTERFACE
 		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${GLFW_LIBS}>
 		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${GLFW_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${GLFW_LIBS_RELEASE}>$<$<CONFIG:MINSIZEREL>:${GLFW_LIBS_RELEASE}>$<$<CONFIG:RELEASE>:${GLFW_LIBS_RELEASE}>>
 		$<$<PLATFORM_ID:Windows>:glfw3>
-		$<$<NOT:$<PLATFORM_ID:Windows>>:glfw dl X11 Xrandr Xinerama Xcursor Xxf86vm>
+		$<$<NOT:$<PLATFORM_ID:Windows>>:glfw dl X11 Xrandr Xxf86vm>
 	)
 
 add_library(deps.TBB INTERFACE)
