@@ -107,9 +107,9 @@ if (WIN32)
 
 	set(ZLIB_INCLUDE ${LIBS_DIR}/zlib/include CACHE PATH "Include path for zlib.")
 	if(MSVC)
-		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for zlib.")
+		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib CACHE PATH "Library path for zlib.")
 	else()
-		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for zlib.")
+		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib CACHE PATH "Library path for zlib.")
 	endif()
 
 	set(VULKAN_INCLUDE $ENV{VK_SDK_PATH}/Include CACHE PATH "Include path for vulkan.")
@@ -153,7 +153,7 @@ elseif(UNIX)
 	set(GLM_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLM.")
 	set(GLI_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLI.")
 	set(ZLIB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for zlib.")
-	set(ZLIB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for zlib.")
+	set(ZLIB_LIBS ${LIBS_DIR}/lib CACHE PATH "Library path for zlib.")
 	set(VULKAN_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vulkan.")
 	set(VULKAN_LIBS ${LIBS_DIR}/lib CACHE PATH "Library path for vulkan.")
 	set(GLFW_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for glfw.")
@@ -216,7 +216,7 @@ target_compile_definitions(deps.zlib INTERFACE
 target_include_directories(deps.zlib SYSTEM INTERFACE
 		${ZLIB_INCLUDE}
 	)
-if(MSVC)
+if(WIN32)
 	target_link_libraries(deps.zlib INTERFACE
 			-LIBPATH:${ZLIB_LIBS}
 			debug zlibstaticd optimized zlibstatic
@@ -224,8 +224,7 @@ if(MSVC)
 else()
 	target_link_libraries(deps.zlib INTERFACE
 			-L${ZLIB_LIBS}
-			$<$<AND:$<PLATFORM_ID:Windows>,$<CXX_COMPILER_ID:GNU>>:zstatic>
-			$<$<NOT:$<PLATFORM_ID:Windows>>:z>
+			z
 		)
 endif()
 
