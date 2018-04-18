@@ -11,7 +11,7 @@ endif()
 
 include(CMakeConfig.txt)
 
-make_build_scripts_project(.gitlab-ci.yml Doxyfile .clang-format)
+make_build_scripts_project(.gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format)
 get_version_info()
 
 if(NOT STATIC_ANALYSIS_ONLY)
