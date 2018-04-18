@@ -89,7 +89,7 @@ template <typename Root_Type, typename T>
 class component_property_assignment final : public abstract_component_property_assignment<Root_Type> {
 	const reflection::property<Root_Type, T, mce::entity::abstract_component_property_assignment,
 							   mce::entity::component_property_assignment, core::engine*>& property_;
-	T value_;
+	T value_; //TODO: Implement type-specific override for initialization of types with uninitialized members (e.g. glm types)
 
 	struct ast_visitor : public boost::static_visitor<> {
 		const std::string& entity_context;

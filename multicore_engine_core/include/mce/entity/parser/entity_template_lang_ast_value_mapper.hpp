@@ -244,7 +244,7 @@ struct ast_value_mapper<ast::rotation_list, glm::tquat<T, p>> {
 	static void convert(const ast::rotation_list& ast_val, glm::tquat<T, p>& val, entity_manager&) {
 		glm::tquat<T, p> orientation{1.0f,0.0f,0.0f,0.0f};
 		for(auto&& entry : ast_val) {
-			glm::tvec3<T, p> axis;
+			glm::tvec3<T, p> axis{0.0f};
 			switch(entry.axis) {
 			case ast::rotation_axis::x: axis.x = T(1); break;
 			case ast::rotation_axis::y: axis.y = T(1); break;
