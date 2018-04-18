@@ -139,6 +139,7 @@ gcc-debug-build:
         BUILD_COMPILER_NAME: "gcc"
         BUILD_SANITIZE: "YES"
         BUILD_POSTFIX: "d"
+        ASAN_OPTIONS: "detect_leaks=0"
     image: $CI_REGISTRY/ci-util/cpp/gcc/debug
     <<: *linux-build-task
 
