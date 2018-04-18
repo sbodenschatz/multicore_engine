@@ -1,5 +1,5 @@
 variables:
-    BUILD_CONCURRENCY: "8"
+    BUILD_CONCURRENCY: "10"
 
 stages:
   - build
@@ -140,6 +140,7 @@ gcc-debug-build:
         BUILD_SANITIZE: "YES"
         BUILD_POSTFIX: "d"
         ASAN_OPTIONS: "detect_leaks=0"
+        BUILD_CONCURRENCY: "4"
     image: $CI_REGISTRY/ci-util/cpp/gcc/debug
     <<: *linux-build-task
 
