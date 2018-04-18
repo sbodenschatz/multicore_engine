@@ -9,6 +9,8 @@
 #pragma warning(disable : 4310)
 #pragma warning(disable : 4458)
 #pragma warning(disable : 4100)
+#pragma warning(disable : 4005)
+#pragma warning(disable : 4701)
 #endif
 #include <gli/gli.hpp>
 #ifdef _MSC_VER
