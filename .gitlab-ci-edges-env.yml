@@ -1,5 +1,5 @@
 variables:
-    BUILD_CONCURRENCY: "10"
+    BUILD_CONCURRENCY: "8"
 
 stages:
   - build
