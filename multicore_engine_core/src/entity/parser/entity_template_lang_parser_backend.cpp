@@ -97,7 +97,7 @@ void entity_template_lang_parser_backend::ast_instance_visitor::operator()(const
 }
 entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::int_list& node) {
-	entity_position_t pos;
+	entity_position_t pos { 0.0f };
 	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) {
 		pos[i] = float(node[i]);
 	}
@@ -105,7 +105,7 @@ operator()(const ast::int_list& node) {
 }
 entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::float_list& node) {
-	entity_position_t pos;
+	entity_position_t pos { 0.0f };
 	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) {
 		pos[i] = node[i];
 	}
@@ -144,7 +144,7 @@ operator()(const ast::float_list& node) {
 }
 entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::rotation_list& node) {
-	entity_orientation_t orientation;
+	entity_orientation_t orientation { 1.0f, 0.0f, 0.0f, 0.0f };
 	for(auto&& entry : node) {
 		glm::vec3 axis;
 		switch(entry.axis) {
