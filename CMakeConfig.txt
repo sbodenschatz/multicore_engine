@@ -220,7 +220,7 @@ target_include_directories(deps.zlib SYSTEM INTERFACE
 	)
 if(WIN32)
 	target_link_libraries(deps.zlib INTERFACE
-			-LIBPATH:${ZLIB_LIBS}
+			$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L>$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:>${ZLIB_LIBS}
 			debug zlibstaticd optimized zlibstatic
 		)
 else()
