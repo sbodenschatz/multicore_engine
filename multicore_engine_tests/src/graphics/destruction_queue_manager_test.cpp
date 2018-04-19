@@ -21,13 +21,14 @@ class test_memory_manager : public device_memory_manager_interface {
 	mutable std::mutex mutex;
 
 public:
-	void free(const device_memory_allocation& allocation) {
+	void free(const device_memory_allocation& allocation) override {
 		std::lock_guard<std::mutex> lock(mutex);
 		EXPECT_GT(destroyed_map.size(), allocation.block_id);
 		destroyed_map[allocation.block_id] = deletion_index++;
 	}
-	device_memory_allocation allocate(const vk::MemoryRequirements&,
-									  vk::MemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal) {
+	device_memory_allocation
+	allocate(const vk::MemoryRequirements&,
+			 vk::MemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal) override {
 		device_memory_allocation a;
 		std::lock_guard<std::mutex> lock(mutex);
 		a.block_id = int32_t(destroyed_map.size());
@@ -38,11 +39,11 @@ public:
 		std::lock_guard<std::mutex> lock(mutex);
 		return destroyed_map;
 	}
-	virtual device* associated_device() const {
+	virtual device* associated_device() const override {
 		std::lock_guard<std::mutex> lock(mutex);
 		return nullptr;
 	}
-	virtual std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation&) const {
+	virtual std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation&) const override {
 		return std::unique_lock<std::mutex>(mutex);
 	}
 };
