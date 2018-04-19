@@ -240,17 +240,17 @@ public:
 };
 /// \brief RAII wrapper to hold unique ownership of a resource managed by a vk::unique_handle<T> and release
 /// it to an associated destruction_queue_manager when the queued_handle goes out of scope or is reassigned.
-template <typename T, typename D>
+template <typename T>
 // cppcheck-suppress copyCtorAndEqOperator
-class queued_handle<vk::UniqueHandle<T, D>> {
-	vk::UniqueHandle<T, D> handle_;
+class queued_handle<vk::UniqueHandle<T>> {
+	vk::UniqueHandle<T> handle_;
 	destruction_queue_manager* qmgr;
 
 public:
 	/// Creates an empty queued_handle.
 	queued_handle() noexcept : qmgr{nullptr} {}
 	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
-	queued_handle(vk::UniqueHandle<T, D>&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
+	queued_handle(vk::UniqueHandle<T>&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
 			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
 	/// Allows move construction.
 	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
@@ -283,11 +283,11 @@ public:
 		return handle_.operator bool();
 	}
 	/// Allows member access to the held resource.
-	const vk::UniqueHandle<T, D>& operator->() const {
+	const vk::UniqueHandle<T>& operator->() const {
 		return handle_;
 	}
 	/// Allows member access to the held resource.
-	vk::UniqueHandle<T, D>& operator->() {
+	vk::UniqueHandle<T>& operator->() {
 		return handle_;
 	}
 	/// Allows access to the held resource.
@@ -298,13 +298,9 @@ public:
 	T get() const {
 		return handle_.get();
 	}
-	/// Allows access to the deleter for the held resource.
-	const D& get_deleter() const {
-		return handle_.getDeleter();
-	}
 	/// \brief Releases the ownership of the held resource and makes the queued_handle empty, the ownership is
 	/// transferred to the returned handle.
-	vk::UniqueHandle<T, D> release() {
+	vk::UniqueHandle<T> release() {
 		qmgr = nullptr;
 		return std::move(handle_);
 	}
