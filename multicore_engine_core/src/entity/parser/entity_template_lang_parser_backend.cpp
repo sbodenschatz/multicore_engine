@@ -97,7 +97,7 @@ void entity_template_lang_parser_backend::ast_instance_visitor::operator()(const
 }
 entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::int_list& node) {
-	entity_position_t pos { 0.0f };
+	entity_position_t pos{0.0f};
 	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) {
 		pos[i] = float(node[i]);
 	}
@@ -105,7 +105,7 @@ operator()(const ast::int_list& node) {
 }
 entity_position_t entity_template_lang_parser_backend::ast_position_visitor::
 operator()(const ast::float_list& node) {
-	entity_position_t pos { 0.0f };
+	entity_position_t pos{0.0f};
 	for(unsigned int i = 0; i < pos.length() && i < node.size(); ++i) {
 		pos[i] = node[i];
 	}
@@ -131,20 +131,20 @@ operator()(const ast::entity_reference& node) {
 }
 entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::int_list& node) {
-	if (node.empty()) return entity_orientation_t{ 1.0f,0.0f,0.0f,0.0f };
+	if(node.empty()) return entity_orientation_t{1.0f, 0.0f, 0.0f, 0.0f};
 	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
 	return glm::angleAxis(glm::radians(float(node[0])),
 						  glm::vec3(float(node[1]), float(node[2]), float(node[3])));
 }
 entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::float_list& node) {
-	if(node.empty()) return entity_orientation_t{ 1.0f,0.0f,0.0f,0.0f };
+	if(node.empty()) return entity_orientation_t{1.0f, 0.0f, 0.0f, 0.0f};
 	if(node.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
 	return glm::angleAxis(glm::radians(float(node[0])), glm::vec3(node[1], node[2], node[3]));
 }
 entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visitor::
 operator()(const ast::rotation_list& node) {
-	entity_orientation_t orientation { 1.0f, 0.0f, 0.0f, 0.0f };
+	entity_orientation_t orientation{1.0f, 0.0f, 0.0f, 0.0f};
 	for(auto&& entry : node) {
 		glm::vec3 axis{0.0f};
 		switch(entry.axis) {

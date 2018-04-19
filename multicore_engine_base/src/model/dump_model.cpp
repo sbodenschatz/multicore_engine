@@ -8,13 +8,11 @@
 #include <mce/model/dump_model.hpp>
 #include <mce/model/model_format.hpp>
 
-
-
-//Workaround for compile error in glm/gtx/dual_quaternion.hpp:
-//TODO Real fix if upstream doesn't fix it
+// Workaround for compile error in glm/gtx/dual_quaternion.hpp:
+// TODO Real fix if upstream doesn't fix it
 #include <glm/glm.hpp>
-#include <glm/gtc/type_precision.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/type_precision.hpp>
 #ifdef GLM_FORCE_CTOR_INIT
 #define GLM_FORCE_CTOR_INIT_ORIG
 #endif

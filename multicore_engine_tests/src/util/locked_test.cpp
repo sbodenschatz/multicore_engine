@@ -89,5 +89,5 @@ TEST(util_locked_test, mutex_mock_test_explicit_transaction) {
 	}
 	ASSERT_TRUE(mocked_mutex_counter == 0);
 }
-}
-}
+} // namespace util
+} // namespace mce
