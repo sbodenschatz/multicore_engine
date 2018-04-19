@@ -5,6 +5,7 @@
  */
 
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/unique_handle.hpp>
 #include <mce/graphics/vk_mock_interface.hpp>
 #include <mce/graphics/window.hpp>
 #include <mutex>
