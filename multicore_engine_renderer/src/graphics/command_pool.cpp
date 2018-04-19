@@ -28,21 +28,31 @@ void command_pool::reset(bool release_resources) {
 	}
 }
 
+namespace {
+auto make_command_buffer_deleter(const vk::Device& dev, const vk::CommandPool& pool) {
+#if VK_HEADER_VERSION >= 70
+	return vk::PoolFree<vk::Device, vk::CommandPool>(dev, pool);
+#else
+	return vk::CommandBufferDeleter(dev, pool);
+#endif
+}
+} // namespace
+
 vk::UniqueCommandBuffer command_pool::allocate_primary_command_buffer() {
 	vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::ePrimary, 1);
 	vk::CommandBuffer buf;
 	vk::Result res = owner_device_->allocateCommandBuffers(&ai, &buf);
-	vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
-	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"),
-								   del);
+	return vk::UniqueCommandBuffer(
+			vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"),
+			make_command_buffer_deleter(owner_device_.native_device(), native_command_pool_.get()));
 }
 vk::UniqueCommandBuffer command_pool::allocate_secondary_command_buffer() {
 	vk::CommandBufferAllocateInfo ai(native_command_pool_.get(), vk::CommandBufferLevel::eSecondary, 1);
 	vk::CommandBuffer buf;
 	vk::Result res = owner_device_->allocateCommandBuffers(&ai, &buf);
-	vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
-	return vk::UniqueCommandBuffer(vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"),
-								   del);
+	return vk::UniqueCommandBuffer(
+			vk::createResultValue(res, buf, "vk::Device::allocateCommandBuffers"),
+			make_command_buffer_deleter(owner_device_.native_device(), native_command_pool_.get()));
 }
 
 std::vector<vk::UniqueCommandBuffer> command_pool::allocate_primary_command_buffers(uint32_t buffer_count) {
