@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/util/math_tools.hpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #ifndef MCE_UTIL_MATH_TOOLS_HPP_

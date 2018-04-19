@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/include/mce/graphics/destruction_queue_manager.hpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #ifndef MCE_GRAPHICS_DESTRUCTION_QUEUE_MANAGER_HPP_

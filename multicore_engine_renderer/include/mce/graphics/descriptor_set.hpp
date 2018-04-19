@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/include/mce/graphics/descriptor_set.hpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #ifndef MCE_GRAPHICS_DESCRIPTOR_SET_HPP_

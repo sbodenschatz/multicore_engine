@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/entity/entity.hpp
- * Copyright 2015-2017 by Stefan Bodenschatz
+ * Copyright 2015-2018 by Stefan Bodenschatz
  */
 
 #ifndef ENTITY_ENTITY_HPP_

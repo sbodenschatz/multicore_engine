@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_tests/src/vk_mock_interface.cpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #include <mce/graphics/device.hpp>

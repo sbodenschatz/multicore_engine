@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/util/algorithm.hpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #ifndef UTIL_ALGORITHM_HPP_

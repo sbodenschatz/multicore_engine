@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/reflection/property.hpp
- * Copyright 2015-2017 by Stefan Bodenschatz
+ * Copyright 2015-2018 by Stefan Bodenschatz
  */
 
 #ifndef REFLECTION_PROPERTY_HPP_

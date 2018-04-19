@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/entity/parser/entity_template_lang_ast_value_map.hpp
- * Copyright 2015-2017 by Stefan Bodenschatz
+ * Copyright 2015-2018 by Stefan Bodenschatz
  */
 
 #ifndef ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_VALUE_MAPPER_HPP_

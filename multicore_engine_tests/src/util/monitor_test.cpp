@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_tests/src/util/monitor_test.cpp
- * Copyright 2015 by Stefan Bodenschatz
+ * Copyright 2015-2018 by Stefan Bodenschatz
  */
 
 #include <algorithm>

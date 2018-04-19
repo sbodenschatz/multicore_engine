@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/graphics/command_pool.hpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #ifndef GRAPHICS_COMMAND_POOL_HPP_

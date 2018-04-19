@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/src/graphics/texture.cpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #ifdef _MSC_VER

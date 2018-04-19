@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/src/entity/parser/entity_template_lang_parser_frontend.cpp
- * Copyright 2015-2016 by Stefan Bodenschatz
+ * Copyright 2015-2018 by Stefan Bodenschatz
  */
 
 #include <algorithm>

@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/include/mce/graphics/unique_handle.hpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #ifndef GRAPHICS_UNIQUE_HANDLE_HPP_
