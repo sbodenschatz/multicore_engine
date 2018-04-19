@@ -152,7 +152,7 @@ public:
 	 * parameter of the allocation member function was false.
 	 */
 	const std::shared_ptr<const descriptor_set_layout>& layout() const {
-		return native_descriptor_set_.get_deleter().layout();
+		return native_descriptor_set_.deleter().layout();
 	}
 
 	/// Allows access to the native vulkan descriptor set handle.

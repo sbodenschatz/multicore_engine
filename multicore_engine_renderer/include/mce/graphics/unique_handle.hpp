@@ -19,176 +19,105 @@
 namespace mce {
 namespace graphics {
 
-/// Provides a RAII wrapper for vkhpp wrapped vulkan handles with a custom destroyer function.
-template <typename T, bool Custom_Destroyer = true>
+/// Provides a RAII wrapper for vkhpp wrapped vulkan handles with a custom deleter.
+template <typename T, typename D>
 class unique_handle {
 private:
-	T handle;
-	boost::optional<vk::Optional<const vk::AllocationCallbacks>> allocator;
-	std::function<void(T&, const vk::Optional<const vk::AllocationCallbacks>&)> destroyer;
+	D deleter_;
+	T handle_;
+
+	void destroy() noexcept {
+		if(handle_) {
+			deleter_(handle_);
+		}
+	}
 
 public:
 	/// Creates an empty unique_handle.
-	unique_handle() : handle() {}
+	unique_handle() = default;
 	/// Creates a unique_handle from a raw handle and the associated deleter function.
-	unique_handle(const T& val,
-				  // cppcheck-suppress passedByValue
-				  std::function<void(T&, const vk::Optional<const vk::AllocationCallbacks>&)> destroyer)
-			: handle(val), destroyer(std::move(destroyer)) {}
-	/// \brief Creates a unique_handle from a raw handle and the associated deleter function with support for
-	/// custom allocators.
-	unique_handle(const T& val, const vk::Optional<const vk::AllocationCallbacks>& alloc,
-				  // cppcheck-suppress passedByValue
-				  std::function<void(T&, const vk::Optional<const vk::AllocationCallbacks>&)> destroyer)
-			: handle(val), allocator(alloc), destroyer(std::move(destroyer)) {}
+	unique_handle(const T& handle, const D& deleter) : deleter_(deleter), handle_(handle) {}
+
 	/// Disallows copying.
 	unique_handle(const unique_handle&) = delete;
 	/// Disallows copying.
 	unique_handle& operator=(const unique_handle&) = delete;
+
 	/// Allows moving.
-	unique_handle(unique_handle&& other) noexcept : handle(other.handle),
-													allocator(other.allocator),
-													destroyer(other.destroyer) {
-		other.handle = T();
-		other.allocator = boost::none;
-		other.destroyer = std::function<void(T&, const vk::Optional<const vk::AllocationCallbacks>&)>();
-	}
+	unique_handle(unique_handle&& other) noexcept
+			: deleter_(std::move(other.deleter_)), handle_(other.release()) {}
+
 	/// Allows moving.
 	unique_handle& operator=(unique_handle&& other) noexcept {
-		reset();
-		handle = other.handle;
-		allocator = other.allocator;
-		destroyer = other.destroyer;
-		other.handle = T();
-		other.allocator = boost::none;
-		other.destroyer = std::function<void(T&, const vk::Optional<const vk::AllocationCallbacks>&)>();
+		destroy();
+		deleter_ = std::move(other.deleter_);
+		handle_ = other.release();
 		return *this;
 	}
-	/// Releases the handle if one is held.
+	/// Destroys the object referenced by the handle if one is held.
 	~unique_handle() {
-		reset();
+		destroy();
 	}
-	/// Releases the handle if one is held.
+	/// Destroys the object referenced by the handle if one is held.
 	void reset() {
-		if(handle) {
-			if(destroyer) {
-				vk::Optional<const vk::AllocationCallbacks> alloc = allocator.value_or(nullptr);
-				destroyer(handle, alloc);
-			}
-		}
-		allocator = boost::none;
-		handle = T();
+		*this = unique_handle();
 	}
 	/// Allows access to the encapsulated handle.
 	T* operator->() noexcept {
-		return &handle;
+		return &handle_;
 	}
 	/// Allows access to the encapsulated handle.
 	const T* operator->() const noexcept {
-		return &handle;
+		return &handle_;
 	}
 	/// Allows access to the encapsulated handle.
 	T& operator*() noexcept {
-		return handle;
+		return handle_;
 	}
 	/// Allows access to the encapsulated handle.
 	const T& operator*() const noexcept {
-		return handle;
+		return handle_;
 	}
 	/// Allows access to the encapsulated handle.
 	T& get() noexcept {
-		return handle;
+		return handle_;
 	}
 	/// Allows access to the encapsulated handle.
 	const T& get() const noexcept {
-		return handle;
+		return handle_;
 	}
 	/// Checks, if a handle is held.
 	explicit operator bool() const {
-		return bool(handle);
+		return bool(handle_);
 	}
 	/// Checks, if no handle is held.
 	bool operator!() const {
-		return !handle;
+		return !handle_;
 	}
-};
 
-/// Provides a RAII wrapper for vulkan handles without a custom destroyer function.
-template <typename T>
-class unique_handle<T, false> {
-private:
-	T handle;
-	boost::optional<vk::Optional<const vk::AllocationCallbacks>> allocator;
+	const D& deleter() const {
+		return deleter_;
+	}
 
-public:
-	/// Creates an empty unique_handle.
-	unique_handle() : handle() {}
-	/// Creates a unique_handle from a raw handle.
-	unique_handle(const T& val) : handle(val) {}
-	/// Creates a unique_handle from a raw handle with support for custom allocators.
-	unique_handle(const T& val, const vk::Optional<const vk::AllocationCallbacks>& alloc)
-			: handle(val), allocator(alloc) {}
-	/// Disallows copying.
-	unique_handle(const unique_handle&) = delete;
-	/// Disallows copying.
-	unique_handle& operator=(const unique_handle&) = delete;
-	/// Allows moving.
-	unique_handle(unique_handle&& other) noexcept : handle(other.handle), allocator(other.allocator) {
-		other.handle = T();
-		other.allocator = boost::none;
+	D& deleter() {
+		return deleter_;
 	}
-	/// Allows moving.
-	unique_handle& operator=(unique_handle&& other) noexcept {
-		reset();
-		handle = other.handle;
-		allocator = other.allocator;
-		other.handle = T();
-		other.allocator = boost::none;
-		return *this;
+
+	T release() {
+		T res = std::move(handle_);
+		handle_ = T();
+		deleter_ = D();
+		return res;
 	}
-	/// Releases the handle if one is held.
-	~unique_handle() {
-		reset();
+
+	void swap(unique_handle& other) {
+		using std::swap;
+		swap(handle_, other.handle);
+		swap(deleter_, other.deleter_);
 	}
-	/// Releases the handle if one is held.
-	void reset() {
-		if(handle) {
-			handle.destroy(allocator.value_or(nullptr));
-		}
-		allocator = boost::none;
-		handle = T();
-	}
-	/// Allows access to the encapsulated handle.
-	T* operator->() noexcept {
-		return &handle;
-	}
-	/// Allows access to the encapsulated handle.
-	const T* operator->() const noexcept {
-		return &handle;
-	}
-	/// Allows access to the encapsulated handle.
-	T& operator*() noexcept {
-		return handle;
-	}
-	/// Allows access to the encapsulated handle.
-	const T& operator*() const noexcept {
-		return handle;
-	}
-	/// Allows access to the encapsulated handle.
-	T& get() noexcept {
-		return handle;
-	}
-	/// Allows access to the encapsulated handle.
-	const T& get() const noexcept {
-		return handle;
-	}
-	/// Checks, if a handle is held.
-	explicit operator bool() const {
-		return bool(handle);
-	}
-	/// Checks, if no handle is held.
-	bool operator!() const {
-		return !handle;
+
+	friend void swap(unique_handle& lhs, unique_handle& rhs) {
+		lhs.swap(rhs);
 	}
 };
 

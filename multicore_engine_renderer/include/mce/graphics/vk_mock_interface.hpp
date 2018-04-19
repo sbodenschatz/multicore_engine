@@ -17,6 +17,7 @@
 #include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
 #include <vulkan/vulkan.hpp>
+#include <mce/graphics/unique_handle.hpp>
 
 namespace mce {
 namespace graphics {
@@ -29,7 +30,7 @@ struct fake_device_memory_deleter {
 };
 
 /// Fake version of vk::UniqueDeviceMemory.
-using fake_unique_device_memory = vk::UniqueHandle<vk::DeviceMemory, fake_device_memory_deleter>;
+using fake_unique_device_memory = unique_handle<vk::DeviceMemory, fake_device_memory_deleter>;
 
 /// Wraps either a vk::UniqueDeviceMemory, a fake_unique_device_memory or is empty.
 // cppcheck-suppress copyCtorAndEqOperator
