@@ -180,13 +180,6 @@ clang-release-build:
     <<: *linux-build-task
     <<: *artifact-spec-build-linux
 
-cpp-check:
-    dependencies: []
-    stage: auxiliary
-    script:
-    - ./run_cppcheck.sh
-    image: $CI_REGISTRY/ci-util/cpp/gcc/release
-
 scan-build:
     dependencies: []
     stage: auxiliary
