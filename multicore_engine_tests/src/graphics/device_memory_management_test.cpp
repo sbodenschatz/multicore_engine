@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_tests/src/graphics/device_memory_management.cpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #include <gtest.hpp>
@@ -43,7 +43,7 @@ TEST(graphics_device_memory_manager_test, simple_allocate_stack_non_overlapping)
 		mem_req.size = alloc_size;
 		mem_req.alignment = alignment;
 		mem_req.memoryTypeBits = 0x1F;
-		auto alloc = mm.allocate(mem_req);
+		auto alloc = mm.allocate(mem_req, true);
 		allocs.push_back(alloc);
 		ASSERT_TRUE((alloc.aligned_offset & (alignment - 1)) == 0);
 	}
@@ -65,7 +65,7 @@ TEST(graphics_device_memory_manager_test, simple_allocate_unordered_non_overlapp
 		mem_req.size = alloc_sizes[i % alloc_sizes_count];
 		mem_req.alignment = alloc_align[i % alloc_align_count];
 		mem_req.memoryTypeBits = 0x1F;
-		auto alloc = mm.allocate(mem_req);
+		auto alloc = mm.allocate(mem_req, true);
 		allocs.push_back(alloc);
 		ASSERT_TRUE((alloc.aligned_offset & (alloc_align[i % alloc_align_count] - 1)) == 0);
 		check_allocs(allocs);
@@ -88,7 +88,7 @@ TEST(graphics_device_memory_manager_test, type_constraints_valid) {
 		mem_req.size = 0x200;
 		mem_req.alignment = 0x10;
 		mem_req.memoryTypeBits = type_req_bits;
-		auto alloc = mm.allocate(mem_req, vk::MemoryPropertyFlags());
+		auto alloc = mm.allocate(mem_req, true, vk::MemoryPropertyFlags());
 		uint64_t type_index = vk_mock_interface::get_memory_type_index(alloc.memory_object);
 		ASSERT_TRUE((1 << type_index) & type_req_bits);
 		allocs.push_back(alloc);
@@ -121,7 +121,7 @@ TEST(graphics_device_memory_manager_test, flag_constraints_valid) {
 		mem_req.size = 0x200;
 		mem_req.alignment = 0x10;
 		mem_req.memoryTypeBits = 0x1F;
-		auto alloc = mm.allocate(mem_req, flags[i]);
+		auto alloc = mm.allocate(mem_req, true, flags[i]);
 		uint64_t type_index = vk_mock_interface::get_memory_type_index(alloc.memory_object);
 		ASSERT_TRUE((1 << type_index) & type_req_bits[i]);
 		allocs.push_back(alloc);
@@ -144,7 +144,7 @@ TEST(graphics_device_memory_manager_test, device_memory_handle_test) {
 		mem_req.size = alloc_size;
 		mem_req.alignment = alignment;
 		mem_req.memoryTypeBits = 0x1F;
-		auto alloc = mm.allocate(mem_req);
+		auto alloc = mm.allocate(mem_req, true);
 		allocs.push_back(make_device_memory_handle(mm, alloc));
 		ASSERT_TRUE((alloc.aligned_offset & (alignment - 1)) == 0);
 	}

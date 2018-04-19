@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/graphics/device_memory_manager.hpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #ifndef GRAPHICS_DEVICE_MEMORY_MANAGER_HPP_
@@ -45,12 +45,14 @@ private:
 		vk::DeviceSize size;
 		vk::MemoryPropertyFlags flags;
 		uint32_t memory_type;
+		bool linear_ressources;
 		std::vector<freelist_entry> freelist;
 		void* mapped_pointer = nullptr;
 		device_memory_block(int32_t id, vk_mock_interface::device_memory_wrapper&& memory_object,
-							vk::DeviceSize size, vk::MemoryPropertyFlags flags, uint32_t memory_type);
+							vk::DeviceSize size, vk::MemoryPropertyFlags flags, uint32_t memory_type,
+							bool linear_ressources);
 		device_memory_allocation try_allocate(const vk::MemoryRequirements& memory_requirements,
-											  vk::MemoryPropertyFlags required_flags);
+											  vk::MemoryPropertyFlags required_flags, bool linear);
 		void free(const device_memory_allocation& allocation);
 		bool empty() const;
 	};
@@ -74,7 +76,7 @@ public:
 
 	/// Requests memory satisfying the given requirements from the manager.
 	virtual device_memory_allocation
-	allocate(const vk::MemoryRequirements& memory_requirements,
+	allocate(const vk::MemoryRequirements& memory_requirements, bool linear,
 			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) override;
 	/// Returns the given memory allocation back to the manager.
 	virtual void free(const device_memory_allocation& allocation) override;
