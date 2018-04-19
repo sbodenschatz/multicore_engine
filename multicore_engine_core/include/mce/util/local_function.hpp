@@ -87,9 +87,7 @@ class local_function<Max_Size, R(Args...)> {
 	class function_object final : public detail::local_function::abstract_function_object<R, Args...> {
 		F f;
 
-		// Original caused false-positive syntax error in cppcheck
-		/*template <typename = void, typename = void>*/
-		template <typename Dummy1 = void, typename Dummy2 = void>
+		template <typename = void, typename = void>
 		struct const_call_helper {
 			static R call(const F&, Args...) {
 				throw std::bad_function_call();
