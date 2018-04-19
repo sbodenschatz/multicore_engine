@@ -230,7 +230,12 @@ void device::create_device() {
 	dev_ci.pQueueCreateInfos = dev_queue_ci.data();
 	dev_ci.queueCreateInfoCount = uint32_t(dev_queue_ci.size());
 
+#if VK_HEADER_VERSION == 70 // workaround for a bug in vulkan SDK 1.1.70
+	native_device_ =
+			vk::UniqueDevice(physical_device_.createDevice(dev_ci), vk::ObjectDestroy<vk::NoParent>());
+#else
 	native_device_ = physical_device_.createDeviceUnique(dev_ci);
+#endif
 
 	graphics_queue_ = native_device_->getQueue(graphics_queue_index_.first, graphics_queue_index_.second);
 	transfer_queue_ = native_device_->getQueue(transfer_queue_index_.first, transfer_queue_index_.second);
