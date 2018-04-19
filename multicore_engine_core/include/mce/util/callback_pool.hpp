@@ -57,7 +57,9 @@ template <typename F, typename R, typename... Args>
 class callback_pool_function_impl<F, R(Args...)> final : public callback_pool_function_iface<R(Args...)> {
 	F f;
 
-	template <typename = void, typename = void>
+	// Original caused false-positive syntax error in cppcheck
+	/*template <typename = void, typename = void>*/
+	template <typename Dummy1 = void, typename Dummy2 = void>
 	struct const_call_helper {
 		static R call(const F&, Args...) {
 			throw std::bad_function_call();
