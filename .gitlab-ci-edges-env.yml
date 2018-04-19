@@ -114,7 +114,7 @@ stages:
     variables:
         GIT_STRATEGY: none
     script:
-    - sha1sum -b cloc_report.txt refman.pdf gcc/* clang/* msvc/* mingw/* > checksums.txt
+    - sha1sum -b cloc_report.txt refman.pdf gcc/* clang/* > checksums.txt
     - cat checksums.txt | sort
     - cat cloc_report.txt
     image: alpine:latest
@@ -126,8 +126,6 @@ stages:
         - cloc_report.txt
         - gcc
         - clang
-        - msvc
-        - mingw
         - checksums.txt
         - licenses
 
