@@ -74,8 +74,6 @@ target_include_directories(mce_compiler_settings SYSTEM INTERFACE
 
 list(APPEND PASS_TO_BOOTSTRAP 
 		LIBS_DIR
-		VULKAN_INCLUDE
-		VULKAN_LIBS
 		GLFW_INCLUDE
 		GLFW_LIBS_DEBUG
 		GLFW_LIBS_RELEASE
@@ -98,9 +96,6 @@ if (WIN32)
 	set(LIBS_DIR C:/Libs CACHE PATH "Custom library directory")
 
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/vkglformat/include CACHE PATH "Include path for vkglformat.")
-
-	set(VULKAN_INCLUDE $ENV{VK_SDK_PATH}/Include CACHE PATH "Include path for vulkan.")
-	set(VULKAN_LIBS $ENV{VK_SDK_PATH}/Lib CACHE PATH "Library path for vulkan.")
 
 	set(GLFW_INCLUDE ${LIBS_DIR}/glfw/include CACHE PATH "Include path for glfw.")
 	if(MSVC)
@@ -137,8 +132,6 @@ if (WIN32)
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vkglformat.")
-	set(VULKAN_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vulkan.")
-	set(VULKAN_LIBS ${LIBS_DIR}/lib CACHE PATH "Library path for vulkan.")
 	set(GLFW_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for glfw.")
 	set(GLFW_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
 	set(TBB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for TBB.")
@@ -177,6 +170,12 @@ find_package(ZLIBStatic REQUIRED)
 find_package(glm REQUIRED)
 find_package(gli REQUIRED)
 
+function(find_vulkan_wrap)
+	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_STATIC_LIBRARY_SUFFIX} ${CMAKE_EXTRA_LINK_EXTENSIONS})
+	find_package(Vulkan REQUIRED)
+endfunction()
+find_vulkan_wrap()
+
 set_property(
 	TARGET ZLIB::ZLIB
 	APPEND
@@ -199,22 +198,11 @@ set_property(
 	PROPERTY INTERFACE_COMPILE_OPTIONS
 		$<$<CXX_COMPILER_ID:MSVC>:/wd4201>
 	)
-
-add_library(deps.vulkan INTERFACE)
-target_compile_definitions(deps.vulkan INTERFACE
-		VKCPP_ENHANCED_MODE
+set_property(
+	TARGET Vulkan::Vulkan
+	APPEND
+	PROPERTY INTERFACE_COMPILE_DEFINITIONS
 		GLFW_INCLUDE_VULKAN
-	)
-target_include_directories(deps.vulkan SYSTEM INTERFACE
-		${VULKAN_INCLUDE}
-	)
-target_link_libraries(deps.vulkan INTERFACE
-		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L>$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:>${VULKAN_LIBS}
-		$<$<PLATFORM_ID:Windows>:vulkan-1>
-		$<$<NOT:$<PLATFORM_ID:Windows>>:vulkan>
-	)
-target_compile_options(deps.vulkan INTERFACE
-		$<$<CXX_COMPILER_ID:MSVC>: /wd4714>
 	)
 
 add_library(deps.glfw INTERFACE)
