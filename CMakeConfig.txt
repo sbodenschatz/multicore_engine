@@ -76,8 +76,6 @@ list(APPEND PASS_TO_BOOTSTRAP
 		LIBS_DIR
 		GLM_INCLUDE 
 		GLI_INCLUDE 
-		ZLIB_INCLUDE
-		ZLIB_LIBS
 		VULKAN_INCLUDE
 		VULKAN_LIBS
 		GLFW_INCLUDE
@@ -106,13 +104,6 @@ if (WIN32)
 	set(GLM_INCLUDE ${LIBS_DIR}/glm/include CACHE PATH "Include path for glm.")
 
 	set(GLI_INCLUDE ${LIBS_DIR}/gli/include CACHE PATH "Include path for gli.")
-
-	set(ZLIB_INCLUDE ${LIBS_DIR}/zlib/include CACHE PATH "Include path for zlib.")
-	if(MSVC)
-		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib CACHE PATH "Library path for zlib.")
-	else()
-		set(ZLIB_LIBS ${LIBS_DIR}/zlib/lib CACHE PATH "Library path for zlib.")
-	endif()
 
 	set(VULKAN_INCLUDE $ENV{VK_SDK_PATH}/Include CACHE PATH "Include path for vulkan.")
 	set(VULKAN_LIBS $ENV{VK_SDK_PATH}/Lib CACHE PATH "Library path for vulkan.")
@@ -154,8 +145,6 @@ elseif(UNIX)
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vkglformat.")
 	set(GLM_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLM.")
 	set(GLI_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for GLI.")
-	set(ZLIB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for zlib.")
-	set(ZLIB_LIBS ${LIBS_DIR}/lib CACHE PATH "Library path for zlib.")
 	set(VULKAN_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vulkan.")
 	set(VULKAN_LIBS ${LIBS_DIR}/lib CACHE PATH "Library path for vulkan.")
 	set(GLFW_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for glfw.")
@@ -212,24 +201,11 @@ target_include_directories(deps.gli SYSTEM INTERFACE
 target_compile_options(deps.gli INTERFACE
 	)
 
-add_library(deps.zlib INTERFACE)
-target_compile_definitions(deps.zlib INTERFACE
-		ZLIB_CONST
-	)
-target_include_directories(deps.zlib SYSTEM INTERFACE
-		${ZLIB_INCLUDE}
-	)
-if(WIN32)
-	target_link_libraries(deps.zlib INTERFACE
-			$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L>$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:>${ZLIB_LIBS}
-			debug zlibstaticd optimized zlibstatic
-		)
-else()
-	target_link_libraries(deps.zlib INTERFACE
-			-L${ZLIB_LIBS}
-			z
-		)
-endif()
+list(APPEND CMAKE_PREFIX_PATH ${LIBS_DIR})
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_helpers")
+
+find_package(zlibstatic REQUIRED)
 
 add_library(deps.vulkan INTERFACE)
 target_compile_definitions(deps.vulkan INTERFACE
