@@ -12,14 +12,11 @@ target_include_directories(mce_base PUBLIC
 target_link_libraries(mce_base 
 		mce_compiler_settings 
 		mce_parsers
-		deps.glm
+		glm
 		ZLIB::ZLIB
 		deps.Boost
 		deps.Boost.Thread
 		deps.Boost.Filesystem
-	)
-target_compile_definitions(mce_base PUBLIC
-		ZLIB_CONST
 	)
 if(MSVC)
 	set_target_properties(mce_base PROPERTIES LINK_FLAGS_RELEASE "/LTCG")

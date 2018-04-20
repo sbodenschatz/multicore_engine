@@ -12,7 +12,7 @@ target_include_directories(mce_parsers PUBLIC
 	)
 target_link_libraries(mce_parsers 
 		mce_compiler_settings 
-		deps.glm
+		glm
 		deps.Boost
 	)
 make_src_groups()
