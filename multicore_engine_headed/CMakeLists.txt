@@ -12,7 +12,7 @@ target_link_libraries(mce_headed
 		mce_parsers 
 		mce_base
 		mce_core
-		deps.glfw
+		glfw
 		deps.TBB
 		deps.Boost.ASIO
 	)

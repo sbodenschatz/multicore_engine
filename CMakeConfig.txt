@@ -74,10 +74,6 @@ target_include_directories(mce_compiler_settings SYSTEM INTERFACE
 
 list(APPEND PASS_TO_BOOTSTRAP 
 		LIBS_DIR
-		GLFW_INCLUDE
-		GLFW_LIBS_DEBUG
-		GLFW_LIBS_RELEASE
-		GLFW_LIBS
 		TBB_INCLUDE
 		TBB_LIBS_DEBUG
 		TBB_LIBS_RELEASE
@@ -96,14 +92,6 @@ if (WIN32)
 	set(LIBS_DIR C:/Libs CACHE PATH "Custom library directory")
 
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/vkglformat/include CACHE PATH "Include path for vkglformat.")
-
-	set(GLFW_INCLUDE ${LIBS_DIR}/glfw/include CACHE PATH "Include path for glfw.")
-	if(MSVC)
-		set(GLFW_LIBS_DEBUG ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_debug CACHE PATH "Library path (debug) for glfw.")
-		set(GLFW_LIBS_RELEASE ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_release CACHE PATH "Library path (release) for glfw.")
-	else()
-		set(GLFW_LIBS ${LIBS_DIR}/glfw/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
-	endif()
 
 	set(TBB_INCLUDE ${LIBS_DIR}/TBB/include CACHE PATH "Include path for TBB.")
 	if(MSVC)
@@ -132,8 +120,6 @@ if (WIN32)
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vkglformat.")
-	set(GLFW_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for glfw.")
-	set(GLFW_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for glfw.")
 	set(TBB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for TBB.")
 	set(TBB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
 	set(GTEST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for gtest.")
@@ -162,7 +148,19 @@ target_include_directories(deps.vkglformat SYSTEM INTERFACE
 target_compile_options(deps.vkglformat INTERFACE
 	)
 
-list(APPEND CMAKE_PREFIX_PATH ${LIBS_DIR})
+if(MSVC)
+	set(compiler_name "msvc")
+elseif(MINGW)
+	set(compiler_name "mingw")
+elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+	set(compiler_name "gcc")
+elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+	set(compiler_name "clang")
+else()
+	set(compiler_name "unknown")
+endif()
+
+list(APPEND CMAKE_PREFIX_PATH ${LIBS_DIR} ${LIBS_DIR}/${compiler_name})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_helpers")
 
@@ -177,6 +175,8 @@ function(find_vulkan_wrap)
 	find_package(Vulkan REQUIRED)
 endfunction()
 find_vulkan_wrap()
+
+find_package(glfw3 REQUIRED)
 
 set_property(
 	TARGET ZLIB::ZLIB
@@ -205,19 +205,6 @@ set_property(
 	APPEND
 	PROPERTY INTERFACE_COMPILE_DEFINITIONS
 		GLFW_INCLUDE_VULKAN
-	)
-
-add_library(deps.glfw INTERFACE)
-target_compile_definitions(deps.glfw INTERFACE
-	)
-target_include_directories(deps.glfw SYSTEM INTERFACE
-		${GLFW_INCLUDE}
-	)
-target_link_libraries(deps.glfw INTERFACE
-		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${GLFW_LIBS}>
-		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${GLFW_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${GLFW_LIBS_RELEASE}>$<$<CONFIG:MINSIZEREL>:${GLFW_LIBS_RELEASE}>$<$<CONFIG:RELEASE>:${GLFW_LIBS_RELEASE}>>
-		$<$<PLATFORM_ID:Windows>:glfw3>
-		$<$<NOT:$<PLATFORM_ID:Windows>>:glfw dl X11 Xrandr Xxf86vm>
 	)
 
 add_library(deps.TBB INTERFACE)
