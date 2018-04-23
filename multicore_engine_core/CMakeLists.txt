@@ -15,7 +15,7 @@ target_link_libraries(mce_core
 		mce_parsers 
 		mce_base
 		deps.TBB
-		deps.Boost.ASIO
+		Boost::asio
 	)
 if(MSVC)
 	set_target_properties(mce_core PROPERTIES LINK_FLAGS_RELEASE "/LTCG")

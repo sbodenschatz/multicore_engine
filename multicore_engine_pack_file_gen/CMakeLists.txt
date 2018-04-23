@@ -6,7 +6,7 @@ add_executable(mce_pack_file_gen ${PACK_FILE_GEN_SRC} ${PACK_FILE_GEN_HEADERS})
 make_src_groups()
 target_link_libraries(mce_pack_file_gen 
 		mce_base
-		deps.Boost.ProgramOptions
+		Boost::program_options
 	)
 if(MSVC)
 	set_target_properties(mce_pack_file_gen PROPERTIES LINK_FLAGS_RELEASE "/LTCG")

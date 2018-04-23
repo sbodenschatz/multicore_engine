@@ -14,9 +14,10 @@ target_link_libraries(mce_base
 		mce_parsers
 		glm
 		ZLIB::ZLIB
-		deps.Boost
-		deps.Boost.Thread
-		deps.Boost.Filesystem
+		Boost::disable_autolinking
+		Boost::boost
+		Boost::thread
+		Boost::filesystem
 	)
 if(MSVC)
 	set_target_properties(mce_base PROPERTIES LINK_FLAGS_RELEASE "/LTCG")

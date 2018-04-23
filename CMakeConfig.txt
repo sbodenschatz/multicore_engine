@@ -81,8 +81,7 @@ list(APPEND PASS_TO_BOOTSTRAP
 		TBB_LIBS_RELWITHDEBINFO
 		TBB_LIBS
 		GTEST_ROOT
-		BOOST_INCLUDE
-		BOOST_LIBS
+		BOOST_ROOT
 	)
 
 if (WIN32)
@@ -100,19 +99,11 @@ if (WIN32)
 		set(TBB_LIBS ${LIBS_DIR}/TBB/lib/windows_intel64_gcc_mingw_${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
 	endif()
 
-	set(BOOST_INCLUDE ${LIBS_DIR}/Boost/include CACHE PATH "Include path for Boost.")
-	if(MSVC)
-		set(BOOST_LIBS ${LIBS_DIR}/Boost/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for Boost.")
-	else()
-		set(BOOST_LIBS ${LIBS_DIR}/Boost/lib_x64_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for Boost.")
-	endif()
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vkglformat.")
 	set(TBB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for TBB.")
 	set(TBB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
-	set(BOOST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for Boost.")
-	set(BOOST_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for Boost.")
 endif()
 
 if(SANITIZER_INSTRUMENTATION AND UNIX)
@@ -170,6 +161,16 @@ if(NOT DEFINED GTEST_ROOT)
 endif()
 find_package(GTest REQUIRED)
 
+if(NOT DEFINED BOOST_ROOT)
+	set(BOOST_ROOT ${LIBS_DIR}/Boost)
+endif()
+find_package(Boost REQUIRED
+		COMPONENTS
+			thread
+			filesystem
+			program_options
+	)
+
 set_property(
 	TARGET ZLIB::ZLIB
 	APPEND
@@ -206,6 +207,22 @@ set_property(
 		GTEST_LANG_CXX11
 	)
 
+set_property(
+	TARGET Boost::boost
+	APPEND
+	PROPERTY INTERFACE_COMPILE_DEFINITIONS
+		$<$<CXX_COMPILER_ID:MSVC>:_HAS_AUTO_PTR_ETC>
+		#The following 2 defines are needed to extend the allowed parameter count for boost::variant to the required amount.
+		BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+		BOOST_MPL_LIMIT_LIST_SIZE=30
+		$<$<CXX_COMPILER_ID:Clang>:_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES>
+		BOOST_NO_AUTO_PTR
+	)
+
+add_library(Boost.asio INTERFACE)
+target_link_libraries(Boost.asio INTERFACE Boost::boost Boost::system $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<PLATFORM_ID:Windows>>:ws2_32 mswsock>)
+add_library(Boost::asio ALIAS Boost.asio)
+
 add_library(deps.TBB INTERFACE)
 target_include_directories(deps.TBB SYSTEM INTERFACE
 		${TBB_INCLUDE}
@@ -224,42 +241,4 @@ else()
 			tbbmalloc
 		)
 endif()
-
-add_library(deps.Boost INTERFACE)
-target_compile_definitions(deps.Boost INTERFACE
-		$<$<CXX_COMPILER_ID:MSVC>:_HAS_AUTO_PTR_ETC>
-		#The following 2 defines are needed to extend the allowed parameter count for boost::variant to the required amount.
-		BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
-		BOOST_MPL_LIMIT_LIST_SIZE=30
-		$<$<CXX_COMPILER_ID:Clang>:_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES>
-		BOOST_NO_AUTO_PTR
-	)
-target_include_directories(deps.Boost SYSTEM INTERFACE
-		${BOOST_INCLUDE}
-	)
-if(WIN32)
-	target_link_libraries(deps.Boost INTERFACE
-			$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${BOOST_LIBS}>
-			$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:${BOOST_LIBS}>
-		)
-else()
-	target_link_libraries(deps.Boost INTERFACE
-			-L${BOOST_LIBS}
-		)
-endif()
-
-add_library(deps.Boost.System INTERFACE)
-target_link_libraries(deps.Boost.System INTERFACE deps.Boost $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_system.a>)
-
-add_library(deps.Boost.ASIO INTERFACE)
-target_link_libraries(deps.Boost.ASIO INTERFACE deps.Boost deps.Boost.System $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<PLATFORM_ID:Windows>>:ws2_32 mswsock>)
-
-add_library(deps.Boost.Thread INTERFACE)
-target_link_libraries(deps.Boost.Thread INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_thread.a>)
-
-add_library(deps.Boost.Filesystem INTERFACE)
-target_link_libraries(deps.Boost.Filesystem INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_filesystem.a>)
-
-add_library(deps.Boost.ProgramOptions INTERFACE)
-target_link_libraries(deps.Boost.ProgramOptions INTERFACE deps.Boost deps.Boost.System $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:boost_program_options.a>)
 

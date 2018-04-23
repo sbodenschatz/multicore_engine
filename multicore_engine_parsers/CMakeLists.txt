@@ -13,7 +13,7 @@ target_include_directories(mce_parsers PUBLIC
 target_link_libraries(mce_parsers 
 		mce_compiler_settings 
 		glm
-		deps.Boost
+		Boost::boost
 	)
 make_src_groups()
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")

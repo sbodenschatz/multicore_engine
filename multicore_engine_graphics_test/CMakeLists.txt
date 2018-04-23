@@ -11,7 +11,7 @@ target_link_libraries(mce_graphics_test
 		mce_core
 		mce_headed
 		mce_renderer
-		deps.Boost.ProgramOptions
+		Boost::program_options
 	)
 if(MSVC)
 	set_target_properties(mce_graphics_test PROPERTIES LINK_FLAGS_RELEASE "/LTCG")

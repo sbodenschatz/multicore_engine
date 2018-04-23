@@ -6,7 +6,7 @@ add_executable(mce_model_converter ${MODEL_CONV_SRC} ${MODEL_CONV_HEADERS})
 make_src_groups()
 target_link_libraries(mce_model_converter 
 		mce_base
-		deps.Boost.ProgramOptions
+		Boost::program_options
 	)
 if(MSVC)
 	set_target_properties(mce_model_converter PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
