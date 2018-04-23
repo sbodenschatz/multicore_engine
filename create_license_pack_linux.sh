@@ -13,11 +13,11 @@ cp /usr/local/share/doc/vulkan-sdk/LICENSE.txt vulkan-sdk
 cp /usr/local/share/doc/vulkan-sdk/sdk_license.html vulkan-sdk
 cp /usr/share/doc/zlib1g-dev/copyright zlib
 cp /usr/share/doc/libc++-dev/copyright libc++
-cp /usr/share/doc/libstdc++-*-dev/copyright libstdc++
-cp /usr/share/doc/libgcc-*-dev/copyright libgcc
+cp /usr/share/doc/libstdc++-?-dev/copyright libstdc++
+cp /usr/share/doc/libgcc-?-dev/copyright libgcc
 cp /usr/share/doc/llvm-*-runtime/copyright llvm-runtime
-cp /usr/share/doc/g++-*/copyright g++
-cp /usr/share/doc/gcc-*-base/copyright gcc-base
+cp /usr/share/doc/g++-?/copyright g++
+cp /usr/share/doc/gcc-?-base/copyright gcc-base
 cp /usr/local/share/doc/googletest/LICENSE gtest
 cp /usr/local/share/doc/googletest/CONTRIBUTORS gtest
 cp /usr/local/share/doc/googlemock/LICENSE gmock
