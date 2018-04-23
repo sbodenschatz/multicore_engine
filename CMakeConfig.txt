@@ -142,86 +142,14 @@ list(APPEND CMAKE_PREFIX_PATH ${LIBS_DIR} ${LIBS_DIR}/${compiler_name})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_helpers")
 
-find_package(ZLIBStatic REQUIRED)
-find_package(glm REQUIRED)
 find_package(gli REQUIRED)
-
-function(find_vulkan_wrap)
-	if(WIN32)
-		set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_STATIC_LIBRARY_SUFFIX} ${CMAKE_EXTRA_LINK_EXTENSIONS})
-	endif()
-	find_package(Vulkan REQUIRED)
-endfunction()
-find_vulkan_wrap()
-
 find_package(glfw3 REQUIRED)
 
-if(NOT DEFINED GTEST_ROOT)
-	set(GTEST_ROOT ${LIBS_DIR}/gtest)
-endif()
-find_package(GTest REQUIRED)
-
-if(NOT DEFINED BOOST_ROOT)
-	set(BOOST_ROOT ${LIBS_DIR}/Boost)
-endif()
-find_package(Boost REQUIRED
-		COMPONENTS
-			thread
-			filesystem
-			program_options
-	)
-
-set_property(
-	TARGET ZLIB::ZLIB
-	APPEND
-	PROPERTY INTERFACE_COMPILE_DEFINITIONS
-		ZLIB_CONST
-	)
-set_property(
-	TARGET glm
-	APPEND
-	PROPERTY INTERFACE_COMPILE_DEFINITIONS
-		GLM_FORCE_RADIANS 
-		GLM_FORCE_SIZE_T_LENGTH
-		GLM_FORCE_DEPTH_ZERO_TO_ONE
-		GLM_ENABLE_EXPERIMENTAL
-		GLM_FORCE_CTOR_INIT
-	)
-set_property(
-	TARGET glm
-	APPEND
-	PROPERTY INTERFACE_COMPILE_OPTIONS
-		$<$<CXX_COMPILER_ID:MSVC>:/wd4201>
-	)
-set_property(
-	TARGET Vulkan::Vulkan
-	APPEND
-	PROPERTY INTERFACE_COMPILE_DEFINITIONS
-		GLFW_INCLUDE_VULKAN
-	)
-
-set_property(
-	TARGET GTest::GTest
-	APPEND
-	PROPERTY INTERFACE_COMPILE_DEFINITIONS
-		GTEST_LANG_CXX11
-	)
-
-set_property(
-	TARGET Boost::boost
-	APPEND
-	PROPERTY INTERFACE_COMPILE_DEFINITIONS
-		$<$<CXX_COMPILER_ID:MSVC>:_HAS_AUTO_PTR_ETC>
-		#The following 2 defines are needed to extend the allowed parameter count for boost::variant to the required amount.
-		BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
-		BOOST_MPL_LIMIT_LIST_SIZE=30
-		$<$<CXX_COMPILER_ID:Clang>:_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES>
-		BOOST_NO_AUTO_PTR
-	)
-
-add_library(Boost.asio INTERFACE)
-target_link_libraries(Boost.asio INTERFACE Boost::boost Boost::system $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<PLATFORM_ID:Windows>>:ws2_32 mswsock>)
-add_library(Boost::asio ALIAS Boost.asio)
+include(SetupZLIB)
+include(SetupGLM)
+include(SetupVulkan)
+include(SetupGTest)
+include(SetupBoost)
 
 add_library(deps.TBB INTERFACE)
 target_include_directories(deps.TBB SYSTEM INTERFACE

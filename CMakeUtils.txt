@@ -15,7 +15,7 @@ function(make_src_groups)
 endfunction()
 
 function(make_build_scripts_project SUFFIX)
-	file(GLOB_RECURSE BUILD_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*CMake*.txt")
+	file(GLOB_RECURSE BUILD_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*CMake*.txt" "*.cmake")
 	list(APPEND BUILD_SCRIPTS ${ARGN})
 	list(REMOVE_ITEM BUILD_SCRIPTS "CMakeLists.txt")
 	add_custom_target(BUILD_SCRIPTS_${SUFFIX} SOURCES ${BUILD_SCRIPTS})
