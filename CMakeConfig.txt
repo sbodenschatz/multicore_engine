@@ -80,10 +80,7 @@ list(APPEND PASS_TO_BOOTSTRAP
 		TBB_LIBS_MINSIZEREL
 		TBB_LIBS_RELWITHDEBINFO
 		TBB_LIBS
-		GTEST_INCLUDE
-		GTEST_LIBS_DEBUG
-		GTEST_LIBS_RELEASE
-		GTEST_LIBS
+		GTEST_ROOT
 		BOOST_INCLUDE
 		BOOST_LIBS
 	)
@@ -103,14 +100,6 @@ if (WIN32)
 		set(TBB_LIBS ${LIBS_DIR}/TBB/lib/windows_intel64_gcc_mingw_${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
 	endif()
 
-	set(GTEST_INCLUDE ${LIBS_DIR}/gtest/include CACHE PATH "Include path for gtest.")
-	if(MSVC)
-		set(GTEST_LIBS_DEBUG ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_debug CACHE PATH "Library path (debug) for gtest.")
-		set(GTEST_LIBS_RELEASE ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_release CACHE PATH "Library path (release) for gtest.")
-	else()
-		set(GTEST_LIBS ${LIBS_DIR}/gtest/lib_${COMPILER_LOWER}_${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
-	endif()
-
 	set(BOOST_INCLUDE ${LIBS_DIR}/Boost/include CACHE PATH "Include path for Boost.")
 	if(MSVC)
 		set(BOOST_LIBS ${LIBS_DIR}/Boost/lib_x64_${COMPILER_LOWER} CACHE PATH "Library path for Boost.")
@@ -122,8 +111,6 @@ elseif(UNIX)
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vkglformat.")
 	set(TBB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for TBB.")
 	set(TBB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
-	set(GTEST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for gtest.")
-	set(GTEST_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for gtest.")
 	set(BOOST_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for Boost.")
 	set(BOOST_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for Boost.")
 endif()
@@ -178,6 +165,11 @@ find_vulkan_wrap()
 
 find_package(glfw3 REQUIRED)
 
+if(NOT DEFINED GTEST_ROOT)
+	set(GTEST_ROOT ${LIBS_DIR}/gtest)
+endif()
+find_package(GTest REQUIRED)
+
 set_property(
 	TARGET ZLIB::ZLIB
 	APPEND
@@ -207,6 +199,13 @@ set_property(
 		GLFW_INCLUDE_VULKAN
 	)
 
+set_property(
+	TARGET GTest::GTest
+	APPEND
+	PROPERTY INTERFACE_COMPILE_DEFINITIONS
+		GTEST_LANG_CXX11
+	)
+
 add_library(deps.TBB INTERFACE)
 target_include_directories(deps.TBB SYSTEM INTERFACE
 		${TBB_INCLUDE}
@@ -225,19 +224,6 @@ else()
 			tbbmalloc
 		)
 endif()
-
-add_library(deps.gtest INTERFACE)
-target_include_directories(deps.gtest SYSTEM INTERFACE
-		${GTEST_INCLUDE}
-	)
-target_compile_definitions(deps.gtest INTERFACE 
-		GTEST_LANG_CXX11
-	)
-target_link_libraries(deps.gtest INTERFACE
-		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${GTEST_LIBS}>
-		$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${GTEST_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${GTEST_LIBS_RELEASE}>$<$<CONFIG:MINSIZEREL>:${GTEST_LIBS_RELEASE}>$<$<CONFIG:RELEASE>:${GTEST_LIBS_RELEASE}>>
-		gtest gtest_main
-	)
 
 add_library(deps.Boost INTERFACE)
 target_compile_definitions(deps.Boost INTERFACE
