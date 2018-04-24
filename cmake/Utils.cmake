@@ -190,19 +190,24 @@ function(convert_models OUTPUT_MODEL_LIST OUTPUT_COL_LIST)
 	set(${OUTPUT_COL_LIST} ${COL_LIST} PARENT_SCOPE)
 endfunction()
 
-function(tbb_shared_libs_copy TARGET_NAME)
+function(shared_libs_copy EXE_TARGET)
 	if(WIN32)
-		if(MSVC)
-			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
-				$<$<CONFIG:DEBUG>:"${TBB_LIBS_DEBUG}/tbb_debug.dll"> $<$<CONFIG:DEBUG>:"${TBB_LIBS_DEBUG}/tbbmalloc_debug.dll">
-				$<$<CONFIG:RELWITHDEBINFO>:"${TBB_LIBS_RELWITHDEBINFO}/tbb.dll"> $<$<CONFIG:RELWITHDEBINFO>:"${TBB_LIBS_RELWITHDEBINFO}/tbbmalloc.dll">
-				$<$<CONFIG:MINSIZEREL>:"${TBB_LIBS_MINSIZEREL}/tbb.dll"> $<$<CONFIG:MINSIZEREL>:"${TBB_LIBS_MINSIZEREL}/tbbmalloc.dll">
-				$<$<CONFIG:RELEASE>:"${TBB_LIBS_RELEASE}/tbb.dll"> $<$<CONFIG:RELEASE>:"${TBB_LIBS_RELEASE}/tbbmalloc.dll">
-				$<TARGET_FILE_DIR:${TARGET_NAME}>)
-		else()
-			add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				${TBB_LIBS}/tbb$<$<CONFIG:DEBUG>:_debug>.dll ${TBB_LIBS}/tbbmalloc$<$<CONFIG:DEBUG>:_debug>.dll
-				$<TARGET_FILE_DIR:${TARGET_NAME}>)
-		endif()
+		set(file_list)
+		foreach(LIB_TARGET ${ARGN})
+			get_target_property(LOC_DEBUG ${LIB_TARGET} IMPORTED_LOCATION_DEBUG)
+			get_target_property(LOC_RELEASE ${LIB_TARGET} IMPORTED_LOCATION_RELEASE)
+			list(APPEND file_list 
+				$<$<CONFIG:DEBUG>:"${LOC_DEBUG}">
+				$<$<CONFIG:RELWITHDEBINFO>:"${LOC_RELEASE}">
+				$<$<CONFIG:MINSIZEREL>:"${LOC_RELEASE}">
+				$<$<CONFIG:RELEASE>:"${LOC_RELEASE}">
+			)
+		endforeach()
+		add_custom_command(
+				TARGET ${EXE_TARGET} POST_BUILD 
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+				${file_list}
+				$<TARGET_FILE_DIR:${EXE_TARGET}>
+			)
 	endif()
 endfunction()

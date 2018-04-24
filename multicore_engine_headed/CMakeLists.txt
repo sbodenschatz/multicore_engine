@@ -13,7 +13,7 @@ target_link_libraries(mce_headed
 		mce_base
 		mce_core
 		glfw
-		deps.TBB
+		TBB::tbb
 		Boost::asio
 	)
 if(MSVC)

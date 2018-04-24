@@ -74,12 +74,6 @@ target_include_directories(mce_compiler_settings SYSTEM INTERFACE
 
 list(APPEND PASS_TO_BOOTSTRAP 
 		LIBS_DIR
-		TBB_INCLUDE
-		TBB_LIBS_DEBUG
-		TBB_LIBS_RELEASE
-		TBB_LIBS_MINSIZEREL
-		TBB_LIBS_RELWITHDEBINFO
-		TBB_LIBS
 		GTEST_ROOT
 		BOOST_ROOT
 	)
@@ -89,21 +83,9 @@ if (WIN32)
 
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/vkglformat/include CACHE PATH "Include path for vkglformat.")
 
-	set(TBB_INCLUDE ${LIBS_DIR}/TBB/include CACHE PATH "Include path for TBB.")
-	if(MSVC)
-		set(TBB_LIBS_DEBUG ${LIBS_DIR}/TBB/lib/windows_intel64_vc/Debug CACHE PATH "Library path (debug) for TBB.")
-		set(TBB_LIBS_RELEASE ${LIBS_DIR}/TBB/lib/windows_intel64_vc/Release CACHE PATH "Library path (release) for TBB.")
-		set(TBB_LIBS_MINSIZEREL ${LIBS_DIR}/TBB/lib/windows_intel64_vc/MinSizeRel CACHE PATH "Library path (min-size release) for TBB.")
-		set(TBB_LIBS_RELWITHDEBINFO ${LIBS_DIR}/TBB/lib/windows_intel64_vc/RelWithDebInfo CACHE PATH "Library path (release) for TBB.")
-	else()
-		set(TBB_LIBS ${LIBS_DIR}/TBB/lib/windows_intel64_gcc_mingw_${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
-	endif()
-
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
 	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vkglformat.")
-	set(TBB_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for TBB.")
-	set(TBB_LIBS ${LIBS_DIR}/lib/${COMPILER_LOWER}-${CONFIG_LOWER} CACHE PATH "Library path for TBB.")
 endif()
 
 if(SANITIZER_INSTRUMENTATION AND UNIX)
@@ -151,22 +133,4 @@ include(${CMAKE_CURRENT_LIST_DIR}/SetupVulkan.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/SetupGTest.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/SetupBoost.cmake)
 
-add_library(deps.TBB INTERFACE)
-target_include_directories(deps.TBB SYSTEM INTERFACE
-		${TBB_INCLUDE}
-	)
-if(WIN32)
-	target_link_libraries(deps.TBB INTERFACE
-			$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-L${TBB_LIBS}>
-			$<$<CXX_COMPILER_ID:MSVC>:-LIBPATH:$<$<CONFIG:DEBUG>:${TBB_LIBS_DEBUG}>$<$<CONFIG:RELWITHDEBINFO>:${TBB_LIBS_RELWITHDEBINFO}>$<$<CONFIG:MINSIZEREL>:${TBB_LIBS_MINSIZEREL}>$<$<CONFIG:RELEASE>:${TBB_LIBS_RELEASE}>>
-			debug tbb_debug optimized tbb
-			debug tbbmalloc_debug optimized tbbmalloc
-		)
-else()
-	target_link_libraries(deps.TBB INTERFACE
-			-L${TBB_LIBS}
-			tbb
-			tbbmalloc
-		)
-endif()
-
+find_package(TBB REQUIRED)
