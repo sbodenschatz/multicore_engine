@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.7)
 project (multicore_engine)
 
-include(CMakeUtils.txt)
+include(cmake/Utils.cmake)
 
 enable_testing()
 
@@ -9,7 +9,7 @@ if(NOT MSVC)
 	set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 endif()
 
-include(CMakeConfig.txt)
+include(cmake/BuildConfig.cmake)
 
 make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format)
 get_version_info()

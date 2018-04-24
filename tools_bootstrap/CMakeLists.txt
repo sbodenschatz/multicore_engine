@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 3.7)
 project (multicore_engine_tools)
 
-include(../CMakeUtils.txt)
+include(../cmake/Utils.cmake)
 set(CMAKE_CONFIGURATION_TYPES "Release")
-include(../CMakeConfig.txt)
+include(../cmake/BuildConfig.cmake)
 
 include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_base/include)
 include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_core/include)

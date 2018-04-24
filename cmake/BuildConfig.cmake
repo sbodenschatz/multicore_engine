@@ -140,16 +140,16 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH ${LIBS_DIR} ${LIBS_DIR}/${compiler_name})
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_helpers")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake_helpers")
 
 find_package(gli REQUIRED)
 find_package(glfw3 REQUIRED)
 
-include(SetupZLIB)
-include(SetupGLM)
-include(SetupVulkan)
-include(SetupGTest)
-include(SetupBoost)
+include(${CMAKE_CURRENT_LIST_DIR}/SetupZLIB.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/SetupGLM.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/SetupVulkan.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/SetupGTest.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/SetupBoost.cmake)
 
 add_library(deps.TBB INTERFACE)
 target_include_directories(deps.TBB SYSTEM INTERFACE
