@@ -1,3 +1,6 @@
 [submodule "cmake_helpers"]
 	path = cmake_helpers
 	url = ../cmake_helpers.git
+[submodule "vkglformat"]
+	path = vkglformat
+	url = ../../Libs/vkglformat.git

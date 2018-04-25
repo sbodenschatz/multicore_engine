@@ -80,12 +80,8 @@ list(APPEND PASS_TO_BOOTSTRAP
 
 if (WIN32)
 	set(LIBS_DIR C:/Libs CACHE PATH "Custom library directory")
-
-	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/vkglformat/include CACHE PATH "Include path for vkglformat.")
-
 elseif(UNIX)
 	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
-	set(VKGLFORMAT_INCLUDE ${LIBS_DIR}/include CACHE PATH "Include path for vkglformat.")
 endif()
 
 if(SANITIZER_INSTRUMENTATION AND UNIX)
@@ -99,14 +95,7 @@ if(SANITIZER_INSTRUMENTATION AND UNIX)
 	endif ()
 endif()
 
-add_library(deps.vkglformat INTERFACE)
-target_compile_definitions(deps.vkglformat INTERFACE
-	)
-target_include_directories(deps.vkglformat SYSTEM INTERFACE
-		${VKGLFORMAT_INCLUDE}
-	)
-target_compile_options(deps.vkglformat INTERFACE
-	)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../vkglformat vkglformat)
 
 if(MSVC)
 	set(compiler_name "msvc")

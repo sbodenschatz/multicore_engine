@@ -13,7 +13,7 @@ target_link_libraries(mce_renderer
 		mce_headed
 		Vulkan::Vulkan
 		gli
-		deps.vkglformat
+		vkglformat
 	)
 if(MSVC)
 	set_target_properties(mce_renderer PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
