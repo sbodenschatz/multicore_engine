@@ -3,21 +3,7 @@ ProcessorCount(CPU_COUNT)
 
 include(SourceGroupGenerator)
 include(VulkanShaderCompiler)
-
-function(make_build_scripts_project SUFFIX)
-	file(GLOB_RECURSE BUILD_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*CMake*.txt" "*.cmake")
-	list(APPEND BUILD_SCRIPTS ${ARGN})
-	list(REMOVE_ITEM BUILD_SCRIPTS "CMakeLists.txt")
-	add_custom_target(BUILD_SCRIPTS_${SUFFIX} SOURCES ${BUILD_SCRIPTS})
-	file(GLOB src_dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/*" "*")
-	get_filename_component(root_dir ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-	foreach(src_dir ${src_dirs})
-		if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${src_dir} AND NOT src_dir STREQUAL root_dir)
-			string(REPLACE / \\ src_grp ${src_dir})
-			source_group(${src_grp} REGULAR_EXPRESSION "${src_dir}/.*")
-		endif()
-	endforeach()
-endfunction()
+include(IntegrateBuildScripts)
 
 function(get_version_info)
 	execute_process(COMMAND ${GIT_BINARY} describe --tags --always --dirty=-modified 
