@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.7)
+cmake_minimum_required (VERSION 3.10)
 project(multicore_engine_renderer)
 file(GLOB_RECURSE RENDERER_SRC "src/*.cpp")
 file(GLOB_RECURSE RENDERER_HEADERS "include/*.hpp")

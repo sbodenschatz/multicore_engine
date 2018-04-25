@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.7)
+cmake_minimum_required (VERSION 3.10)
 project(multicore_engine_graphics_test)
 file(GLOB_RECURSE GRAPHICS_TEST_SRC "src/*.cpp")
 file(GLOB_RECURSE GRAPHICS_TEST_HEADERS "include/*.hpp")

@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.7)
+cmake_minimum_required (VERSION 3.10)
 project(multicore_engine_base)
 configure_file(src/core/version.cpp.in src/core/version.cpp)
 file(GLOB_RECURSE BASE_SRC "src/*.cpp")

@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.7)
+cmake_minimum_required (VERSION 3.10)
 project(multicore_engine_headed)
 file(GLOB_RECURSE HEADED_SRC "src/*.cpp")
 file(GLOB_RECURSE HEADED_HEADERS "include/*.hpp")
