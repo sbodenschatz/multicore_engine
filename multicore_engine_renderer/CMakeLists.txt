@@ -3,6 +3,7 @@ project(multicore_engine_renderer)
 file(GLOB_RECURSE RENDERER_SRC "src/*.cpp")
 file(GLOB_RECURSE RENDERER_HEADERS "include/*.hpp")
 add_library(mce_renderer STATIC ${RENDERER_SRC} ${RENDERER_HEADERS})
+include(SourceGroupGenerator)
 make_src_groups_code("include/mce" "src")
 target_include_directories(mce_renderer PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

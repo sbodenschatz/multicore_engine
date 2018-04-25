@@ -1,9 +1,8 @@
 cmake_minimum_required (VERSION 3.10)
 project (multicore_engine)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_helpers")
-
-include(cmake/Utils.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/UseModules.cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 enable_testing()
 
@@ -11,21 +10,14 @@ if(NOT MSVC)
 	set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 endif()
 
-include(cmake/BuildConfig.cmake)
+include(BuildConfig)
 
+include(IntegrateBuildScripts)
 make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format)
+include(RepositoryVersionDetector)
 get_version_info()
 
 if(NOT STATIC_ANALYSIS_ONLY)
-	bootstrap_tools()
-	get_directory_property(HAS_PARENT PARENT_DIRECTORY)
-	if(HAS_PARENT)
-		message(STATUS "Providing BOOTSTRAP_LOAD_UNIT_GEN and BOOTSTRAP_PACK_FILE_GEN to parent directory.")
-		set(BOOTSTRAP_LOAD_UNIT_GEN ${BOOTSTRAP_LOAD_UNIT_GEN} PARENT_SCOPE)
-		set(BOOTSTRAP_PACK_FILE_GEN ${BOOTSTRAP_PACK_FILE_GEN} PARENT_SCOPE)
-	else()
-		message(STATUS "Using bootstrap tools only internally because there is no parent directory.")
-	endif()
 	add_subdirectory(multicore_engine_assets)
 	add_subdirectory(multicore_engine_test_assets)
 endif()

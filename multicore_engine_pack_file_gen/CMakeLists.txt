@@ -3,6 +3,7 @@ project(multicore_engine_pack_file_gen)
 file(GLOB_RECURSE PACK_FILE_GEN_SRC "src/*.cpp")
 file(GLOB_RECURSE PACK_FILE_GEN_HEADERS "include/*.hpp")
 add_executable(mce_pack_file_gen ${PACK_FILE_GEN_SRC} ${PACK_FILE_GEN_HEADERS})
+include(SourceGroupGenerator)
 make_src_groups_code("include/mce" "src")
 target_link_libraries(mce_pack_file_gen 
 		mce_base

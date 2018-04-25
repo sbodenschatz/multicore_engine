@@ -1,3 +1,5 @@
+include_guard()
+
 find_package(ZLIBStatic REQUIRED)
 set_property(
 	TARGET ZLIB::ZLIB

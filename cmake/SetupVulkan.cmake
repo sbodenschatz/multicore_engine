@@ -1,3 +1,5 @@
+include_guard()
+
 function(find_vulkan_wrap)
 	if(WIN32)
 		set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_STATIC_LIBRARY_SUFFIX} ${CMAKE_EXTRA_LINK_EXTENSIONS})

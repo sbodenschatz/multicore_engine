@@ -1,3 +1,5 @@
+include_guard()
+
 if(NOT DEFINED BOOST_ROOT)
 	set(BOOST_ROOT ${LIBS_DIR}/Boost)
 endif()

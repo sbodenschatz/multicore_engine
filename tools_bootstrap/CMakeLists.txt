@@ -1,19 +1,11 @@
 cmake_minimum_required (VERSION 3.10)
 project (multicore_engine_tools)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake_helpers")
+include("${CMAKE_CURRENT_LIST_DIR}/../UseModules.cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
 
-include(../cmake/Utils.cmake)
 set(CMAKE_CONFIGURATION_TYPES "Release")
-include(../cmake/BuildConfig.cmake)
-
-include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_base/include)
-include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_core/include)
-include_directories(${CMAKE_SOURCE_DIR}/../multicore_engine_parsers/include)
-
-message(STATUS "Branch: " ${BUILD_BRANCH})
-message(STATUS "Version: " ${BUILD_VERSION})
-message(STATUS "Version string: " ${BUILD_VERSION_STRING})
+include(BuildConfig)
 
 add_subdirectory(../multicore_engine_parsers multicore_engine_parsers)
 add_subdirectory(../multicore_engine_base multicore_engine_base)

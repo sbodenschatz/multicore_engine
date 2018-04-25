@@ -15,6 +15,7 @@ target_link_libraries(mce_parsers
 		glm
 		Boost::boost
 	)
+include(SourceGroupGenerator)
 make_src_groups_code("include/mce" "src")
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og")

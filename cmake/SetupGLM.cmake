@@ -1,3 +1,5 @@
+include_guard()
+
 find_package(glm REQUIRED)
 set_property(
 	TARGET glm

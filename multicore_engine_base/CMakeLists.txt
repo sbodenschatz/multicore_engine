@@ -4,6 +4,7 @@ configure_file(src/core/version.cpp.in src/core/version.cpp)
 file(GLOB_RECURSE BASE_SRC "src/*.cpp")
 file(GLOB_RECURSE BASE_HEADERS "include/*.hpp")
 add_library(mce_base STATIC ${BASE_SRC} ${BASE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/src/core/version.cpp src/core/version.cpp.in)
+include(SourceGroupGenerator)
 make_src_groups_code("include/mce" "src")
 target_include_directories(mce_base PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

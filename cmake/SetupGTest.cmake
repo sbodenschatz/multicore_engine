@@ -1,3 +1,5 @@
+include_guard()
+
 if(NOT DEFINED GTEST_ROOT)
 	set(GTEST_ROOT ${LIBS_DIR}/gtest)
 endif()

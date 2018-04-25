@@ -1,3 +1,5 @@
+include_guard()
+
 add_library(mce_compiler_settings INTERFACE)
 target_compile_definitions(mce_compiler_settings INTERFACE
 		$<$<CONFIG:Debug>:DEBUG>

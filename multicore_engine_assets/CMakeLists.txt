@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.10)
 project(multicore_engine_assets)
+include(SourceGroupGenerator)
 make_src_groups_dirs()
+include(AssetBuildTools)
 
 file(GLOB src_dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*" "*/*" "*/*/*" "*/*/*/*")
 foreach(src_dir ${src_dirs})

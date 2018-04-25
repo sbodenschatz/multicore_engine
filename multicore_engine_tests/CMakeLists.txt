@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.10)
 
 project(multicore_engine_tests)
 
+include(SourceGroupGenerator)
 make_src_groups_code("include/mce" "src")
 
 include_directories(${PROJECT_SOURCE_DIR}/../multicore_engine_tests/include)
