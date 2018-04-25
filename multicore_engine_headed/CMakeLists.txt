@@ -3,7 +3,7 @@ project(multicore_engine_headed)
 file(GLOB_RECURSE HEADED_SRC "src/*.cpp")
 file(GLOB_RECURSE HEADED_HEADERS "include/*.hpp")
 add_library(mce_headed STATIC ${HEADED_SRC} ${HEADED_HEADERS})
-make_src_groups()
+make_src_groups_code("include/mce" "src")
 target_include_directories(mce_headed PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
