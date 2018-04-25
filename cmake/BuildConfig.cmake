@@ -11,10 +11,6 @@ if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
   set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
-set(GIT_BINARY git CACHE FILEPATH "Git binary to use for version determination.")
-set(VERSION "[unknown version]" CACHE STRING "Fallback version to use if auto-detection fails.")
-set(BRANCH "[unknown branch]" CACHE STRING "Fallback branch name to use if auto-detection fails.")
-
 if (MSVC)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4221 notelemetry.obj")
 	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /WX /ignore:4221 notelemetry.obj")
