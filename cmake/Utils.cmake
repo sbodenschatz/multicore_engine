@@ -2,6 +2,7 @@ include(ProcessorCount)
 ProcessorCount(CPU_COUNT)
 
 include(SourceGroupGenerator)
+include(VulkanShaderCompiler)
 
 function(make_build_scripts_project SUFFIX)
 	file(GLOB_RECURSE BUILD_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*CMake*.txt" "*.cmake")
@@ -57,21 +58,6 @@ function(get_version_info)
 	set(BUILD_VERSION ${BUILD_VERSION} PARENT_SCOPE)
 	set(BUILD_VERSION_STRING ${BUILD_VERSION_STRING} PARENT_SCOPE)
 	set(PASS_TO_BOOTSTRAP ${PASS_TO_BOOTSTRAP} BUILD_BRANCH BUILD_VERSION BUILD_VERSION_STRING PARENT_SCOPE)
-endfunction()
-
-function(compile_glsl_to_spirv OUTPUT_LIST)
-	set(SPV_LIST)
-	foreach(SRC_FILE ${ARGN})
-		set(SPV_FILE ${SRC_FILE}.spv)
-		add_custom_command(
-			OUTPUT ${SPV_FILE}
-			COMMAND glslangValidator -V -o ${SPV_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}
-			MAIN_DEPENDENCY ${SRC_FILE}
-			COMMENT "Compiling GLSL shader \"${SRC_FILE}\" to SPIR-V file \"${SPV_FILE}\""
-		)
-		list(APPEND SPV_LIST ${SPV_FILE})
-	endforeach()
-	set(${OUTPUT_LIST} ${SPV_LIST} PARENT_SCOPE)
 endfunction()
 
 function(build_load_units OUTPUT_META_LIST OUTPUT_PAYLOAD_LIST)
