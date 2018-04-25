@@ -61,15 +61,15 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../vkglformat vkglformat)
 
 list(APPEND CMAKE_PREFIX_PATH ${LIBS_DIR} ${LIBS_DIR}/${compiler_name})
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake_helpers")
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
 find_package(gli REQUIRED)
 find_package(glfw3 REQUIRED)
 
-include(${CMAKE_CURRENT_LIST_DIR}/SetupZLIB.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/SetupGLM.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/SetupVulkan.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/SetupGTest.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/SetupBoost.cmake)
+include(SetupZLIB)
+include(SetupGLM)
+include(SetupVulkan)
+include(SetupGTest)
+include(SetupBoost)
 
 find_package(TBB REQUIRED)

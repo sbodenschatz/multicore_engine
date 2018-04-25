@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.10)
 project (multicore_engine_tools)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake_helpers")
+
 include(../cmake/Utils.cmake)
 set(CMAKE_CONFIGURATION_TYPES "Release")
 include(../cmake/BuildConfig.cmake)
