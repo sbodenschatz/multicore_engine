@@ -15,7 +15,6 @@ target_compile_options(mce_compiler_settings INTERFACE
 		$<$<CXX_COMPILER_ID:Clang>: -Wno-unused-private-field>
 		$<$<CXX_COMPILER_ID:GNU>:>
 		$<$<CXX_COMPILER_ID:MSVC>: /W4 /WX /MP /std:c++latest>
-		$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<NOT:$<CONFIG:DEBUG>>>: /GL>
 	)
 if(NOT DEBUG_O0)
 	target_compile_options(mce_compiler_settings INTERFACE
