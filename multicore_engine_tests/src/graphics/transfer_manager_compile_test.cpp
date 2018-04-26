@@ -4,6 +4,9 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+// TODO: Find source of libc++ linking problem with the compile tests
+#ifndef MCECLANG
+
 #include <gtest.hpp>
 #include <mce/glfw/window.hpp>
 #include <mce/graphics/destruction_queue_manager.hpp>
@@ -76,3 +79,5 @@ TEST(graphics_transfer_manager, compile_test) {
 
 } // namespace graphics
 } // namespace mce
+
+#endif
