@@ -2,16 +2,7 @@ include_guard()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
-if(NOT MSVC)
-	if(NOT (CMAKE_BUILD_TYPE STREQUAL Debug) AND NOT (CMAKE_BUILD_TYPE STREQUAL Release))
-		set(CMAKE_BUILD_TYPE Release)
-	endif()
-	string(TOLOWER ${CMAKE_BUILD_TYPE} CONFIG_LOWER)
-endif()
-
-if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
-  set(CMAKE_DEBUG_POSTFIX d)
-endif()
+include(BuildTypeSettings)
 
 include(LibsDir)
 
