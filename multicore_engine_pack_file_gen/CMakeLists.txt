@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(multicore_engine_pack_file_gen)
+project(multicore_engine_pack_file_gen LANGUAGES CXX)
 file(GLOB_RECURSE PACK_FILE_GEN_SRC "src/*.cpp")
 file(GLOB_RECURSE PACK_FILE_GEN_HEADERS "include/*.hpp")
 add_executable(mce_pack_file_gen ${PACK_FILE_GEN_SRC} ${PACK_FILE_GEN_HEADERS})

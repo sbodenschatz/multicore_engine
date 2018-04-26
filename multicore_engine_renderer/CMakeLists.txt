@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(multicore_engine_renderer)
+project(multicore_engine_renderer LANGUAGES CXX)
 file(GLOB_RECURSE RENDERER_SRC "src/*.cpp")
 file(GLOB_RECURSE RENDERER_HEADERS "include/*.hpp")
 add_library(mce_renderer STATIC ${RENDERER_SRC} ${RENDERER_HEADERS})

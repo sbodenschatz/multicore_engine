@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(multicore_engine_graphics_test)
+project(multicore_engine_graphics_test LANGUAGES CXX)
 file(GLOB_RECURSE GRAPHICS_TEST_SRC "src/*.cpp")
 file(GLOB_RECURSE GRAPHICS_TEST_HEADERS "include/*.hpp")
 add_executable(mce_graphics_test ${GRAPHICS_TEST_SRC} ${GRAPHICS_TEST_HEADERS})

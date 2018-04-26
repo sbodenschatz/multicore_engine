@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(multicore_engine_load_unit_gen)
+project(multicore_engine_load_unit_gen LANGUAGES CXX)
 file(GLOB_RECURSE LOAD_UNIT_GEN_SRC "src/*.cpp")
 file(GLOB_RECURSE LOAD_UNIT_GEN_HEADERS "include/*.hpp")
 add_executable(mce_load_unit_gen ${LOAD_UNIT_GEN_SRC} ${LOAD_UNIT_GEN_HEADERS})

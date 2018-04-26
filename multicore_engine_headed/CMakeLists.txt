@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(multicore_engine_headed)
+project(multicore_engine_headed LANGUAGES CXX)
 file(GLOB_RECURSE HEADED_SRC "src/*.cpp")
 file(GLOB_RECURSE HEADED_HEADERS "include/*.hpp")
 add_library(mce_headed STATIC ${HEADED_SRC} ${HEADED_HEADERS})
