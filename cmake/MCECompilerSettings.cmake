@@ -11,8 +11,7 @@ target_compile_definitions(mce_compiler_settings INTERFACE
 	)
 target_compile_options(mce_compiler_settings INTERFACE
 		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>: -std=c++1z -Wall -Wextra -Werror -fno-strict-aliasing -Wold-style-cast>
-		#$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++ -Wno-unused-private-field>
-		$<$<CXX_COMPILER_ID:Clang>: -Wno-unused-private-field>
+		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++ -Wno-unused-private-field>
 		$<$<CXX_COMPILER_ID:GNU>:>
 		$<$<CXX_COMPILER_ID:MSVC>: /W4 /WX /MP /std:c++latest>
 	)
@@ -22,7 +21,7 @@ if(NOT DEBUG_O0)
 		)
 endif()
 target_link_libraries(mce_compiler_settings INTERFACE
-		#$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++>
+		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++>
 		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>: atomic>
 	)
 target_include_directories(mce_compiler_settings SYSTEM INTERFACE 
