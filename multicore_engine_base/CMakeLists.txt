@@ -20,8 +20,4 @@ target_link_libraries(mce_base
 		Boost::thread
 		Boost::filesystem
 	)
-if(MSVC)
-	set_target_properties(mce_base PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
-	set_target_properties(mce_base PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
-	set_target_properties(mce_base PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/LTCG")
-endif()
+enable_custom_lto(mce_base)

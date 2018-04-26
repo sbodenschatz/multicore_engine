@@ -9,8 +9,4 @@ target_link_libraries(mce_pack_file_gen
 		mce_base
 		Boost::program_options
 	)
-if(MSVC)
-	set_target_properties(mce_pack_file_gen PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
-	set_target_properties(mce_pack_file_gen PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
-	set_target_properties(mce_pack_file_gen PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/LTCG")
-endif()
+enable_custom_lto(mce_pack_file_gen)
