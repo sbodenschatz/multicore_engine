@@ -12,10 +12,10 @@ if(NOT MSVC)
 endif()
 
 include(BuildConfig)
-
 include(IntegrateBuildScripts)
-make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format)
 include(RepositoryVersionDetector)
+
+make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format)
 get_version_info()
 
 if(NOT STATIC_ANALYSIS_ONLY)
