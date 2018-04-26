@@ -21,6 +21,9 @@ include(MCECompilerSettings)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../vkglformat vkglformat)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 find_package(gli REQUIRED)
 find_package(glfw3 REQUIRED)
 

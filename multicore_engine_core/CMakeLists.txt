@@ -17,5 +17,6 @@ target_link_libraries(mce_core
 		mce_base
 		TBB::tbb
 		Boost::asio
+		Threads::Threads
 	)
 enable_custom_lto(mce_core)
