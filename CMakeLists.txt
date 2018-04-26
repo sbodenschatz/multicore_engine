@@ -32,3 +32,5 @@ add_subdirectory(multicore_engine_graphics_test)
 add_subdirectory(multicore_engine_load_unit_gen)
 add_subdirectory(multicore_engine_pack_file_gen)
 add_subdirectory(multicore_engine_model_converter)
+
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT mce_graphics_test)
