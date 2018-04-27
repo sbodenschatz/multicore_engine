@@ -15,7 +15,7 @@ include(BuildConfig)
 include(IntegrateBuildScripts)
 include(RepositoryVersionDetector)
 
-make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format)
+make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format create_license_pack_linux.sh create_license_pack_windows.bat)
 get_version_info()
 
 if(NOT STATIC_ANALYSIS_ONLY)
