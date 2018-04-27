@@ -4,7 +4,6 @@ variables:
 
 stages:
   - build
-  - auxiliary
   - package
 
 .cache-paths-spec: &cache-paths
@@ -181,7 +180,7 @@ clang-release-build:
 
 scan-build:
     dependencies: []
-    stage: auxiliary
+    stage: build
     script:
     - mkdir -p build && cd build
     - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
@@ -191,7 +190,7 @@ scan-build:
 
 api-doc:
     dependencies: []
-    stage: auxiliary
+    stage: build
     script:
     - chmod +x generate_cloc_report.sh
     - ./generate_cloc_report.sh
@@ -219,7 +218,7 @@ api-doc:
 
 license-pack-linux:
     dependencies: []
-    stage: auxiliary
+    stage: build
     script:
     - ./create_license_pack_linux.sh
     image: $CI_REGISTRY/ci-util/cpp/clang/release
