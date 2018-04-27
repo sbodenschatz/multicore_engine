@@ -22,14 +22,14 @@ stages:
 .artifacts-spec-build-linux-template: &artifact-spec-build-linux
     artifacts:
         name: "mce_${CI_COMMIT_REF_SLUG}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
-        expire_in: 1 week
+        expire_in: 1 day
         paths:
         - ${BUILD_COMPILER_NAME}
 
 .artifacts-spec-build-windows-template: &artifact-spec-build-windows
     artifacts:
         name: "mce_%CI_COMMIT_REF_SLUG%_%CI_JOB_ID%_%CI_COMMIT_SHA%_%CI_JOB_NAME%"
-        expire_in: 1 week
+        expire_in: 1 day
         paths:
         - "%BUILD_COMPILER_NAME%"
 
@@ -210,7 +210,7 @@ api-doc:
         - doc
     artifacts:
         name: "mce_${CI_COMMIT_REF_SLUG}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
-        expire_in: 1 week
+        expire_in: 1 day
         paths:
         - refman.pdf
         - refman_html
@@ -224,7 +224,7 @@ license-pack-linux:
     image: $CI_REGISTRY/ci-util/cpp/clang/release
     artifacts:
         name: "mce_${CI_COMMIT_REF_SLUG}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
-        expire_in: 1 week
+        expire_in: 1 day
         paths:
         - licenses
 
@@ -234,7 +234,7 @@ package-base:
     - tags
     artifacts:
         <<: *package-artifact-spec
-        expire_in: 6 months
+        expire_in: 2 weeks
 
 package-tags:
     <<: *package-task
