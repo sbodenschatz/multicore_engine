@@ -1,0 +1,9 @@
+include_guard()
+
+find_package(ZLIBStatic REQUIRED)
+set_property(
+	TARGET ZLIB::ZLIB
+	APPEND
+	PROPERTY INTERFACE_COMPILE_DEFINITIONS
+		ZLIB_CONST
+	)

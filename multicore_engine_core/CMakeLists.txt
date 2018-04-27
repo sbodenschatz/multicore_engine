@@ -1,9 +1,10 @@
-cmake_minimum_required (VERSION 3.7)
-project(multicore_engine_core)
+cmake_minimum_required (VERSION 3.10)
+project(multicore_engine_core LANGUAGES CXX)
 file(GLOB_RECURSE CORE_SRC "src/*.cpp")
 file(GLOB_RECURSE CORE_HEADERS "include/*.hpp")
 add_library(mce_core STATIC ${CORE_SRC} ${CORE_HEADERS})
-make_src_groups()
+include(SourceGroupGenerator)
+make_src_groups_code("include/mce" "src")
 if(USE_BLOCKED_COMPONENT_POOLS)
 	target_compile_definitions(mce_core PUBLIC MCE_USE_BLOCKED_COMPONENT_POOLS)
 endif()
@@ -14,12 +15,8 @@ target_include_directories(mce_core PUBLIC
 target_link_libraries(mce_core 
 		mce_parsers 
 		mce_base
-		deps.glfw
-		deps.TBB
-		deps.Boost.ASIO
+		TBB::tbb
+		Boost::asio
+		Threads::Threads
 	)
-if(MSVC)
-	set_target_properties(mce_core PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
-	set_target_properties(mce_core PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
-	set_target_properties(mce_core PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/LTCG")
-endif()
+enable_custom_lto(mce_core)

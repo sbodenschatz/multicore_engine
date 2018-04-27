@@ -1,7 +1,9 @@
-cmake_minimum_required (VERSION 3.7)
-project (multicore_engine)
+cmake_minimum_required (VERSION 3.10)
+# Language C is needed for phthreads detection to work correctly
+project (multicore_engine LANGUAGES CXX C)
 
-include(CMakeUtils.txt)
+include("${CMAKE_CURRENT_LIST_DIR}/UseModules.cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 enable_testing()
 
@@ -9,21 +11,14 @@ if(NOT MSVC)
 	set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 endif()
 
-include(CMakeConfig.txt)
+include(BuildConfig)
+include(IntegrateBuildScripts)
+include(RepositoryVersionDetector)
 
-make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format)
+make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format create_license_pack_linux.sh create_license_pack_windows.bat)
 get_version_info()
 
 if(NOT STATIC_ANALYSIS_ONLY)
-	bootstrap_tools()
-	get_directory_property(HAS_PARENT PARENT_DIRECTORY)
-	if(HAS_PARENT)
-		message(STATUS "Providing BOOTSTRAP_LOAD_UNIT_GEN and BOOTSTRAP_PACK_FILE_GEN to parent directory.")
-		set(BOOTSTRAP_LOAD_UNIT_GEN ${BOOTSTRAP_LOAD_UNIT_GEN} PARENT_SCOPE)
-		set(BOOTSTRAP_PACK_FILE_GEN ${BOOTSTRAP_PACK_FILE_GEN} PARENT_SCOPE)
-	else()
-		message(STATUS "Using bootstrap tools only internally because there is no parent directory.")
-	endif()
 	add_subdirectory(multicore_engine_assets)
 	add_subdirectory(multicore_engine_test_assets)
 endif()
@@ -38,3 +33,5 @@ add_subdirectory(multicore_engine_graphics_test)
 add_subdirectory(multicore_engine_load_unit_gen)
 add_subdirectory(multicore_engine_pack_file_gen)
 add_subdirectory(multicore_engine_model_converter)
+
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT mce_graphics_test)

@@ -41,7 +41,7 @@ stages:
     - cd build
     - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DSANITIZER_INSTRUMENTATION=${BUILD_SANITIZE} ..
     - cmake --build . -- -j ${BUILD_CONCURRENCY}
-    - export LD_LIBRARY_PATH=/usr/local/lib/${BUILD_COMPILER_NAME}-${BUILD_TYPE,,}/
+    - export ASAN_SYMBOLIZER_PATH=$(find / -name llvm-symbolizer)
     - ctest --output-on-failure
     - cd ..
     - cmake -E make_directory ${BUILD_COMPILER_NAME}

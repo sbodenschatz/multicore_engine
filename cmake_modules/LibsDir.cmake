@@ -1,0 +1,21 @@
+include_guard()
+
+if(MSVC)
+	set(compiler_name "msvc")
+elseif(MINGW)
+	set(compiler_name "mingw")
+elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+	set(compiler_name "gcc")
+elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+	set(compiler_name "clang")
+else()
+	set(compiler_name "unknown")
+endif()
+
+if (WIN32)
+	set(LIBS_DIR C:/Libs CACHE PATH "Custom library directory")
+elseif(UNIX)
+	set(LIBS_DIR /usr/local CACHE PATH "Custom library directory")
+endif()
+
+list(APPEND CMAKE_PREFIX_PATH ${LIBS_DIR} ${LIBS_DIR}/${compiler_name})
