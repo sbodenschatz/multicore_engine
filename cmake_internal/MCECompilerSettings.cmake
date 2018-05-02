@@ -24,9 +24,6 @@ target_link_libraries(mce_compiler_settings INTERFACE
 		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++>
 		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>: atomic>
 	)
-target_include_directories(mce_compiler_settings SYSTEM INTERFACE 
-		$<$<CXX_COMPILER_ID:Clang>: /usr/include/libcxxabi/>
-	)
 
 install(TARGETS mce_compiler_settings 
 		EXPORT mce-dev
