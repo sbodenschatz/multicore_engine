@@ -56,7 +56,7 @@ stages:
     - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%BUILD_COMPILER_NAME% ..
     - cmake --build . -- -j %BUILD_CONCURRENCY%
     - ctest --output-on-failure
-    - cmake --build . --target install -- -j ${BUILD_CONCURRENCY}
+    - cmake --build . --target install -- -j %BUILD_CONCURRENCY%
     - cd ..
     - cmake -E rename build/%BUILD_COMPILER_NAME% %BUILD_COMPILER_NAME%
     - glslangValidator -v
@@ -67,11 +67,10 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Visual Studio 15 2017 Win64" ..
+    - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -DCMAKE_INSTALL_PREFIX=%BUILD_COMPILER_NAME% -G "Visual Studio 15 2017 Win64" ..
     - cmake --build . --config %BUILD_TYPE% -- /m:%BUILD_CONCURRENCY%
     - ctest -C %BUILD_TYPE% --output-on-failure
-    - cd ..
-    - cmake --build . --config %BUILD_TYPE% --target INSTALL -- -j ${BUILD_CONCURRENCY}
+    - cmake --build . --config %BUILD_TYPE% --target INSTALL -- /m:%BUILD_CONCURRENCY%
     - cd ..
     - cmake -E rename build/%BUILD_COMPILER_NAME% %BUILD_COMPILER_NAME%
     # These libraries are huge on release build due to LTCG and are therefore only included for tagged builds.
