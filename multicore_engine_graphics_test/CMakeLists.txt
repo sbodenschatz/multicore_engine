@@ -19,3 +19,15 @@ if(NOT STATIC_ANALYSIS_ONLY)
 endif()
 include(SharedLibsCopy)
 shared_libs_copy(mce_graphics_test SHARED_LIBS TBB::tbb TBB::tbbmalloc)
+
+install(
+		TARGETS mce_graphics_test
+		DESTINATION bin
+		COMPONENT mce-test
+	)
+
+install(
+		FILES ${SHARED_LIBS}
+		DESTINATION bin
+		COMPONENT mce-test
+	)

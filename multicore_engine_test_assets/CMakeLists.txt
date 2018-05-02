@@ -29,3 +29,9 @@ add_custom_target(mce_test_assets_units ALL SOURCES ${LOAD_UNIT_DESCS} DEPENDS $
 add_custom_target(mce_test_assets_packs ALL SOURCES ${PACK_DESCS} DEPENDS ${PACK_FILES})
 add_dependencies(mce_test_assets_units mce_test_assets_compile mce_test_assets_models)
 add_dependencies(mce_test_assets_packs mce_test_assets_units)
+
+install(
+		FILES ${PACK_FILES}
+		DESTINATION assets
+		COMPONENT mce-test
+	)

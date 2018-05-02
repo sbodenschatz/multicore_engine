@@ -62,4 +62,4 @@ export(
 	)
 
 include(ComponentInstallTargets)
-define_component_install_targets(mce mce-dev)
+define_component_install_targets(mce mce-dev mce-test)
