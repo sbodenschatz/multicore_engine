@@ -96,7 +96,9 @@ graphics_test::graphics_test()
 			{{std::make_unique<asset::pack_file_reader>(), "assets.pack"},
 			 {std::make_unique<asset::pack_file_reader>(), "../multicore_engine_test_assets/assets.pack"},
 			 {std::make_unique<asset::pack_file_reader>(),
-			  ((exe_path.parent_path() / "multicore_engine_test_assets") / "assets.pack").string()}}));
+			  ((exe_path.parent_path() / "multicore_engine_test_assets") / "assets.pack").string()},
+			 {std::make_unique<asset::pack_file_reader>(),
+			  ((exe_path.parent_path() / "assets") / "assets.pack").string()}}));
 	amgr_.add_asset_loader(loader);
 	amgr_.start_pin_load_unit("shaders");
 	amgr_.start_pin_load_unit("models_geo");
