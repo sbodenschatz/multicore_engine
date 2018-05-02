@@ -55,6 +55,12 @@ install(
 		COMPONENT mce-dev
 	)
 
+install(
+		FILES ${CMAKE_CURRENT_SOURCE_DIR}/default.cfg
+		DESTINATION .
+		COMPONENT mce
+	)
+
 export(
 		EXPORT mce-dev 
 		NAMESPACE mce::
