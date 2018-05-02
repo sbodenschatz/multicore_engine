@@ -7,10 +7,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_internal")
 
 enable_testing()
 
-if(NOT MSVC)
-	set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
-endif()
-
 include(BuildConfig)
 include(IntegrateBuildScripts)
 include(RepositoryVersionDetector)
