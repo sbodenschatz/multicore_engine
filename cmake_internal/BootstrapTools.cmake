@@ -36,8 +36,8 @@ function(bootstrap_tools)
 	print_list("	Forwarded variables for bootstrap" ${BOOTSTRAP_VAR_CMD})
 	if(MSVC)
 		file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools_bootstrap)
-		execute_process(COMMAND cmake -G "${CMAKE_GENERATOR}" ${CMAKE_CURRENT_LIST_DIR}/../tools_bootstrap ${BOOTSTRAP_VAR_CMD} WORKING_DIRECTORY tools_bootstrap)
-		execute_process(COMMAND cmake --build . --config Release WORKING_DIRECTORY tools_bootstrap)
+		execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ${CMAKE_CURRENT_LIST_DIR}/../tools_bootstrap ${BOOTSTRAP_VAR_CMD} WORKING_DIRECTORY tools_bootstrap)
+		execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release WORKING_DIRECTORY tools_bootstrap)
 		set(BOOTSTRAP_LOAD_UNIT_GEN
 			${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_load_unit_gen/Release/mce_load_unit_gen
 			CACHE FILEPATH
@@ -51,8 +51,8 @@ function(bootstrap_tools)
 		mark_as_advanced(BOOTSTRAP_LOAD_UNIT_GEN BOOTSTRAP_PACK_FILE_GEN)
 	else()
 		file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools_bootstrap)
-		execute_process(COMMAND cmake -G "${CMAKE_GENERATOR}" ${CMAKE_CURRENT_LIST_DIR}/../tools_bootstrap -DCMAKE_BUILD_TYPE=Release ${BOOTSTRAP_VAR_CMD} WORKING_DIRECTORY tools_bootstrap)
-		execute_process(COMMAND cmake --build . --config Release -- -j ${CPU_COUNT} WORKING_DIRECTORY tools_bootstrap)
+		execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ${CMAKE_CURRENT_LIST_DIR}/../tools_bootstrap -DCMAKE_BUILD_TYPE=Release ${BOOTSTRAP_VAR_CMD} WORKING_DIRECTORY tools_bootstrap)
+		execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release -- -j ${CPU_COUNT} WORKING_DIRECTORY tools_bootstrap)
 		set(BOOTSTRAP_LOAD_UNIT_GEN
 			${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_load_unit_gen/mce_load_unit_gen
 			CACHE FILEPATH

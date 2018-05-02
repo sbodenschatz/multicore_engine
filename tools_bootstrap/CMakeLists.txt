@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.10)
 project (multicore_engine_tools LANGUAGES CXX C)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../UseModules.cmake")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake_internal")
 
 set(CMAKE_CONFIGURATION_TYPES "Release")
 include(BuildConfig)

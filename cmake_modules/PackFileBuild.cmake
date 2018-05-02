@@ -1,6 +1,6 @@
 include_guard()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../cmake/BootstrapTools.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake_internal/BootstrapTools.cmake")
 
 function(build_pack_files OUTPUT_LIST)
 	ensure_tools_bootstrapped()

@@ -20,8 +20,6 @@ include(SanitizerInstrumentationOption)
 include(MCECompilerSettings)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../vkglformat vkglformat)
-list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_BINARY_DIR}/vkglformat)
-find_package(vkglformat REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
