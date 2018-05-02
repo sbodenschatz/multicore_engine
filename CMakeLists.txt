@@ -34,10 +34,31 @@ set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT mce_graphics_test)
 
 install(
 		EXPORT mce-dev 
-		DESTINATION lib/cmake/mce
+		DESTINATION cmake/mce
 		NAMESPACE mce::
 		COMPONENT mce-dev
 		FILE mceConfig.cmake
+	)
+
+install(
+		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules
+		DESTINATION cmake/mce
+		COMPONENT mce-dev
+	)
+install(
+		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake_helpers
+		DESTINATION cmake/mce
+		COMPONENT mce-dev
+	)
+install(
+		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake_internal
+		DESTINATION cmake/mce
+		COMPONENT mce-dev
+	)
+install(
+		FILES ${CMAKE_CURRENT_SOURCE_DIR}/UseModules.cmake
+		DESTINATION cmake/mce
+		COMPONENT mce-dev
 	)
 
 export(
