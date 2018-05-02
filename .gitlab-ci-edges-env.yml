@@ -83,7 +83,7 @@ stages:
     variables:
         GIT_STRATEGY: none
     script:
-    - sha1sum -b cloc_report.txt refman.pdf gcc/* clang/* > checksums.txt
+    - sha1sum -b gcc/assets/* clang/assets/* > checksums.txt
     - cat checksums.txt | sort
     - cat cloc_report.txt
     image: alpine:latest
