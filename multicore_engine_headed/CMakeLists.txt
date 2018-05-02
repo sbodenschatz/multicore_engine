@@ -26,6 +26,9 @@ install(
 		COMPONENT mce-dev
 	)
 
+include(ProvideEmbeddedImport)
+provide_embedded_import(mce:: mce_headed)
+
 install(
 		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
 		DESTINATION include

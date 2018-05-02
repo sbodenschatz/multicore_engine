@@ -26,6 +26,9 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 endif()
 enable_custom_lto(mce_parsers)
 
+include(ProvideEmbeddedImport)
+provide_embedded_import(mce:: mce_parsers)
+
 install(TARGETS mce_parsers 
 		EXPORT mce-dev
 		DESTINATION lib
