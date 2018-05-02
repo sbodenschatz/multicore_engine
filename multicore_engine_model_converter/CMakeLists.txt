@@ -10,3 +10,9 @@ target_link_libraries(mce_model_converter
 		Boost::program_options
 	)
 enable_custom_lto(mce_model_converter)
+
+install(
+		TARGETS mce_model_converter
+		DESTINATION bin
+		COMPONENT mce
+	)

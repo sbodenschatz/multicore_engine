@@ -29,3 +29,10 @@ add_custom_target(mce_assets_units ALL SOURCES ${LOAD_UNIT_DESCS} DEPENDS ${LOAD
 add_custom_target(mce_assets_packs ALL SOURCES ${PACK_DESCS} DEPENDS ${PACK_FILES})
 add_dependencies(mce_assets_units mce_assets_compile mce_assets_models)
 add_dependencies(mce_assets_packs mce_assets_units)
+
+message(STATUS "PACK_FILES: ${PACK_FILES}")
+install(
+		FILES ${PACK_FILES}
+		DESTINATION assets
+		COMPONENT mce
+	)

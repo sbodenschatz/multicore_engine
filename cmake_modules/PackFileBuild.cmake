@@ -8,7 +8,7 @@ function(build_pack_files OUTPUT_LIST)
 	foreach(DESC_FILE ${ARGN})
 		get_filename_component(BASE_NAME ${DESC_FILE} NAME_WE)
 		get_filename_component(DIR ${DESC_FILE} DIRECTORY)
-		set(PACK_FILE ${DIR}${BASE_NAME}.pack)
+		set(PACK_FILE ${CMAKE_CURRENT_BINARY_DIR}/${DIR}${BASE_NAME}.pack)
 		execute_process(COMMAND ${BOOTSTRAP_PACK_FILE_GEN} --deps -d ${CMAKE_CURRENT_SOURCE_DIR}/${DESC_FILE} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} OUTPUT_VARIABLE DEPS_LIST RESULT_VARIABLE DEPS_RES)
 		add_custom_command(
 			OUTPUT ${PACK_FILE}

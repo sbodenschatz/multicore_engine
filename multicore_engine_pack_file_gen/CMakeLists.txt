@@ -10,3 +10,9 @@ target_link_libraries(mce_pack_file_gen
 		Boost::program_options
 	)
 enable_custom_lto(mce_pack_file_gen)
+
+install(
+		TARGETS mce_pack_file_gen
+		DESTINATION bin
+		COMPONENT mce
+	)

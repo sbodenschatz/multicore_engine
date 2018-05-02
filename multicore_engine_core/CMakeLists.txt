@@ -20,3 +20,16 @@ target_link_libraries(mce_core
 		Threads::Threads
 	)
 enable_custom_lto(mce_core)
+
+install(
+		TARGETS mce_core 
+		EXPORT mce-dev
+		DESTINATION lib
+		COMPONENT mce-dev
+	)
+
+install(
+		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+		DESTINATION include
+		COMPONENT mce-dev
+	)

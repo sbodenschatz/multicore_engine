@@ -18,3 +18,16 @@ target_link_libraries(mce_headed
 		Boost::asio
 	)
 enable_custom_lto(mce_headed)
+
+install(
+		TARGETS mce_headed 
+		EXPORT mce-dev
+		DESTINATION lib
+		COMPONENT mce-dev
+	)
+
+install(
+		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+		DESTINATION include
+		COMPONENT mce-dev
+	)

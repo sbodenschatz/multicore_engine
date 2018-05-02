@@ -35,3 +35,17 @@ add_subdirectory(multicore_engine_pack_file_gen)
 add_subdirectory(multicore_engine_model_converter)
 
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT mce_graphics_test)
+
+install(
+		EXPORT mce-dev 
+		DESTINATION lib/cmake/mce
+		NAMESPACE mce::
+		COMPONENT mce-dev
+		FILE mceConfig.cmake
+	)
+
+export(
+		EXPORT mce-dev 
+		NAMESPACE mce::
+		FILE mceConfig.cmake
+	)

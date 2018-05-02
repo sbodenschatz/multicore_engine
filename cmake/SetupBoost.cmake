@@ -22,7 +22,7 @@ set_property(
 		BOOST_NO_AUTO_PTR
 	)
 
-add_library(Boost.asio INTERFACE)
+add_library(Boost.asio INTERFACE IMPORTED GLOBAL)
 target_link_libraries(Boost.asio INTERFACE Boost::boost Boost::system $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<PLATFORM_ID:Windows>>:ws2_32 mswsock>)
 add_library(Boost::asio ALIAS Boost.asio)
 

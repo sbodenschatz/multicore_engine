@@ -27,3 +27,9 @@ target_link_libraries(mce_compiler_settings INTERFACE
 target_include_directories(mce_compiler_settings SYSTEM INTERFACE 
 		$<$<CXX_COMPILER_ID:Clang>: /usr/include/libcxxabi/>
 	)
+
+install(TARGETS mce_compiler_settings 
+		EXPORT mce-dev
+		DESTINATION lib
+		COMPONENT mce-dev
+	)

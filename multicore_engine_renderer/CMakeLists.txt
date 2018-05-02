@@ -14,6 +14,19 @@ target_link_libraries(mce_renderer
 		mce_headed
 		Vulkan::Vulkan
 		gli
-		vkglformat
+		vkglformat::vkglformat
 	)
 enable_custom_lto(mce_renderer)
+
+install(
+		TARGETS mce_renderer 
+		EXPORT mce-dev
+		DESTINATION lib
+		COMPONENT mce-dev
+	)
+
+install(
+		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+		DESTINATION include
+		COMPONENT mce-dev
+	)
