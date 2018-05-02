@@ -30,9 +30,10 @@ add_custom_target(mce_assets_packs ALL SOURCES ${PACK_DESCS} DEPENDS ${PACK_FILE
 add_dependencies(mce_assets_units mce_assets_compile mce_assets_models)
 add_dependencies(mce_assets_packs mce_assets_units)
 
-message(STATUS "PACK_FILES: ${PACK_FILES}")
 install(
 		FILES ${PACK_FILES}
 		DESTINATION assets
 		COMPONENT mce
 	)
+
+set(MCE_ENGINE_ASSETS_PACKS ${PACK_FILES} CACHE INTERNAL "Packfile(s) containing engine-wide assets (such as basic shaders).")
