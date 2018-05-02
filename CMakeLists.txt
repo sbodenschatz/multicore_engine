@@ -61,19 +61,5 @@ export(
 		FILE mceConfig.cmake
 	)
 
-function(define_install_targets)
-	get_property(MCE_TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
-	add_custom_target(
-		install-mce-dev
-		DEPENDS ${MCE_TARGETS}
-		COMMAND
-			"${CMAKE_COMMAND}" -DCMAKE_INSTALL_COMPONENT=mce-dev -DCMAKE_INSTALL_CONFIG_NAME="$<CONFIG>" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake"
-	)
-	add_custom_target(
-		install-mce
-		DEPENDS ${MCE_TARGETS}
-		COMMAND
-			"${CMAKE_COMMAND}" -DCMAKE_INSTALL_COMPONENT=mce -DCMAKE_INSTALL_CONFIG_NAME="$<CONFIG>" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake"
-	)
-endfunction()
-define_install_targets()
+include(ComponentInstallTargets)
+define_component_install_targets(mce mce-dev)
