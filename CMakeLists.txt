@@ -1,18 +1,23 @@
 cmake_minimum_required (VERSION 3.10)
-# Language C is needed for phthreads detection to work correctly
-project (multicore_engine LANGUAGES CXX C)
 
 include("${CMAKE_CURRENT_LIST_DIR}/UseModules.cmake")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_internal")
+
+include(RepositoryVersionDetector)
+get_version_info()
+
+project (multicore_engine
+		VERSION ${BUILD_VERSION_MAJOR}.${BUILD_VERSION_MINOR}.${BUILD_VERSION_PATCH}.${BUILD_VERSION_TWEAK} 
+		# Language C is needed for pthreads detection to work correctly
+		LANGUAGES CXX C
+	)
 
 enable_testing()
 
 include(BuildConfig)
 include(IntegrateBuildScripts)
-include(RepositoryVersionDetector)
 
 make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format create_license_pack_linux.sh create_license_pack_windows.bat)
-get_version_info()
 
 if(NOT STATIC_ANALYSIS_ONLY)
 	add_subdirectory(multicore_engine_assets)

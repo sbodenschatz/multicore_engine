@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(multicore_engine_test_assets)
+
 include(SourceGroupGenerator)
 make_src_groups_dirs()
 include(AssetBuildTools)

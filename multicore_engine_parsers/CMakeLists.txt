@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(multicore_engine_parsers LANGUAGES CXX)
+
 file(GLOB_RECURSE PARSERS_SRC "src/*.cpp")
 file(GLOB_RECURSE PARSERS_HEADERS "src/*.hpp")
 add_library(mce_parsers STATIC ${PARSERS_SRC} ${PARSERS_HEADERS})
