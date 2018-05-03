@@ -19,7 +19,12 @@ include(SanitizerInstrumentationOption)
 
 include(MCECompilerSettings)
 
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../vkglformat vkglformat)
+option(MCE_VKGLFORMAT_AS_SUBDIRECTORY "Use vkglformat as an embedded subdirectory (uses find_package otherwise)." ON)
+if(MCE_VKGLFORMAT_AS_SUBDIRECTORY)
+	add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../vkglformat vkglformat)
+else()
+	find_package(vkglformat)
+endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
