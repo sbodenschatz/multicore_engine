@@ -21,6 +21,7 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
 	endif()
 endif()
+set_target_properties(mce_parsers PROPERTIES EXPORT_NAME parsers)
 enable_custom_lto(mce_parsers)
 
 include(ProvideEmbeddedImport)

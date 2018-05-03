@@ -20,6 +20,7 @@ target_link_libraries(mce_base
 		Boost::thread
 		Boost::filesystem
 	)
+set_target_properties(mce_base PROPERTIES EXPORT_NAME base)
 enable_custom_lto(mce_base)
 
 install(

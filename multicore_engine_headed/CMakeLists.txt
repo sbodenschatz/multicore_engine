@@ -17,6 +17,7 @@ target_link_libraries(mce_headed
 		TBB::tbb
 		Boost::asio
 	)
+set_target_properties(mce_headed PROPERTIES EXPORT_NAME headed)
 enable_custom_lto(mce_headed)
 
 install(

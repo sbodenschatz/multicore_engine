@@ -16,6 +16,7 @@ target_link_libraries(mce_renderer
 		gli
 		vkglformat::vkglformat
 	)
+set_target_properties(mce_renderer PROPERTIES EXPORT_NAME renderer)
 enable_custom_lto(mce_renderer)
 
 install(

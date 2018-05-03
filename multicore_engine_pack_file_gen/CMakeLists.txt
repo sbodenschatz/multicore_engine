@@ -9,6 +9,7 @@ target_link_libraries(mce_pack_file_gen
 		mce_base
 		Boost::program_options
 	)
+set_target_properties(mce_pack_file_gen PROPERTIES EXPORT_NAME pack_file_gen)
 enable_custom_lto(mce_pack_file_gen)
 
 install(

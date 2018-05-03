@@ -9,6 +9,7 @@ target_link_libraries(mce_model_converter
 		mce_base
 		Boost::program_options
 	)
+set_target_properties(mce_model_converter PROPERTIES EXPORT_NAME model_converter)
 enable_custom_lto(mce_model_converter)
 
 install(

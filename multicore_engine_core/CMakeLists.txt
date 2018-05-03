@@ -19,6 +19,7 @@ target_link_libraries(mce_core
 		Boost::asio
 		Threads::Threads
 	)
+set_target_properties(mce_core PROPERTIES EXPORT_NAME core)
 enable_custom_lto(mce_core)
 
 install(

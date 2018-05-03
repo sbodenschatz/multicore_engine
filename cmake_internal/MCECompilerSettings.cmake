@@ -24,6 +24,7 @@ target_link_libraries(mce_compiler_settings INTERFACE
 		$<$<CXX_COMPILER_ID:Clang>: -stdlib=libc++>
 		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>: atomic>
 	)
+set_target_properties(mce_compiler_settings PROPERTIES EXPORT_NAME compiler_settings)
 
 install(TARGETS mce_compiler_settings 
 		EXPORT mce-dev

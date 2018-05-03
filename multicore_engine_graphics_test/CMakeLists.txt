@@ -13,6 +13,7 @@ target_link_libraries(mce_graphics_test
 		mce_renderer
 		Boost::program_options
 	)
+set_target_properties(mce_graphics_test PROPERTIES EXPORT_NAME graphics_test)
 enable_custom_lto(mce_graphics_test)
 if(NOT STATIC_ANALYSIS_ONLY)
 	add_dependencies(mce_graphics_test mce_test_assets_packs)
