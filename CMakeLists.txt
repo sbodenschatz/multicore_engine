@@ -12,13 +12,12 @@ project (multicore_engine
 		LANGUAGES CXX C
 	)
 
+include(IntegrateBuildScripts)
+make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format create_license_pack_linux.sh create_license_pack_windows.bat)
+
 enable_testing()
 
 include(BuildConfig)
-include(IntegrateBuildScripts)
-
-make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format create_license_pack_linux.sh create_license_pack_windows.bat)
-
 
 add_subdirectory(multicore_engine_parsers)
 add_subdirectory(multicore_engine_base)
