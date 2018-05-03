@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_tests/src/entity/entity_component_test.cpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #include <gtest.hpp>
@@ -144,7 +144,7 @@ public:
 
 class test_b_quat_component : public component {
 private:
-	glm::quat orientation_;
+	glm::quat orientation_{1.0f, 0.0f, 0.0f, 0.0f};
 
 public:
 	test_b_quat_component(entity& owner, const component_configuration& configuration) noexcept
@@ -166,9 +166,9 @@ public:
 class test_b_float_component : public component {
 private:
 	float scalar_ = 0.0f;
-	glm::vec2 vec2_;
-	glm::vec3 vec3_;
-	glm::vec4 vec4_;
+	glm::vec2 vec2_{0.0f};
+	glm::vec3 vec3_{0.0f};
+	glm::vec4 vec4_{0.0f};
 
 public:
 	test_b_float_component(entity& owner, const component_configuration& configuration) noexcept
@@ -217,9 +217,9 @@ public:
 class test_b_int_component : public component {
 private:
 	int scalar_ = 0;
-	glm::ivec2 vec2_;
-	glm::ivec3 vec3_;
-	glm::ivec4 vec4_;
+	glm::ivec2 vec2_{0};
+	glm::ivec3 vec3_{0};
+	glm::ivec4 vec4_{0};
 
 public:
 	test_b_int_component(entity& owner, const component_configuration& configuration) noexcept

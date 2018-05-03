@@ -1,13 +1,26 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_base/src/model/dump_model.cpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #include <cstring>
-#include <glm/gtx/string_cast.hpp>
 #include <mce/model/dump_model.hpp>
 #include <mce/model/model_format.hpp>
+
+// Workaround for compile error in glm/gtx/dual_quaternion.hpp:
+// TODO Real fix if upstream doesn't fix it
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/type_precision.hpp>
+#ifdef GLM_FORCE_CTOR_INIT
+#define GLM_FORCE_CTOR_INIT_ORIG
+#endif
+#undef GLM_FORCE_CTOR_INIT
+#include <glm/gtx/string_cast.hpp>
+#ifdef GLM_FORCE_CTOR_INIT_ORIG
+#define GLM_FORCE_CTOR_INIT
+#endif
 
 namespace mce {
 namespace model {

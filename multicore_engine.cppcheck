@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="1">
+    <platform>Unspecified</platform>
+    <analyze-all-vs-configs>true</analyze-all-vs-configs>
     <includedir>
         <dir name="multicore_engine_base/include/"/>
         <dir name="multicore_engine_core/include/"/>
+        <dir name="multicore_engine_headed/include/"/>
+        <dir name="multicore_engine_renderer/include/"/>
     </includedir>
+    <defines>
+        <define name="-U_MSC_VER -UMULTICORE_ENGINE_WINDOWS -UGLM_DEPTH_CLIP_SPACE -UDEBUG -UMemoryBarrier"/>
+    </defines>
 </project>

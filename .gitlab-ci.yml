@@ -41,15 +41,15 @@ stages:
     - cd build
     - cmake -U*_INCLUDE -U*_LIBS -ULIBS_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DSANITIZER_INSTRUMENTATION=${BUILD_SANITIZE} ..
     - cmake --build . -- -j ${BUILD_CONCURRENCY}
-    - export LD_LIBRARY_PATH=/usr/local/lib/${BUILD_COMPILER_NAME}-${BUILD_TYPE,,}/
+    - export ASAN_SYMBOLIZER_PATH=$(find / -name llvm-symbolizer)
     - ctest --output-on-failure
     - cd ..
     - cmake -E make_directory ${BUILD_COMPILER_NAME}
-    - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a ${BUILD_COMPILER_NAME}/libmce_parsers.a
-    - cmake -E copy build/multicore_engine_base/libmce_base.a ${BUILD_COMPILER_NAME}/libmce_base.a
-    - cmake -E copy build/multicore_engine_core/libmce_core.a ${BUILD_COMPILER_NAME}/libmce_core.a
-    - cmake -E copy build/multicore_engine_headed/libmce_headed.a ${BUILD_COMPILER_NAME}/libmce_headed.a
-    - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a ${BUILD_COMPILER_NAME}/libmce_renderer.a
+    - cmake -E copy build/multicore_engine_parsers/libmce_parsers${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_parsers${BUILD_POSTFIX}.a
+    - cmake -E copy build/multicore_engine_base/libmce_base${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_base${BUILD_POSTFIX}.a
+    - cmake -E copy build/multicore_engine_core/libmce_core${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_core${BUILD_POSTFIX}.a
+    - cmake -E copy build/multicore_engine_headed/libmce_headed${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_headed${BUILD_POSTFIX}.a
+    - cmake -E copy build/multicore_engine_renderer/libmce_renderer${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_renderer${BUILD_POSTFIX}.a
     - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test ${BUILD_COMPILER_NAME}/graphics_test
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
     - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
@@ -69,11 +69,11 @@ stages:
     - ctest --output-on-failure
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
-    - cmake -E copy build/multicore_engine_parsers/libmce_parsers.a %BUILD_COMPILER_NAME%/libmce_parsers.a
-    - cmake -E copy build/multicore_engine_base/libmce_base.a %BUILD_COMPILER_NAME%/libmce_base.a
-    - cmake -E copy build/multicore_engine_core/libmce_core.a %BUILD_COMPILER_NAME%/libmce_core.a
-    - cmake -E copy build/multicore_engine_headed/libmce_headed.a %BUILD_COMPILER_NAME%/libmce_headed.a
-    - cmake -E copy build/multicore_engine_renderer/libmce_renderer.a %BUILD_COMPILER_NAME%/libmce_renderer.a
+    - cmake -E copy build/multicore_engine_parsers/libmce_parsers%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_parsers%BUILD_POSTFIX%.a
+    - cmake -E copy build/multicore_engine_base/libmce_base%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_base%BUILD_POSTFIX%.a
+    - cmake -E copy build/multicore_engine_core/libmce_core%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_core%BUILD_POSTFIX%.a
+    - cmake -E copy build/multicore_engine_headed/libmce_headed%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_headed%BUILD_POSTFIX%.a
+    - cmake -E copy build/multicore_engine_renderer/libmce_renderer%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_renderer%BUILD_POSTFIX%.a
     - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
@@ -94,11 +94,11 @@ stages:
     - cd ..
     - cmake -E make_directory %BUILD_COMPILER_NAME%
     # These libraries are huge on release build due to LTCG and are therefore only included for tagged builds.
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/mce_parsers.lib %BUILD_COMPILER_NAME%/mce_parsers.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/mce_base.lib %BUILD_COMPILER_NAME%/mce_base.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core.lib %BUILD_COMPILER_NAME%/mce_core.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_headed/%BUILD_TYPE%/mce_headed.lib %BUILD_COMPILER_NAME%/mce_headed.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_renderer/%BUILD_TYPE%/mce_renderer.lib %BUILD_COMPILER_NAME%/mce_renderer.lib) ELSE (echo Skipping LTCG Lib)
+    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/mce_parsers%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_parsers%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
+    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/mce_base%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_base%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
+    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_core%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
+    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_headed/%BUILD_TYPE%/mce_headed%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_headed%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
+    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_renderer/%BUILD_TYPE%/mce_renderer%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_renderer%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
     - cmake -E copy build/multicore_engine_graphics_test/%BUILD_TYPE%/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
     - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
     - cmake -E copy build/multicore_engine_pack_file_gen/%BUILD_TYPE%/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
@@ -139,6 +139,7 @@ gcc-debug-build:
         BUILD_TYPE: "Debug"
         BUILD_COMPILER_NAME: "gcc"
         BUILD_SANITIZE: "YES"
+        BUILD_POSTFIX: "d"
     tags:
     - cpp
     <<: *linux-build-task
@@ -150,6 +151,7 @@ gcc-release-build:
         BUILD_TYPE: "Release"
         BUILD_COMPILER_NAME: "gcc"
         BUILD_SANITIZE: "NO"
+        BUILD_POSTFIX: ""
     tags:
     - cpp
     <<: *linux-build-task
@@ -163,6 +165,7 @@ clang-debug-build:
         BUILD_COMPILER_NAME: "clang"
         BUILD_SANITIZE: "YES"
         ASAN_OPTIONS: "detect_leaks=0"
+        BUILD_POSTFIX: "d"
     tags:
     - cpp
     <<: *linux-build-task
@@ -174,6 +177,7 @@ clang-release-build:
         BUILD_TYPE: "Release"
         BUILD_COMPILER_NAME: "clang"
         BUILD_SANITIZE: "NO"
+        BUILD_POSTFIX: ""
     tags:
     - cpp
     <<: *linux-build-task
@@ -183,6 +187,7 @@ msvc-debug-build:
     variables:
         BUILD_COMPILER_NAME: "msvc"
         BUILD_TYPE: "Debug"
+        BUILD_POSTFIX: "d"
     tags:
     - win-cpp
     <<: *msbuild-build-task
@@ -191,6 +196,7 @@ msvc-release-build:
     variables:
         BUILD_COMPILER_NAME: "msvc"
         BUILD_TYPE: "Release"
+        BUILD_POSTFIX: ""
     tags:
     - win-cpp
     except:
@@ -203,6 +209,7 @@ msvc-release-build-tags:
         BUILD_COMPILER_NAME: "msvc"
         BUILD_TYPE: "Release"
         INCLUDE_LTCG_LIBS_ARTIFACTS: "1"
+        BUILD_POSTFIX: ""
     tags:
     - win-cpp
     only:
@@ -216,6 +223,7 @@ mingw-debug-build:
         BUILD_C_COMPILER: "gcc"
         BUILD_TYPE: "Debug"
         BUILD_COMPILER_NAME: "mingw"
+        BUILD_POSTFIX: "d"
     tags:
     - win-cpp
     <<: *mingw-build-task
@@ -226,6 +234,7 @@ mingw-release-build:
         BUILD_C_COMPILER: "gcc"
         BUILD_TYPE: "Release"
         BUILD_COMPILER_NAME: "mingw"
+        BUILD_POSTFIX: ""
     tags:
     - win-cpp
     <<: *mingw-build-task

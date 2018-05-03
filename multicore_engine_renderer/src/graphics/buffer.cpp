@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/include/mce/graphics/buffer.cpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #include <mce/graphics/buffer.hpp>
@@ -20,8 +20,8 @@ buffer::buffer(device& dev, device_memory_manager_interface& mem_mgr,
 	vk::BufferCreateInfo ci({}, size, usage, vk::SharingMode::eExclusive);
 	buff_ = decltype(buff_)(dev->createBufferUnique(ci), destruction_manager);
 	memory_handle_ = decltype(memory_handle_)(
-			make_device_memory_handle(
-					mem_mgr, mem_mgr.allocate(dev->getBufferMemoryRequirements(*buff_), required_flags)),
+			make_device_memory_handle(mem_mgr, mem_mgr.allocate(dev->getBufferMemoryRequirements(*buff_),
+																true, required_flags)),
 			destruction_manager);
 	auto lock = memory_handle_->obtain_lock();
 	dev->bindBufferMemory(buff_.get(), memory_handle_->memory(), memory_handle_->offset());

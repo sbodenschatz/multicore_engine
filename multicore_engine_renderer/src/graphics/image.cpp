@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/include/mce/graphics/image.cpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #include <mce/graphics/image.hpp>
@@ -28,8 +28,9 @@ base_image::base_image(image_dimension img_dim, bool layered, image_aspect_mode 
 			vk::SharingMode::eExclusive, 0, nullptr, layout_);
 	img_ = decltype(img_)(dev->createImageUnique(ci), destruction_manager);
 	mem_handle_ = decltype(mem_handle_)(
-			make_device_memory_handle(
-					mem_mgr, mem_mgr.allocate(dev->getImageMemoryRequirements(*img_), required_flags)),
+			make_device_memory_handle(mem_mgr,
+									  mem_mgr.allocate(dev->getImageMemoryRequirements(*img_),
+													   tiling == vk::ImageTiling::eLinear, required_flags)),
 			destruction_manager);
 	auto lock = mem_handle_->obtain_lock();
 	dev->bindImageMemory(*img_, mem_handle_->memory(), mem_handle_->offset());

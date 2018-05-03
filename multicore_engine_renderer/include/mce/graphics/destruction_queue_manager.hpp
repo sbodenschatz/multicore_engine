@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/include/mce/graphics/destruction_queue_manager.hpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #ifndef MCE_GRAPHICS_DESTRUCTION_QUEUE_MANAGER_HPP_
@@ -240,17 +240,17 @@ public:
 };
 /// \brief RAII wrapper to hold unique ownership of a resource managed by a vk::unique_handle<T> and release
 /// it to an associated destruction_queue_manager when the queued_handle goes out of scope or is reassigned.
-template <typename T, typename D>
+template <typename T>
 // cppcheck-suppress copyCtorAndEqOperator
-class queued_handle<vk::UniqueHandle<T, D>> {
-	vk::UniqueHandle<T, D> handle_;
+class queued_handle<vk::UniqueHandle<T>> {
+	vk::UniqueHandle<T> handle_;
 	destruction_queue_manager* qmgr;
 
 public:
 	/// Creates an empty queued_handle.
 	queued_handle() noexcept : qmgr{nullptr} {}
 	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
-	queued_handle(vk::UniqueHandle<T, D>&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
+	queued_handle(vk::UniqueHandle<T>&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
 			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
 	/// Allows move construction.
 	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
@@ -283,11 +283,83 @@ public:
 		return handle_.operator bool();
 	}
 	/// Allows member access to the held resource.
-	const vk::UniqueHandle<T, D>& operator->() const {
+	const vk::UniqueHandle<T>& operator->() const {
 		return handle_;
 	}
 	/// Allows member access to the held resource.
-	vk::UniqueHandle<T, D>& operator->() {
+	vk::UniqueHandle<T>& operator->() {
+		return handle_;
+	}
+	/// Allows access to the held resource.
+	const T& operator*() const {
+		return *handle_;
+	}
+	/// Allows access to the held resource.
+	T get() const {
+		return handle_.get();
+	}
+	/// \brief Releases the ownership of the held resource and makes the queued_handle empty, the ownership is
+	/// transferred to the returned handle.
+	vk::UniqueHandle<T> release() {
+		qmgr = nullptr;
+		return std::move(handle_);
+	}
+	/// Allows access to the destruction_queue_manager.
+	destruction_queue_manager* destruction_manager() const {
+		return qmgr;
+	}
+};
+
+/// \brief RAII wrapper to hold unique ownership of a resource managed by a vk::unique_handle<T> and release
+/// it to an associated destruction_queue_manager when the queued_handle goes out of scope or is reassigned.
+template <typename T, typename D>
+// cppcheck-suppress copyCtorAndEqOperator
+class queued_handle<unique_handle<T, D>> {
+	unique_handle<T, D> handle_;
+	destruction_queue_manager* qmgr;
+
+public:
+	/// Creates an empty queued_handle.
+	queued_handle() noexcept : qmgr{nullptr} {}
+	/// Created a queued_handle from the given resource handle and destruction_queue_manager.
+	queued_handle(unique_handle<T, D>&& handle, destruction_queue_manager* destruction_queue_mgr) noexcept
+			: handle_{std::move(handle)}, qmgr{destruction_queue_mgr} {}
+	/// Allows move construction.
+	queued_handle(queued_handle&& other) noexcept : handle_{std::move(other.handle_)}, qmgr{other.qmgr} {
+		other.qmgr = nullptr;
+	}
+	/// Allows move assignment.
+	queued_handle& operator=(queued_handle&& other) noexcept {
+		if(qmgr) {
+			qmgr->enqueue(std::move(handle_));
+		}
+		handle_ = std::move(other.handle_);
+		qmgr = other.qmgr;
+		other.qmgr = nullptr;
+		return *this;
+	}
+
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle(const queued_handle&) = delete;
+	/// Explicitly forbids copying as queued_handle is a move-only type for unique ownership.
+	queued_handle& operator=(const queued_handle&) = delete;
+
+	/// Releases the held resource to the destruction_queue_manager.
+	~queued_handle() noexcept {
+		if(qmgr) {
+			qmgr->enqueue(std::move(handle_));
+		}
+	}
+	/// Checks if the queued_handle is non-empty.
+	explicit operator bool() const {
+		return handle_.operator bool();
+	}
+	/// Allows member access to the held resource.
+	const unique_handle<T, D>& operator->() const {
+		return handle_;
+	}
+	/// Allows member access to the held resource.
+	unique_handle<T, D>& operator->() {
 		return handle_;
 	}
 	/// Allows access to the held resource.
@@ -299,12 +371,12 @@ public:
 		return handle_.get();
 	}
 	/// Allows access to the deleter for the held resource.
-	const D& get_deleter() const {
-		return handle_.getDeleter();
+	const D& deleter() const {
+		return handle_.deleter();
 	}
 	/// \brief Releases the ownership of the held resource and makes the queued_handle empty, the ownership is
 	/// transferred to the returned handle.
-	vk::UniqueHandle<T, D> release() {
+	unique_handle<T, D> release() {
 		qmgr = nullptr;
 		return std::move(handle_);
 	}

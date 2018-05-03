@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_tests/src/graphics/destruction_queue_manager_test.cpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #include <algorithm>
@@ -21,13 +21,14 @@ class test_memory_manager : public device_memory_manager_interface {
 	mutable std::mutex mutex;
 
 public:
-	void free(const device_memory_allocation& allocation) {
+	void free(const device_memory_allocation& allocation) override {
 		std::lock_guard<std::mutex> lock(mutex);
 		EXPECT_GT(destroyed_map.size(), allocation.block_id);
 		destroyed_map[allocation.block_id] = deletion_index++;
 	}
-	device_memory_allocation allocate(const vk::MemoryRequirements&,
-									  vk::MemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal) {
+	device_memory_allocation
+	allocate(const vk::MemoryRequirements&, bool,
+			 vk::MemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal) override {
 		device_memory_allocation a;
 		std::lock_guard<std::mutex> lock(mutex);
 		a.block_id = int32_t(destroyed_map.size());
@@ -38,21 +39,21 @@ public:
 		std::lock_guard<std::mutex> lock(mutex);
 		return destroyed_map;
 	}
-	virtual device* associated_device() const {
+	virtual device* associated_device() const override {
 		std::lock_guard<std::mutex> lock(mutex);
 		return nullptr;
 	}
-	virtual std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation&) const {
+	virtual std::unique_lock<std::mutex> obtain_lock(const device_memory_allocation&) const override {
 		return std::unique_lock<std::mutex>(mutex);
 	}
 };
 
 std::pair<int32_t, int32_t> alloc_frame_data_handle(test_memory_manager& mm, destruction_queue_manager& dqm) {
 	std::pair<int32_t, int32_t> range;
-	auto h1 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-	auto h2 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-	auto h3 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-	auto h4 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+	auto h1 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+	auto h2 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+	auto h3 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+	auto h4 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
 	range.first = h1.allocation().block_id;
 	range.second = h4.allocation().block_id;
 	dqm.enqueue(std::move(h1));
@@ -155,23 +156,23 @@ TEST(graphics_destruction_queue_manager_test, destruction_order_handle) {
 	destruction_queue_manager_test::test_memory_manager mm;
 	{
 		destruction_queue_manager dqm(nullptr, 3);
-		auto h0 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h1 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h2 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h3 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h4 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h0 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h1 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h2 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h3 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h4 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
 		dqm.enqueue(std::move(h4));
 		dqm.enqueue(std::move(h3));
 		dqm.enqueue(std::move(h2));
 		dqm.enqueue(std::move(h1));
 		dqm.enqueue(std::move(h0));
 		dqm.cleanup_and_set_current(1);
-		auto h5 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h6 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h7 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h8 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h9 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h10 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h5 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h6 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h7 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h8 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h9 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h10 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
 		dqm.enqueue(std::move(h5));
 		dqm.enqueue(std::move(h6));
 		dqm.enqueue(std::move(h7));
@@ -198,23 +199,23 @@ TEST(graphics_destruction_queue_manager_test, destruction_order_handle_advance) 
 	destruction_queue_manager_test::test_memory_manager mm;
 	{
 		destruction_queue_manager dqm(nullptr, 3);
-		auto h0 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h1 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h2 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h3 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h4 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h0 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h1 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h2 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h3 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h4 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
 		dqm.enqueue(std::move(h4));
 		dqm.enqueue(std::move(h3));
 		dqm.enqueue(std::move(h2));
 		dqm.enqueue(std::move(h1));
 		dqm.enqueue(std::move(h0));
 		dqm.advance();
-		auto h5 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h6 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h7 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h8 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h9 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
-		auto h10 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements()));
+		auto h5 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h6 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h7 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h8 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h9 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
+		auto h10 = make_device_memory_handle(mm, mm.allocate(vk::MemoryRequirements(), true));
 		dqm.enqueue(std::move(h5));
 		dqm.enqueue(std::move(h6));
 		dqm.enqueue(std::move(h7));

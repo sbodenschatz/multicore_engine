@@ -1,32 +1,23 @@
-cmake_minimum_required (VERSION 3.7)
-project (multicore_engine)
+cmake_minimum_required (VERSION 3.10)
 
-include(CMakeUtils.txt)
+include("${CMAKE_CURRENT_LIST_DIR}/UseModules.cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_internal")
+
+include(RepositoryVersionDetector)
+get_version_info()
+
+project (multicore_engine
+		VERSION ${BUILD_VERSION_MAJOR}.${BUILD_VERSION_MINOR}.${BUILD_VERSION_PATCH}.${BUILD_VERSION_TWEAK} 
+		# Language C is needed for pthreads detection to work correctly
+		LANGUAGES CXX C
+	)
+
+include(IntegrateBuildScripts)
+make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format create_license_pack_linux.sh create_license_pack_windows.bat)
 
 enable_testing()
 
-if(NOT MSVC)
-	set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
-endif()
-
-include(CMakeConfig.txt)
-
-make_build_scripts_project(.gitlab-ci.yml Doxyfile .clang-format)
-get_version_info()
-
-if(NOT STATIC_ANALYSIS_ONLY)
-	bootstrap_tools()
-	get_directory_property(HAS_PARENT PARENT_DIRECTORY)
-	if(HAS_PARENT)
-		message(STATUS "Providing BOOTSTRAP_LOAD_UNIT_GEN and BOOTSTRAP_PACK_FILE_GEN to parent directory.")
-		set(BOOTSTRAP_LOAD_UNIT_GEN ${BOOTSTRAP_LOAD_UNIT_GEN} PARENT_SCOPE)
-		set(BOOTSTRAP_PACK_FILE_GEN ${BOOTSTRAP_PACK_FILE_GEN} PARENT_SCOPE)
-	else()
-		message(STATUS "Using bootstrap tools only internally because there is no parent directory.")
-	endif()
-	add_subdirectory(multicore_engine_assets)
-	add_subdirectory(multicore_engine_test_assets)
-endif()
+include(BuildConfig)
 
 add_subdirectory(multicore_engine_parsers)
 add_subdirectory(multicore_engine_base)
@@ -38,3 +29,48 @@ add_subdirectory(multicore_engine_graphics_test)
 add_subdirectory(multicore_engine_load_unit_gen)
 add_subdirectory(multicore_engine_pack_file_gen)
 add_subdirectory(multicore_engine_model_converter)
+
+if(NOT STATIC_ANALYSIS_ONLY)
+	add_subdirectory(multicore_engine_assets)
+	add_subdirectory(multicore_engine_test_assets)
+endif()
+
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT mce_graphics_test)
+
+install(
+		EXPORT mce-dev 
+		DESTINATION cmake/mce
+		NAMESPACE mce::
+		COMPONENT mce-dev
+		FILE mceConfig.cmake
+	)
+
+install(
+		DIRECTORY
+			${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules
+			${CMAKE_CURRENT_SOURCE_DIR}/cmake_helpers
+			${CMAKE_CURRENT_SOURCE_DIR}/cmake_internal
+		DESTINATION cmake/mce
+		COMPONENT mce-dev
+	)
+
+install(
+		FILES ${CMAKE_CURRENT_SOURCE_DIR}/UseModules.cmake
+		DESTINATION cmake/mce
+		COMPONENT mce-dev
+	)
+
+install(
+		FILES ${CMAKE_CURRENT_SOURCE_DIR}/default.cfg
+		DESTINATION .
+		COMPONENT mce
+	)
+
+export(
+		EXPORT mce-dev 
+		NAMESPACE mce::
+		FILE mceConfig.cmake
+	)
+
+include(ComponentInstallTargets)
+define_component_install_targets(mce mce-dev mce-test)

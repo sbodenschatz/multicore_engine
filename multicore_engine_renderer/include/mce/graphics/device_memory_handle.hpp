@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/graphics/device_memory_handle.hpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #ifndef GRAPHICS_MM_DEVICE_MEMORY_HANDLE_HPP_
@@ -74,7 +74,7 @@ public:
 	virtual void free(const device_memory_allocation& allocation) = 0;
 	/// Interface function to request memory satisfying the given requirements from the manager.
 	virtual device_memory_allocation
-	allocate(const vk::MemoryRequirements& memory_requirements,
+	allocate(const vk::MemoryRequirements& memory_requirements, bool linear,
 			 vk::MemoryPropertyFlags required_flags = vk::MemoryPropertyFlagBits::eDeviceLocal) = 0;
 	/// Interface function to allow access to the device associated with the device memory manager.
 	virtual device* associated_device() const = 0;

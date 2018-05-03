@@ -1,10 +1,11 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_tests/src/vk_mock_interface.cpp
- * Copyright 2016 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/unique_handle.hpp>
 #include <mce/graphics/vk_mock_interface.hpp>
 #include <mce/graphics/window.hpp>
 #include <mutex>
@@ -25,7 +26,8 @@ device_memory_wrapper allocate_memory(mce::graphics::device*, vk::MemoryAllocate
 	std::lock_guard<std::mutex> lock(mock_alloc_id_mutex);
 	return fake_unique_device_memory(
 			vk::DeviceMemory(VkDeviceMemory((1ull << 63) | (uint64_t(ai.memoryTypeIndex) << 30) |
-											uint64_t(mock_alloc_ids[ai.memoryTypeIndex]++))));
+											uint64_t(mock_alloc_ids[ai.memoryTypeIndex]++))),
+			fake_device_memory_deleter());
 }
 
 uint32_t get_memory_type_index(const vk::DeviceMemory& mem) {

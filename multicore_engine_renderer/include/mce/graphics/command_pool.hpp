@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/graphics/command_pool.hpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #ifndef GRAPHICS_COMMAND_POOL_HPP_
@@ -61,7 +61,8 @@ public:
 										 buffer_count);
 		std::array<vk::CommandBuffer, buffer_count> buf;
 		vk::Result res = owner_device_->allocateCommandBuffers(&ai, buf.data());
-		vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
+		vk::PoolFree<vk::Device, vk::CommandPool> del(owner_device_.native_device(),
+													  native_command_pool_.get());
 		if(res != vk::Result::eSuccess) {
 			throw std::system_error(res, "vk::Device::allocateCommandBuffers");
 		}
@@ -79,7 +80,8 @@ public:
 										 buffer_count);
 		std::array<vk::CommandBuffer, buffer_count> buf;
 		vk::Result res = owner_device_->allocateCommandBuffers(&ai, buf.data());
-		vk::CommandBufferDeleter del(owner_device_.native_device(), native_command_pool_.get());
+		vk::PoolFree<vk::Device, vk::CommandPool> del(owner_device_.native_device(),
+													  native_command_pool_.get());
 		if(res != vk::Result::eSuccess) {
 			throw std::system_error(res, "vk::Device::allocateCommandBuffers");
 		}

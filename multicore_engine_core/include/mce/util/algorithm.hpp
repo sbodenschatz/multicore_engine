@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/util/algorithm.hpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #ifndef UTIL_ALGORITHM_HPP_
@@ -112,9 +112,7 @@ template <typename ItVal, typename ItPref, typename KeyFunc>
 ItVal preference_sort(ItVal val_begin, ItVal val_end, ItPref pref_begin, ItPref pref_end, KeyFunc key) {
 	auto pref = [&pref_begin, &pref_end](const auto& x) { return std::find(pref_begin, pref_end, x); };
 	std::stable_sort(val_begin, val_end,
-					 [&pref_begin, &pref_end, &key, &pref](const auto& v0, const auto& v1) {
-						 return pref(key(v0)) < pref(key(v1));
-					 });
+					 [&key, &pref](const auto& v0, const auto& v1) { return pref(key(v0)) < pref(key(v1)); });
 	return std::find_if(val_begin, val_end,
 						[&key, &pref, &pref_end](const auto& v) { return pref(key(v)) == pref_end; });
 }

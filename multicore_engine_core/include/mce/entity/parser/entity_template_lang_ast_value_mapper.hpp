@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/entity/parser/entity_template_lang_ast_value_map.hpp
- * Copyright 2015-2017 by Stefan Bodenschatz
+ * Copyright 2015-2018 by Stefan Bodenschatz
  */
 
 #ifndef ENTITY_PARSER_ENTITY_TEMPLATE_LANG_AST_VALUE_MAPPER_HPP_
@@ -110,7 +110,7 @@ template <>
 struct ast_value_mapper<float_list, glm::vec2> {
 	/// Converts ast_val to vec2 and stores it in val.
 	static void convert(const float_list& ast_val, glm::vec2& val, entity_manager&) {
-		val = glm::vec2();
+		val = glm::vec2(0.0f);
 		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) {
 			val[i] = ast_val[i];
 		}
@@ -122,7 +122,7 @@ template <>
 struct ast_value_mapper<float_list, glm::vec3> {
 	/// Converts ast_val to vec3 and stores it in val.
 	static void convert(const float_list& ast_val, glm::vec3& val, entity_manager&) {
-		val = glm::vec3();
+		val = glm::vec3(0.0f);
 		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) {
 			val[i] = ast_val[i];
 		}
@@ -134,7 +134,7 @@ template <>
 struct ast_value_mapper<float_list, glm::vec4> {
 	/// Converts ast_val to vec4 and stores it in val.
 	static void convert(const float_list& ast_val, glm::vec4& val, entity_manager&) {
-		val = glm::vec4();
+		val = glm::vec4(0.0f);
 		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) {
 			val[i] = ast_val[i];
 		}
@@ -146,7 +146,7 @@ template <typename T>
 struct ast_value_mapper<int_list, T, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to int and stores it in val.
 	static void convert(const int_list& ast_val, T& val, entity_manager&) {
-		val = 0;
+		val = T();
 		if(ast_val.size()) {
 			val = checked_numeric_conversion<T>(ast_val[0]);
 		}
@@ -158,7 +158,7 @@ template <>
 struct ast_value_mapper<int_list, bool> {
 	/// Converts ast_val to int and stores it in val.
 	static void convert(const int_list& ast_val, bool& val, entity_manager&) {
-		val = 0;
+		val = false;
 		if(ast_val.size()) {
 			val = bool(ast_val[0]);
 		}
@@ -166,11 +166,11 @@ struct ast_value_mapper<int_list, bool> {
 };
 
 /// Maps integer lists from the AST to tvec2.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<int_list, glm::tvec2<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to tvec2<T,p> and stores it in val.
 	static void convert(const int_list& ast_val, glm::tvec2<T, p>& val, entity_manager&) {
-		val = glm::tvec2<T, p>();
+		val = glm::tvec2<T, p>(T());
 		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) {
 			val[i] = checked_numeric_conversion<T>(ast_val[i]);
 		}
@@ -178,11 +178,11 @@ struct ast_value_mapper<int_list, glm::tvec2<T, p>, std::enable_if_t<std::is_ari
 };
 
 /// Maps integer lists from the AST to tvec3.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<int_list, glm::tvec3<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to tvec3<T,p> and stores it in val.
 	static void convert(const int_list& ast_val, glm::tvec3<T, p>& val, entity_manager&) {
-		val = glm::tvec3<T, p>();
+		val = glm::tvec3<T, p>(T());
 		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) {
 			val[i] = checked_numeric_conversion<T>(ast_val[i]);
 		}
@@ -190,11 +190,11 @@ struct ast_value_mapper<int_list, glm::tvec3<T, p>, std::enable_if_t<std::is_ari
 };
 
 /// Maps integer lists from the AST to tvec4.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<int_list, glm::tvec4<T, p>, std::enable_if_t<std::is_arithmetic<T>::value>> {
 	/// Converts ast_val to tvec4<T,p> and stores it in val.
 	static void convert(const int_list& ast_val, glm::tvec4<T, p>& val, entity_manager&) {
-		val = glm::tvec4<T, p>();
+		val = glm::tvec4<T, p>(T());
 		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) {
 			val[i] = checked_numeric_conversion<T>(ast_val[i]);
 		}
@@ -212,11 +212,11 @@ struct ast_value_mapper<ast::entity_reference, mce::entity::entity_reference> {
 };
 
 /// Maps float lists from the AST to tquat.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<ast::float_list, glm::tquat<T, p>> {
 	/// Converts ast_val to tquat<T,p> and stores it in val.
 	static void convert(const ast::float_list& ast_val, glm::tquat<T, p>& val, entity_manager&) {
-		if(ast_val.empty()) val = glm::tquat<T, p>();
+		if(ast_val.empty()) val = glm::tquat<T, p>(1.0f, 0.0f, 0.0f, 0.0f);
 		if(ast_val.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
 		val = glm::angleAxis(glm::radians(T(ast_val[0])),
 							 glm::tvec3<T, p>(ast_val[1], ast_val[2], ast_val[3]));
@@ -224,11 +224,11 @@ struct ast_value_mapper<ast::float_list, glm::tquat<T, p>> {
 };
 
 /// Maps int lists from the AST to tquat.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<ast::int_list, glm::tquat<T, p>> {
 	/// Converts ast_val to tquat<T,p> and stores it in val.
 	static void convert(const ast::int_list& ast_val, glm::tquat<T, p>& val, entity_manager&) {
-		if(ast_val.empty()) val = glm::tquat<T, p>();
+		if(ast_val.empty()) val = glm::tquat<T, p>(1.0f, 0.0f, 0.0f, 0.0f);
 		if(ast_val.size() < 4) throw value_type_exception("Invalid angle-axis quaternion literal.");
 		val = glm::angleAxis(glm::radians(checked_numeric_conversion<T>(ast_val[0])),
 							 glm::tvec3<T, p>(checked_numeric_conversion<T>(ast_val[1]),
@@ -238,13 +238,13 @@ struct ast_value_mapper<ast::int_list, glm::tquat<T, p>> {
 };
 
 /// Maps rotation lists from the AST to tquat.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct ast_value_mapper<ast::rotation_list, glm::tquat<T, p>> {
 	/// Converts ast_val to tquat<T,p> and stores it in val.
 	static void convert(const ast::rotation_list& ast_val, glm::tquat<T, p>& val, entity_manager&) {
-		glm::tquat<T, p> orientation;
+		glm::tquat<T, p> orientation{1.0f, 0.0f, 0.0f, 0.0f};
 		for(auto&& entry : ast_val) {
-			glm::tvec3<T, p> axis;
+			glm::tvec3<T, p> axis{0.0f};
 			switch(entry.axis) {
 			case ast::rotation_axis::x: axis.x = T(1); break;
 			case ast::rotation_axis::y: axis.y = T(1); break;

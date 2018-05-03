@@ -1,10 +1,11 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/graphics/vk_mock_interface.cpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #include <mce/graphics/device.hpp>
+#include <mce/graphics/unique_handle.hpp>
 #include <mce/graphics/vk_mock_interface.hpp>
 #include <mce/graphics/window.hpp>
 
@@ -21,9 +22,9 @@ device_memory_wrapper allocate_memory(mce::graphics::device* dev, vk::MemoryAllo
 	vk::DeviceMemory dev_mem;
 	vk::Result res = dev->native_device().allocateMemory(&ai, nullptr, &dev_mem);
 	if(res != vk::Result::eSuccess)
-		return vk::UniqueDeviceMemory(vk::DeviceMemory(), vk::DeviceMemoryDeleter(dev->native_device()));
+		return vk::UniqueDeviceMemory(vk::DeviceMemory(), vk::ObjectFree<vk::Device>(dev->native_device()));
 	else
-		return vk::UniqueDeviceMemory(dev_mem, vk::DeviceMemoryDeleter(dev->native_device()));
+		return vk::UniqueDeviceMemory(dev_mem, vk::ObjectFree<vk::Device>(dev->native_device()));
 }
 
 vk::PhysicalDeviceMemoryProperties get_physical_dev_mem_properties(mce::graphics::device* dev) {

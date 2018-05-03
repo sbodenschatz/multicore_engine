@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/src/graphics/pipeline.cpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #include <algorithm>
@@ -29,13 +29,13 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_
 	std::vector<vk::GraphicsPipelineCreateInfo> pipelines_ci;
 	pipelines_ci.reserve(pipeline_configs.size());
 	std::transform(pipeline_configs.begin(), pipeline_configs.end(), std::back_inserter(pipelines_ci),
-				   [&, owner_dev](pipeline_config& pcfg) { return pcfg.generate_create_info_structure(); });
+				   [&](pipeline_config& pcfg) { return pcfg.generate_create_info_structure(); });
 	auto native_pipelines =
 			owner_dev.createGraphicsPipelinesUnique(pipeline_cache.native_pipeline_cache(), pipelines_ci);
 	pipelines.reserve(native_pipelines.size());
 	std::transform(pipeline_configs.begin(), pipeline_configs.end(), native_pipelines.begin(),
 				   std::back_inserter(pipelines),
-				   [owner_dev, dqm](const pipeline_config& config, vk::UniquePipeline& native_pipeline) {
+				   [dqm](const pipeline_config& config, vk::UniquePipeline& native_pipeline) {
 					   return pipeline(dqm, std::move(native_pipeline), config.layout());
 				   });
 	return pipelines;

@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/graphics/device_memory_manager.cpp
- * Copyright 2016-2017 by Stefan Bodenschatz
+ * Copyright 2016-2018 by Stefan Bodenschatz
  */
 
 #include <cassert>
@@ -20,9 +20,9 @@ namespace graphics {
 
 device_memory_manager::device_memory_block::device_memory_block(
 		int32_t id, vk_mock_interface::device_memory_wrapper&& memory_object, vk::DeviceSize size,
-		vk::MemoryPropertyFlags flags, uint32_t memory_type)
+		vk::MemoryPropertyFlags flags, uint32_t memory_type, bool linear)
 		: id(id), memory_object(std::move(memory_object)), size(size), flags(flags), memory_type(memory_type),
-		  freelist({{0, size}}) {}
+		  linear_ressources(linear), freelist({{0, size}}) {}
 
 device_memory_allocation
 device_memory_manager::freelist_entry::try_allocate(const vk::MemoryRequirements& memory_requirements,
@@ -53,7 +53,9 @@ void device_memory_manager::freelist_entry::merge(freelist_entry& successor) {
 
 device_memory_allocation
 device_memory_manager::device_memory_block::try_allocate(const vk::MemoryRequirements& memory_requirements,
-														 vk::MemoryPropertyFlags required_flags) {
+														 vk::MemoryPropertyFlags required_flags,
+														 bool linear) {
+	if(linear_ressources != linear) return device_memory_allocation();
 	if((flags & required_flags) != required_flags) return device_memory_allocation();
 	if(!(memory_requirements.memoryTypeBits & (1 << memory_type))) return device_memory_allocation();
 	for(auto it = freelist.begin(); it != freelist.end(); ++it) {
@@ -119,11 +121,12 @@ void device_memory_manager::cleanup(unsigned int keep_per_memory_type) {
 }
 
 device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequirements& memory_requirements,
+														 bool linear,
 														 vk::MemoryPropertyFlags required_flags) {
 	std::lock_guard<std::mutex> lock(mutex_);
 	if(memory_requirements.size < block_size_) {
 		for(auto& block : blocks_) {
-			auto alloc = block.try_allocate(memory_requirements, required_flags);
+			auto alloc = block.try_allocate(memory_requirements, required_flags, linear);
 			if(alloc.valid()) return alloc;
 		}
 		// No existing block can provide memory with the requested properties, allocate a new one:
@@ -143,13 +146,13 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 						blocks_.begin(), blocks_.end(), mem_type,
 						[](const device_memory_block& blk, uint32_t type) { return blk.memory_type < type; });
 				auto block_it = blocks_.emplace(insert_pos, next_block_id++, std::move(mem), block_size_,
-												required_flags, mem_type);
+												required_flags, mem_type, linear);
 				if(dev && (physical_device_properties_.memoryTypes[mem_type].propertyFlags &
 						   vk::MemoryPropertyFlagBits::eHostVisible)) {
 					block_it->mapped_pointer = dev->native_device().mapMemory(block_it->memory_object.get(),
 																			  0, VK_WHOLE_SIZE, {});
 				}
-				auto alloc = block_it->try_allocate(memory_requirements, required_flags);
+				auto alloc = block_it->try_allocate(memory_requirements, required_flags, linear);
 				if(alloc.valid()) return alloc;
 			}
 		}
@@ -162,7 +165,7 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 		}
 	} else {
 		for(auto& block : separate_blocks_) {
-			auto alloc = block.try_allocate(memory_requirements, required_flags);
+			auto alloc = block.try_allocate(memory_requirements, required_flags, linear);
 			if(alloc.valid()) return alloc;
 		}
 		bool type_found = false;
@@ -180,14 +183,15 @@ device_memory_allocation device_memory_manager::allocate(const vk::MemoryRequire
 				auto insert_pos = std::lower_bound(
 						separate_blocks_.begin(), separate_blocks_.end(), mem_type,
 						[](const device_memory_block& blk, uint32_t type) { return blk.memory_type < type; });
-				auto block_it = separate_blocks_.emplace(insert_pos, next_separate_block_id--, std::move(mem),
-														 memory_requirements.size, required_flags, mem_type);
+				auto block_it =
+						separate_blocks_.emplace(insert_pos, next_separate_block_id--, std::move(mem),
+												 memory_requirements.size, required_flags, mem_type, linear);
 				if(dev && (physical_device_properties_.memoryTypes[mem_type].propertyFlags &
 						   vk::MemoryPropertyFlagBits::eHostVisible)) {
 					block_it->mapped_pointer = dev->native_device().mapMemory(block_it->memory_object.get(),
 																			  0, VK_WHOLE_SIZE, {});
 				}
-				auto alloc = block_it->try_allocate(memory_requirements, required_flags);
+				auto alloc = block_it->try_allocate(memory_requirements, required_flags, linear);
 				if(alloc.valid())
 					return alloc;
 				else

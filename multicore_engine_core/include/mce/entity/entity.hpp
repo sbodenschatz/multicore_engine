@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/entity/entity.hpp
- * Copyright 2015-2017 by Stefan Bodenschatz
+ * Copyright 2015-2018 by Stefan Bodenschatz
  */
 
 #ifndef ENTITY_ENTITY_HPP_
@@ -36,8 +36,8 @@ class entity {
 private:
 	mce::entity::entity_manager& entity_manager_;
 	entity_id_t id_;
-	entity_position_t position_;
-	entity_orientation_t orientation_;
+	entity_position_t position_{0.0f};
+	entity_orientation_t orientation_{1.0f, 0.0f, 0.0f, 0.0f};
 	template <typename T>
 	using component_container = boost::container::small_vector<T, 16>;
 	containers::generic_flat_map<component_container, component_type_id_t, component_pool_ptr> components_;

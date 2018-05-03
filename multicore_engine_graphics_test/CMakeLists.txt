@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 3.7)
-project(multicore_engine_graphics_test)
+cmake_minimum_required (VERSION 3.10)
+
 file(GLOB_RECURSE GRAPHICS_TEST_SRC "src/*.cpp")
 file(GLOB_RECURSE GRAPHICS_TEST_HEADERS "include/*.hpp")
 add_executable(mce_graphics_test ${GRAPHICS_TEST_SRC} ${GRAPHICS_TEST_HEADERS})
@@ -11,14 +11,24 @@ target_link_libraries(mce_graphics_test
 		mce_core
 		mce_headed
 		mce_renderer
-		deps.Boost.ProgramOptions
+		Boost::program_options
 	)
-if(MSVC)
-	set_target_properties(mce_graphics_test PROPERTIES LINK_FLAGS_RELEASE "/LTCG")
-	set_target_properties(mce_graphics_test PROPERTIES LINK_FLAGS_MINSIZEREL "/LTCG")
-	set_target_properties(mce_graphics_test PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/LTCG")
-endif()
+set_target_properties(mce_graphics_test PROPERTIES EXPORT_NAME graphics_test)
+enable_custom_lto(mce_graphics_test)
 if(NOT STATIC_ANALYSIS_ONLY)
 	add_dependencies(mce_graphics_test mce_test_assets_packs)
 endif()
-tbb_shared_libs_copy(mce_graphics_test)
+include(SharedLibsCopy)
+shared_libs_copy(mce_graphics_test SHARED_LIBS TBB::tbb TBB::tbbmalloc)
+
+install(
+		TARGETS mce_graphics_test
+		DESTINATION bin
+		COMPONENT mce-test
+	)
+
+install(
+		FILES ${SHARED_LIBS}
+		DESTINATION bin
+		COMPONENT mce-test
+	)

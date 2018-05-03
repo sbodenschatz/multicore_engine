@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/reflection/property.hpp
- * Copyright 2015-2017 by Stefan Bodenschatz
+ * Copyright 2015-2018 by Stefan Bodenschatz
  */
 
 #ifndef REFLECTION_PROPERTY_HPP_
@@ -232,7 +232,8 @@ public:
 	make_assignment(Assignment_Param...) const override;
 	/// Writes the value of the property on the given object to the given binary stream.
 	virtual void from_bstream(Root_Type& object, bstream::ibstream& istr) const override {
-		T val;
+		T val; // TODO: Implement type-specific override for initialization of types with uninitialized
+			   // members (e.g. glm types)
 		istr >> val;
 		set_value(object, val);
 	}

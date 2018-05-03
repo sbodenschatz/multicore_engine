@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_renderer/include/mce/graphics/descriptor_set.hpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #ifndef MCE_GRAPHICS_DESCRIPTOR_SET_HPP_
@@ -152,7 +152,7 @@ public:
 	 * parameter of the allocation member function was false.
 	 */
 	const std::shared_ptr<const descriptor_set_layout>& layout() const {
-		return native_descriptor_set_.get_deleter().layout();
+		return native_descriptor_set_.deleter().layout();
 	}
 
 	/// Allows access to the native vulkan descriptor set handle.

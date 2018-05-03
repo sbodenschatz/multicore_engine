@@ -1,6 +1,8 @@
-cmake_minimum_required (VERSION 3.7)
-project(multicore_engine_assets)
-make_src_grp_dir()
+cmake_minimum_required (VERSION 3.10)
+
+include(SourceGroupGenerator)
+make_src_groups_dirs()
+include(AssetBuildTools)
 
 file(GLOB src_dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*" "*/*" "*/*/*" "*/*/*/*")
 foreach(src_dir ${src_dirs})
@@ -27,3 +29,11 @@ add_custom_target(mce_assets_units ALL SOURCES ${LOAD_UNIT_DESCS} DEPENDS ${LOAD
 add_custom_target(mce_assets_packs ALL SOURCES ${PACK_DESCS} DEPENDS ${PACK_FILES})
 add_dependencies(mce_assets_units mce_assets_compile mce_assets_models)
 add_dependencies(mce_assets_packs mce_assets_units)
+
+install(
+		FILES ${PACK_FILES}
+		DESTINATION assets
+		COMPONENT mce
+	)
+
+set(MCE_ENGINE_ASSETS_PACKS ${PACK_FILES} CACHE INTERNAL "Packfile(s) containing engine-wide assets (such as basic shaders).")

@@ -1,7 +1,7 @@
 /*
  * Multi-Core Engine project
  * File /multicore_engine_core/include/mce/util/math_tools.hpp
- * Copyright 2017 by Stefan Bodenschatz
+ * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
 #ifndef MCE_UTIL_MATH_TOOLS_HPP_
@@ -34,35 +34,36 @@ template <typename>
 struct vector_size {};
 
 /// Determines the number of components in a glm vector.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct vector_size<glm::tvec1<T, p>> {
 	static constexpr int value = 1; ///< Represents the size of a glm::tvec1 (=1).
 };
 
 /// Determines the number of components in a glm vector.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct vector_size<glm::tvec2<T, p>> {
 	static constexpr int value = 2; ///< Represents the size of a glm::tvec2 (=2).
 };
 
 /// Determines the number of components in a glm vector.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct vector_size<glm::tvec3<T, p>> {
 	static constexpr int value = 3; ///< Represents the size of a glm::tvec3 (=3).
 };
 
 /// Determines the number of components in a glm vector.
-template <typename T, glm::precision p>
+template <typename T, glm::qualifier p>
 struct vector_size<glm::tvec4<T, p>> {
 	static constexpr int value = 4; ///< Represents the size of a glm::tvec4 (=4).
 };
 
 /// Returns the maximum value of all components a glm vector.
-template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
-T component_max(const Vector_Type<T, p>& v) {
+template <glm::length_t s, typename T, glm::qualifier p,
+		  template <glm::length_t, typename, glm::qualifier> class Vector_Type>
+T component_max(const Vector_Type<s, T, p>& v) {
 	using std::max;
 	T m = v[0];
-	for(int i = 1; i < vector_size<Vector_Type<T, p>>::value; ++i) {
+	for(int i = 1; i < vector_size<Vector_Type<s, T, p>>::value; ++i) {
 		m = max(m, v[i]);
 	}
 	return m;
@@ -75,10 +76,11 @@ T component_max(T v) {
 }
 
 /// Returns the minimum value of all components a glm vector.
-template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
-T component_min(const Vector_Type<T, p>& v) {
+template <glm::length_t s, typename T, glm::qualifier p,
+		  template <glm::length_t, typename, glm::qualifier> class Vector_Type>
+T component_min(const Vector_Type<s, T, p>& v) {
 	T m = v[0];
-	for(int i = 1; i < vector_size<Vector_Type<T, p>>::value; ++i) {
+	for(int i = 1; i < vector_size<Vector_Type<s, T, p>>::value; ++i) {
 		m = min(m, v[i]);
 	}
 	return m;
@@ -91,10 +93,11 @@ T component_min(T v) {
 }
 
 /// Returns the sum of all components a glm vector.
-template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
-T component_add(const Vector_Type<T, p>& v) {
+template <glm::length_t s, typename T, glm::qualifier p,
+		  template <glm::length_t, typename, glm::qualifier> class Vector_Type>
+T component_add(const Vector_Type<s, T, p>& v) {
 	T m = v[0];
-	for(int i = 1; i < vector_size<Vector_Type<T, p>>::value; ++i) {
+	for(int i = 1; i < vector_size<Vector_Type<s, T, p>>::value; ++i) {
 		m = m + v[i];
 	}
 	return m;
@@ -107,10 +110,11 @@ T component_add(T v) {
 }
 
 /// Returns the product of all components a glm vector.
-template <typename T, glm::precision p, template <typename, glm::precision> class Vector_Type>
-T component_mul(const Vector_Type<T, p>& v) {
+template <glm::length_t s, typename T, glm::qualifier p,
+		  template <glm::length_t, typename, glm::qualifier> class Vector_Type>
+T component_mul(const Vector_Type<s, T, p>& v) {
 	T m = v[0];
-	for(int i = 1; i < vector_size<Vector_Type<T, p>>::value; ++i) {
+	for(int i = 1; i < vector_size<Vector_Type<s, T, p>>::value; ++i) {
 		m = m * v[i];
 	}
 	return m;

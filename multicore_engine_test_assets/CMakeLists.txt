@@ -1,6 +1,8 @@
-cmake_minimum_required (VERSION 3.7)
-project(multicore_engine_test_assets)
-make_src_grp_dir()
+cmake_minimum_required (VERSION 3.10)
+
+include(SourceGroupGenerator)
+make_src_groups_dirs()
+include(AssetBuildTools)
 
 file(GLOB src_dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*" "*/*" "*/*/*" "*/*/*/*")
 foreach(src_dir ${src_dirs})
@@ -27,3 +29,9 @@ add_custom_target(mce_test_assets_units ALL SOURCES ${LOAD_UNIT_DESCS} DEPENDS $
 add_custom_target(mce_test_assets_packs ALL SOURCES ${PACK_DESCS} DEPENDS ${PACK_FILES})
 add_dependencies(mce_test_assets_units mce_test_assets_compile mce_test_assets_models)
 add_dependencies(mce_test_assets_packs mce_test_assets_units)
+
+install(
+		FILES ${PACK_FILES}
+		DESTINATION assets
+		COMPONENT mce-test
+	)
