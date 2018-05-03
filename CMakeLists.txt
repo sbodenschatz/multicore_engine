@@ -19,10 +19,6 @@ include(IntegrateBuildScripts)
 
 make_build_scripts_project(MCE .gitlab-ci.yml .gitlab-ci-edges-env.yml Doxyfile .clang-format create_license_pack_linux.sh create_license_pack_windows.bat)
 
-if(NOT STATIC_ANALYSIS_ONLY)
-	add_subdirectory(multicore_engine_assets)
-	add_subdirectory(multicore_engine_test_assets)
-endif()
 
 add_subdirectory(multicore_engine_parsers)
 add_subdirectory(multicore_engine_base)
@@ -34,6 +30,11 @@ add_subdirectory(multicore_engine_graphics_test)
 add_subdirectory(multicore_engine_load_unit_gen)
 add_subdirectory(multicore_engine_pack_file_gen)
 add_subdirectory(multicore_engine_model_converter)
+
+if(NOT STATIC_ANALYSIS_ONLY)
+	add_subdirectory(multicore_engine_assets)
+	add_subdirectory(multicore_engine_test_assets)
+endif()
 
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT mce_graphics_test)
 
