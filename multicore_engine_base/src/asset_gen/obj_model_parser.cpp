@@ -23,6 +23,8 @@
 #include <numeric>
 #include <string>
 
+#include <iostream>
+
 namespace mce {
 namespace asset_gen {
 
@@ -225,8 +227,20 @@ obj_model_parser::calculate_tangents(const std::array<glm::ivec3, 3>& vertex_tri
 									tex_coords.at(vertex_tripples[2].y)}};
 	std::array<glm::vec3, 2> q = {{p[1] - p[0], p[2] - p[0]}};
 	std::array<glm::vec2, 2> duv = {{uv[1] - uv[0], uv[2] - uv[0]}};
-	glm::mat2 m_duv_inv = (1.0f / (duv[0].s * duv[1].t - duv[1].s * duv[0].t)) *
-						  glm::mat2(duv[1].t, -duv[1].s, -duv[0].t, duv[0].s);
+	auto divisor = duv[0].s * duv[1].t - duv[1].s * duv[0].t;
+	if(abs(divisor) < std::numeric_limits<float>::min()) {
+		std::cerr << "Warning: Collapsed UVs triangle "
+				  << "(" << vertex_tripples[0].x + 1 << "," << vertex_tripples[0].y + 1 << ","
+				  << vertex_tripples[0].z + 1 << ")"
+				  << "(" << vertex_tripples[1].x + 1 << "," << vertex_tripples[1].y + 1 << ","
+				  << vertex_tripples[1].z + 1 << ")"
+				  << "(" << vertex_tripples[2].x + 1 << "," << vertex_tripples[2].y + 1 << ","
+				  << vertex_tripples[2].z + 1 << ")"
+				  << " resulting in faulty tangent space.\n";
+		glm::vec3 zero{0.0f};
+		return {zero, zero};
+	}
+	glm::mat2 m_duv_inv = (1.0f / divisor) * glm::mat2(duv[1].t, -duv[1].s, -duv[0].t, duv[0].s);
 	glm::mat3x2 m_q = glm::mat3x2(q[0].x, q[1].x, q[0].y, q[1].y, q[0].z, q[1].z);
 	glm::mat2x3 m_t = transpose(m_duv_inv * m_q);
 	return {m_t[0], m_t[1]};
@@ -239,8 +253,22 @@ std::tuple<static_model, model::static_model_collision_data> obj_model_parser::f
 		assert(it_tan != tangents.end());
 		auto it_bitan = bitangents.find(glm::ivec2(vert_idx.first.x, vert_idx.first.z));
 		assert(it_bitan != bitangents.end());
-		vert.tangent = glm::normalize(it_tan->second);
-		vert.bitangent = glm::normalize(it_bitan->second);
+		if(glm::dot(it_tan->second, it_tan->second) > 0.0f) {
+			vert.tangent = glm::normalize(it_tan->second);
+		} else {
+			std::cerr << "Warning: Zero  tangent  on vertex "
+					  << "(" << vert_idx.first.x + 1 << "," << vert_idx.first.y + 1 << ","
+					  << vert_idx.first.z + 1 << ") resulting in faulty tangent space.\n";
+			vert.tangent = glm::vec3{0.0f};
+		}
+		if(glm::dot(it_bitan->second, it_bitan->second) > 0.0f) {
+			vert.bitangent = glm::normalize(it_bitan->second);
+		} else {
+			std::cerr << "Warning: Zero bitangent on vertex "
+					  << "(" << vert_idx.first.x + 1 << "," << vert_idx.first.y + 1 << ","
+					  << vert_idx.first.z + 1 << ") resulting in faulty tangent space.\n";
+			vert.bitangent = glm::vec3{0.0f};
+		}
 	}
 	for(auto& mesh : meshes) {
 		mesh.collision_data.sphere.center =
