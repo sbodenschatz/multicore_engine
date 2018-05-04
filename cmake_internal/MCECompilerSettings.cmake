@@ -26,6 +26,9 @@ target_link_libraries(mce_compiler_settings INTERFACE
 	)
 set_target_properties(mce_compiler_settings PROPERTIES EXPORT_NAME compiler_settings)
 
+include(ProvideEmbeddedImport)
+provide_embedded_import(mce:: mce_compiler_settings)
+
 install(TARGETS mce_compiler_settings 
 		EXPORT mce-dev
 		DESTINATION lib
