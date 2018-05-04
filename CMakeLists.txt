@@ -54,8 +54,17 @@ install(
 		COMPONENT mce-dev
 	)
 
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+		${CMAKE_CURRENT_BINARY_DIR}/mceConfigVersion.cmake
+		VERSION ${multicore_engine_VERSION}
+		COMPATIBILITY SameMajorVersion
+	)
+
 install(
-		FILES ${CMAKE_CURRENT_SOURCE_DIR}/UseModules.cmake
+		FILES
+			${CMAKE_CURRENT_SOURCE_DIR}/UseModules.cmake
+			${CMAKE_CURRENT_BINARY_DIR}/mceConfigVersion.cmake
 		DESTINATION cmake/mce
 		COMPONENT mce-dev
 	)
