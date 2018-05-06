@@ -1,9 +1,9 @@
 variables:
     BUILD_CONCURRENCY: "10"
+    GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
   - build
-  - auxiliary
   - package
 
 .cache-paths-spec: &cache-paths
@@ -11,51 +11,41 @@ stages:
 
 .linux-cache-spec-template: &linux-cache-spec
     cache:
-        key: ${CI_COMMIT_REF_NAME}/${CI_JOB_NAME}
+        key: ${CI_COMMIT_REF_SLUG}-${CI_JOB_NAME}
         paths: *cache-paths
 
 .windows-cache-spec-template: &windows-cache-spec
     cache:
         paths: *cache-paths
-        key: "%CI_COMMIT_REF_NAME%/%CI_JOB_NAME%/%CI_RUNNER_ID%"
+        key: "%CI_COMMIT_REF_SLUG%-%CI_JOB_NAME%-%CI_RUNNER_ID%"
 
 .artifacts-spec-build-linux-template: &artifact-spec-build-linux
     artifacts:
-        name: "mce_${CI_COMMIT_REF_NAME##*/}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
+        name: "mce_${CI_COMMIT_REF_SLUG}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
         expire_in: 1 week
         paths:
         - ${BUILD_COMPILER_NAME}
 
 .artifacts-spec-build-windows-template: &artifact-spec-build-windows
     artifacts:
-        name: "mce_%CI_COMMIT_REF_NAME:*/=%_%CI_JOB_ID%_%CI_COMMIT_SHA%_%CI_JOB_NAME%"
+        name: "mce_%CI_COMMIT_REF_SLUG%_%CI_JOB_ID%_%CI_COMMIT_SHA%_%CI_JOB_NAME%"
         expire_in: 1 week
         paths:
         - "%BUILD_COMPILER_NAME%"
 
 .linux-build-template: &linux-build-task
     stage: build
-    <<: *linux-cache-spec    
+    <<: *linux-cache-spec
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -U*_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DSANITIZER_INSTRUMENTATION=${BUILD_SANITIZE} ..
+    - cmake -U*_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DSANITIZER_INSTRUMENTATION=${BUILD_SANITIZE} -DCMAKE_INSTALL_PREFIX=${BUILD_COMPILER_NAME} ..
     - cmake --build . -- -j ${BUILD_CONCURRENCY}
     - export ASAN_SYMBOLIZER_PATH=$(find / -name llvm-symbolizer)
     - ctest --output-on-failure
+    - cmake --build . --target install -- -j ${BUILD_CONCURRENCY}
     - cd ..
-    - cmake -E make_directory ${BUILD_COMPILER_NAME}
-    - cmake -E copy build/multicore_engine_parsers/libmce_parsers${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_parsers${BUILD_POSTFIX}.a
-    - cmake -E copy build/multicore_engine_base/libmce_base${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_base${BUILD_POSTFIX}.a
-    - cmake -E copy build/multicore_engine_core/libmce_core${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_core${BUILD_POSTFIX}.a
-    - cmake -E copy build/multicore_engine_headed/libmce_headed${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_headed${BUILD_POSTFIX}.a
-    - cmake -E copy build/multicore_engine_renderer/libmce_renderer${BUILD_POSTFIX}.a ${BUILD_COMPILER_NAME}/libmce_renderer${BUILD_POSTFIX}.a
-    - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test ${BUILD_COMPILER_NAME}/graphics_test
-    - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen ${BUILD_COMPILER_NAME}/load_unit_gen
-    - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen ${BUILD_COMPILER_NAME}/pack_file_gen
-    - cmake -E copy build/multicore_engine_model_converter/mce_model_converter ${BUILD_COMPILER_NAME}/model_converter
-    - cmake -E copy build/multicore_engine_assets/engine.pack ${BUILD_COMPILER_NAME}/engine.pack
-    - cmake -E copy build/multicore_engine_test_assets/assets.pack ${BUILD_COMPILER_NAME}/assets.pack
+    - cmake -E rename build/${BUILD_COMPILER_NAME} ${BUILD_COMPILER_NAME}
     - glslangValidator -v
 
 .mingw-build-template: &mingw-build-task
@@ -64,22 +54,12 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -U*_DIR -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+    - cmake -U*_DIR -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%BUILD_COMPILER_NAME% ..
     - cmake --build . -- -j %BUILD_CONCURRENCY%
     - ctest --output-on-failure
+    - cmake --build . --target install -- -j %BUILD_CONCURRENCY%
     - cd ..
-    - cmake -E make_directory %BUILD_COMPILER_NAME%
-    - cmake -E copy build/multicore_engine_parsers/libmce_parsers%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_parsers%BUILD_POSTFIX%.a
-    - cmake -E copy build/multicore_engine_base/libmce_base%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_base%BUILD_POSTFIX%.a
-    - cmake -E copy build/multicore_engine_core/libmce_core%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_core%BUILD_POSTFIX%.a
-    - cmake -E copy build/multicore_engine_headed/libmce_headed%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_headed%BUILD_POSTFIX%.a
-    - cmake -E copy build/multicore_engine_renderer/libmce_renderer%BUILD_POSTFIX%.a %BUILD_COMPILER_NAME%/libmce_renderer%BUILD_POSTFIX%.a
-    - cmake -E copy build/multicore_engine_graphics_test/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
-    - cmake -E copy build/multicore_engine_load_unit_gen/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
-    - cmake -E copy build/multicore_engine_pack_file_gen/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
-    - cmake -E copy build/multicore_engine_model_converter/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
-    - cmake -E copy build/multicore_engine_assets/engine.pack %BUILD_COMPILER_NAME%/engine.pack
-    - cmake -E copy build/multicore_engine_test_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
+    - cmake -E rename build/%BUILD_COMPILER_NAME% %BUILD_COMPILER_NAME%
     - glslangValidator -v
 
 .msbuild-build-template: &msbuild-build-task
@@ -88,25 +68,14 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -U*_DIR -G "Visual Studio 15 2017 Win64" ..
+    - cmake -U*_DIR -DCMAKE_INSTALL_PREFIX=%BUILD_COMPILER_NAME% -G "Visual Studio 15 2017 Win64" ..
     - cmake --build . --config %BUILD_TYPE% -- /m:%BUILD_CONCURRENCY%
     - ctest -C %BUILD_TYPE% --output-on-failure
+    - cmake --build . --config %BUILD_TYPE% --target INSTALL -- /m:%BUILD_CONCURRENCY%
     - cd ..
-    - cmake -E make_directory %BUILD_COMPILER_NAME%
+    - cmake -E rename build/%BUILD_COMPILER_NAME% %BUILD_COMPILER_NAME%
     # These libraries are huge on release build due to LTCG and are therefore only included for tagged builds.
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_parsers/%BUILD_TYPE%/mce_parsers%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_parsers%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_base/%BUILD_TYPE%/mce_base%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_base%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_core/%BUILD_TYPE%/mce_core%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_core%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_headed/%BUILD_TYPE%/mce_headed%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_headed%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
-    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (cmake -E copy build/multicore_engine_renderer/%BUILD_TYPE%/mce_renderer%BUILD_POSTFIX%.lib %BUILD_COMPILER_NAME%/mce_renderer%BUILD_POSTFIX%.lib) ELSE (echo Skipping LTCG Lib)
-    - cmake -E copy build/multicore_engine_graphics_test/%BUILD_TYPE%/mce_graphics_test.exe %BUILD_COMPILER_NAME%/graphics_test.exe
-    - cmake -E copy build/multicore_engine_load_unit_gen/%BUILD_TYPE%/mce_load_unit_gen.exe %BUILD_COMPILER_NAME%/load_unit_gen.exe
-    - cmake -E copy build/multicore_engine_pack_file_gen/%BUILD_TYPE%/mce_pack_file_gen.exe %BUILD_COMPILER_NAME%/pack_file_gen.exe
-    - cmake -E copy build/multicore_engine_model_converter/%BUILD_TYPE%/mce_model_converter.exe %BUILD_COMPILER_NAME%/model_converter.exe
-    - cmake -E copy build/multicore_engine_assets/engine.pack %BUILD_COMPILER_NAME%/engine.pack
-    - cmake -E copy build/multicore_engine_test_assets/assets.pack %BUILD_COMPILER_NAME%/assets.pack
-    #- cmake -E remove_directory build/multicore_engine_assets
-    #- cmake -E remove_directory build/multicore_engine_test_assets
+    - IF DEFINED INCLUDE_LTCG_LIBS_ARTIFACTS (echo Keeping LTCG LIBS) ELSE (cmake -E remove_directory %BUILD_COMPILER_NAME%/lib)
     - glslangValidator -v
 
 .package-task-template: &package-task
@@ -114,11 +83,10 @@ stages:
     variables:
         GIT_STRATEGY: none
     script:
-    - sha1sum -b cloc_report.txt refman.pdf gcc/* clang/* msvc/* mingw/* > checksums.txt
+    - sha1sum -b gcc/assets/* clang/assets/* msvc/assets/* mingw/assets/* > checksums.txt
     - cat checksums.txt | sort
     - cat cloc_report.txt
-    tags:
-    - package
+    image: alpine:latest
     artifacts: &package-artifact-spec
         name: "mce_${CI_COMMIT_REF_NAME##*/}_${CI_JOB_ID}_${CI_COMMIT_SHA}"
         paths:
@@ -140,8 +108,8 @@ gcc-debug-build:
         BUILD_COMPILER_NAME: "gcc"
         BUILD_SANITIZE: "YES"
         BUILD_POSTFIX: "d"
-    tags:
-    - cpp
+        ASAN_OPTIONS: "detect_leaks=0"
+    image: $CI_REGISTRY/ci-util/cpp/gcc/debug
     <<: *linux-build-task
 
 gcc-release-build:
@@ -152,8 +120,7 @@ gcc-release-build:
         BUILD_COMPILER_NAME: "gcc"
         BUILD_SANITIZE: "NO"
         BUILD_POSTFIX: ""
-    tags:
-    - cpp
+    image: $CI_REGISTRY/ci-util/cpp/gcc/release
     <<: *linux-build-task
     <<: *artifact-spec-build-linux
 
@@ -163,11 +130,10 @@ clang-debug-build:
         BUILD_C_COMPILER: "clang"
         BUILD_TYPE: "Debug"
         BUILD_COMPILER_NAME: "clang"
-        BUILD_SANITIZE: "YES"
+        BUILD_SANITIZE: "NO" #Currently disabled due to something in gtest triggering the sanitizer when using libc++.
         ASAN_OPTIONS: "detect_leaks=0"
         BUILD_POSTFIX: "d"
-    tags:
-    - cpp
+    image: $CI_REGISTRY/ci-util/cpp/clang/debug
     <<: *linux-build-task
 
 clang-release-build:
@@ -178,8 +144,7 @@ clang-release-build:
         BUILD_COMPILER_NAME: "clang"
         BUILD_SANITIZE: "NO"
         BUILD_POSTFIX: ""
-    tags:
-    - cpp
+    image: $CI_REGISTRY/ci-util/cpp/clang/release
     <<: *linux-build-task
     <<: *artifact-spec-build-linux
 
@@ -240,28 +205,19 @@ mingw-release-build:
     <<: *mingw-build-task
     <<: *artifact-spec-build-windows
 
-cpp-check:
-    dependencies: []
-    stage: auxiliary
-    script:
-    - ./run_cppcheck.sh
-    tags:
-    - cpp
-
 scan-build:
     dependencies: []
-    stage: auxiliary
+    stage: build
     script:
     - mkdir -p build && cd build
     - cmake -U*_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DSTATIC_ANALYSIS_ONLY=YES ..
     - scan-build --status-bugs make -j $[$(grep -c ^processor /proc/cpuinfo)+2] config=debug CC=clang CXX=clang++
-    tags:
-    - cpp
+    image: $CI_REGISTRY/ci-util/cpp/clang/release
     <<: *linux-cache-spec    
 
 api-doc:
     dependencies: []
-    stage: auxiliary
+    stage: build
     script:
     - chmod +x generate_cloc_report.sh
     - ./generate_cloc_report.sh
@@ -275,14 +231,12 @@ api-doc:
     - cd ..
     - mv html ../refman_html
     - cat warnings.log
-    tags:
-    - latex
-    - doxygen
+    image: $CI_REGISTRY/ci-util/latex
     cache:
         paths:
         - doc
     artifacts:
-        name: "mce_${CI_COMMIT_REF_NAME##*/}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
+        name: "mce_${CI_COMMIT_REF_SLUG}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
         expire_in: 1 week
         paths:
         - refman.pdf
@@ -291,7 +245,7 @@ api-doc:
 
 license-pack-windows:
     dependencies: []
-    stage: auxiliary
+    stage: build
     script:
     - create_license_pack_windows.bat
     tags:
@@ -304,13 +258,12 @@ license-pack-windows:
         
 license-pack-linux:
     dependencies: []
-    stage: auxiliary
+    stage: build
     script:
     - ./create_license_pack_linux.sh
-    tags:
-    - cpp
+    image: $CI_REGISTRY/ci-util/cpp/clang/release
     artifacts:
-        name: "mce_${CI_COMMIT_REF_NAME##*/}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
+        name: "mce_${CI_COMMIT_REF_SLUG}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
         expire_in: 1 week
         paths:
         - licenses
