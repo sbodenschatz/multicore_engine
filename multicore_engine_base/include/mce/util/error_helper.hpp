@@ -14,6 +14,7 @@
 
 #include <cstdint>
 #include <mce/exceptions.hpp>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <utility>
