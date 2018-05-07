@@ -20,24 +20,14 @@ namespace mce {
 namespace entity {
 namespace parser {
 
-struct entity_template_lang_grammar;
-struct entity_template_lang_skipper;
-
 /// Implements the front-end of the entity template language parser.
 /**
  * Parses the text file into an AST.
  */
 class entity_template_lang_parser_frontend {
-	/// Stores the grammar of the parsers.
-	std::unique_ptr<entity_template_lang_grammar> grammar;
-	/// Stores the skip parser of the parser.
-	std::unique_ptr<entity_template_lang_skipper> skipper;
-
 public:
 	/// Constructs a parser front-end object.
-	entity_template_lang_parser_frontend();
-	/// Destroys the parser front-end object.
-	~entity_template_lang_parser_frontend();
+	entity_template_lang_parser_frontend() = default;
 
 	/// \brief Parses the character sequence represented by first and last and uses the given filename for
 	/// error messages.
