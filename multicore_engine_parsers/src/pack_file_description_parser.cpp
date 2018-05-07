@@ -19,15 +19,14 @@
 #pragma warning(disable : 4459)
 #pragma warning(disable : 4127)
 #endif
+#include <boost/config/warning_disable.hpp>
+#include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <mce/asset_gen/pack_file_description_ast.hpp>
 #include <mce/asset_gen/pack_file_description_ast_fusion.hpp>
 #include <mce/asset_gen/pack_file_description_parser.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/util/error_helper.hpp>
-
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/home/x3.hpp>
-#include <boost/spirit/home/x3/support/ast/variant.hpp>
 
 namespace x3 = boost::spirit::x3;
 namespace ascii = boost::spirit::x3::ascii;
