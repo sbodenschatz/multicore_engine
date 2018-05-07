@@ -19,7 +19,6 @@ enable_testing()
 
 include(BuildConfig)
 
-add_subdirectory(multicore_engine_parsers)
 add_subdirectory(multicore_engine_base)
 add_subdirectory(multicore_engine_core)
 add_subdirectory(multicore_engine_headed)

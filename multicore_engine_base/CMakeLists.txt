@@ -12,7 +12,6 @@ target_include_directories(mce_base PUBLIC
 	)
 target_link_libraries(mce_base 
 		mce_compiler_settings 
-		mce_parsers
 		glm
 		ZLIB::ZLIB
 		Boost::disable_autolinking

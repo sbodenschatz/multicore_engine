@@ -10,7 +10,6 @@ target_include_directories(mce_headed PUBLIC
 		$<INSTALL_INTERFACE:include>
 	)
 target_link_libraries(mce_headed 
-		mce_parsers 
 		mce_base
 		mce_core
 		glfw
