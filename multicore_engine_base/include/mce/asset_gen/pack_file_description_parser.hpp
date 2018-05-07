@@ -20,19 +20,11 @@ namespace mce {
 namespace asset_gen {
 namespace parser {
 
-struct pack_file_description_grammar;
-struct pack_file_description_skipper;
-
 /// Implements the parser front end for pack file description files.
 class pack_file_description_parser {
-	std::unique_ptr<pack_file_description_grammar> grammar;
-	std::unique_ptr<pack_file_description_skipper> skipper;
-
 public:
 	/// Constructs the pack file description parser.
-	pack_file_description_parser();
-	/// Explicit destructor required because the grammar and skipper are only complete types in the cpp file.
-	~pack_file_description_parser();
+	pack_file_description_parser() = default;
 	/// Parses the given character sequence using the given filename for error tracking.
 	ast::pack_file_ast_root parse(const std::string& filename, const char*& first, const char* last);
 	/// Loads and parses the named file.

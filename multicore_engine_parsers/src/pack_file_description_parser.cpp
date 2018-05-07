@@ -17,116 +17,86 @@
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4459)
-#pragma warning(disable : 4503)
-#pragma warning(disable : 4244)
-#pragma warning(disable : 4714)
 #pragma warning(disable : 4127)
-#pragma warning(disable : 4100)
-#pragma warning(disable : 4348)
 #endif
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/qi.hpp>
 #include <mce/asset_gen/pack_file_description_ast.hpp>
 #include <mce/asset_gen/pack_file_description_ast_fusion.hpp>
 #include <mce/asset_gen/pack_file_description_parser.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/util/error_helper.hpp>
 
-namespace spirit = boost::spirit;
-namespace qi = boost::spirit::qi;
-namespace phoenix = boost::phoenix;
+#include <boost/config/warning_disable.hpp>
+#include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/support/ast/variant.hpp>
+
+namespace x3 = boost::spirit::x3;
+namespace ascii = boost::spirit::x3::ascii;
 
 namespace mce {
 namespace asset_gen {
 namespace parser {
+namespace pack_file_description_parser_impl {
+using x3::char_;
+using x3::eoi;
+using x3::eol;
+using x3::eps;
+using x3::int_;
+using x3::lexeme;
+using x3::lit;
+using x3::no_case;
+using x3::rule;
 
-struct pack_file_description_skipper : qi::grammar<const char*> {
-	qi::rule<const char*> skip;
-	pack_file_description_skipper() : pack_file_description_skipper::base_type(skip, "Skipper") {
-		using qi::lit;
-		using qi::char_;
-		using qi::eol;
-		using qi::eoi;
-		skip = (spirit::ascii::space | (lit("//") >> *((char_ - eol) - eoi) >> (eol | eoi)));
+auto skipper = ascii::space | (lit("//") >> *((char_ - eol) - eoi));
+rule<class pack_file_ast_root, ast::pack_file_ast_root> start;
+rule<class pack_file_section, ast::pack_file_section> section;
+rule<class pack_file_entry, ast::pack_file_entry> entry;
+rule<class pack_file_string_literal, std::string> string_literal;
+rule<class pack_file_identifier, std::string> identifier;
+rule<class pack_file_zip_level, int> zip_level;
+rule<class pack_file_lookup_spec, ast::lookup_type> lookup_spec;
+
+struct lookup_type_ : x3::symbols<ast::lookup_type> {
+	lookup_type_() {
+		add("w", ast::lookup_type::w);
+		add("d", ast::lookup_type::d);
 	}
-};
+} lookup_type;
 
-struct pack_file_description_grammar
-		: qi::grammar<const char*, pack_file_description_skipper, ast::pack_file_ast_root()> {
-	template <typename Signature>
-	using rule = qi::rule<const char*, pack_file_description_skipper, Signature>;
+auto identifier_def = lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
+auto string_literal_def = lexeme[lit('\"') > *((char_ - '\"')) > lit('\"')];
+auto lookup_spec_def = no_case[lookup_type];
+auto entry_def = string_literal > -(lookup_spec) > -(lit('-') > lit('>') > string_literal) > lit(';');
+auto set_default_zip_level = [](auto& ctx) { _val(ctx) = -1; };
+auto set_uncompressed_zip_level = [](auto& ctx) { _val(ctx) = -2; };
+auto zip_level_def = ((lit("zip(") > int_ > lit(')')))	 // Explicit level
+					 | (lit("zip")[set_default_zip_level]) // Default level
+					 | (eps[set_default_zip_level]);	   // Uncompressed
+auto section_def = identifier > zip_level > lit('{') > *(entry) > lit('}');
+auto start_def = *(section);
 
-	rule<ast::pack_file_ast_root()> start;
-	rule<ast::pack_file_section()> section;
-	rule<ast::pack_file_entry()> entry;
-	rule<std::string()> string_literal;
-	rule<std::string()> identifier;
-	rule<int> zip_level;
-	rule<int> integer_zip_level;
-	rule<ast::lookup_type> lookup_spec;
+BOOST_SPIRIT_DEFINE(start);
+BOOST_SPIRIT_DEFINE(section);
+BOOST_SPIRIT_DEFINE(entry);
+BOOST_SPIRIT_DEFINE(string_literal);
+BOOST_SPIRIT_DEFINE(identifier);
+BOOST_SPIRIT_DEFINE(lookup_spec);
+BOOST_SPIRIT_DEFINE(zip_level);
 
-	pack_file_description_grammar() : pack_file_description_grammar::base_type(start) {
-		using qi::_1;
-		using spirit::_val;
-		using phoenix::at_c;
-		using qi::on_error;
-		using qi::fail;
-		using qi::debug;
-		using qi::lit;
-		using qi::char_;
-		using qi::lexeme;
-		using qi::no_case;
-		using spirit::long_long;
-		using spirit::float_;
-		using spirit::int_;
-		using qi::eps;
-
-		identifier %= lexeme[char_("a-zA-Z_") >> *char_("0-9a-zA-Z_")];
-		string_literal %= lexeme[lit('\"') > *((char_ - '\"')) > lit('\"')];
-		lookup_spec = no_case[lit("w")[_val = ast::lookup_type::w] | lit("d")[_val = ast::lookup_type::d]];
-		entry %= string_literal > -(lookup_spec) > -(lit('-') > lit('>') > string_literal) > lit(';');
-		integer_zip_level %= int_;
-		zip_level = ((lit("zip(") > integer_zip_level > lit(')'))[_val = _1]) // Explicit level
-					| (lit("zip")[_val = -1])								  // Default level
-					| (eps[_val = -2]);										  // Uncompressed
-		section %= identifier > zip_level > lit('{') > *(entry) > lit('}');
-		start %= *(section);
-
-		BOOST_SPIRIT_DEBUG_NODE(start);
-		BOOST_SPIRIT_DEBUG_NODE(section);
-		BOOST_SPIRIT_DEBUG_NODE(entry);
-		BOOST_SPIRIT_DEBUG_NODE(identifier);
-		BOOST_SPIRIT_DEBUG_NODE(string_literal);
-		BOOST_SPIRIT_DEBUG_NODE(zip_level);
-		BOOST_SPIRIT_DEBUG_NODE(integer_zip_level);
-
-		on_error<qi::rethrow>(entry, [](auto...) {});
-		on_error<qi::rethrow>(section, [](auto...) {});
-		on_error<qi::rethrow>(zip_level, [](auto...) {});
-	}
-};
-
-pack_file_description_parser::pack_file_description_parser()
-		: grammar(std::make_unique<pack_file_description_grammar>()),
-		  skipper(std::make_unique<pack_file_description_skipper>()) {}
-pack_file_description_parser::~pack_file_description_parser() {}
+} // namespace pack_file_description_parser_impl
 
 ast::pack_file_ast_root pack_file_description_parser::parse(const std::string& filename, const char*& first,
 															const char* last) {
 	ast::pack_file_ast_root ast_root;
 	const char* buffer_start = first;
 	try {
-		bool r = qi::phrase_parse(first, last, *grammar, *skipper, ast_root);
-		if(!r || !std::all_of(first, last, [](char c) {
-			   return c == ' ' || c == '\t' || c == '\0' || c == '\n';
-		   })) {
+		bool r = phrase_parse(first, last, pack_file_description_parser_impl::start,
+							  pack_file_description_parser_impl::skipper, ast_root);
+		if(!r || !std::all_of(first, last,
+							  [](char c) { return c == ' ' || c == '\t' || c == '\0' || c == '\n'; })) {
 			util::throw_syntax_error(filename, buffer_start, first, "General syntax error");
 		}
-	} catch(boost::spirit::qi::expectation_failure<const char*>& ef) {
-		util::throw_syntax_error(filename, buffer_start, ef.first, "Syntax error", ef.what_);
+	} catch(x3::expectation_failure<const char*>& ef) {
+		util::throw_syntax_error(filename, buffer_start, ef.where(), "Syntax error", ef.which());
 	}
 	return ast_root;
 }
