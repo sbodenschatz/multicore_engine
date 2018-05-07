@@ -69,7 +69,7 @@ auto set_default_zip_level = [](auto& ctx) { _val(ctx) = -1; };
 auto set_uncompressed_zip_level = [](auto& ctx) { _val(ctx) = -2; };
 auto zip_level_def = ((lit("zip(") > int_ > lit(')')))	 // Explicit level
 					 | (lit("zip")[set_default_zip_level]) // Default level
-					 | (eps[set_default_zip_level]);	   // Uncompressed
+					 | (eps[set_uncompressed_zip_level]);  // Uncompressed
 auto section_def = identifier > zip_level > lit('{') > *(entry) > lit('}');
 auto start_def = *(section);
 
