@@ -22,7 +22,8 @@
 #include <stdexcept>
 #include <vulkan/vulkan.hpp>
 
-#if !defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE
+#if(!defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE) &&                      \
+		((GLM_CONFIG_CLIP_CONTROL & GLM_CLIP_CONTROL_ZO_BIT) != 0)
 #error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
 #endif
 
