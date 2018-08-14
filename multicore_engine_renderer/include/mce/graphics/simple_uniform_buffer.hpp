@@ -12,12 +12,12 @@
  * Defines the simple_uniform_buffer class.
  */
 
+#include <glm/gtx/type_trait.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/buffer.hpp>
 #include <mce/memory/align.hpp>
 #include <type_traits>
 #include <vulkan/vulkan.hpp>
-#include <glm/gtx/type_trait.hpp>
 
 namespace mce {
 namespace graphics {
@@ -26,8 +26,7 @@ namespace detail {
 
 template <typename T>
 struct uniform_buffer_is_element_compatible {
-	static constexpr bool value = (std::is_trivially_copyable<T>::value && std::is_standard_layout<T>::value) ||
-					glm::type<T>::is_vec || glm::type<T>::is_mat || glm::type<T>::is_quat;
+	static constexpr bool value = std::is_trivially_copyable<T>::value && std::is_standard_layout<T>::value;
 };
 
 } // namespace detail
