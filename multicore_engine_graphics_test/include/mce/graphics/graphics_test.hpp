@@ -79,7 +79,7 @@ class graphics_test {
 	std::shared_ptr<const sampler> sampler_;
 	std::unique_ptr<framebuffer> fb_;
 	rendering::static_model_ptr mdl_;
-	glm::vec3 rot_angle;
+	glm::vec3 rot_angle{0.0f, 0.0f, 0.0f};
 	rendering::material_ptr mat_;
 
 	struct vertex {

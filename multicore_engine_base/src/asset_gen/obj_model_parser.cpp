@@ -94,7 +94,7 @@ void obj_model_parser::parse(std::istream& input) {
 
 void obj_model_parser::parse_vertex_position(boost::string_view line) {
 	size_t i = 0;
-	glm::vec3 pos;
+	glm::vec3 pos{0.0f, 0.0f, 0.0f};
 	util::split_iterate(line, " ", [this, &pos, &i](boost::string_view e) {
 		// cppcheck-suppress knownConditionTrueFalse
 		if(i >= 3) throw syntax_exception("Too many components.");
@@ -105,7 +105,7 @@ void obj_model_parser::parse_vertex_position(boost::string_view line) {
 }
 void obj_model_parser::parse_vertex_normal(boost::string_view line) {
 	size_t i = 0;
-	glm::vec3 normal;
+	glm::vec3 normal{0.0f, 0.0f, 0.0f};
 	util::split_iterate(line, " ", [this, &normal, &i](boost::string_view e) {
 		// cppcheck-suppress knownConditionTrueFalse
 		if(i >= 3) throw syntax_exception("Too many components.");
@@ -116,7 +116,7 @@ void obj_model_parser::parse_vertex_normal(boost::string_view line) {
 }
 void obj_model_parser::parse_vertex_texcoords(boost::string_view line) {
 	size_t i = 0;
-	glm::vec2 uv;
+	glm::vec2 uv{0.0f, 0.0f};
 	util::split_iterate(line, " ", [this, &uv, &i](boost::string_view e) {
 		// cppcheck-suppress knownConditionTrueFalse
 		if(i >= 2) throw syntax_exception("Too many components.");
@@ -162,7 +162,7 @@ void obj_model_parser::parse_face(boost::string_view line) {
 	size_t face_vertex = 0;
 	std::array<glm::ivec3, 3> vert_tripples;
 	util::split_iterate(line, " ", [this, &face_vertex, &vert_tripples](boost::string_view vert_ref) {
-		glm::ivec3 current_tripple;
+		glm::ivec3 current_tripple{0, 0, 0};
 		size_t elem_index = 0;
 		util::split_iterate(
 				vert_ref, "/", [this, &current_tripple, &elem_index](boost::string_view ref_elem) {
@@ -237,7 +237,7 @@ obj_model_parser::calculate_tangents(const std::array<glm::ivec3, 3>& vertex_tri
 				  << "(" << vertex_tripples[2].x + 1 << "," << vertex_tripples[2].y + 1 << ","
 				  << vertex_tripples[2].z + 1 << ")"
 				  << " resulting in faulty tangent space.\n";
-		glm::vec3 zero{0.0f};
+		glm::vec3 zero{0.0f, 0.0f, 0.0f};
 		return {zero, zero};
 	}
 	glm::mat2 m_duv_inv = (1.0f / divisor) * glm::mat2(duv[1].t, -duv[1].s, -duv[0].t, duv[0].s);

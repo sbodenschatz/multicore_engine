@@ -146,7 +146,7 @@ entity_orientation_t entity_template_lang_parser_backend::ast_orientation_visito
 operator()(const ast::rotation_list& node) {
 	entity_orientation_t orientation{1.0f, 0.0f, 0.0f, 0.0f};
 	for(auto&& entry : node) {
-		glm::vec3 axis{0.0f};
+		glm::vec3 axis{0.0f, 0.0f, 0.0f};
 		switch(entry.axis) {
 		case ast::rotation_axis::x: axis.x = 1.0f; break;
 		case ast::rotation_axis::y: axis.y = 1.0f; break;

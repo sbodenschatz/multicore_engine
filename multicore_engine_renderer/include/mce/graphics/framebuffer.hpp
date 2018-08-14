@@ -109,7 +109,7 @@ class framebuffer {
 private:
 	device* dev_;
 	window* win_;
-	glm::uvec2 size_;
+	glm::uvec2 size_{0, 0};
 	std::vector<image_var> attachments_;
 	std::vector<image_view_var> attachment_views_;
 	std::shared_ptr<const framebuffer_config> config_;

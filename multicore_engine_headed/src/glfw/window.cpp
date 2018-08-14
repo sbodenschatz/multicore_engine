@@ -82,7 +82,7 @@ bool window::should_close() const {
 	return glfwWindowShouldClose(window_.get());
 }
 glm::dvec2 window::cursor_position() const {
-	glm::dvec2 pos;
+	glm::dvec2 pos{0.0, 0.0};
 	glfwGetCursorPos(window_.get(), &pos.x, &pos.y);
 	return pos;
 }
@@ -127,7 +127,7 @@ void window::title(const std::string& value) {
 }
 
 glm::ivec2 window::window_position() const {
-	glm::ivec2 s;
+	glm::ivec2 s{0, 0};
 	glfwGetWindowPos(window_.get(), &s.x, &s.y);
 	return s;
 }
@@ -135,7 +135,7 @@ void window::window_position(glm::ivec2 pos) {
 	glfwSetWindowPos(window_.get(), pos.x, pos.y);
 }
 glm::ivec2 window::window_size() const {
-	glm::ivec2 s;
+	glm::ivec2 s{0, 0};
 	glfwGetWindowSize(window_.get(), &s.x, &s.y);
 	return s;
 }
@@ -143,7 +143,7 @@ void window::window_size(glm::ivec2 size) {
 	glfwSetWindowSize(window_.get(), size.x, size.y);
 }
 glm::ivec2 window::framebuffer_size() const {
-	glm::ivec2 s;
+	glm::ivec2 s{0, 0};
 	glfwGetFramebufferSize(window_.get(), &s.x, &s.y);
 	return s;
 }
@@ -270,5 +270,5 @@ void window::window_drop_callback_s(GLFWwindow* window, int count, const char** 
 	}
 }
 
-} /* namespace glfw_wrapper */
+} // namespace glfw
 } /* namespace mce */

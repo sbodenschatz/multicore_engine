@@ -47,12 +47,12 @@ std::vector<video_mode> monitor::video_modes() const {
 	return res;
 }
 glm::ivec2 monitor::physical_size() const {
-	glm::ivec2 res;
+	glm::ivec2 res{0, 0};
 	glfwGetMonitorPhysicalSize(monitor_, &res.x, &res.y);
 	return res;
 }
 glm::ivec2 monitor::virtual_position() const {
-	glm::ivec2 res;
+	glm::ivec2 res{0, 0};
 	glfwGetMonitorPos(monitor_, &res.x, &res.y);
 	return res;
 }
@@ -88,5 +88,5 @@ void monitor::gamma(float gamma_exponent) {
 	glfwSetGamma(monitor_, gamma_exponent);
 }
 
-} /* namespace glfw_wrapper */
+} // namespace glfw
 } /* namespace mce */

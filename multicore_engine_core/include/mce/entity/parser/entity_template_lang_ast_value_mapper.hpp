@@ -110,7 +110,7 @@ template <>
 struct ast_value_mapper<float_list, glm::vec2> {
 	/// Converts ast_val to vec2 and stores it in val.
 	static void convert(const float_list& ast_val, glm::vec2& val, entity_manager&) {
-		val = glm::vec2(0.0f);
+		val = glm::vec2(0.0f, 0.0f);
 		for(unsigned int i = 0; i < 2 && i < ast_val.size(); ++i) {
 			val[i] = ast_val[i];
 		}
@@ -122,7 +122,7 @@ template <>
 struct ast_value_mapper<float_list, glm::vec3> {
 	/// Converts ast_val to vec3 and stores it in val.
 	static void convert(const float_list& ast_val, glm::vec3& val, entity_manager&) {
-		val = glm::vec3(0.0f);
+		val = glm::vec3(0.0f, 0.0f, 0.0f);
 		for(unsigned int i = 0; i < 3 && i < ast_val.size(); ++i) {
 			val[i] = ast_val[i];
 		}
@@ -134,7 +134,7 @@ template <>
 struct ast_value_mapper<float_list, glm::vec4> {
 	/// Converts ast_val to vec4 and stores it in val.
 	static void convert(const float_list& ast_val, glm::vec4& val, entity_manager&) {
-		val = glm::vec4(0.0f);
+		val = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 		for(unsigned int i = 0; i < 4 && i < ast_val.size(); ++i) {
 			val[i] = ast_val[i];
 		}

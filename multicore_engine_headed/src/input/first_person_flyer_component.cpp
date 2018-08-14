@@ -37,7 +37,7 @@ void first_person_flyer_component::process(const mce::core::frame_time& frame_ti
 }
 void first_person_flyer_component::process_keyboard(const mce::core::frame_time& frame_time,
 													const input_system& sys) {
-	glm::vec3 velocity;
+	glm::vec3 velocity{0.0f, 0.0f, 0.0f};
 	if(sys.current_key_state(forward_key_)) {
 		velocity.z = -1.0f;
 	}
