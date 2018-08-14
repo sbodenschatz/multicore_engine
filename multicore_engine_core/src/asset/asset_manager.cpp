@@ -33,7 +33,8 @@ asset_manager::~asset_manager() {
 void asset_manager::start_clean() {
 	task_pool.post([this]() {
 		std::unique_lock<std::shared_timed_mutex> lock(loaded_assets_rw_lock);
-		boost::remove_erase_if(loaded_assets, [](const auto& element) { return element.second.unique(); });
+		boost::remove_erase_if(loaded_assets,
+							   [](const auto& element) { return element.second.use_count() == 1; });
 	});
 }
 std::shared_ptr<const asset> asset_manager::call_loaders_sync(const std::shared_ptr<asset>& asset_to_load) {
