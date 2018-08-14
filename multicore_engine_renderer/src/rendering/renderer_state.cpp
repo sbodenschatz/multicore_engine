@@ -4,8 +4,16 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
-#include <cassert>
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127)
+#endif
 #include <glm/gtc/matrix_transform.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#include <cassert>
 #include <mce/entity/entity_manager.hpp>
 #include <mce/graphics/graphics_system.hpp>
 #include <mce/graphics/pipeline.hpp>

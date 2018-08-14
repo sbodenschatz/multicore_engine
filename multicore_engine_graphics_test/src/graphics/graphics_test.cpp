@@ -4,7 +4,14 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127)
+#endif
 #include <glm/gtc/matrix_transform.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #include <glm/vec2.hpp>
 #include <iomanip>
 #include <iostream>
