@@ -30,7 +30,9 @@ void command_pool::reset(bool release_resources) {
 
 namespace {
 auto make_command_buffer_deleter(const vk::Device& dev, const vk::CommandPool& pool) {
-#if VK_HEADER_VERSION >= 70
+#if VK_HEADER_VERSION >= 82
+	return vk::PoolFree<vk::Device, vk::CommandPool, vk::DispatchLoaderStatic>(dev, pool);
+#elif VK_HEADER_VERSION >= 70
 	return vk::PoolFree<vk::Device, vk::CommandPool>(dev, pool);
 #else
 	return vk::CommandBufferDeleter(dev, pool);
