@@ -18,7 +18,12 @@ namespace graphics {
 static_assert(detail::uniform_buffer_is_element_compatible<glm::quat>::value &&
 					  detail::uniform_buffer_is_element_compatible<glm::vec2>::value &&
 					  detail::uniform_buffer_is_element_compatible<glm::vec3>::value &&
-					  detail::uniform_buffer_is_element_compatible<glm::vec4>::value,
+					  detail::uniform_buffer_is_element_compatible<glm::vec4>::value &&
+					  detail::uniform_buffer_is_element_compatible<glm::ivec2>::value &&
+					  detail::uniform_buffer_is_element_compatible<glm::ivec3>::value &&
+					  detail::uniform_buffer_is_element_compatible<glm::ivec4>::value &&
+					  detail::uniform_buffer_is_element_compatible<int>::value &&
+					  detail::uniform_buffer_is_element_compatible<float>::value,
 			  "Condition for uniform types must not be too strict for common glm types to be usable.");
 
 simple_uniform_buffer::simple_uniform_buffer(device& dev, device_memory_manager_interface& mem_mgr,
