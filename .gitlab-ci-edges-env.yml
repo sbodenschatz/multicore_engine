@@ -39,7 +39,7 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -U*_DIR -G "Unix Makefiles" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DSANITIZER_INSTRUMENTATION=${BUILD_SANITIZE} -DCMAKE_INSTALL_PREFIX=${BUILD_COMPILER_NAME} ..
+    - cmake -U*_DIR -G "Ninja" -DCMAKE_C_COMPILER=${BUILD_C_COMPILER} -DCMAKE_CXX_COMPILER=${BUILD_CXX_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DSANITIZER_INSTRUMENTATION=${BUILD_SANITIZE} -DCMAKE_INSTALL_PREFIX=${BUILD_COMPILER_NAME} ..
     - cmake --build . -- -j ${BUILD_CONCURRENCY}
     - ctest --output-on-failure
     - cmake --build . --target install -- -j ${BUILD_CONCURRENCY}
@@ -53,7 +53,7 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -U*_DIR -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%BUILD_COMPILER_NAME% ..
+    - cmake -U*_DIR -G "Ninja" -DCMAKE_C_COMPILER=%BUILD_C_COMPILER% -DCMAKE_CXX_COMPILER=%BUILD_CXX_COMPILER% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%BUILD_COMPILER_NAME% ..
     - cmake --build . -- -j %BUILD_CONCURRENCY%
     - ctest --output-on-failure
     - cmake --build . --target install -- -j %BUILD_CONCURRENCY%
