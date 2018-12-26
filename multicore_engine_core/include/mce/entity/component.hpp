@@ -117,14 +117,7 @@ protected:
 /// \brief Allows more comfortable registration of properties by applying the convention that the property
 /// uses a getter and a setter that are both named like the property and differentiate by signature.
 #define REGISTER_COMPONENT_PROPERTY(LIST, COMP, TYPE, NAME)                                                  \
-	register_component_property<TYPE, COMP>(                                                                 \
-			LIST, #NAME,                                                                                     \
-			static_cast<mce::reflection::linked_property<                                                    \
-					component, TYPE, COMP, mce::entity::abstract_component_property_assignment,              \
-					mce::entity::component_property_assignment, mce::core::engine*>::getter_t>(&COMP::NAME), \
-			static_cast<mce::reflection::linked_property<                                                    \
-					component, TYPE, COMP, mce::entity::abstract_component_property_assignment,              \
-					mce::entity::component_property_assignment, mce::core::engine*>::setter_t>(&COMP::NAME))
+	register_component_property<TYPE, COMP>(LIST, #NAME, &COMP::NAME, &COMP::NAME)
 
 /// \brief Allows more comfortable registration of properties by applying the convention that the property is
 /// represented by a member variable that has the same name as the property.
@@ -135,14 +128,6 @@ protected:
 /// uses a getter and a setter that are both named like the property suffixed by "_name" and differentiate by
 /// signature.
 #define REGISTER_COMPONENT_PROPERTY_NAME_PROXY(LIST, COMP, TYPE, NAME)                                       \
-	register_component_property<TYPE, COMP>(                                                                 \
-			LIST, #NAME, static_cast<mce::reflection::linked_property<                                       \
-								 component, TYPE, COMP, mce::entity::abstract_component_property_assignment, \
-								 mce::entity::component_property_assignment, mce::core::engine*>::getter_t>( \
-								 &COMP::NAME##_name),                                                        \
-			static_cast<mce::reflection::linked_property<                                                    \
-					component, TYPE, COMP, mce::entity::abstract_component_property_assignment,              \
-					mce::entity::component_property_assignment, mce::core::engine*>::setter_t>(              \
-					&COMP::NAME##_name))
+	register_component_property<TYPE, COMP>(LIST, #NAME, &COMP::NAME##_name, &COMP::NAME##_name)
 
 #endif /* ENTITY_COMPONENT_HPP_ */
