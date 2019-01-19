@@ -32,10 +32,10 @@ std::vector<char> pipeline_cache::read_file(const std::string& filename) {
 	return res;
 }
 
-void pipeline_cache::write_file(const std::string& filename, const std::vector<char>& content) {
+void pipeline_cache::write_file(const std::string& filename, const std::vector<unsigned char>& content) {
 	std::ofstream stream(filename, std::ios::binary | std::ios::trunc);
 	if(stream) {
-		stream.write(content.data(), content.size());
+		stream.write(reinterpret_cast<const char*>(content.data()), content.size());
 		stream.close();
 	}
 }
@@ -65,10 +65,7 @@ pipeline_cache::pipeline_cache(device& dev, bool file_read_only)
 pipeline_cache::~pipeline_cache() {
 	if(!native_pipeline_cache_) return;
 	if(file_read_only_) return;
-	size_t data_size = 0;
-	device_->getPipelineCacheData(*native_pipeline_cache_, &data_size, nullptr);
-	std::vector<char> content(data_size);
-	device_->getPipelineCacheData(*native_pipeline_cache_, &data_size, content.data());
+	std::vector<unsigned char> content = device_->getPipelineCacheData(*native_pipeline_cache_);
 	if(!boost::filesystem::equivalent(boost::filesystem::current_path(), cache_path_))
 		boost::filesystem::create_directories(cache_path_);
 	write_file(cache_filename().string(), content);

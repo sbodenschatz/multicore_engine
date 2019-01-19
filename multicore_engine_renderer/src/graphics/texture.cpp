@@ -4,7 +4,14 @@
  * Copyright 2017-2018 by Stefan Bodenschatz
  */
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4701)
+#endif
 #include <glm/gtc/type_precision.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #ifdef _MSC_VER
 #pragma warning(push)

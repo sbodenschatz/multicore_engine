@@ -33,7 +33,7 @@ private:
 	static boost::filesystem::path cache_path_;
 
 	std::vector<char> read_file(const std::string& filename);
-	void write_file(const std::string& filename, const std::vector<char>& content);
+	void write_file(const std::string& filename, const std::vector<unsigned char>& content);
 
 public:
 	/// \brief Attempts to load the pipeline cache from persistence storage or provides an empty cache if no
