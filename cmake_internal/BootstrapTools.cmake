@@ -36,7 +36,7 @@ function(bootstrap_tools)
 	print_list("	Forwarded variables for bootstrap" ${BOOTSTRAP_VAR_CMD})
 	if(MSVC)
 		file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools_bootstrap)
-		execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ${CMAKE_CURRENT_LIST_DIR}/../tools_bootstrap ${BOOTSTRAP_VAR_CMD} WORKING_DIRECTORY tools_bootstrap)
+		execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -A "${CMAKE_GENERATOR_PLATFORM}" ${CMAKE_CURRENT_LIST_DIR}/../tools_bootstrap ${BOOTSTRAP_VAR_CMD} WORKING_DIRECTORY tools_bootstrap)
 		execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release WORKING_DIRECTORY tools_bootstrap)
 		set(BOOTSTRAP_LOAD_UNIT_GEN
 			${CMAKE_BINARY_DIR}/tools_bootstrap/multicore_engine_load_unit_gen/Release/mce_load_unit_gen
