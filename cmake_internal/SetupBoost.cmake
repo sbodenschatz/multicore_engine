@@ -5,6 +5,7 @@ if(NOT DEFINED BOOST_ROOT)
 endif()
 find_package(Boost REQUIRED
 		COMPONENTS
+			system
 			thread
 			filesystem
 			program_options
