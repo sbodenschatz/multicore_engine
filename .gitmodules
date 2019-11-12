@@ -3,4 +3,4 @@
 	url = ../cmake_helpers.git
 [submodule "vkglformat"]
 	path = vkglformat
-	url = ../../Libs/vkglformat.git
+	url = ../vkglformat.git
