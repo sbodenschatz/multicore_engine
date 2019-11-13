@@ -20,6 +20,7 @@
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4005)
 #pragma warning(disable : 4701)
+#pragma warning(disable : 5054)
 #endif
 #include <gli/gli.hpp>
 #ifdef _MSC_VER
