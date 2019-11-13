@@ -36,8 +36,8 @@ TEST(containers_per_thread_test, thread_index_consistency) {
 	std::vector<std::thread> threads;
 	for(int i = 0; i < num_threads; ++i) {
 		threads.emplace_back([i, &res, &pt, &indices]() {
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(1ms);
+			//using namespace std::chrono_literals; //TODO: Find out why this causes an ICE on MSVC (VS 16.3.6)
+			std::this_thread::sleep_for(std::chrono::milliseconds(1)); //TODO: Use UDL again
 			auto index = pt.slot_index();
 			indices[i] = int(index);
 			for(int j = 0; j < 1024; ++j) {
@@ -67,8 +67,8 @@ TEST(containers_per_thread_test, object_access) {
 	std::vector<std::thread> threads;
 	for(int i = 0; i < num_threads; ++i) {
 		threads.emplace_back([i, &pt]() {
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(1ms);
+			//using namespace std::chrono_literals; //TODO: Find out why this causes an ICE on MSVC (VS 16.3.6)
+			std::this_thread::sleep_for(std::chrono::milliseconds(1)); //TODO: Use UDL again
 			pt.get() = i;
 		});
 	}
@@ -91,8 +91,8 @@ TEST(containers_per_thread_index_test, thread_index_consistency) {
 	std::vector<std::thread> threads;
 	for(int i = 0; i < num_threads; ++i) {
 		threads.emplace_back([i, &res, &pt, &indices]() {
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(1ms);
+			//using namespace std::chrono_literals; //TODO: Find out why this causes an ICE on MSVC (VS 16.3.6)
+			std::this_thread::sleep_for(std::chrono::milliseconds(1)); //TODO: Use UDL again
 			auto index = pt.slot_index();
 			indices[i] = int(index);
 			for(int j = 0; j < 1024; ++j) {
