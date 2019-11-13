@@ -41,7 +41,7 @@ graphics_system::graphics_system(core::engine& eng, windowing::window_system& wi
 							  vk::FenceCreateInfo(vk::FenceCreateFlagBits::eSignaled));
 				  })),
 		  current_swapchain_image_{0}, render_queue_cmd_pool_(device_, device_.graphics_queue_index().first),
-		  present_queue_cmd_pool_(device_, device_.transfer_queue_index().first),
+		  present_queue_cmd_pool_(device_, device_.present_queue_index().first),
 		  render_queue_start_frame_cmd_buffers_(
 				  window_.swapchain_images().size(), containers::generator_param([this](size_t) {
 					  return render_queue_cmd_pool_.allocate_primary_command_buffer();
