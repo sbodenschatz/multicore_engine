@@ -54,7 +54,7 @@ public:
 		cv.wait(guard, [this] { return !queue.empty(); });
 		T value = std::move(queue.front());
 		queue.pop();
-		return std::move(value);
+		return value;
 	}
 
 	/// \brief If an element is available at the front of the queue it is assigned to target and true is
