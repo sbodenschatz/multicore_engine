@@ -42,8 +42,8 @@ void pipeline_cache::write_file(const std::string& filename, const std::vector<u
 
 pipeline_cache::pipeline_cache(device& dev, bool file_read_only)
 		: device_(dev), file_read_only_{file_read_only} {
-	std::copy(dev.physical_device_properties().pipelineCacheUUID,
-			  dev.physical_device_properties().pipelineCacheUUID + VK_UUID_SIZE, uuid_);
+	std::copy(dev.physical_device_properties().pipelineCacheUUID.begin(),
+			  dev.physical_device_properties().pipelineCacheUUID.end(), uuid_);
 	uuid_str_.reserve(2 * VK_UUID_SIZE);
 	auto hex_digit = [](auto val) -> char { return char((val < 10) ? ('0' + val) : ('A' + (val - 10))); };
 	for(int i = 0; i < VK_UUID_SIZE; ++i) {
