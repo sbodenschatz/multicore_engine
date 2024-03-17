@@ -21,7 +21,7 @@
 #include <mce/util/unused.hpp>
 #include <vector>
 
-#if (!defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE) &&                      \
+#if(!defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE) &&                      \
 		((GLM_CONFIG_CLIP_CONTROL & GLM_CLIP_CONTROL_ZO_BIT) == 0)
 #error "A GLM version supporting GLM_FORCE_DEPTH_ZERO_TO_ONE is required for vulkan."
 #endif
@@ -245,10 +245,10 @@ void device::create_device() {
 
 device::~device() {}
 
-boost::optional<vk::Format> device::best_supported_format_try(vk::ArrayProxy<const vk::Format> candidates,
-															  vk::FormatFeatureFlags required_flags,
-															  format_support_query_type query_type) const
-		noexcept {
+boost::optional<vk::Format>
+device::best_supported_format_try(vk::ArrayProxy<const vk::Format> candidates,
+								  vk::FormatFeatureFlags required_flags,
+								  format_support_query_type query_type) const noexcept {
 	auto member = (query_type == format_support_query_type::optimal_tiling_image)
 						  ? &vk::FormatProperties::optimalTilingFeatures
 						  : ((query_type == format_support_query_type::linear_tiling_image)

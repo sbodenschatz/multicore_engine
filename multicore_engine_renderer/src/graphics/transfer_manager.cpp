@@ -28,8 +28,8 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 		  ring_slots{ring_slots}, running_jobs{ring_slots},
 		  staging_buffer(dev, mm, &dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc,
 						 vk::MemoryPropertyFlagBits::eHostVisible),
-		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()}, staging_buffer_ends{
-																						ring_slots, nullptr} {
+		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()},
+		  staging_buffer_ends{ring_slots, nullptr} {
 	transfer_command_bufers.reserve(ring_slots);
 	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
 		pending_ownership_command_buffers.reserve(ring_slots);

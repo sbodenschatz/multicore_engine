@@ -32,8 +32,8 @@ simple_descriptor_pool::~simple_descriptor_pool() {}
 
 simple_descriptor_pool::simple_descriptor_pool(simple_descriptor_pool&& other) noexcept
 		: dev_{other.dev_}, native_pool_{std::move(other.native_pool_)},
-		  max_resources_{std::move(other.max_resources_)}, available_resources_{
-																   std::move(other.available_resources_)} {
+		  max_resources_{std::move(other.max_resources_)},
+		  available_resources_{std::move(other.available_resources_)} {
 	other.dev_ = nullptr;
 }
 simple_descriptor_pool& simple_descriptor_pool::operator=(simple_descriptor_pool&& other) noexcept {
