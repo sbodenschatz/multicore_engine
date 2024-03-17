@@ -5,6 +5,7 @@
  */
 
 #ifdef MULTICORE_ENGINE_WINDOWS
+#define NOMINMAX // Prevent minwindef.h from breaking the C++ standard library by defining min and max macros.
 #include <windows.h> //Fix macro redefinition error in glfw header
 #endif
 
