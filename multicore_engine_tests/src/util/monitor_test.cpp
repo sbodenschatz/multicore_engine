@@ -28,7 +28,7 @@ struct monitor_test_object {
 	bool check() const {
 		return std::all_of(std::begin(data), std::end(data), [&](auto val) { return val == data[0]; });
 	}
-	bool operator==(const monitor_test_object& other) {
+	bool operator==(const monitor_test_object& other) const {
 		return std::equal(std::begin(data), std::end(data), std::begin(other.data), std::end(other.data));
 	}
 };
