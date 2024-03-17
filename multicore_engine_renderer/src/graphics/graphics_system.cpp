@@ -100,7 +100,10 @@ void graphics_system::prerender(const mce::core::frame_time&) {
 			device_->acquireNextImageKHR(window_.swapchain(), ~0ull, tmp_semaphore_.get(), vk::Fence());
 	if(acq_res.result == vk::Result::eSuccess) {
 		current_swapchain_image_ = acq_res.value;
-		device_->waitForFences(fences_[current_swapchain_image_].get(), true, ~0u);
+		auto fence_wait_res = device_->waitForFences(fences_[current_swapchain_image_].get(), true, ~0u);
+		if(fence_wait_res == vk::Result::eTimeout) {
+			throw mce::graphics_exception("waiting for fence timed out.");
+		}
 		device_->resetFences(fences_[current_swapchain_image_].get());
 		using std::swap;
 		swap(tmp_semaphore_, acquire_semaphores_[current_swapchain_image_]);
@@ -144,8 +147,11 @@ void graphics_system::postrender(const mce::core::frame_time&) {
 				vk::Fence{});
 	}
 	auto swapchain_handle = window_.swapchain();
-	device_.present_queue().presentKHR(
+	auto present_result = device_.present_queue().presentKHR(
 			vk::PresentInfoKHR(1, &present_sema, 1, &swapchain_handle, &current_swapchain_image_));
+	if(present_result == vk::Result::eSuboptimalKHR) {
+		// TODO: Handle suboptimal
+	}
 	transfer_manager_.end_frame();
 }
 
