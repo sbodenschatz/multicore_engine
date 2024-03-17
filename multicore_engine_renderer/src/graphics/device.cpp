@@ -112,7 +112,7 @@ void device::find_physical_device() {
 	util::preference_sort(suitable_phy_devs, device_type_preferences_,
 						  [](const vk::PhysicalDevice& pd) { return pd.getProperties().deviceType; });
 	util::preference_sort(suitable_phy_devs, device_preferences_, [](const vk::PhysicalDevice& pd) {
-		return std::string(pd.getProperties().deviceName);
+		return std::string(pd.getProperties().deviceName.data());
 	});
 
 	physical_device_ = suitable_phy_devs.front();
