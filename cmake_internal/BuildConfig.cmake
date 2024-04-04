@@ -33,8 +33,8 @@ find_package(gli REQUIRED)
 find_package(glfw3 REQUIRED)
 
 include(SetupZLIB)
-include(SetupGLM)
 include(SetupVulkan)
+include(SetupGLM)
 include(SetupGTest)
 include(SetupBoost)
 

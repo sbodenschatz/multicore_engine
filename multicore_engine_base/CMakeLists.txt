@@ -13,7 +13,7 @@ target_include_directories(mce_base PUBLIC
 	)
 target_link_libraries(mce_base 
 		mce_compiler_settings 
-		glm
+		glm::glm
 		ZLIB::ZLIB
 		Boost::disable_autolinking
 		Boost::boost

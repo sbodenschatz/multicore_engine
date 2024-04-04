@@ -2,7 +2,7 @@ include_guard()
 
 find_package(glm REQUIRED)
 set_property(
-	TARGET glm
+	TARGET glm::glm
 	APPEND
 	PROPERTY INTERFACE_COMPILE_DEFINITIONS
 		GLM_FORCE_RADIANS 
@@ -11,7 +11,7 @@ set_property(
 		GLM_ENABLE_EXPERIMENTAL
 	)
 set_property(
-	TARGET glm
+	TARGET glm::glm
 	APPEND
 	PROPERTY INTERFACE_COMPILE_OPTIONS
 		$<$<CXX_COMPILER_ID:MSVC>:/wd4201>
