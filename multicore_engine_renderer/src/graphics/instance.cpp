@@ -20,6 +20,7 @@
 #include <mce/util/unused.hpp>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_set>
 #include <vulkan/vulkan.hpp>
 
 #if(!defined(GLM_DEPTH_CLIP_SPACE) || GLM_DEPTH_CLIP_SPACE != GLM_DEPTH_ZERO_TO_ONE) &&                      \
@@ -68,9 +69,18 @@ instance::instance(const core::software_metadata& engine_metadata,
 
 	extensions = glfw_instance.required_vulkan_instance_extensions();
 
+	auto supported_layers_props = vk::enumerateInstanceLayerProperties();
+	std::unordered_set<std::string> supported_layer_names;
+	std::transform(supported_layers_props.begin(), supported_layers_props.end(),
+				   std::inserter(supported_layer_names, supported_layer_names.end()),
+				   [](const auto& prop) { return prop.layerName; });
+
 	std::copy(exts.begin(), exts.end(), std::back_inserter(extensions));
 	if(validation_level > 0) {
-		layers.emplace_back("VK_LAYER_LUNARG_standard_validation");
+		std::string validation_layer_name = "VK_LAYER_LUNARG_standard_validation";
+		if(supported_layer_names.contains(validation_layer_name)) {
+			layers.emplace_back(validation_layer_name);
+		}
 		extensions.emplace_back("VK_EXT_debug_report");
 	}
 	std::sort(extensions.begin(), extensions.end());
