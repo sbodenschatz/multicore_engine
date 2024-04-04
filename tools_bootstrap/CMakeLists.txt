@@ -1,4 +1,6 @@
 cmake_minimum_required (VERSION 3.10)
+cmake_policy(VERSION 3.10...3.29)
+
 project (multicore_engine_tools
 		VERSION ${BUILD_VERSION_MAJOR}.${BUILD_VERSION_MINOR}.${BUILD_VERSION_PATCH}.${BUILD_VERSION_TWEAK}
 		# Language C is needed for phthreads detection to work correctly

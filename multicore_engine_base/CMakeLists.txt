@@ -1,4 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
+cmake_policy(VERSION 3.10...3.29)
 
 configure_file(src/core/version.cpp.in src/core/version.cpp)
 file(GLOB_RECURSE BASE_SRC "src/*.cpp")
