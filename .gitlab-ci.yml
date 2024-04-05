@@ -182,7 +182,8 @@ msvc-release-build-tags:
     <<: *msbuild-build-task
     <<: *artifact-spec-build-windows
 
-mingw-debug-build:
+# Currently disabled as TBB has various problems with MingGW
+.mingw-debug-build:
     variables:
         BUILD_CXX_COMPILER: "g++"
         BUILD_C_COMPILER: "gcc"
@@ -193,7 +194,8 @@ mingw-debug-build:
     - win-cpp
     <<: *mingw-build-task
 
-mingw-release-build:
+# Currently disabled as TBB has various problems with MingGW
+.mingw-release-build:
     variables:
         BUILD_CXX_COMPILER: "g++"
         BUILD_C_COMPILER: "gcc"
