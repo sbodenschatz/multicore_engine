@@ -78,7 +78,7 @@ instance::instance(const core::software_metadata& engine_metadata,
 	std::copy(exts.begin(), exts.end(), std::back_inserter(extensions));
 	if(validation_level > 0) {
 		std::string validation_layer_name = "VK_LAYER_LUNARG_standard_validation";
-		if(supported_layer_names.contains(validation_layer_name)) {
+		if(supported_layer_names.find(validation_layer_name) != supported_layer_names.end()) {
 			layers.emplace_back(validation_layer_name);
 		}
 		extensions.emplace_back("VK_EXT_debug_report");

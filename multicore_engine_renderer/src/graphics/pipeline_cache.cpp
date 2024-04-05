@@ -46,7 +46,7 @@ pipeline_cache::pipeline_cache(device& dev, bool file_read_only)
 			  dev.physical_device_properties().pipelineCacheUUID.end(), uuid_);
 	uuid_str_.reserve(2 * VK_UUID_SIZE);
 	auto hex_digit = [](auto val) -> char { return char((val < 10) ? ('0' + val) : ('A' + (val - 10))); };
-	for(int i = 0; i < VK_UUID_SIZE; ++i) {
+	for(unsigned int i = 0; i < VK_UUID_SIZE; ++i) {
 		if(i % 4 == 0 && i != 0) uuid_str_ += '-';
 		uuid_str_ += hex_digit((uuid_[i] & 0xF0u) >> 4);
 		uuid_str_ += hex_digit(uuid_[i] & 0x0Fu);
