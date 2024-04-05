@@ -17,7 +17,6 @@
 #include <mce/model/model_data_manager.hpp>
 #include <mce/util/statistics.hpp>
 #include <sstream>
-#include <tbb/task_scheduler_init.h>
 
 namespace mce {
 namespace core {
@@ -78,7 +77,8 @@ void engine::initialize_stats() {
 }
 
 void engine::run() {
-	tsi = std::make_unique<tbb::task_scheduler_init>(max_general_concurrency_);
+	tbb_concurrency_control = std::make_unique<oneapi::tbb::global_control>(
+			oneapi::tbb::global_control::max_allowed_parallelism, max_general_concurrency_);
 	core::clock clk;
 	running_ = true;
 	while(running()) {

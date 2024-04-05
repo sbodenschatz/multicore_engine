@@ -18,12 +18,9 @@
 #include <mce/core/version.hpp>
 #include <mce/util/type_id.hpp>
 #include <memory>
+#include <oneapi/tbb/global_control.h>
 #include <utility>
 #include <vector>
-
-namespace tbb {
-class task_scheduler_init;
-} // namespace tbb
 
 namespace mce {
 namespace asset {
@@ -54,7 +51,7 @@ struct engine_core_stats_pimpl;
 /// Represents the central management class for the subsystems of the engine.
 class engine {
 	uint32_t max_general_concurrency_;
-	std::unique_ptr<tbb::task_scheduler_init> tsi;
+	std::unique_ptr<oneapi::tbb::global_control> tbb_concurrency_control;
 	std::atomic<bool> running_;
 	software_metadata engine_metadata_;
 	software_metadata application_metadata_;
