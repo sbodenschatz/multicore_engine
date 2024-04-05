@@ -16,8 +16,9 @@
 #include <boost/variant.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/device.hpp>
-#include <vulkan/vulkan.hpp>
 #include <mce/graphics/unique_handle.hpp>
+#include <variant>
+#include <vulkan/vulkan.hpp>
 
 namespace mce {
 namespace graphics {
@@ -35,7 +36,7 @@ using fake_unique_device_memory = unique_handle<vk::DeviceMemory, fake_device_me
 /// Wraps either a vk::UniqueDeviceMemory, a fake_unique_device_memory or is empty.
 // cppcheck-suppress copyCtorAndEqOperator
 class device_memory_wrapper {
-	boost::variant<boost::blank, vk::UniqueDeviceMemory, fake_unique_device_memory> handle_;
+	std::variant<boost::blank, vk::UniqueDeviceMemory, fake_unique_device_memory> handle_;
 
 public:
 	/// Creates a wrapper containing a vk::UniqueDeviceMemory.
@@ -77,7 +78,7 @@ public:
 			}
 		};
 		visitor v;
-		return handle_.apply_visitor(v);
+		return std::visit(v, handle_);
 	}
 	/// Allows access to the contained non-owning device memory handle.
 	const vk::DeviceMemory& get() const {
@@ -93,7 +94,7 @@ public:
 			}
 		};
 		visitor v;
-		return handle_.apply_visitor(v);
+		return std::visit(v, handle_);
 	}
 	/// Allows access to the contained non-owning device memory handle.
 	vk::DeviceMemory get() {
@@ -109,7 +110,7 @@ public:
 			}
 		};
 		visitor v;
-		return handle_.apply_visitor(v);
+		return std::visit(v, handle_);
 	}
 };
 
