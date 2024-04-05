@@ -308,7 +308,7 @@ public:
 		if(!try_immediate_alloc_buffer(data.get(), data_size, dst_buffer, dst_offset,
 									   std::forward<F>(callback))) {
 			waiting_jobs.push_back(
-					buffer_transfer_job(std::move(data), data_size, nullptr, dst_buffer, dst_offset,
+					buffer_transfer_job(data, data_size, nullptr, dst_buffer, dst_offset,
 										take_callback<void(vk::Buffer)>(std::forward<F>(callback))));
 		}
 	}
