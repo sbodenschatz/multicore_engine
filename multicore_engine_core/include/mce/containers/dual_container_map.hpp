@@ -124,7 +124,7 @@ public:
 	 * different containers and the connection is only formed by matching indexes.
 	 */
 	template <typename It_Map, typename It_Key, typename It_Value>
-	class iterator_ : public std::iterator<std::random_access_iterator_tag, std::pair<It_Key&, It_Value&>> {
+	class iterator_{
 		size_t index;
 		It_Map* map;
 
@@ -137,8 +137,14 @@ public:
 		friend class dual_container_map_base;
 
 	public:
+		using iterator_category = std::random_access_iterator_tag;
+		using value_type = std::pair<It_Key&, It_Value&>;
+		using difference_type = ptrdiff_t;
+		using pointer = std::pair<It_Key&, It_Value&>*;
 		/// The type referenced by the iterator.
-		typedef typename iterator_::value_type reference;
+		using reference = std::pair<It_Key&, It_Value&>;
+
+
 		/// Disallow default-construction.
 		iterator_() = delete;
 
