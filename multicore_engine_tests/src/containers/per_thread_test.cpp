@@ -4,6 +4,7 @@
  * Copyright 2017 by Stefan Bodenschatz
  */
 
+#include <algorithm>
 #include <chrono>
 #include <gtest.hpp>
 #include <mce/containers/per_thread.hpp>
