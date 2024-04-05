@@ -12,7 +12,6 @@
  * Defines the simple_uniform_buffer class.
  */
 
-#include <glm/gtx/type_trait.hpp>
 #include <mce/exceptions.hpp>
 #include <mce/graphics/buffer.hpp>
 #include <mce/memory/align.hpp>
