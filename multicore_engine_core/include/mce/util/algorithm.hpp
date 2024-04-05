@@ -212,7 +212,7 @@ It grouped_foreach(It begin, It end, ElementFunc element_func, ParentPred parent
 /// nested groups defined by foreach_grouping objects in the groups parameter.
 /**
  * The range is required to be sorted according to the grouping criteria.
- * The groupings are defined using foreach_grouping object.
+ * The groupings are defined using foreach_grouping objects.
  * The helper function make_foreach_grouping provides template argument deduction for creating
  * foreach_grouping objects if no C++17 class template argument deduction is available.
  *
