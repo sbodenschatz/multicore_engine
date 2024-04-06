@@ -19,7 +19,7 @@ stages:
         paths: *cache-paths
         key: "%CI_COMMIT_REF_SLUG%-%CI_JOB_NAME%-%CI_RUNNER_ID%"
 
-.artifacts-spec-build-linux-template: &artifact-spec-build-linux
+.artifacts-spec-build-template: &artifact-spec-build
     artifacts:
         name: "mce_${CI_COMMIT_REF_SLUG}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
         expire_in: 1 day
@@ -120,7 +120,7 @@ gcc-release-build:
         BUILD_POSTFIX: ""
     image: $CI_BUILD_IMAGE_BASE/gcc/release
     <<: *linux-build-task
-    <<: *artifact-spec-build-linux
+    <<: *artifact-spec-build
 
 clang-debug-build:
     variables:
@@ -144,7 +144,7 @@ clang-release-build:
         BUILD_POSTFIX: ""
     image: $CI_BUILD_IMAGE_BASE/clang/release
     <<: *linux-build-task
-    <<: *artifact-spec-build-linux
+    <<: *artifact-spec-build
 
 scan-build:
     dependencies: []
