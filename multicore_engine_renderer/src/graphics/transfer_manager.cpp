@@ -6,6 +6,7 @@
 
 #include <boost/container/small_vector.hpp>
 #include <cassert>
+#include <mce/exceptions.hpp>
 #include <mce/graphics/sync_utils.hpp>
 #include <mce/graphics/transfer_manager.hpp>
 #include <utility>
@@ -27,8 +28,8 @@ transfer_manager::transfer_manager(device& dev, device_memory_manager_interface&
 		  ring_slots{ring_slots}, running_jobs{ring_slots},
 		  staging_buffer(dev, mm, &dqm, 1 << 27, vk::BufferUsageFlagBits::eTransferSrc,
 						 vk::MemoryPropertyFlagBits::eHostVisible),
-		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()}, staging_buffer_ends{
-																						ring_slots, nullptr} {
+		  chunk_placer{staging_buffer.mapped_pointer(), staging_buffer.size()},
+		  staging_buffer_ends{ring_slots, nullptr} {
 	transfer_command_bufers.reserve(ring_slots);
 	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {
 		pending_ownership_command_buffers.reserve(ring_slots);
@@ -139,7 +140,10 @@ void transfer_manager::start_frame_internal(uint32_t ring_index, std::unique_loc
 	auto jobs = job_scratch_pad.get();
 	current_ring_index = ring_index;
 	auto nd = dev.native_device();
-	nd.waitForFences({fences[current_ring_index].get()}, true, ~0ull);
+	auto fence_wait_res = nd.waitForFences({fences[current_ring_index].get()}, true, ~0ull);
+	if(fence_wait_res == vk::Result::eTimeout) {
+		throw mce::graphics_exception("waiting for fence timed out.");
+	}
 	dqm.cleanup_and_set_current(ring_index);
 	transfer_command_bufers[current_ring_index]->reset({});
 	if(dev.graphics_queue_index().first != dev.transfer_queue_index().first) {

@@ -32,8 +32,8 @@ simple_descriptor_pool::~simple_descriptor_pool() {}
 
 simple_descriptor_pool::simple_descriptor_pool(simple_descriptor_pool&& other) noexcept
 		: dev_{other.dev_}, native_pool_{std::move(other.native_pool_)},
-		  max_resources_{std::move(other.max_resources_)}, available_resources_{
-																   std::move(other.available_resources_)} {
+		  max_resources_{std::move(other.max_resources_)},
+		  available_resources_{std::move(other.available_resources_)} {
 	other.dev_ = nullptr;
 }
 simple_descriptor_pool& simple_descriptor_pool::operator=(simple_descriptor_pool&& other) noexcept {
@@ -62,8 +62,8 @@ simple_descriptor_pool::allocate_descriptor_set(const std::shared_ptr<const desc
 	}
 	auto res = (*dev_)->allocateDescriptorSets(&ai, &set);
 	available_resources_ -= req;
-	return descriptor_set(*dev_, vk::createResultValue(res, set, "vk::Device::allocateDescriptorSets"),
-						  store_layout ? layout : std::shared_ptr<descriptor_set_layout>());
+	vk::resultCheck(res, "vk::Device::allocateDescriptorSets failed");
+	return descriptor_set(*dev_, set, store_layout ? layout : std::shared_ptr<descriptor_set_layout>());
 }
 
 std::vector<descriptor_set> simple_descriptor_pool::allocate_descriptor_sets(

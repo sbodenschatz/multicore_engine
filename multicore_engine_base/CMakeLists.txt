@@ -1,4 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
+cmake_policy(VERSION 3.10...3.29)
 
 configure_file(src/core/version.cpp.in src/core/version.cpp)
 file(GLOB_RECURSE BASE_SRC "src/*.cpp")
@@ -12,7 +13,7 @@ target_include_directories(mce_base PUBLIC
 	)
 target_link_libraries(mce_base 
 		mce_compiler_settings 
-		glm
+		glm::glm
 		ZLIB::ZLIB
 		Boost::disable_autolinking
 		Boost::boost

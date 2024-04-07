@@ -432,7 +432,7 @@ public:
 
 	/// Implements a forward iterator over the active objects in an unordered_object_pool.
 	template <typename It_T, typename Target_T>
-	class iterator_ : public std::iterator<std::forward_iterator_tag, It_T> {
+	class iterator_ {
 		Target_T target;
 		friend class unordered_object_pool<T, block_size>;
 
@@ -441,6 +441,12 @@ public:
 		}
 
 	public:
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = It_T;
+		using difference_type = ptrdiff_t;
+		using pointer = It_T*;
+		using reference = It_T&;
+
 		/// Creates an past-end iterator.
 		iterator_() : target{nullptr, nullptr} {}
 

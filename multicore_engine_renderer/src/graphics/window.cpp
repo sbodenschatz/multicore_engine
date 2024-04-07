@@ -5,6 +5,7 @@
  */
 
 #ifdef MULTICORE_ENGINE_WINDOWS
+#define NOMINMAX // Prevent minwindef.h from breaking the C++ standard library by defining min and max macros.
 #include <windows.h> //Fix macro redefinition error in glfw header
 #endif
 
@@ -61,7 +62,7 @@ void window::configure_surface_format() {
 		auto format_preferences = util::make_array( // vk::Format::eB8G8R8A8Srgb
 				vk::Format::eB8G8R8A8Unorm
 				// TODO Place other preferred formats here
-				);
+		);
 		util::preference_sort(surface_formats, format_preferences, [](const auto& v) { return v.format; });
 		color_space_ = surface_formats[0].colorSpace;
 		surface_format_ = surface_formats[0].format;
@@ -124,10 +125,10 @@ void window::create_swapchain() {
 }
 
 framebuffer_config
-		// cppcheck-suppress passedByValue
-		window::make_framebuffer_config(std::vector<framebuffer_attachment_config> additional_attachments,
-										// cppcheck-suppress passedByValue
-										std::vector<framebuffer_pass_config> passes) {
+// cppcheck-suppress passedByValue
+window::make_framebuffer_config(std::vector<framebuffer_attachment_config> additional_attachments,
+								// cppcheck-suppress passedByValue
+								std::vector<framebuffer_pass_config> passes) {
 	framebuffer_config res{std::move(additional_attachments), std::move(passes)};
 	framebuffer_attachment_config swapchain_attachment(surface_format_);
 	swapchain_attachment.is_swapchain_image_ = true;

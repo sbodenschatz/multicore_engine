@@ -521,7 +521,15 @@ public:
 	 * type of iterators should never be dereferenced (like past-end-iterators).
 	 */
 	template <typename It_T, typename Target_T>
-	class iterator_ : public std::iterator<std::forward_iterator_tag, It_T> {
+	class iterator_ {
+	public:
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = It_T;
+		using difference_type = ptrdiff_t;
+		using pointer = It_T*;
+		using reference = It_T&;
+
+	private:
 		Target_T target;
 		const smart_object_pool<T, block_size>* pool;
 		bool is_limiter = false;

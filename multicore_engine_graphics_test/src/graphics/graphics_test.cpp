@@ -173,7 +173,7 @@ graphics_test::graphics_test()
 	vertex vertices[] = {{{0.0f, -1.0f, 0.2f}, {1.0f, 0.0f, 0.0f}}, {{-1.0f, 1.0f, 0.2f}, {0.0f, 1.0f, 0.0f}},
 						 {{1.0f, 1.0f, 0.2f}, {0.0f, 0.0f, 1.0f}},
 
-						 {{0.0f, 1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}},  {{1.0f, -1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}},
+						 {{0.0f, 1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}},	{{1.0f, -1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}},
 						 {{-1.0f, -1.0f, 0.1f}, {1.0f, 0.0f, 0.0f}}};
 	tmgr_.upload_buffer(vertices, sizeof(vertices), vertex_buffer_.native_buffer(), 0,
 						[this](vk::Buffer) { //
@@ -196,7 +196,11 @@ graphics_test::graphics_test()
 graphics_test::~graphics_test() {
 	containers::dynamic_array<vk::Fence> tmp(
 			fences_.size(), containers::generator_param([this](size_t i) { return fences_[i].get(); }));
-	dev_->waitForFences({uint32_t(tmp.size()), tmp.data()}, true, ~0u);
+	auto wait_result = dev_->waitForFences({uint32_t(tmp.size()), tmp.data()}, true, ~0u);
+	if(wait_result == vk::Result::eTimeout) {
+		std::cerr << "waiting for fence timed out.";
+		std::terminate();
+	}
 }
 
 void graphics_test::run() {
@@ -206,7 +210,10 @@ void graphics_test::run() {
 	while(!glfw_win_.should_close()) {
 		auto acq_res = dev_->acquireNextImageKHR(win_.swapchain(), ~0ull, tmp_semaphore_.get(), vk::Fence());
 		auto img_index = acq_res.value;
-		dev_->waitForFences(fences_[img_index].get(), true, ~0u);
+		auto wait_result = dev_->waitForFences(fences_[img_index].get(), true, ~0u);
+		if(wait_result == vk::Result::eTimeout) {
+			throw mce::graphics_exception("waiting for fence timed out.");
+		}
 		dev_->resetFences(fences_[img_index].get());
 		using std::swap;
 		swap(tmp_semaphore_, acquire_semaphores_[acq_res.value]);
@@ -287,8 +294,11 @@ void graphics_test::run() {
 								cmd_buff_handles.data(), 1, &present_sema)},
 				fences_[img_index].get());
 		auto swapchain_handle = win_.swapchain();
-		dev_.present_queue().presentKHR(
+		auto present_result = dev_.present_queue().presentKHR(
 				vk::PresentInfoKHR(1, &present_sema, 1, &swapchain_handle, &img_index));
+		if(present_result == vk::Result::eSuboptimalKHR) {
+			// TODO: Handle suboptimal
+		}
 		tmgr_.end_frame();
 	}
 }

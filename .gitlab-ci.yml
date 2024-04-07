@@ -19,14 +19,14 @@ stages:
         paths: *cache-paths
         key: "%CI_COMMIT_REF_SLUG%-%CI_JOB_NAME%-%CI_RUNNER_ID%"
 
-.artifacts-spec-build-linux-template: &artifact-spec-build-linux
+.artifacts-spec-build-template: &artifact-spec-build
     artifacts:
         name: "mce_${CI_COMMIT_REF_SLUG}_${CI_JOB_ID}_${CI_COMMIT_SHA}_${CI_JOB_NAME}"
         expire_in: 1 week
         paths:
         - ${BUILD_COMPILER_NAME}
 
-.artifacts-spec-build-windows-template: &artifact-spec-build-windows
+.artifacts-spec-build-cmd-template: &artifact-spec-build-cmd
     artifacts:
         name: "mce_%CI_COMMIT_REF_SLUG%_%CI_JOB_ID%_%CI_COMMIT_SHA%_%CI_JOB_NAME%"
         expire_in: 1 week
@@ -68,7 +68,7 @@ stages:
     script:
     - cmake -E make_directory build
     - cd build
-    - cmake -U*_DIR -DCMAKE_INSTALL_PREFIX=%BUILD_COMPILER_NAME% -G "Visual Studio 16 2019" -A x64 ..
+    - cmake -U*_DIR -DCMAKE_INSTALL_PREFIX=%BUILD_COMPILER_NAME% -G "Visual Studio 17 2022" -A x64 ..
     - cmake --build . --config %BUILD_TYPE% -- /m:%BUILD_CONCURRENCY%
     - ctest -C %BUILD_TYPE% --output-on-failure
     - cmake --build . --config %BUILD_TYPE% --target INSTALL -- /m:%BUILD_CONCURRENCY%
@@ -83,7 +83,7 @@ stages:
     variables:
         GIT_STRATEGY: none
     script:
-    - sha1sum -b gcc/assets/* clang/assets/* msvc/assets/* mingw/assets/* > checksums.txt
+    - sha1sum -b gcc/assets/* clang/assets/* msvc/assets/* > checksums.txt
     - cat checksums.txt | sort
     - cat cloc_report.txt
     image: alpine:latest
@@ -122,7 +122,7 @@ gcc-release-build:
         BUILD_POSTFIX: ""
     image: $CI_REGISTRY/ci-util/cpp/gcc/release
     <<: *linux-build-task
-    <<: *artifact-spec-build-linux
+    <<: *artifact-spec-build
 
 clang-debug-build:
     variables:
@@ -146,7 +146,7 @@ clang-release-build:
         BUILD_POSTFIX: ""
     image: $CI_REGISTRY/ci-util/cpp/clang/release
     <<: *linux-build-task
-    <<: *artifact-spec-build-linux
+    <<: *artifact-spec-build
 
 msvc-debug-build:
     variables:
@@ -167,7 +167,7 @@ msvc-release-build:
     except:
     - tags
     <<: *msbuild-build-task
-    <<: *artifact-spec-build-windows
+    <<: *artifact-spec-build
 
 msvc-release-build-tags:
     variables:
@@ -180,9 +180,10 @@ msvc-release-build-tags:
     only:
     - tags
     <<: *msbuild-build-task
-    <<: *artifact-spec-build-windows
+    <<: *artifact-spec-build
 
-mingw-debug-build:
+# Currently disabled as TBB has various problems with MingGW
+.mingw-debug-build:
     variables:
         BUILD_CXX_COMPILER: "g++"
         BUILD_C_COMPILER: "gcc"
@@ -193,7 +194,8 @@ mingw-debug-build:
     - win-cpp
     <<: *mingw-build-task
 
-mingw-release-build:
+# Currently disabled as TBB has various problems with MingGW
+.mingw-release-build:
     variables:
         BUILD_CXX_COMPILER: "g++"
         BUILD_C_COMPILER: "gcc"
@@ -203,7 +205,7 @@ mingw-release-build:
     tags:
     - win-cpp
     <<: *mingw-build-task
-    <<: *artifact-spec-build-windows
+    <<: *artifact-spec-build
 
 scan-build:
     dependencies: []

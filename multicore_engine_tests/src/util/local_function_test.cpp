@@ -66,8 +66,15 @@ struct test_class {
 
 TEST(util_local_function_test, call_memfn_void) {
 	test_class obj;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif // __GNUC__
 	local_function<128, void(test_class&)> f = std::mem_fn(&test_class::foo);
 	f(obj);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif // __GNUC__
 	ASSERT_TRUE(obj.x == 42);
 }
 

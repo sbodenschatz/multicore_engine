@@ -115,7 +115,7 @@ public:
 	* Satisfies the requirements of the RandomAccessIterator concept.
 	*/
 	template <typename It_Map, typename It, typename It_T>
-	class iterator_ : public std::iterator<std::random_access_iterator_tag, It_T> {
+	class iterator_ {
 		It iterator;
 
 		explicit iterator_(It iterator) noexcept : iterator(iterator) {}
@@ -127,6 +127,12 @@ public:
 		friend class generic_flat_map_base;
 
 	public:
+		using iterator_category = std::random_access_iterator_tag;
+		using value_type = It_T;
+		using difference_type = ptrdiff_t;
+		using pointer = It_T*;
+		using reference = It_T&;
+
 		/// Disallow default-construction.
 		iterator_() = delete;
 

@@ -31,7 +31,9 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_
 	std::transform(pipeline_configs.begin(), pipeline_configs.end(), std::back_inserter(pipelines_ci),
 				   [&](pipeline_config& pcfg) { return pcfg.generate_create_info_structure(); });
 	auto native_pipelines =
-			owner_dev.createGraphicsPipelinesUnique(pipeline_cache.native_pipeline_cache(), pipelines_ci);
+			owner_dev.createGraphicsPipelinesUnique(pipeline_cache.native_pipeline_cache(), pipelines_ci)
+					.value; // We aren't using VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT, thus
+							// we don't need to watch for VK_PIPELINE_COMPILE_REQUIRED here
 	pipelines.reserve(native_pipelines.size());
 	std::transform(pipeline_configs.begin(), pipeline_configs.end(), native_pipelines.begin(),
 				   std::back_inserter(pipelines),
@@ -43,7 +45,11 @@ std::vector<pipeline> pipeline::create_pipelines(const device& dev, destruction_
 pipeline pipeline::create_pipeline(const device& dev, destruction_queue_manager* dqm,
 								   pipeline_cache& pipeline_cache, pipeline_config pipeline_cfg) {
 	vk::GraphicsPipelineCreateInfo ci = pipeline_cfg.generate_create_info_structure();
-	return pipeline(dqm, dev->createGraphicsPipelineUnique(pipeline_cache.native_pipeline_cache(), ci),
+	return pipeline(dqm,
+					dev->createGraphicsPipelineUnique(pipeline_cache.native_pipeline_cache(), ci)
+							// We aren't using VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT, thus
+							// we don't need to watch for VK_PIPELINE_COMPILE_REQUIRED here
+							.value,
 					pipeline_cfg.layout());
 }
 

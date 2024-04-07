@@ -22,6 +22,7 @@
 #include <mce/util/unused.hpp>
 #include <numeric>
 #include <string>
+#include <fstream>
 
 #include <iostream>
 

@@ -18,7 +18,6 @@
 #include <mce/containers/smart_object_pool.hpp>
 #include <mce/exceptions.hpp>
 #include <tbb/blocked_range.h>
-#include <tbb/tbb_stddef.h>
 
 namespace mce {
 namespace containers {
